@@ -1,11 +1,11 @@
-# Writes the web color map and the web normal map of the Tripo rabbit from the maps of its FBX
-# (design 4.5, assets/models/rabbit/README.md, "Color map" and "Normal map"). The color map is the
-# source image at 2048 pixels, with no change of a color out of the eyes: the fur, the brows, and
-# the eye paint stay as the FBX shows them. The iris of each eye moves (`shift_eyes()`), and the
-# lash line of each upper lid gets lighter (`soft_lash()`). The normal map
-# limits each tilt of the source, scales it to 1024 pixels, and stores the tilts times
-# NORMAL_MAP_GAIN of src/scene/fur.ts. The output depends only on the input files and on cwebp
-# 1.5.0.
+# Writes the web maps of the Tripo rabbit from the maps of its FBX (design 4.5,
+# assets/models/rabbit/README.md, "Maps"): `rabbit-color.webp` and `rabbit-normal.webp`. The color
+# map is the source image at 2048 pixels with the white fur of the sheet (FUR_CHROMA) and fur
+# strands (STRANDS): each color takes a small luma step along the strands, and the hue stays. The
+# pink skin (the inner ears, the nose, and the paw pads) and the eyeballs keep their color and take
+# no strands (SKIN, EYE_MARGIN). The normal map adds the slope of the same strands to the tilts of
+# the source, with the same skin weight. The output depends only on
+# the input files, the rig file of the eyeballs, and on cwebp 1.5.0.
 #
 # Usage: uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/rabbit-maps.py
 import os
@@ -14,7 +14,7 @@ import sys
 import tempfile
 
 import numpy as np
-from PIL import Image, ImageFilter
+from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gaze_shift  # noqa: E402
@@ -31,471 +31,176 @@ QUALITY = 60
 #: (`NORMAL_MAP_GAIN` of src/scene/fur.ts). A larger tilt is a baked edge of the source mesh.
 NORMAL_LIMIT = 0.2
 NORMAL_GAIN = 4
+#: The texels of the eyeballs and this many texels around them take no strands.
+EYE_MARGIN = 4
+#: The fur strands that the maps add (`strands()`), with the values of tools/fox-maps.py. The
+#: source paints soft strokes in the fur, and the strands give the fur of the app the strands of
+#: the other Tripo bodies (a wavelength of 8 to 10 texels at 1024 pixels across the strands).
+STRANDS = {
+    #: The seed of the noise of the strands.
+    'seed': 7,
+    #: The sigma in texels at SIZE of the blur of the structure tensor (the strand direction).
+    'direction_sigma': 24.0,
+    #: The sigma in texels at SIZE of the blur of the noise: the width of a strand.
+    'width_sigma': 1.4,
+    #: The half length in texels at SIZE of a strand, and the step of its samples.
+    'half_length': 22.0,
+    'step': 1.0,
+    #: The sigma in texels at SIZE of the blur that the height of the strands loses (a high pass).
+    'high_pass_sigma': 10.0,
+    #: The root mean square of the x, y tilt of the strands in the normal map.
+    'tilt': 0.06,
+    #: The luma factor of the strands in the color map, for each standard deviation of the height:
+    #: a strand crest is lighter, and a groove darker.
+    'luma': 0.16,
+    #: The largest height of a strand, in standard deviations.
+    'clip': 2.5,
+}
 
-#: The step in degrees of the grid of ball directions on which `shift_eyes()` finds the parts of
-#: the eye paint. A cell holds the direction at the angle `lam` out from the forward axis of the
-#: head (+z of the seated bind) and at the angle `psi` up.
-GRID_STEP = 0.5
-#: The part of the grid that can hold eye paint, in degrees: lam from, lam to, psi from, psi to.
-EYE_WINDOW = (-10.0, 100.0, -40.0, 70.0)
-#: The smallest channel and the largest saturation of a white texel, the largest luma of an iris
-#: texel (or its smallest saturation), and the largest luma of a pupil texel (sRGB).
-WHITE_LOW = 150
-WHITE_SAT = 0.14
-IRIS_LUMA = 110
-IRIS_SAT = 0.5
-PUPIL_LUMA = 50
-#: The size in cells of the closing that joins the iris and the white into one painted eye.
-EYE_CLOSE = 9
-#: The width in cells of the band at the edge of the painted eye: the lash line and the shade of
-#: the lids. The decal takes no paint from it.
-EDGE_BAND = 3
-#: The angle in degrees added to the iris radius, so that the soft edge of the iris moves with it.
-IRIS_EDGE = 2.0
-#: The view of the gaze target, in degrees down from the forward axis of the head, and the turn of
-#: each target out from the middle of the painted eye in that view. With a turn of 4 degrees, the
-#: right eye looked a little out, past the viewer, from the front.
-VIEW_DOWN = 15.0
-GAZE_OUT = 0.0
-#: The part of the full turn of each iris toward its target that the map applies. The full turn
-#: (about 8 degrees) read wall-eyed from the front, so the iris moves only a small part of the way
-#: from the source paint.
-SHIFT_SHARE = 0.35
-#: The step in degrees of the turn about the iris middle that finds the paint of a hidden iris
-#: point on its ring.
-RING_STEP = 1.0
-#: The largest angle in degrees from a point that the lids or the band hide, toward the iris
-#: middle, in which `hidden_iris()` finds the open paint next to it.
-HIDDEN_REACH = 20.0
-#: The rim of the iris on the nose side, in degrees in from the iris radius, that takes the mirror
-#: of the clean outer rim. On the nose side, the source iris meets the lash line and a pale band.
-RIM_IN = 4.0
-#: The angle in degrees out of the iris disk on the nose side in which a texel that is not white
-#: (the pale band at the lash line) also takes the fill white.
-NOSE_BAND = 4.0
-#: The smallest luma of a band cell on the nose side that takes the fill white: a lighter cell is
-#: the brown shade of the corner, a darker cell the lash line.
-LASH_LUMA = 70
-#: The lash line of the upper lid: the skin texels within LASH_REACH ball radii of the ball middle
-#: that a view of `LASH_VIEWS` shows. They lie on the rim of the socket, over the top of the iris.
-LASH_REACH = 1.08
-#: The views (degrees up, degrees to the left side) that find the skin faces around each eye.
-LASH_VIEWS = [(e, a) for e in (0, 10, 20, 30) for a in (-35, 0, 35)]
-#: The arc of the lash line that `soft_lash()` lightens: the angle in degrees about the moved iris
-#: middle, from straight up. The arc has the full share to LASH_ARC[0] and none from LASH_ARC[1],
-#: so the outer corner of the lash line keeps its paint.
-LASH_ARC = (40.0, 75.0)
-#: The largest share of the move of a lash texel toward the fur color above the eye.
-LASH_SHARE = 0.8
-#: The fur color above the eye: the median of the shown skin texels from FUR_BAND[0] to FUR_BAND[1]
-#: ball radii from the ball middle, within LASH_ARC[0] degrees of straight up.
-FUR_BAND = (1.2, 1.5)
+#: The pink skin of the source, which takes no strands: the share of a texel is a smoothstep of
+#: the Oklab chroma (C_RAMP) times 1 minus a smoothstep of the distance of the hue from H_MID
+#: (H_RAMP, in degrees). The skin of the source has the Oklab C 0.084 to 0.097 and h 37 to 48, and
+#: the cream fur C 0.053 to 0.055 and h 69 to 71.
+SKIN = {'C_RAMP': (0.065, 0.08), 'H_MID': 42.0, 'H_RAMP': (12.0, 20.0)}
+
+#: The factor of the Oklab chroma of each fur texel (`fur_tone()`). The source paints the fur
+#: cream (C 0.055), and the turnaround sheet shows it white (C 0.014 to 0.021). With this factor,
+#: the fur of the map has the chroma of the sheet (0.019).
+FUR_CHROMA = 0.35
 
 
-def color_map():
-    """Writes the color map: the source scaled to SIZE (Lanczos), the irises moved
-    (`shift_eyes()`), the lash line of each upper lid lightened (`soft_lash()`), WebP quality
-    QUALITY, method 6."""
-    image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
-    rig = gaze_shift.read_rig(RIG)
-    image, irises = shift_eyes(rig, image)
-    image = soft_lash(rig, image, irises)
-    image.save(COLOR_OUT, 'WEBP', quality=QUALITY, method=6)
-    print(f'{COLOR_OUT}: {SIZE} x {SIZE}, {os.path.getsize(COLOR_OUT)} bytes')
+def linear(srgb):
+    c = np.asarray(srgb, np.float64) / 255.0
+    return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
 
 
-def grid_axes():
-    """Gives the lam (columns) and the psi (rows, top down) of the cells of the grid."""
-    lam = np.arange(-90, 90 + GRID_STEP / 2, GRID_STEP)
-    psi = np.arange(90, -90 - GRID_STEP / 2, -GRID_STEP)
-    return lam, psi
+def srgb8(lin):
+    c = np.clip(lin, 0.0, 1.0)
+    c = np.where(c <= 0.0031308, c * 12.92, 1.055 * c ** (1 / 2.4) - 0.055)
+    return np.round(c * 255.0).astype(np.uint8)
 
 
-def direction(lam, psi, sign):
-    """Gives the unit ball direction at the angles lam (out) and psi (up), in degrees. The sign is
-    +1 for the left eye (+x) and -1 for the right eye."""
-    a, b = np.radians(lam), np.radians(psi)
-    return np.stack([sign * np.cos(b) * np.sin(a), np.sin(b), np.cos(b) * np.cos(a)], -1)
+def oklab(lin):
+    m1 = np.array([[0.4122214708, 0.5363325363, 0.0514459929],
+                   [0.2119034982, 0.6806995451, 0.1073969566],
+                   [0.0883024619, 0.2817188376, 0.6299787005]])
+    m2 = np.array([[0.2104542553, 0.7936177850, -0.0040720468],
+                   [1.9779984951, -2.4285922050, 0.4505937099],
+                   [0.0259040371, 0.7827717662, -0.8086757660]])
+    return np.cbrt(lin @ m1.T) @ m2.T
 
 
-def angles(d, sign):
-    """Gives the angles lam (out) and psi (up) in degrees of unit ball directions."""
-    return (np.degrees(np.arctan2(sign * d[..., 0], d[..., 2])),
-            np.degrees(np.arcsin(np.clip(d[..., 1], -1, 1))))
-
-
-def cell(d, sign):
-    """Gives the grid cell (row, column) of unit ball directions."""
-    lam, psi = angles(d, sign)
-    size = int(round(180 / GRID_STEP)) + 1
-    col = np.clip(np.round((lam + 90) / GRID_STEP).astype(int), 0, size - 1)
-    row = np.clip(np.round((90 - psi) / GRID_STEP).astype(int), 0, size - 1)
-    return row, col
-
-
-def largest(mask):
-    """Gives the largest connected part of a mask."""
-    labels, count = gaze_shift.parts(mask)
-    if count == 0:
-        return mask
-    sizes = np.bincount(labels.ravel())[1:]
-    return labels == 1 + int(np.argmax(sizes))
-
-
-def fill_holes(mask):
-    """Gives the mask with each closed hole filled."""
-    labels, count = gaze_shift.parts(~mask)
-    edge = np.unique(np.r_[labels[0], labels[-1], labels[:, 0], labels[:, -1]])
-    return mask | ((labels > 0) & ~np.isin(labels, edge))
-
-
-def morph(mask, size, grow):
-    """Gives the mask grown (MaxFilter) or shrunk (MinFilter) by a square of `size` cells."""
-    kind = ImageFilter.MaxFilter if grow else ImageFilter.MinFilter
-    return np.asarray(Image.fromarray(mask).filter(kind(size))) > 0
-
-
-def eye_parts(rig, src, faces, c, sign):
-    """Finds the parts of the eye paint of one ball on the grid:
-    - The colors of the source on the ball at each cell (`ball_colors()`).
-    - White: each channel above WHITE_LOW and a saturation below WHITE_SAT. Iris: a luma below
-      IRIS_LUMA or a saturation above IRIS_SAT. Pupil: a luma below PUPIL_LUMA. Only in EYE_WINDOW.
-    - The painted eye E: the largest part of the white and the iris, closed by EYE_CLOSE cells,
-      with its holes filled. The band: the cells of E within EDGE_BAND cells of its edge.
-    - The pupil p: the mean direction of the largest part of the pupil cells of E off the band.
-    - The iris middle q and radius a: along the row of p, the iris runs in from the first white
-      cell out of p, to the last iris cell off the band. Along the column of that middle, it runs
-      from the last iris cell off the band below to the last one above.
-    Gives a dict of the grids and the values."""
-    lam, psi = grid_axes()
-    lam_g, psi_g = np.meshgrid(lam, psi)
-    dirs = direction(lam_g, psi_g, sign)
-    colors, _ = gaze_shift.ball_colors(rig, faces, c, dirs.reshape(-1, 3), src)
-    colors = colors.reshape(dirs.shape)
-    luma = colors @ [0.2126, 0.7152, 0.0722]
-    top, low = colors.max(-1), colors.min(-1)
-    sat = (top - low) / np.maximum(top, 1)
-    lam0, lam1, psi0, psi1 = EYE_WINDOW
-    window = (lam_g > lam0) & (lam_g < lam1) & (psi_g > psi0) & (psi_g < psi1)
-    white = window & (low > WHITE_LOW) & (sat < WHITE_SAT)
-    iris = window & ((luma < IRIS_LUMA) | (sat > IRIS_SAT))
-    eye = largest(fill_holes(morph(morph(white | iris, EYE_CLOSE, True), EYE_CLOSE, False)))
-    inner = morph(eye, 2 * EDGE_BAND + 1, False)
-    band = eye & ~inner
-    pupil = largest(inner & (luma < PUPIL_LUMA))
-    weights = np.cos(np.radians(psi_g[pupil]))[:, None]
-    p = (dirs[pupil] * weights).sum(axis=0)
-    p /= np.linalg.norm(p)
-    row, col = cell(p[None], sign)
-    row, col = int(row[0]), int(col[0])
-    out = col
-    while out < len(lam) - 1 and not white[row, out]:
-        out += 1
-    inn = col
-    while inn > 0 and iris[row, inn - 1] and inner[row, inn - 1]:
-        inn -= 1
-    q_lam = (lam[inn] + lam[out]) / 2
-    a = (lam[out] - lam[inn]) / 2
-    mid = int(np.argmin(np.abs(lam - q_lam)))
-    up = row
-    while up > 0 and iris[up - 1, mid] and inner[up - 1, mid]:
-        up -= 1
-    down = row
-    while down < len(psi) - 1 and iris[down + 1, mid] and inner[down + 1, mid]:
-        down += 1
-    q = direction(q_lam, (psi[up] + psi[down]) / 2, sign)
-    return dict(colors=colors, dirs=dirs, luma=luma, white=white, iris=iris, eye=eye, band=band,
-                p=p, q=q, a=a)
-
-
-def view_middle(rig, faces, c, r, sign, eye):
-    """Gives the ball direction in the middle of the painted eye E that a camera sees from VIEW_DOWN
-    degrees above the forward axis of the head (parallel rays, as `gaze_targets()` of
-    tools/gaze_shift.py): the hit nearest to the mean place of the hits in E on the view plane."""
-    triangles, positions = rig[0], rig[1]
-    corners = positions[triangles]
-    near = np.flatnonzero(np.linalg.norm(corners.mean(axis=1) - c, axis=1) < 3 * r)
-    down = np.radians(VIEW_DOWN)
-    v = np.array([0.0, np.sin(down), np.cos(down)])
-    across = np.array([1.0, 0.0, 0.0])
-    tilt = np.cross(v, across)
-    steps = np.arange(-1.6 * r, 1.6 * r, gaze_shift.RAY_STEP)
-    gx, gy = np.meshgrid(steps, steps)
-    origins = c + gx.ravel()[:, None] * across + gy.ravel()[:, None] * tilt + v
-    rays = np.tile(-v, (len(origins), 1))
-    t_hit, hit, _ = gaze_shift.ray_hits(origins, rays, corners[near])
-    on_ball = (hit >= 0) & np.isin(near[np.maximum(hit, 0)], faces)
-    shown = origins[on_ball] + t_hit[on_ball, None] * rays[on_ball] - c
-    shown /= np.linalg.norm(shown, axis=1)[:, None]
-    in_eye = eye[cell(shown, sign)]
-    flat = np.c_[gx.ravel(), gy.ravel()][on_ball][in_eye]
-    return shown[in_eye][np.argmin(np.linalg.norm(flat - flat.mean(axis=0), axis=1))]
-
-
-def white_rows(parts, old):
-    """Gives a function from psi to the fill white of the eye: the median color of the white cells
-    of E off the old iris and off the band, row by row, with a linear step between rows."""
-    lam, psi = grid_axes()
-    use = parts['white'] & parts['eye'] & ~parts['band'] & ~old
-    rows = [k for k in range(len(psi)) if use[k].sum() >= 3]
-    if not rows:
-        sys.exit('The eye shows no white, so the move has no fill white.')
-    keys = psi[rows][::-1]
-    values = np.array([np.median(parts['colors'][k][use[k]], axis=0) for k in rows])[::-1]
-    return lambda at: np.stack([np.interp(at, keys, values[:, i]) for i in range(3)], -1)
-
-
-def hidden_iris(points, q, open_, decal, sign):
-    """Finds, for each point that the lids or the band hide (out of `open_`), the first open cell
-    toward the iris middle q, in steps of GRID_STEP degrees up to HIDDEN_REACH. Gives a mask of
-    the points for which that cell lies in the decal (a hidden part of the iris), and the direction
-    of that cell for each point."""
-    out = np.zeros(len(points), bool)
-    nearest = points.copy()
-    todo = np.ones(len(points), bool)
-    angle = np.arccos(np.clip(points @ q, -1, 1))
-    side = q[None] - (points @ q)[:, None] * points
-    side /= np.maximum(np.linalg.norm(side, axis=1), 1e-12)[:, None]
-    for step in np.radians(np.arange(GRID_STEP, HIDDEN_REACH + GRID_STEP / 2, GRID_STEP)):
-        k = np.flatnonzero(todo & (step < angle))
-        if len(k) == 0:
-            break
-        cand = np.cos(step) * points[k] + np.sin(step) * side[k]
-        row, col = cell(cand, sign)
-        hit = open_[row, col]
-        out[k[hit]] = decal[row, col][hit]
-        nearest[k[hit]] = cand[hit]
-        todo[k[hit]] = False
-    return out, nearest
-
-
-def ring_points(points, q, inside, sign):
-    """Gives, for each point of the iris disk about q, the nearest point on its ring about q (the
-    same angle from q) that lies in `inside`, in steps of RING_STEP degrees each way. A point with
-    no such point stays."""
-    e1 = np.cross([0.0, 1.0, 0.0], q)
-    e1 /= np.linalg.norm(e1)
-    e2 = np.cross(q, e1)
-    radius = np.arccos(np.clip(points @ q, -1, 1))
-    turn = np.arctan2(points @ e2, points @ e1)
-    out = points.copy()
-    open_ = np.ones(len(points), bool)
-    for step in np.arange(RING_STEP, 180 + RING_STEP / 2, RING_STEP):
-        for s in (1.0, -1.0):
-            if not open_.any():
-                return out
-            k = np.flatnonzero(open_)
-            t = turn[k] + s * np.radians(step)
-            cand = (np.cos(radius[k])[:, None] * q + np.sin(radius[k])[:, None]
-                    * (np.cos(t)[:, None] * e1 + np.sin(t)[:, None] * e2))
-            good = inside[cell(cand, sign)]
-            out[k[good]] = cand[good]
-            open_[k[good]] = False
-    return out
-
-
-def shift_eyes(rig, image):
-    """Moves the iris of each eyeball, with its pupil and its painted light, as one decal on its
-    ball, so that the rabbit does not look cross-eyed. Each eye has its own target, because the
-    two eyes of the source are not mirror images. For each side, with the parts of `eye_parts()`:
-    - The target t: SHIFT_SHARE of the way from the source pupil p to the middle of the painted eye
-      in the view of `view_middle()`, turned out by GAZE_OUT degrees, at the mean psi of the two
-      pupils.
-    - The decal D: the iris cells of E off the band within a + IRIS_EDGE of q, grown by IRIS_EDGE
-      degrees, so that the soft edge of the iris moves with it. The old place O: D and each part
-      of the iris paint of E (the band included) that touches D.
-    - With T the turn that takes p to t, each ball texel of E at the direction d takes the source
-      color at T^-1 d when that point lies in D.
-    - A point T^-1 d of the iris disk (a + IRIS_EDGE about q) that the lids or the band hide,
-      with D as the first open cell toward q (`hidden_iris()`), is a hidden part of the iris. It
-      takes the color of the nearest point of D on its ring about q (`ring_points()`), the clean
-      side of the same iris, or else the color of that first open cell.
-    - On the nose side, the source iris meets the lash line and a pale band, so its rim is not
-      clean. A moved point T^-1 d on the nose half of the rim (more than a - RIM_IN from q) takes
-      the mirror of that point about the vertical plane through q, on the clean outer rim, when
-      that mirror point is open. When it is not open, a point out of the iris radius a does not
-      move.
-    - The cells of E off the band on the nose side within NOSE_BAND degrees out of the iris disk
-      that are not white (the pale band), and the band cells there with a luma of LASH_LUMA or
-      more (the brown shade of the corner), also belong to O.
-    - Each other texel of O takes the white of its row (`white_rows()`). The rest of the band (the
-      lash line and the shade of the lids on the white) keeps its paint.
-    No texel takes a new color except the fill white, which is the median white of the same eye.
-    Only the eyeball texels of E and the padding next to them change. Gives the new image, and for
-    each side the moved iris middle and the iris radius a."""
-    eyes = rig[3]
-    base = np.asarray(image)
-    out = base.astype(np.float64)
-    texels, taken = gaze_shift.ball_texels(rig, out.shape[0])
-    written = np.zeros(taken.shape, bool)
-    src = gaze_shift.fill_around(out, taken)
-    sides = {}
-    irises = {}
-    for side, sign in (('L', 1.0), ('R', -1.0)):
-        faces = np.array(eyes[side]['faces'])
-        c, r, _ = gaze_shift.ball_frame(rig, faces)
-        parts = eye_parts(rig, src, faces, c, sign)
-        parts.update(faces=faces, c=c, r=r, sign=sign,
-                     middle=view_middle(rig, faces, c, r, sign, parts['eye']))
-        sides[side] = parts
-    height = np.mean([angles(parts['p'], parts['sign'])[1] for parts in sides.values()])
-    for side, parts in sides.items():
-        sign, q, p = parts['sign'], parts['q'], parts['p']
-        mid_lam, mid_psi = angles(parts['middle'], sign)
-        full = direction(mid_lam + GAZE_OUT, height, sign)
-        t = p * (1 - SHIFT_SHARE) + full * SHIFT_SHARE
-        t = t / np.linalg.norm(t)
-        turn = gaze_shift.turn_matrix(p, t)
-        irises[side] = (turn @ q, parts['a'])
-        lam, psi = grid_axes()
-        lam_g, psi_g = np.meshgrid(lam, psi)
-        from_q = gaze_shift.angle_to(parts['dirs'].reshape(-1, 3), q).reshape(lam_g.shape)
-        disk = from_q < parts['a'] + IRIS_EDGE
-        edge = 2 * int(round(IRIS_EDGE / GRID_STEP)) + 1
-        open_ = parts['eye'] & ~parts['band']
-        decal = disk & open_ & morph(parts['iris'] & disk, edge, True)
-        labels, _ = gaze_shift.parts(parts['iris'] & parts['eye'])
-        old = decal | np.isin(labels, np.unique(labels[decal & (labels > 0)]))
-        q_lam = angles(q, sign)[0]
-        nose = (lam_g < q_lam) & (from_q < parts['a'] + IRIS_EDGE + NOSE_BAND)
-        old |= nose & open_ & ~parts['white']
-        old |= nose & parts['band'] & (parts['luma'] >= LASH_LUMA)
-        fill = white_rows(parts, old)
-
-        ys, xs, places = texels[side]
-        d = places - parts['c']
-        d /= np.linalg.norm(d, axis=1)[:, None]
-        k_row, k_col = cell(d, sign)
-        work = np.flatnonzero(parts['eye'][k_row, k_col])
-        source = d[work] @ turn
-        first = source.copy()
-        s_row, s_col = cell(source, sign)
-        in_decal = decal[s_row, s_col]
-        hidden = np.zeros(len(work), bool)
-        shut = np.flatnonzero(~open_[s_row, s_col] & disk[s_row, s_col])
-        hidden[shut], edge_points = hidden_iris(source[shut], q, open_, decal, sign)
-        k = np.flatnonzero(hidden)
-        ring = ring_points(source[k], q, decal, sign)
-        on_ring = decal[cell(ring, sign)]
-        source[k] = np.where(on_ring[:, None], ring, edge_points[hidden[shut]])
-        moved = in_decal | hidden
-        radius = gaze_shift.angle_to(first, q)
-        rim = np.flatnonzero((radius > parts['a'] - RIM_IN) & (angles(first, sign)[0] < q_lam)
-                             & moved)
-        across = gaze_shift.mirror(first[rim], q)
-        clean = open_[cell(across, sign)]
-        source[rim[clean]] = across[clean]
-        moved[rim[~clean & (radius[rim] > parts['a'])]] = False
-        colors, found = gaze_shift.ball_colors(rig, parts['faces'], parts['c'], source[moved], src)
-        new = out[ys, xs].copy()
-        new[work[moved][found]] = colors[found]
-        left = work[~moved & old[k_row[work], k_col[work]]]
-        new[left] = fill(angles(d[left], sign)[1])
-        # A texel at the edge of two ball triangles can come twice, with the places of two
-        # triangles. Only the changed rows write, so that a row with no change does not undo them.
-        changed = np.zeros(len(d), bool)
-        changed[work[moved][found]] = True
-        changed[left] = True
-        out[ys[changed], xs[changed]] = new[changed]
-        written[ys[changed], xs[changed]] = True
-        p_lam, p_psi = angles(p, sign)
-        q_psi = angles(q, sign)[1]
-        print(f'eye {side}: pupil at lam {p_lam:.1f}, psi {p_psi:.1f}; iris middle at lam '
-              f'{q_lam:.1f}, psi {q_psi:.1f}, radius {parts["a"]:.1f}; middle of the eye at lam '
-              f'{mid_lam:.1f}, psi {mid_psi:.1f}; target lam {mid_lam + GAZE_OUT:.1f}, psi '
-              f'{height:.1f}; the decal turns {gaze_shift.angle_to(p[None], t)[0]:.1f} degrees '
-              f'({mid_lam + GAZE_OUT - p_lam:+.1f} out, {height - p_psi:+.1f} up); '
-              f'{int(moved.sum())} texels moved, {int(hidden.sum())} of them from the ring, '
-              f'{int(clean.sum())} from the mirror of the outer rim, {len(left)} take the fill '
-              f'white')
-    # The padding next to a changed texel takes its new color (`ball_image()`), so that no old
-    # color shows as a line on a seam. The other texels keep the source.
-    near = morph(written, 2 * gaze_shift.EYE_FILL + 1, True)
-    result = np.asarray(gaze_shift.ball_image(rig, out, taken))
-    return Image.fromarray(np.where(near[..., None], result, base)), irises
+def linear_of_oklab(lab):
+    m1 = np.array([[1.0, 0.3963377774, 0.2158037573],
+                   [1.0, -0.1055613458, -0.0638541728],
+                   [1.0, -0.0894841775, -1.2914855480]])
+    m2 = np.array([[4.0767416621, -3.3077115913, 0.2309699292],
+                   [-1.2684380046, 2.6097574011, -0.3413193965],
+                   [-0.0041960863, -0.7034186147, 1.7076147010]])
+    return ((lab @ m1.T) ** 3) @ m2.T
 
 
 def smoothstep(a, b, x):
-    """Gives 0 below a, 1 above b, and the smooth Hermite step between them."""
     t = np.clip((x - a) / (b - a), 0.0, 1.0)
     return t * t * (3 - 2 * t)
 
 
-def arc_angles(d, q):
-    """Gives the angle in degrees of each unit direction d about the unit axis q from straight up
-    (0 above q, 180 below it)."""
-    up = np.array([0.0, 1.0, 0.0]) - q[1] * q
-    up /= np.linalg.norm(up)
-    side = d - (d @ q)[:, None] * q
-    length = np.maximum(np.linalg.norm(side, axis=1), 1e-12)
-    return np.degrees(np.arccos(np.clip(side @ up / length, -1, 1)))
+def skin_share(image):
+    """Gives the share of the pink skin of each texel (SKIN), from 0 (fur) to 1 (skin)."""
+    lab = oklab(linear(np.asarray(image)))
+    C = np.hypot(lab[..., 1], lab[..., 2])
+    h = np.degrees(np.arctan2(lab[..., 2], lab[..., 1]))
+    dh = np.abs((h - SKIN['H_MID'] + 180) % 360 - 180)
+    return smoothstep(*SKIN['C_RAMP'], C) * (1 - smoothstep(*SKIN['H_RAMP'], dh))
 
 
-def shown_faces(rig, c, r):
-    """Gives the triangles within 2.2 ball radii of the ball middle c that a view of LASH_VIEWS
-    shows (parallel rays, as `view_middle()`). The lids lie under the skin, so no lid face shows."""
-    triangles, positions = rig[0], rig[1]
-    corners = positions[triangles]
-    near = np.flatnonzero(np.linalg.norm(corners.mean(axis=1) - c, axis=1) < 2.2 * r)
-    steps = np.arange(-2.2 * r, 2.2 * r, gaze_shift.RAY_STEP)
-    gx, gy = np.meshgrid(steps, steps)
-    shown = set()
-    for up_deg, left_deg in LASH_VIEWS:
-        e, a = np.radians(up_deg), np.radians(left_deg)
-        v = np.array([np.sin(a) * np.cos(e), np.sin(e), np.cos(a) * np.cos(e)])
-        across = np.cross(-v, [0.0, 1.0, 0.0])
-        across /= np.linalg.norm(across)
-        tilt = np.cross(across, -v)
-        origins = c + gx.ravel()[:, None] * across + gy.ravel()[:, None] * tilt + v
-        _, hit, _ = gaze_shift.ray_hits(origins, np.tile(-v, (len(origins), 1)), corners[near])
-        shown |= set(near[hit[hit >= 0]].tolist())
-    return np.array(sorted(shown))
+def fur_tone(image, fur):
+    """Gives the color map with the white fur of the sheet: the Oklab chroma of each texel takes the
+    factor FUR_CHROMA by its fur share (1 on the fur, 0 on the skin and on the eyeballs). The
+    lightness and the hue stay."""
+    lab = oklab(linear(np.asarray(image)))
+    lab[..., 1:] *= 1 + fur[..., None] * (FUR_CHROMA - 1)
+    return Image.fromarray(srgb8(linear_of_oklab(lab)))
 
 
-def soft_lash(rig, image, irises):
-    """Lightens the painted lash line of each upper lid over the iris, so that the upper lid reads
-    soft and not stern. The source paints a dark line on the rim of the socket, and in the stage
-    light it reads as a thick dark wedge over the top of the iris. For each side, with the moved
-    iris middle q (`shift_eyes()`):
-    - The lash texels: the texels of the skin faces that a view shows (`shown_faces()`, no
-      eyeball face) within LASH_REACH ball radii of the ball middle.
-    - The fur color: the median color of the shown skin texels in FUR_BAND above the eye.
-    - A lash texel at the angle th about q from straight up (`arc_angles()`) moves toward the fur
-      color by the share LASH_SHARE * (1 - smoothstep(LASH_ARC[0], LASH_ARC[1], th)), and only when
-      the fur color is lighter. Thus a thin, lighter line stays, and the lower lid and the outer
-      corner of the lash line keep their paint.
-    Only these skin texels change. Gives the new image."""
-    out = np.asarray(image).astype(np.float64)
-    luma_of = np.array([0.2126, 0.7152, 0.0722])
-    for side in ('L', 'R'):
-        q = irises[side][0]
-        faces = np.array(rig[3][side]['faces'])
-        c, r, _ = gaze_shift.ball_frame(rig, faces)
-        skin = shown_faces(rig, c, r)
-        skin = skin[~np.isin(skin, faces)]
-        ys, xs, places = gaze_shift.eye_texels(rig, skin, out.shape[0])
-        d = places - c
-        dist = np.linalg.norm(d, axis=1) / r
-        d /= np.linalg.norm(d, axis=1)[:, None]
-        th = arc_angles(d, q)
-        fur = np.median(out[ys, xs][(dist >= FUR_BAND[0]) & (dist < FUR_BAND[1])
-                                    & (th < LASH_ARC[0])], axis=0)
-        lash = dist < LASH_REACH
-        share = LASH_SHARE * (1 - smoothstep(LASH_ARC[0], LASH_ARC[1], th)) * lash
-        old = out[ys, xs]
-        share[old @ luma_of >= fur @ luma_of] = 0
-        changed = share > 1e-3
-        # A texel at the edge of two triangles can come twice: each row writes the same color.
-        new = old + share[:, None] * (fur - old)
-        print(f'lash {side}: {len(skin)} shown skin faces, fur {np.round(fur).astype(int).tolist()}, '
-              f'{len(np.unique(ys[changed] * out.shape[1] + xs[changed]))} texels lighten, the mean '
-              f'luma goes from {(old[changed] @ luma_of).mean():.0f} to '
-              f'{(new[changed] @ luma_of).mean():.0f}')
-        out[ys[changed], xs[changed]] = new[changed]
-    return Image.fromarray(np.round(out).clip(0, 255).astype(np.uint8))
+def blur(a, sigma):
+    """Gives a Gaussian blur of a square image (wrapped edges), by the FFT."""
+    f = np.fft.fftfreq(a.shape[0])
+    g = np.exp(-2 * (np.pi * sigma) ** 2 * (f[:, None] ** 2 + f[None, :] ** 2))
+    return np.real(np.fft.ifft2(np.fft.fft2(a) * g))
 
 
-def normal_map():
+def sample(a, y, x):
+    """Gives the bilinear samples of an image at the texel points (y, x), with wrapped edges."""
+    n = a.shape[0]
+    y0, x0 = np.floor(y).astype(np.int64), np.floor(x).astype(np.int64)
+    fy, fx = y - y0, x - x0
+    y0, x0 = y0 % n, x0 % n
+    y1, x1 = (y0 + 1) % n, (x0 + 1) % n
+    return ((a[y0, x0] * (1 - fx) + a[y0, x1] * fx) * (1 - fy)
+            + (a[y1, x0] * (1 - fx) + a[y1, x1] * fx) * fy)
+
+
+def strands(image):
+    """Gives the height of the fur strands at SIZE, in standard deviations, with the mean 0.
+
+    1. The strand direction of each texel: the direction of least change of the structure tensor
+       of the source maps (the luma of the color map and the two tilts of the normal map, each
+       over its root mean square gradient), blurred by `direction_sigma`.
+    2. White noise (seeded), blurred by `width_sigma`, then summed along the strand direction
+       over `half_length` on each side with a Hann weight (a line integral convolution).
+    3. A high pass (`high_pass_sigma`), then the scale to one standard deviation."""
+    S = STRANDS
+    luma = linear(np.asarray(image)) @ np.array([0.2126, 0.7152, 0.0722])
+    tilt = np.asarray(Image.open(NORMAL_SOURCE).convert('RGB')).astype(np.float64) / 255 * 2 - 1
+    k = tilt.shape[0] // SIZE
+    tilt = tilt[..., :2].reshape(SIZE, k, SIZE, k, 2).mean(axis=(1, 3))
+    jxx, jxy, jyy = (np.zeros((SIZE, SIZE)) for _ in range(3))
+    for channel in (luma, tilt[..., 0], tilt[..., 1]):
+        gy, gx = np.gradient(channel)
+        norm = np.mean(gx * gx + gy * gy) + 1e-12
+        jxx += gx * gx / norm
+        jxy += gx * gy / norm
+        jyy += gy * gy / norm
+    jxx, jxy, jyy = (blur(j, S['direction_sigma']) for j in (jxx, jxy, jyy))
+    # The gradient direction is 0.5 atan2(2 jxy, jxx - jyy). The strands run square to it.
+    angle = 0.5 * np.arctan2(2 * jxy, jxx - jyy) + np.pi / 2
+    dx, dy = np.cos(angle), np.sin(angle)
+    noise = blur(np.random.default_rng(S['seed']).standard_normal((SIZE, SIZE)), S['width_sigma'])
+    yy, xx = np.mgrid[0:SIZE, 0:SIZE].astype(np.float64)
+    height = np.zeros((SIZE, SIZE))
+    total = 0.0
+    steps = int(S['half_length'] / S['step'])
+    for i in range(-steps, steps + 1):
+        t = i * S['step']
+        w = 0.5 + 0.5 * np.cos(np.pi * t / (S['half_length'] + S['step']))
+        height += w * sample(noise, yy + t * dy, xx + t * dx)
+        total += w
+    height /= total
+    height -= blur(height, S['high_pass_sigma'])
+    height /= height.std()
+    return np.clip(height, -S['clip'], S['clip'])
+
+
+def strand_color(image, height):
+    """Gives the color map with the strands: each linear color times 1 + `luma` times the height.
+    The height of the strands is 0 on the skin and on the eyeballs (`main()`)."""
+    lin = linear(np.asarray(image))
+    factor = 1 + STRANDS['luma'] * height
+    return Image.fromarray(srgb8(lin * factor[..., None]))
+
+
+def strand_tilts(height):
+    """Gives the x, y tilts of the strands at NORMAL_SIZE: the slope of the height, with the root
+    mean square tilt `tilt`. The y tilt points up in the image (+v of OpenGL)."""
+    gy, gx = np.gradient(height)
+    t = np.stack([-gx, gy], -1)
+    k = SIZE // NORMAL_SIZE
+    t = t.reshape(NORMAL_SIZE, k, NORMAL_SIZE, k, 2).mean(axis=(1, 3))
+    return t * (STRANDS['tilt'] / np.sqrt((t ** 2).sum(-1).mean()))
+
+
+def normal_map(extra=None):
     """Writes the normal map of the fur: each x, y tilt of the source limited to the length
     NORMAL_LIMIT, a box scale to NORMAL_SIZE, then the tilts times NORMAL_GAIN in red and green,
     255 in blue (the shader does not read it), and cwebp -q 60 -sharp_yuv -m 6. The limit comes
@@ -507,6 +212,11 @@ def normal_map():
     t[over] *= (NORMAL_LIMIT / length[over])[:, None]
     k = t.shape[0] // NORMAL_SIZE
     small = t.reshape(NORMAL_SIZE, k, NORMAL_SIZE, k, 2).mean(axis=(1, 3))
+    if extra is not None:
+        small = small + extra
+        length = np.linalg.norm(small, axis=-1)
+        over2 = length > NORMAL_LIMIT
+        small[over2] *= (NORMAL_LIMIT / length[over2])[:, None]
     v = np.clip(small * NORMAL_GAIN, -1, 1)
     rgb = np.zeros((NORMAL_SIZE, NORMAL_SIZE, 3), np.uint8)
     rgb[..., :2] = np.round((v + 1) / 2 * 255).astype(np.uint8)
@@ -522,10 +232,19 @@ def normal_map():
 
 def main():
     which = sys.argv[1:] or ['color', 'normal']
+    image = Image.open(SOURCE).convert('RGB').resize((SIZE, SIZE), Image.LANCZOS)
+    rig = gaze_shift.read_rig(RIG)
+    fur = 1 - skin_share(image)
+    fur[gaze_shift.eye_mask(rig, SIZE, EYE_MARGIN)] = 0
+    height = strands(image) * fur
+    image = fur_tone(image, fur)
+    print(f'skin share above 0.5: {(fur < 0.5).mean() * 100:.1f} % of the texels')
+    image = strand_color(image, height)
     if 'color' in which:
-        color_map()
+        image.save(COLOR_OUT, 'WEBP', quality=QUALITY, method=6)
+        print(f'{COLOR_OUT}: {SIZE} x {SIZE}, {os.path.getsize(COLOR_OUT)} bytes')
     if 'normal' in which:
-        normal_map()
+        normal_map(strand_tilts(height))
 
 
 if __name__ == '__main__':
