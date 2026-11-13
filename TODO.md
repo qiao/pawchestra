@@ -1308,10 +1308,6 @@ navigation menu at the top of the mockup is out of scope.
 - [ ] Do the hall of the scene look task before the color tasks. Wide film shots show the stage in
       a black space, with no wall and no seats. Also do the bow of the conductor to the audience
       early: the end of a piece now has no reward (2.4, 5.4).
-- [ ] Try a fixed gradient from the top edge with the text shadow in place of the title shade. In
-      play the shade shows as a dark smudge on the light beam. Check 4.5:1 with
-      `e2e/title-shade.e2e.ts`. If it passes, remove `src/app/backdrop-probe.ts` and its cost
-      (2.8).
 - [ ] Draw staff lines and note heads into one small canvas texture at start (no file), and use it
       on each stand sheet and on the score of the conductor desk. The sheets are blank white quads
       (`src/models/props.ts`), and the close shots show them (4.6).
@@ -1354,10 +1350,6 @@ navigation menu at the top of the mockup is out of scope.
       The main thread passes. With the pixel ratio 1.5, no side light shadows, and 12 stage
       samples, the GPU was about 5 ms p95 on a view of the stage top, in one run that was not
       valid (another process used the GPU). Measure it on an idle machine.
-- [ ] Cut the main-thread cost of the read of the title backdrop (`app/backdrop-probe.ts`, 2.8).
-      A frame with a read or its result took about 2 ms more than another frame, mostly in the
-      browser, in about 18% of the frames. With no read, the main thread p95 went from 4.00 ms to
-      3.04 ms (median of two runs each). A longer interval changes how fast the shade follows the frame.
 - [ ] Pin the views of the traces of `pnpm frame`, for example with a fixed shot. The shot plan
       follows the layout, so the piano scale of 2026-10-24 moved the Metal trace from a view of
       the hall to a view of the stage top: 2.2 ms more GPU time with no change of a frame (9.7).
