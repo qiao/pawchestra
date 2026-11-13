@@ -1619,9 +1619,11 @@ export class App {
   /**
    * Loads the audio module after the first frame of the scene (design 6.3, 7.2), creates the
    * `Player` with the speed and the volume of the bar, and loads the samples of the current
-   * piece before the first click.
+   * piece before the first click. The font of the title loads at the same point, so that it does
+   * not delay the build of the first piece.
    */
   async #startAudio(): Promise<void> {
+    this.#ui.title.loadFont();
     const { LoadReplacedError, WorkletPlayer } = await import('../audio/player.ts');
     // With the audio service started, the `AudioContext` does not block the main thread.
     await this.#audioOutput;
