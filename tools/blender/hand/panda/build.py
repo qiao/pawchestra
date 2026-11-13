@@ -198,7 +198,10 @@ def turn_paws(body):
             uvs = {l.vert.index: tuple(l[uv].uv) for l in face.loops}
             old.append((forward, [uvs[q.index] for q in quad]))
             bm.faces.remove(face)
-        # The paw: each arm vertex past ring A along the axis, on the side of the paw.
+        # The paw: each arm vertex past ring A along the axis, on the side of the paw. Ring A
+        # stays: it is slanted, so 5 (left) and 4 (right) of its 16 vertices lay past the mean,
+        # turned with the paw, and sheared the quads before the ring into a pinched wrist with a
+        # stretched texture.
         S = np.array([rings.studio(v.co) for v in bm.verts])
         Borig = S[B].copy()
         t_a = float(np.mean((S[A] - f) @ axis))
@@ -208,6 +211,7 @@ def turn_paws(body):
             & (r < P.get('turnReach', 0.08))
             & (sign * S[:, 0] > 0.15)
         )
+        move[A] = False
         S[move] = (S[move] - f) @ R.T + f
         for i in np.nonzero(move)[0]:
             bm.verts[i].co = Vector((S[i] @ sa.TO_STUDIO).tolist())

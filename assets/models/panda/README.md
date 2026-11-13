@@ -102,9 +102,14 @@ the height, in the source):
   y 0.115, 0.138, and 0.158. The knee joint is at y 0.13.
 - **Paws turned.** Each vertex past the arm ring at x 0.238 turns rigidly about the rest forearm
   axis by whole ring steps of 22.5 degrees: -135 degrees on the left (6 steps) and 112.5 degrees on
-  the right (5 steps), 427 and 426 vertices. New quads join the two rings with the step offset, and
-  the far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units). The new
-  quads keep the UVs of the old band ("Arm twist").
+  the right (5 steps), 422 vertices on each side. New quads join the two rings with the step
+  offset, and the far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units).
+  The new quads keep the UVs of the old band ("Arm twist").
+- **Forearm loop.** The ring at x 0.238, near the elbow, does not turn. It is slanted, so 5 (left)
+  and 4 (right) of its 16 vertices lie past its mean along the forearm axis. When they turned with
+  the forearm, they moved up to 0.118 units, and the quads before the ring sheared into notches
+  below the elbow: 12 faces on the left and 9 on the right had UV scale ratios of 3.0 to 23.3,
+  against about 1.2 on the faces around them.
 - **Arm stretch.** The point edit `armStretch` ("Arm stretch" below), before the automatic weights.
 - **Paw size.** The point edit `paw` ("Paw size" below), after the automatic weights. Its paw frame
   moves with the forearm joint and the wrist joint of the arm stretch.
@@ -264,7 +269,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/panda.rig.glb` | 1,152,576 bytes | `20b3a4ab857d92fb7ae886726002146d1b17c250e467f9efc75123cbda7f90f2` |
-| `tripo-hand/panda.rig.json` | 16,255 bytes | `bc6f05713aa42875aff1093a965db82335753cbf82f09d28c7007b6fdf57f144` |
+| `tripo-hand/panda.rig.glb` | 1,152,972 bytes | `c65e8eef26c682c1459810df094b607bf87974ff094a67ffdc1de203e03c21ba` |
+| `tripo-hand/panda.rig.json` | 16,255 bytes | `66b86315aae29b60f2ea44e9dec99524ee8011aaee8798aae7b4dba441f605bd` |
 | `tripo-hand/panda-color.webp` | 259,152 bytes, 2048 × 2048 | `f630fa99d34ef0f4be8b5c8bafcdf90602ca1488d0f5946fc11420e66165909c` |
 | `tripo-hand/panda-normal.webp` | 52,722 bytes, 1024 × 1024 | `aa537e7099c209fab0f402754cc48d6d45b930806cc567942ab1c56d31e551bb` |
