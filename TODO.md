@@ -863,7 +863,7 @@ passes.
       hold-fit fox-violinist`). Images: `reports/2026-11-13-fox-move/`.
 - [ ] Tripo red fox violinist: the paws go up to 2.5 cm into the violin and the left forearm 2.0
       cm (`pnpm body-clip fox-red:violin`, limit 0.045 H), as on the fox before (2.3 cm).
-- [ ] Tripo tan fox flutist: with the longer paw, the right paw at rest and in the lift lies 73°
+- [ ] Tripo tan fox flutist: with the longer paw, the right paw at rest and in the lift lies 69°
       from its side of the flute (limit 60°), so it holds the flute in each sample and grasps it in
       none (`pnpm wind-grip flutist`, 100% before). Fit the rest grip of `FOX_FLUTE`.
 - [ ] `pnpm wind-grip` has no row for the bow paw of the red fox. The fit of `bowGrip` used an
