@@ -1071,12 +1071,14 @@ little over each phrase and keeps still on each note, as a real choir singer ope
 keeps the head still. Neighbor voices sway to opposite sides, so that the choir does not move as one
 block. The flippers hold the outer edges of the folder with the elbows down and out (`CHOIR_HOLD`). As a
 hand holds a book, the outer third of each flipper curls around the outer edge of the cover: each
-grip lies just outside the edge (`CHOIR_FOLDER.gripIn`), the paw bends toward the palm at the
-wrist with the palm on its grip (`CHOIR_HOLD.flex`), and the fingers curl (`CHOIR_HOLD.curl`).
-The covers are about as wide as an A4 page (`CHOIR_FOLDER.width`), so that the grips stay in the
-reach of the flippers. Reason: with the grips inside the edges, each flipper went through the
-cover, and the cover cut the flipper in the side view. A curl of the fingers alone bent
-only the last part of the flipper, and the flipper looked flat. Reason:
+grip lies just outside the edge and a little in front of the cover (`CHOIR_FOLDER.gripIn`,
+`gripFront`), the paw bends toward the palm at the wrist with the palm on its grip
+(`CHOIR_HOLD.flex`), and the fingers curl far, so that the flipper tip lies on the front of the
+cover, inside its edge (`CHOIR_HOLD.curl`). The covers are about as wide as an A4 page
+(`CHOIR_FOLDER.width`), so that the grips stay in the reach of the flippers. Reason: with the
+grips inside the edges, each flipper went through the cover, and the cover cut the flipper in the
+side view. With a small curl, the flipper tips stood off the cover beside its edges. A larger bend
+at the wrist moves the wrist away from the shoulder, and the palms missed their grips. Reason:
 the rebuilt flippers are free round arms, and with the elbows of the old flippers the upper arms
 went into the chest. A larger turn of the elbows turns the grips off the accepted grip.
 

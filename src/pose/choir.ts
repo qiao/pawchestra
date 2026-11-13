@@ -21,11 +21,15 @@ export const CHOIR_HOLD = {
   poleL: [-1, -1, 0.1],
   poleR: [1, -1, 0.1],
   /**
-   * The curl of the fingers around the outer edges of the folder. With {@link CHOIR_HOLD.flex},
-   * the outer third of each flipper of the Tripo penguin curls about 40° toward the front of the
-   * cover. The curl of 35° alone bent only the last 3 cm, and the flipper looked flat.
+   * The curl of the fingers around the outer edges of the folder. With {@link CHOIR_HOLD.flex}
+   * and the grip 1 cm in front of the cover (`CHOIR_FOLDER.gripFront`), the flipper tip of the
+   * Tripo penguin curls around the outer edge onto the front of the cover. The digits then come 3.0
+   * cm inside the edge, 0.3 cm off the cover, and no flipper edge crosses the folder. With 15°, the
+   * digits stood 2.7 cm off the cover beside its edge. With 85°, they lay 0.1 cm off it, and with
+   * 90°, the flipper went through the cover. A larger flex in place of the curl moves the wrist
+   * away from the shoulder: with 45°, the palms missed their grips by 10.7 mm.
    */
-  curl: 15 * MathUtils.DEG2RAD,
+  curl: 80 * MathUtils.DEG2RAD,
   /**
    * The bend of each paw toward the palm at the wrist. The palm keeps its grip, and the arm
    * follows. The wrist of the Tripo penguin is at two thirds of the flipper, so the bend starts

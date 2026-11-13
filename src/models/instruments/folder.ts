@@ -53,8 +53,14 @@ export const CHOIR_FOLDER = {
    * flippers: the palms missed them by up to 18 mm.
    */
   gripIn: -0.03,
-  /** The distance of each grip of a palm in front of its cover, away from the singer, in meters. */
-  gripFront: 0.02,
+  /**
+   * The distance of each grip of a palm in front of its cover, away from the singer, in meters.
+   * With the curl of the flipper tip (`CHOIR_HOLD.curl`), the digits wrap the outer edge onto the
+   * front of the cover, 0.3 cm off it. With 2 cm, the palms missed their grips by 5.5 mm, and the
+   * curled digits stood 1.2 cm or more off the cover. With 0.8 cm, the curled tip went through
+   * the cover.
+   */
+  gripFront: 0.01,
 };
 
 /**
