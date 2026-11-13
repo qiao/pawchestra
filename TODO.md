@@ -1005,6 +1005,16 @@ passes.
 - [ ] Tripo beagle cellist: the clearance sweep puts the cello 12.3 cm into the chest at the bass
       side of the upper back, behind the left upper arm. No view shows it; the fit measures only
       the middle line of the back.
+- [ ] Tripo fox seat (4.4): give the fox chain the key `bind_sit` of the cat and the pig
+      (`sit_move()` of `tools/blender/bind_edit.py`). A knob of 3 vertices with `hips` 1.0 under
+      the haunch sets the seat top, so its key also lifts the knob onto the thigh plane, and the
+      seat rises.
+- [ ] Tripo pig seat (4.4): the haunch sits on the front half of the chair, about 11 cm in front
+      of the back posts, because the round back sets the chair depth. Only a forward trunk lean in
+      the bind (`studio.trunk`) moves the haunch back, and it moves each hold of `PIG_HORN`.
+- [ ] Tripo cat seat (4.4): the haunch sits about 9 cm in front of the back posts, and the round
+      back of the haunch keeps 5 cm to them. `seatBack` of `ANIMALS` can move the cat back by up
+      to 4 cm. Check the layout moves and the shins at the front edge of the seat.
 
 Done when: the gallery shows each species with its instrument, the budget test passes, and the
 scene of each demo has its seats and stage size with no overlap.
