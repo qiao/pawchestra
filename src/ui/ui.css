@@ -507,11 +507,20 @@ body:has(.camera[aria-pressed='true']) .title .github {
   color: var(--accent-strong);
 }
 
-/* While the drawer shows the demo list, "Select music" has nothing to open, so it hides. A wide
-   window opens the drawer at the demo list at start (design 2.8). The button keeps its box, so
-   that the first screen and the stage do not move. */
-body:has(.drawer:not([hidden]) #panel-demos:not([hidden])) .first-screen .select-piece {
-  visibility: hidden;
+/* "Watch as a film" and "Select music" stand in one line below the intro line (design 2.8). */
+.first-screen .intro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* While the drawer shows the demo list, "Select music" has nothing to open, so it goes. A wide
+   window opens the drawer at the demo list at start (design 2.8). "Watch as a film" keeps the
+   height of the line, so that the first screen and the stage do not move. */
+body:has(.drawer:not([hidden]) #panel-demos:not([hidden]))
+  .first-screen
+  .select-piece:not(.watch-film) {
+  display: none;
 }
 
 /* The box keeps its height with no text, so that the play button does not move when the load

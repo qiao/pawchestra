@@ -3,7 +3,7 @@
 import { soloFromQuery } from './app/look-override.ts';
 import { inject } from '@vercel/analytics';
 import { App } from './app/app.ts';
-import { fileFromHash } from './app/demos.ts';
+import { fileFromHash, filmFromHash } from './app/demos.ts';
 import type { DevHook } from './app/dev-hook.ts';
 import { NO_WEBGL2_TEXT } from './app/messages.ts';
 import { yieldToMain } from './app/slices.ts';
@@ -119,8 +119,11 @@ function start(canvas: HTMLCanvasElement, scene: StageScene): void {
   // The URL hash `#demo=<id>` opens a demo (design 2.2). A change of the hash in the address bar
   // shows its demo. It is no user gesture, so the first screen waits for a click.
   window.addEventListener('hashchange', () => {
+    app.setFilmAtPlay(filmFromHash(location.hash));
     app.select(fileFromHash(location.hash, import.meta.env.DEV), false).catch(reportError);
   });
+  // `film=1` starts the piece in Cinematic mode at the first play (design 2.2).
+  app.setFilmAtPlay(filmFromHash(location.hash));
   const first = fileFromHash(location.hash, import.meta.env.DEV);
   // The first screen waits for a click, because the browser needs a user gesture (design 2.2).
   app.select(first, false).catch(reportError);

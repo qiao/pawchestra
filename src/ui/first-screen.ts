@@ -1,4 +1,4 @@
-import { INTRO_TEXT, SELECT_PIECE_TEXT } from '../app/play-control.ts';
+import { INTRO_TEXT, SELECT_PIECE_TEXT, WATCH_FILM_TEXT } from '../app/play-control.ts';
 import type { ScreenBox } from '../shots/frame.ts';
 import { createButton, createElement, setAttribute, setText } from './dom.ts';
 import { createIcon, setIcon } from './icons.ts';
@@ -61,7 +61,8 @@ function createRingCircle(className: string): SVGCircleElement {
  * The first screen (design 2.2, 2.8): a round play button of 72 px in the middle of the stage.
  * While the samples load, a ring around the button shows the progress, and a label below it shows
  * the load text. A polite live region reads the load text (2.8). Until the first play of the
- * session, a line tells what the app does, and a text button opens the demo list.
+ * session, a line tells what the app does, a text button starts the piece as a film, and a text
+ * button opens the demo list.
  */
 export class FirstScreen {
   readonly element: HTMLElement;
@@ -78,10 +79,17 @@ export class FirstScreen {
    *
    * @param onPlay The action of a click on the play button.
    * @param onSelectPiece The action of a click on the button that opens the demo list.
+   * @param onWatchFilm The action of a click on "Watch as a film": the piece starts in Cinematic
+   *   mode.
    * @param focusAfterHide Gets the keyboard focus when the first screen hides with the keyboard
    *   focus in it.
    */
-  constructor(onPlay: () => void, onSelectPiece: () => void, focusAfterHide: () => void) {
+  constructor(
+    onPlay: () => void,
+    onSelectPiece: () => void,
+    onWatchFilm: () => void,
+    focusAfterHide: () => void,
+  ) {
     this.#focusAfterHide = focusAfterHide;
     this.element = createElement('div', 'first-screen');
     const button = createButton('play', 'Play');
@@ -104,7 +112,12 @@ export class FirstScreen {
     const selectPiece = createButton('select-piece', '');
     selectPiece.textContent = SELECT_PIECE_TEXT;
     selectPiece.addEventListener('click', onSelectPiece);
-    this.#intro.append(line, selectPiece);
+    const watchFilm = createButton('select-piece watch-film', '');
+    watchFilm.textContent = WATCH_FILM_TEXT;
+    watchFilm.addEventListener('click', onWatchFilm);
+    const actions = createElement('div', 'intro-actions');
+    actions.append(watchFilm, selectPiece);
+    this.#intro.append(line, actions);
     this.element.append(button, this.#status, this.#intro);
   }
 

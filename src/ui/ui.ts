@@ -30,6 +30,8 @@ const STAGE_FADE_MS = 150;
 interface UiActions extends BarActions {
   /** A click on the play button of the first screen. */
   readonly onFirstPlay: () => void;
+  /** A click on "Watch as a film" of the first screen: the piece starts in Cinematic mode. */
+  readonly onWatchFilm: () => void;
   /** A click on a row of the demo list. */
   readonly onSelectDemo: (id: DemoId) => void;
   /** A file that the user selected with the file button or dropped on the page. */
@@ -119,6 +121,7 @@ export class Ui {
       () => {
         this.openDemoList();
       },
+      actions.onWatchFilm,
       () => {
         this.bar.focusPlay();
       },

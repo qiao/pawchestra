@@ -15,7 +15,13 @@
   positive and cheerful piece. Its orchestra sits in the rest pose (5.2), a large play button
   starts the music, and the samples load right after the first frame.
 - The URL hash `#demo=<id>` opens a demo (`fileFromHash()` in `app/demos.ts`). A selection in the
-  demo list writes the hash with `history.replaceState()`. A dropped file does not change the URL.
+  demo list writes the hash with `history.replaceState()`. `film=1` in the hash starts the first
+  play in Cinematic mode (`filmFromHash()`), and each change of the mode writes or removes it, so
+  that a copied link opens the same piece in the same mode. A dropped file removes the hash,
+  because a link cannot open a file of the user.
+- "Copy link" in the settings of the drawer gives the URL of the page: the share sheet of the
+  system on a touch device, else the clipboard with a short status line (`shareLink()` of
+  `app/share-link.ts`).
 - Only the first screen waits for a click, because the browser needs a user gesture before it
   plays audio. A piece that the user selects later starts when its samples are ready.
 - A click on play while the samples load starts the piece when they are ready, and a second click
@@ -131,6 +137,8 @@ page starts in Free mode (`app/camera-mode.ts`).
 - **Free** is the orbit camera. After a drag, a pinch, or a wheel in Cinematic mode, it starts
   from the current camera, so the view does not jump. It cannot go below the stage, and a zoom
   stops outside the box of the stage and the players.
+- "Watch as a film" on the first screen (2.8) and `film=1` in the hash (2.2) change to Cinematic
+  mode at the next play. A change of the mode by the user before the play cancels it.
 - **Cinematic** takes each frame from `cameraAt()`: the shots of 5.6. The first shot starts from
   the default view, so a click on play makes no cut. A drag, a pinch, or a wheel changes to Free
   at once. The change to Cinematic mode closes the drawer (2.3).
@@ -304,13 +312,16 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   closer. The volume slider shrinks to half its width before a control leaves the bar.
 - **First screen**: a round play button below the front edge of the stage, so that it does not
   cover the orchestra. In Free mode, the camera frame shrinks until the stage is clear of it
-  (`clearFirstScreen()`); Cinematic mode keeps its full frame (2.5). A ring shows the load progress of the bytes, and the load text counts
-  the files (`loadText()`). Until the first play, an intro line tells what the app does, and
-  "Select music" opens the demo list. The line names the classical music before the MIDI file,
-  because most visitors have no MIDI file. While the drawer shows the demo list, the button has nothing to
-  open, so it hides (`visibility: hidden`, so that the first screen keeps its size). A wide window
-  opens the drawer at the demo list at start, so there the intro line shows alone. ASD-STE100 has
-  no verb "choose", so the buttons say "Select".
+  (`clearFirstScreen()`). Cinematic mode keeps its full frame (2.5). A ring shows the load
+  progress of the bytes, and the load text counts the files (`loadText()`). Until the first play,
+  an intro line tells what the app does, "Watch as a film" starts the piece in Cinematic mode,
+  and "Select music" opens the demo list. The line names the classical music before the MIDI
+  file, because most visitors have no MIDI file. The film is the best view of the app, and its
+  icon in the bar has no text and no tooltip on a touch screen, so the first screen names it.
+  While the drawer shows the demo list, "Select music" has nothing to open, so it hides. "Watch as
+  a film" keeps the height of the line, so that the first screen keeps its size. A wide window
+  opens the drawer at the demo list at start, so there the film button shows alone. ASD-STE100
+  has no verb "choose", so the buttons say "Select".
   `index.html` holds the same load state as static HTML and the style sheets in its head (inline
   in the build, 7.2), so the first paint shows no unstyled page.
 - **Drawer**: a floating panel in `--panel-glass`, nearly opaque, so that its dim text keeps
@@ -427,6 +438,10 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 | Drop overlay | Drop the MIDI file to play it. |
 | First screen, until the first play of the session | An orchestra of animals plays classical music. It also plays your MIDI file. |
 | First screen, the button that opens the demo list | Select music |
+| First screen, the button that starts the piece in Cinematic mode | Watch as a film |
+| Settings, the button that copies or shares the link of the page | Copy link |
+| Status after the link is in the clipboard | The link is copied. |
+| Status after the browser did not copy the link | The link did not copy. Copy it from the address bar. |
 | Seat row, the mute button and the solo button | Mute / Only this |
 | Row above the seat list that clears each mute and solo flag | All seats |
 

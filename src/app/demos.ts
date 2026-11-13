@@ -270,8 +270,19 @@ export function fileFromHash(hash: string, devServer: boolean): StageFile {
  * Gives the URL hash of a demo (design 2.2).
  *
  * @param id The demo.
- * @returns The hash, for example `#demo=beethoven-9`.
+ * @param film True to start the piece in Cinematic mode at the first play.
+ * @returns The hash, for example `#demo=beethoven-9` or `#demo=beethoven-9&film=1`.
  */
-export function demoHash(id: DemoId): string {
-  return `#demo=${id}`;
+export function demoHash(id: DemoId, film = false): string {
+  return film ? `#demo=${id}&film=1` : `#demo=${id}`;
+}
+
+/**
+ * Tells if the URL hash asks for Cinematic mode at the first play: `film=1` (design 2.2).
+ *
+ * @param hash The hash of the URL, for example `#demo=beethoven-9&film=1`, or '' for none.
+ * @returns True for `film=1`.
+ */
+export function filmFromHash(hash: string): boolean {
+  return new URLSearchParams(hash.replace(/^#/u, '')).get('film') === '1';
 }

@@ -278,6 +278,11 @@ export class App {
   #message: Message | null = null;
   /** Cinematic or Free (design 2.5). The page starts in Free mode. */
   #cameraMode: CameraMode = 'free';
+  /**
+   * True if the next play changes the camera to Cinematic mode: after "Watch as a film", or with
+   * `film=1` in the URL hash (design 2.2). A change of the mode by the user clears it.
+   */
+  #filmAtPlay = false;
   /** The camera of the shot of the last frame, which `cameraAt()` writes. */
   readonly #shotCamera = createCameraPose();
   /** The phone layout of design 2.8, which moves the frame above the sheet. */
@@ -315,6 +320,9 @@ export class App {
         onFirstPlay: () => {
           // The large button follows the rules of the play button of the bar (design 2.2).
           this.#clickPlay();
+        },
+        onWatchFilm: () => {
+          this.#watchFilm();
         },
         onSeek: (songSec) => {
           this.#seek(songSec);
@@ -598,6 +606,9 @@ export class App {
    * @param event The event.
    */
   #changeCamera(event: CameraEvent): void {
+    if (event !== 'new-piece') {
+      this.#filmAtPlay = false;
+    }
     const mode = nextMode(this.#cameraMode, event);
     if (mode === 'cinematic' && this.#cameraMode === 'free') {
       this.#ui.closeDrawerForFilm();
@@ -605,7 +616,29 @@ export class App {
     if (event === 'toggle') {
       this.#scene.blendNextModeChange();
     }
+    const changed = mode !== this.#cameraMode;
     this.#cameraMode = mode;
+    if (changed) {
+      this.#writeHash();
+    }
+  }
+
+  /**
+   * Writes the URL hash of the current piece (design 2.2): the demo, with `film=1` in Cinematic
+   * mode, so that a copied link opens the same piece in the same mode. A file of the user has no
+   * hash, because a link cannot open it. The hash adds no entry to the history.
+   */
+  #writeHash(): void {
+    const file = this.#piece?.file;
+    if (file === undefined) {
+      return;
+    }
+    const { pathname, search } = window.location;
+    const hash =
+      file !== null && isDemoId(file) ? demoHash(file, this.#cameraMode === 'cinematic') : '';
+    if (window.location.hash !== hash) {
+      history.replaceState(history.state, '', `${pathname}${search}${hash}`);
+    }
   }
 
   /** Cinematic or Free (design 2.5). */
@@ -765,9 +798,9 @@ export class App {
     this.#audio?.resume();
     this.select(file, true)
       .then((shown) => {
-        // The hash opens the demo again after a reload. It adds no entry to the history.
-        if (shown && isDemoId(file)) {
-          history.replaceState(history.state, '', demoHash(file));
+        // The hash opens the demo again after a reload.
+        if (shown) {
+          this.#writeHash();
         }
       })
       .catch(reportError);
@@ -839,6 +872,8 @@ export class App {
     const title = fileTitle(score.sequenceName, file.name);
     const piece = preparePiece({ file: null, title, bytes, score }, scene, true);
     this.#showPiece(piece, prepared);
+    // A link cannot open a file of the user, so the hash of the earlier demo goes (design 2.2).
+    this.#writeHash();
     if (covered) {
       this.#ui.uncoverStage();
     }
@@ -1251,6 +1286,36 @@ export class App {
   }
 
   /**
+   * Starts the piece in Cinematic mode: "Watch as a film" of the first screen (design 2.2, 2.8).
+   * The camera changes at the play, so that a piece that waits for its samples keeps the first
+   * screen in Free mode until then. A piece that already waits keeps its wait.
+   */
+  #watchFilm(): void {
+    this.#filmAtPlay = true;
+    const piece = this.#piece;
+    if (!piece) {
+      if (!this.#playWhenShown) {
+        this.#clickPlay();
+      }
+      return;
+    }
+    const action = playAction({ ...piece, playing: this.#state.transport.playing });
+    if (action === 'play' || action === 'wait' || action === 'retry') {
+      this.#clickPlay();
+    }
+  }
+
+  /**
+   * Sets the start mode of the next play from the URL hash (design 2.2): `film=1` starts the piece
+   * in Cinematic mode at its first play.
+   *
+   * @param film True for `film=1`.
+   */
+  setFilmAtPlay(film: boolean): void {
+    this.#filmAtPlay = film;
+  }
+
+  /**
    * Plays the piece, and records the change in the transport of the pose. A play starts the
    * count-in from the start point (design 5.4, 6.5): the seek point that the listener does not
    * hear yet, else the song time of the `Player`.
@@ -1275,6 +1340,10 @@ export class App {
     );
     audio.player.play(start.countInSec);
     this.#state = start.state;
+    if (this.#filmAtPlay && this.#cameraMode === 'free') {
+      this.#changeCamera('toggle');
+    }
+    this.#filmAtPlay = false;
     piece.played = true;
     piece.playWhenReady = false;
     this.#sessionPlayed = true;
