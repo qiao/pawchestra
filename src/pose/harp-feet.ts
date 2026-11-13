@@ -58,13 +58,13 @@ interface LegRest {
  * points out, forward, and a little up: with the knee of the bind, the knee went back over the
  * front corner of the stool, and the left shin 2.0 cm into the stool. With this knee, the left
  * shin goes 1.8 cm into the stool only in a pedal move (0.7 % of the samples). The base stands to
- * the right of the middle (`HARP_PLACE.side`), so the right hoof rests 0.15 H to the right of its
- * bind place: with the bind place, the right hoof went 2.1 cm into the base in 1.9 % of the
- * samples, in pedal moves, and with this place 1.9 cm in 0.7 %.
+ * the right of the middle (`HARP_PLACE.side`), so the right hoof rests 0.25 H to the right of its
+ * bind place: on the harp of the scale 0.85, with 0.15 H, the right hoof went 1.7 cm into the base
+ * in pedal moves (0.1 % of the play), and with 0.25 H 1.2 cm (`pnpm body-clip harpist`).
  */
 const LEG_RESTS: readonly [left: LegRest, right: LegRest] = [
   { hoof: [-0.55, 0, 0.6], knee: [-0.5, 0.3, -1] },
-  { hoof: [0.15, 0, 0], knee: null },
+  { hoof: [0.25, 0, 0], knee: null },
 ];
 
 /** One leg of a harpist and the harp pedals in front of it, in the model axes. */
