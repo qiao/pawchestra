@@ -333,20 +333,21 @@ export const HANDS_HOLDS = {
   // strings, the left wrist bends back 58° to 60° in the rest, the lift, and the play, 88° from
   // the straight paw. With the palm 31° down, it bends back 26° to 31°, 58° from the straight
   // paw. With the group places of the fingering, the paw swing p95 is 57° at 45° down, 61° at
-  // 39°, and 59° at 42° (`pnpm arm-check`). The right palm faces the strings, 25° down and 20°
-  // back (`faceR`), as the wrists of a harpist go a little down: on the Tripo fawn
+  // 39°, and 59° at 42° (`pnpm arm-check`). The right palm faces the strings, 27° down and 20°
+  // back (`faceR`), as the wrists of a harpist go a little down. On the harp of 0.975, with the palm
+  // 6° down, the right paw missed 1.3 % of its note targets by up to 8.5 mm. On the harp of 0.85
   // with the higher right elbow and the harp place of 2026-11-13, the right paw twists 48° on its
   // forearm at 14° down, 34° at 27° down, and 31° with the turn back (p95 of `pnpm hold-fit
   // harpist`). The turn back keeps the twist of the right forearm bone in the chord and the pluck
-  // at 42° (62° with no turn back, 52° before the round). The right palm lies 10 cm above the
-  // pluck point, 8.3 cm right of the strings, and 4.3 cm toward the player: at 7 cm above, the
-  // right paw missed 3.6 % of its note targets by up to 1.7 cm in the fast run near 111 s of
-  // `boulanger-matin`, and the right upper arm went 1.4 cm into the soundbox in 16 % of the
-  // samples. The top of the soundbox stands below the right shoulder, so the right arm hangs
-  // outside it, and the right elbow points out and 45° down (`poleR`). With the elbow out and 9°
-  // down, the right upper arm stood out 40° from the trunk (p50) against 33° (`scratch/dh/evalc.ts`
-  // of the round 2026-11-13). An elbow forward, at [0.5, -1, -1.5], twisted the right paw of the
-  // old deer up to 74° on its forearm (`pnpm hold-fit harpist`). The left fingers point up and back
+  // at 42° (62° with no turn back, 52° before the round). The right palm lies 6.9 cm above the
+  // pluck point, 11.7 cm right of the strings, and 5.2 cm toward the player: on the harp of 0.975
+  // in front of the chest, with the palm of the harp of 0.85 (10 cm above, 8.3 cm right), the right
+  // elbow bent to 82° (p5, 180° is straight) against 96°. The top of the soundbox rests against
+  // the chest, below the right shoulder, so the right elbow points out, up, and a little back
+  // (`poleR`), and the right arm passes outside the top of the soundbox. With the elbow out and down
+  // ([1, -1, 0]), the right upper arm went 1.7 cm into the soundbox in 17 % of the samples
+  // (`scratch/dh/evalc.ts` of the round 2026-11-13). An elbow forward, at [0.5, -1, -1.5], twisted
+  // the right paw of the old deer up to 74° on its forearm (`pnpm hold-fit harpist`). The left fingers point up and back
   // along the strings (`aimL`): with the fingers on
   // the line from the shoulder and the palm square to the strings, the left paw bends 86° to 91°
   // on its bent bind forearm. The elbows point out and down, in the play and
@@ -360,7 +361,7 @@ export const HANDS_HOLDS = {
     action: 'pluck',
     keyPoint: harpStringPosition,
     palmL: [-0.55, 1.05, 0.090569],
-    palmR: [0.289, 0.35, 0.15],
+    palmR: [0.409, 0.24, 0.18],
     // The highest strings of the left hand lie near the chest of the Tripo fawn, and the palm 0.30 m
     // above their pluck points stands near the height of the shoulder. From C3 to D4, the left palm
     // moves up to 4 cm nearer to the strings, 6 cm down, and 6 cm toward the column. With the
@@ -369,14 +370,14 @@ export const HANDS_HOLDS = {
     // hold-fit harpist`, `pnpm pose-depth harpist`).
     highL: { from: 48, to: 62, offset: [0.181139, -0.271708, -0.271708] },
     // The highest strings of the right hand lie near the right shoulder, at the neck of the harp.
-    // From G4 to C7, the right palm moves up to 17 cm down the strings and 2.6 cm away from them,
+    // From B3 to C7, the right palm moves up to 24 cm down the strings and 5.2 cm away from them,
     // as the right wrist of a harpist comes near the soundboard in the upper register (section 4).
-    // On the harp of the scale 0.85, with the move of 10 cm from G5, the right elbow bent to 73°
-    // (p5, 180° is straight), and with this move to 99°. The note targets do not change
+    // On the harp of 0.975, with the move of 17 cm from G4, the right elbow bent to 74° (p5, 180°
+    // is straight), and with this move to 96°. The note targets do not change
     // (`scratch/dh/evalc.ts` of the round 2026-11-13).
-    highR: { from: 67, to: 96, offset: [0.090569, -0.6, 0] },
+    highR: { from: 59, to: 96, offset: [0.1806, -0.85, 0] },
     faceL: [1, -1.5, 0],
-    faceR: [-1, -0.5, 0.4],
+    faceR: [-1, -0.55, 0.4],
     aimL: [0, 1, 0.5],
     aimR: null,
     lean: 0,
@@ -396,7 +397,7 @@ export const HANDS_HOLDS = {
     most: HARP_FINGERING.fingers,
     apart: 0,
     poleL: [-0.85, -1.2, 0.3],
-    poleR: [1, -1, 0],
+    poleR: [1, 1, 0.3],
     curl: 15 * MathUtils.DEG2RAD,
     curlClosed: 60 * MathUtils.DEG2RAD,
     // After its pluck, the thumb bends over finger 2 (`docs/reference/harp-technique.md`, section
