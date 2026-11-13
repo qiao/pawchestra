@@ -207,11 +207,12 @@ finds no row. The pink of the paws is the pink of the source: the mean color of 
 RGB (231, 155, 135) in the source map and (229, 156, 136) in `mouse-color.webp`.
 
 **Maps** (`tools/mouse-maps.py`). The tool scales the color map of the source to 2048 pixels
-(Lanczos), adds the fur strands of `tools/fox-maps.py` (`strands()`) to the fur, and writes WebP
-quality 60, method 6 (Pillow 13.0.0). The pink skin (Oklab C from 0.06, h near 35 degrees: 24 % of
-the texels) and the eyeballs take no strands. It writes `mouse-normal.webp` from the normal map of
-the FBX with the slope of the same strands: each x, y tilt limited to 0.2 (4.27 % of the texels), a
-box scale to 1024 pixels, the tilts times 4 in red and green, 255 in blue, and `cwebp -q 60
+(Lanczos), adds the soft fur strands of `tools/fox-maps.py` (`strands()`, tilt 0.03, luma 0.08, half
+length 11 texels) to the fur, and writes WebP quality 60, method 6 (Pillow 13.0.0). The pink skin
+(Oklab C from 0.06, h near 35 degrees: 24 % of the texels) and the eyeballs take no strands. It
+writes `mouse-normal.webp` from the normal map of the FBX with the slope of the same strands: each
+x, y tilt limited to 0.2 (4.27 % of the texels), a box scale to 1024 pixels, the tilts times 4 in
+red and green, 255 in blue, and `cwebp -q 60
 -sharp_yuv -m 6` (libwebp 1.5.0). The eye mask comes from the rig file, so run the tool after the
 chain.
 
@@ -224,5 +225,5 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 |---|---|---|
 | `tripo-hand/mouse.rig.glb` | 1,168,048 bytes | `05fe01765647a9669efda3f91eb08478f5230bb1dbb25a6f746a490a6638cfa5` |
 | `tripo-hand/mouse.rig.json` | 17,320 bytes | `01c2822da13fefb835080fec61e7424f3bcdcdf56c72256fa66e96229e33b5d2` |
-| `tripo-hand/mouse-color.webp` | 257,276 bytes, 2048 × 2048 | `c7865caf72b02338b984c617ad201f0cd2a3c3abf1da7794ee296dc03f18ed9a` |
-| `tripo-hand/mouse-normal.webp` | 214,706 bytes, 1024 × 1024 | `b45a2aaea51861a709b94434bde25e50ca12b73d5d1adc323e781ec45b4198b4` |
+| `tripo-hand/mouse-color.webp` | 227,220 bytes, 2048 × 2048 | `91da719f0aa1a77655125e3034962a62b0708837d2b3fcef182a0aff337f2ab1` |
+| `tripo-hand/mouse-normal.webp` | 174,666 bytes, 1024 × 1024 | `a39faab17e9846fb1fd278a74e36eca974bf4d863583340df897b58d0779b3f3` |
