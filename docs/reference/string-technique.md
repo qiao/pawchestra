@@ -618,8 +618,9 @@ The app does not follow these facts:
   no place of the right hand. The short arms of the rabbit do not reach the top of the thigh in
   front of the hip, so its frog end stands beside the thigh and not on it. The frog end of the
   red fox stays 16 cm above the thigh. In a move, the bow tip of the red fox turns to the left
-  below the snout, and its grip moves out and to the front, so that the roll of the paw on the stick
-  changes over the whole move (`restBow.via`).
+  below the snout, and its grip moves out and to the front (`restBow.via`). The roll of the paw
+  on the stick mixes from the roll of the rest arm to the roll of the play (`restRollOf()`), so
+  the paw does not roll over where the stick points near the elbow.
 
 ### 3.3 The cello on the chair and at rest
 

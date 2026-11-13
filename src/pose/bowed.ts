@@ -752,6 +752,8 @@ const pluckBow: BowPlace = { grip: new Vector3(), rotation: new Quaternion() };
 const pluckHand: BowHand = { wrist: new Vector3(), rotation: new Quaternion() };
 const palmOffset = new Vector3();
 const restBow: BowPlace = { grip: new Vector3(), rotation: new Quaternion() };
+/** The rest bow with no move of the via ({@link liftVia}), for {@link restRollOf}. */
+const restBowAt: BowPlace = { grip: new Vector3(), rotation: new Quaternion() };
 const viaRotation = new Quaternion();
 const viaReach = new Vector3();
 const held: BowPlace = { grip: new Vector3(), rotation: new Quaternion() };
@@ -1568,6 +1570,54 @@ interface HoldArmInput {
   readonly state: BowState;
   /** The eased weight of the playing pose. */
   readonly weight: number;
+  /** The roll of the hand around the rest bow in the rest pose, in radians ({@link restRollOf}). */
+  readonly restRoll: number;
+}
+
+const restShoulder = createFrame();
+const restTurn = new Quaternion();
+const restArmPole = new Vector3();
+const restArm = createArmPose();
+const restGrip: BowHand = { wrist: new Vector3(), rotation: new Quaternion() };
+
+/**
+ * Gives the roll of the right hand around the rest bow in the rest pose, toward the elbow of the
+ * rest arm, as {@link holdArm} gives it at the weight 0: the shoulder bone with no forward turn,
+ * the rest pole, and {@link ROLL_PASSES} passes. In a move, the roll of the hand mixes from this
+ * roll to the roll of the play (design 5.2). Reason: the roll toward the elbow of the moving arm
+ * is far from steady where the stick points near the elbow, and the rest bow of the red fox
+ * points up to the elbow. It turned the bow paw by 180° in the first fifth of each lift, at up to
+ * 2,000°/s.
+ *
+ * @param rig The points of the player.
+ * @param frames The posed frames of the root and of the chest.
+ * @param bow The rest bow with no move of the via, in the posed axes.
+ * @returns The roll, in radians.
+ */
+function restRollOf(rig: BowedRig, frames: TorsoFrames, bow: BowPlace): number {
+  const shoulder = poseShoulder(
+    rig.armR,
+    frames.chest,
+    rig.chestBind,
+    shoulderTurn(rig, 0, restTurn),
+    restShoulder,
+  );
+  restArmPole.fromArray(rig.restPoleR).applyQuaternion(frames.root.rotation);
+  gripHand(rig, bow, 0, restGrip);
+  let angle = 0;
+  for (let pass = 0; pass < ROLL_PASSES; pass++) {
+    const { elbow } = solveArm(
+      rig.armR.bind,
+      shoulder.position,
+      shoulder.rotation,
+      restGrip.wrist,
+      restArmPole,
+      restArm,
+    );
+    angle = rollToward(rig, bow, elbow);
+    gripHand(rig, bow, angle, restGrip);
+  }
+  return angle;
 }
 
 /**
@@ -1674,7 +1724,7 @@ function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm 
           .multiply(bowLocal.setFromAxisAngle(stickBind.fromArray(rig.stick), -playRoll));
         held.grip.fromArray(rig.grip).applyQuaternion(heldHand.rotation).add(heldHand.wrist);
       }
-      const restRoll = weight < 1 ? rollToward(rig, restBow, aim) : 0;
+      const restRoll = weight < 1 ? input.restRoll : 0;
       liftMix(restBow.rotation, held.rotation, weight, held.rotation);
       held.grip.lerpVectors(restBow.grip, held.grip, weight);
       const mixed = restRoll + (playRoll - restRoll) * weight;
@@ -1789,6 +1839,8 @@ export function poseBowed(
   // In the rest pose, the hand holds the bow on the right thigh.
   restBow.rotation.fromArray(rig.restBow.rotation).premultiply(frames.root.rotation);
   posePoint(frames.root, ORIGIN, rig.restBow.grip, restBow.grip);
+  restBowAt.rotation.copy(restBow.rotation);
+  restBowAt.grip.copy(restBow.grip);
   liftVia(rig, frames, weight, restBow);
 
   // The right elbow points out to the side in the rest pose. While the player plays, it turns
@@ -1808,7 +1860,8 @@ export function poseBowed(
   } else {
     basePole.copy(restPole);
   }
-  const arm = { rig, chest, shoulder, strings, state, weight };
+  const restRoll = weight < 1 ? restRollOf(rig, frames, restBowAt) : 0;
+  const arm = { rig, chest, shoulder, strings, state, weight, restRoll };
   let angle: number;
   let onStick: number;
   if (pizzicato <= 0 || pizzicato >= 1) {

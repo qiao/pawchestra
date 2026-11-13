@@ -249,6 +249,11 @@ count-in (5.4, 6.5), and lower them when the hold of `transport.holdSec` after a
   On a pronated bind paw, the playing grip lies past 180° in the supination, so the paw turns the
   other way, through the direction of no paw twist. Reason: the change of the hold cannot change
   the bind of the body, and the other way flips the paw on six recast bodies.
+- **Steady bow roll.** In a move, the roll of the bow paw around the stick mixes from the roll of
+  the rest pose to the roll of the play (`restRollOf()` of `pose/bowed.ts`). The rest roll comes
+  from the rest arm, and not from the moving arm. Reason: the roll toward the elbow of the moving
+  arm changes fast where the stick points near the elbow. The upright rest bow of the red fox
+  points up to the elbow, and its paw rolled about 180° in the first fifth of each lift.
 - **Seated posture.** Each seated player sits tall off the chair back, with the hips above the
   knees, vertical shins, and the soles flat, as real seated string players sit: "The main point
   is that your hips are higher than your knees" (violinist.com, discussion 9372). The seat stays
