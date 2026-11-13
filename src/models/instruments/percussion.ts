@@ -98,10 +98,14 @@ export const TIMPANI = {
    * palm, at the middle of the palm along the fingers, and 3 cm toward the thumb. The palm of the
    * stump paw faces down at the kettles, so the shaft runs across the lower side of the stump,
    * as through a fist, and the paw stays over the head of the kettle. A grip 5 cm along the
-   * fingers put the shaft out of the end of the stump.
+   * fingers put the shaft out of the end of the stump. The left grip lies 0.05 H back from the
+   * middle of the palm toward the wrist and 0.02 H toward the thumb, so that the end of the
+   * stump closes on the shaft (`pnpm wind-grip timpanist`: the paw grasps in 84% of the play
+   * and in each rest and lowering sample). At the middle of the palm, the left paw grasped in
+   * 1% of the play, with the tips 2.1 cm off the shaft.
    */
-  malletSpotL: [0.07, 0, 0.03],
-  /** The grip of the mallet in the closed right paw: the paws of the Tripo elephant are symmetric. */
+  malletSpotL: [0.07, -0.05, 0.02],
+  /** The grip of the mallet in the closed right paw, where the right stump closes on it. */
   malletSpotR: [0.07, 0, 0.03],
   /**
    * The length of each shaft behind its grip, in meters ({@link MALLET_BUTT}). The shaft goes
