@@ -1304,9 +1304,8 @@ navigation menu at the top of the mockup is out of scope.
 - [ ] Do the hall of the scene look task before the color tasks. Wide film shots show the stage in
       a black space, with no wall and no seats. Also do the bow of the conductor to the audience
       early: the end of a piece now has no reward (2.4, 5.4).
-- [ ] Draw staff lines and note heads into one small canvas texture at start (no file), and use it
-      on each stand sheet and on the score of the conductor desk. The sheets are blank white quads
-      (`src/models/props.ts`), and the close shots show them (4.6).
+- [ ] Print music on the sheet of the piano desk too (`SCENE_COLORS.sheet` of the piano). The
+      stands and the conductor score have it (`scene/sheets.ts`) (4.5).
 - [ ] The mouse is a faceted body beside fur bodies in one frame. Check that a Tripo hand body of
       the mouse is in the body plan (4.3).
 - [ ] Show the user the key shadow fit of the solo and section shots
