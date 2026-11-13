@@ -1329,8 +1329,6 @@ navigation menu at the top of the mockup is out of scope.
       body length), and check the holds of the dog and the hippo.
 - [ ] Slope the strings of the bowed strings down about 5° from the bridge to the nut, as on a real
       instrument. The bow contact, the fingerboard target, and the left hand poses follow the line.
-- [ ] Conductor: at the song end, turn to the audience on the podium, bow, and turn back (5.4). Keep
-      the clearance tests of the stand.
 - [ ] Audit the seating of design 4.2 against professional orchestras and choirs, with sources and
       the file and the line of each finding. Then fix the findings that the user approves.
 - [ ] Bring the high tier within the frame target of 9.7 (4 ms p95 on the GPU and the main thread).
