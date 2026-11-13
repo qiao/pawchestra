@@ -124,7 +124,8 @@ The weights, in the rest pose:
 1. Automatic Weights, then Limit Total 4 and Normalize All, on a copy of the mesh with no tail.
 2. Arm rows: each vertex of a side with |x| from 0.10, within 0.07 units of the line of the rest
    arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.10 to 0 at x
-   0.14, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.178, 0.193, 0.208, and 0.223,
+   0.14, an elbow helper share that grows from 0 at x 0.165 to 1 at the elbow joint (x 0.2) and
+   falls to 0 at x 0.236,
    and the rest on the 4 roll segments.
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.004 from 0.04 units before
    the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.0035 from
@@ -250,7 +251,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/wolf.rig.glb` | 1,308,864 bytes | `6ecfa7db2db9f69d9c0b41dfcff853c769e9e70ac9564479118210f351cfe919` |
-| `tripo-hand/wolf.rig.json` | 15,687 bytes | `88ceab3e84fa4ee3650c6b3b99ec6f7b02ba498495fb2b4f6b3ed61516468508` |
+| `tripo-hand/wolf.rig.glb` | 1,308,864 bytes | `4358aa435aebefe376aba342bceac46e0dce0d8f75173ea395d0dc89be1237bc` |
+| `tripo-hand/wolf.rig.json` | 15,687 bytes | `4e98ad5620909eb5feb68cdbcf34d7367475d511e5b4afda535e9e05285a4861` |
 | `tripo-hand/wolf-color.webp` | 171,898 bytes, 2048 × 2048 | `bc6334af510185d4367b057c36ca289174cfc2936b3cfde64ab2b63a10215efa` |
 | `tripo-hand/wolf-normal.webp` | 62,414 bytes, 1024 × 1024 | `dd4896a3db92b8b187b31e4e9c118e5fbccbf1f9478fb43126727f8222beed59` |
