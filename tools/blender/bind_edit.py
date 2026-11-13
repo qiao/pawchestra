@@ -235,3 +235,102 @@ def sharp_edges(points, corners, keep, limit=50.0):
         concave = bool((points[other] - points[edge[0]]) @ n[tris[0]] > 0)
         rows.append((angle, edge, concave, (points[edge[0]] + points[edge[1]]) / 2))
     return sorted(rows, key=lambda r: -r[0])
+
+
+def _smoothstep(x, a, b):
+    """Gives 0 below a, 1 above b, and the smooth step 3t^2 - 2t^3 between them."""
+    t = np.clip((np.asarray(x, float) - a) / (b - a), 0.0, 1.0)
+    return t * t * (3.0 - 2.0 * t)
+
+
+def _free_shares(body, rig):
+    """Gives the normalized weight share of the thighs and of the free parts (the tail, the shins,
+    the feet, the toes, and the arms) of each vertex (two arrays of n)."""
+    names = {g.index: g.name for g in body.vertex_groups}
+    deform = {b.name for b in rig.data.bones if b.use_deform}
+    n = len(body.data.vertices)
+    total, thigh, free = (np.zeros(n) for _ in range(3))
+    arm = ('arm', 'hand', 'finger', 'clavicle', 'thumb', 'digit', 'seg', 'wrist', 'elbow')
+    for v in body.data.vertices:
+        for g in v.groups:
+            name = names[g.group]
+            if name not in deform:
+                continue
+            total[v.index] += g.weight
+            root = name.split('_')[0]
+            if root == 'thigh':
+                thigh[v.index] += g.weight
+            elif name.startswith('tail') or root in ('shin', 'foot', 'toes') or any(k in name for k in arm):
+                free[v.index] += g.weight
+    total = np.maximum(total, 1e-9)
+    return thigh / total, np.clip(free / total, 0.0, 1.0)
+
+
+def sit_move(body, rig, rule):
+    """Gives the move of the key `bind_sit` (design 4.4, "Hand rig"): it puts the underside of the
+    haunch behind the hip joints onto the plane of the thigh underside, so that the haunch rests on
+    the seat. Call it after `pose_bind()`. The seat top of the app is the lowest body point over
+    the seat (`seatHeightOf()` of `tools/studio-body.ts`), so a drop to that plane keeps the seat
+    height.
+
+    The rule (units of the file): `band` the height above the column bottom over which the drop
+    falls to 0, `most` the largest drop, `ramp` the fade in front of the hip joints, `end` the
+    fade at the back of the haunch (from `back - 2 end` to `back - end`), and `radius` the radius
+    of the column of each vertex. The body points are the vertices with a free share below 0.5
+    and |x| within the half width of the seat (the property `seat` of the armature). The plane is
+    the lowest thigh point (thigh share above 0.5) from the seat front back to the hip joints.
+    Each body point behind `hip - ramp` and below `plane + 2.5 band` moves down by
+    min(bottom - plane, most) times the fades, times 1 - its free share. `bottom` is the lowest
+    low point (a body point below `plane + 3 band`) within `radius` of it on x and y, and `back`
+    is the largest y of the low points. A point below the plane moves up to it. With `across`
+    true, `bottom` is the lowest low point within `radius` of it on y at each x: all points of a
+    slice across the seat at one height move by the same drop, so the cross section of the haunch
+    keeps its round form and rests on the plane at its lowest point. A column of each point turns
+    the cross section into a box with steep sides, and on a coarse mesh its edge shows as teeth.
+
+    Returns:
+        The move (n x 3) and a dict of the facts: the hip y and z, the plane, the back, and the
+        lowest body point over the seat before and after.
+    """
+    band, most, ramp = float(rule['band']), float(rule['most']), float(rule['ramp'])
+    end, radius = float(rule['end']), float(rule['radius'])
+    across = bool(rule.get('across', False))
+    points = bind_points(body)
+    thigh, free = _free_shares(body, rig)
+    seat = rig['seat']
+    half = float(seat['halfWidth'])
+    front = -float(seat['front'])
+    heads = [np.array(rig.matrix_world @ rig.pose.bones[f'thigh_{s}'].head) for s in 'LR']
+    hip_y = float(np.mean([h[1] for h in heads]))
+    hip_z = float(np.mean([h[2] for h in heads]))
+    over = (np.abs(points[:, 0]) <= half) & (free < 0.5)
+    thighs = over & (thigh > 0.5) & (points[:, 1] >= front) & (points[:, 1] <= hip_y)
+    plane = float(points[thighs, 2].min())
+    seated = over & (points[:, 1] >= front)
+    low_points = points[over & (points[:, 2] <= plane + 3 * band)]
+    back = float(low_points[:, 1].max())
+    move = np.zeros_like(points)
+    chosen = np.nonzero(over & (points[:, 1] >= hip_y - ramp) & (points[:, 2] <= plane + 2.5 * band))
+    for i in chosen[0]:
+        p = points[i]
+        if across:
+            near = low_points[np.abs(low_points[:, 1] - p[1]) <= radius]
+        else:
+            near = low_points[np.hypot(low_points[:, 0] - p[0], low_points[:, 1] - p[1]) <= radius]
+        bottom = float(near[:, 2].min()) if len(near) else float(p[2])
+        gap = bottom - plane
+        drop = min(gap, most) * _smoothstep(p[1], hip_y - ramp, hip_y)
+        if gap > 0:
+            drop *= 1.0 - _smoothstep(p[1], back - 2 * end, back - end)
+        drop *= (1.0 - _smoothstep(p[2] - bottom, 0.0, band)) * (1.0 - free[i])
+        move[i, 2] = -drop
+    after = points + move
+    facts = {
+        'hipY': hip_y,
+        'hipZ': hip_z,
+        'plane': plane,
+        'back': back,
+        'lowBefore': float(points[seated, 2].min()),
+        'lowAfter': float(after[seated, 2].min()),
+    }
+    return move, facts
