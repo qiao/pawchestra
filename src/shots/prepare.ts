@@ -3,6 +3,8 @@ import { ModelCache } from '../models/model-cache.ts';
 import type { SceneLayout } from '../models/layout.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import { lastAtOrBefore } from '../pose/blend.ts';
+import { POSE_SEED, preparePoses } from '../pose/plan.ts';
+import type { PosePlan } from '../pose/plan.ts';
 import { mixHash, mulberry32 } from '../pose/random.ts';
 import { smoothstep } from '../pose/rest.ts';
 import { runAll } from '../score/steps.ts';
@@ -2654,6 +2656,7 @@ function startAttempt(
  * @param seed The seed of the plan.
  * @param models The player models of the score, which the layout shares.
  * @param trace The trace to write, or `null` for a plan with no trace.
+ * @param poses The pose plan of the score, for the play pose of the details of the inserts.
  * @returns The steps, which return the plan for `cameraAt()`.
  */
 function* planShotsSteps(
@@ -2662,6 +2665,7 @@ function* planShotsSteps(
   seed: number,
   models: ModelCache,
   trace: TraceSink | null,
+  poses: PosePlan,
 ): Steps<ShotPlan> {
   const music = prepareMusic(score);
   yield;
@@ -2895,6 +2899,7 @@ function* planShotsSteps(
       music,
       layout,
       models,
+      poses,
       clearance: planner.clearance,
       bodies,
       heads: subjects.heads,
@@ -2927,6 +2932,7 @@ function* planShotsSteps(
  * @param layout The layout of the score, from `layoutScene()`.
  * @param seed The seed of the plan.
  * @param models The player models of the score, which the layout shares. A new cache by default.
+ * @param poses The pose plan of the score. The plan of the seed of the app by default.
  * @returns The plan for `cameraAt()`.
  */
 export function prepareShots(
@@ -2934,8 +2940,9 @@ export function prepareShots(
   layout: SceneLayout,
   seed: number,
   models = new ModelCache(),
+  poses = preparePoses(score, layout, POSE_SEED, models),
 ): ShotPlan {
-  return runAll(planShotsSteps(score, layout, seed, models, null));
+  return runAll(planShotsSteps(score, layout, seed, models, null, poses));
 }
 
 /**
@@ -2945,6 +2952,7 @@ export function prepareShots(
  * @param layout The layout of the score, from `layoutScene()`.
  * @param seed The seed of the plan.
  * @param models The player models of the score, which the layout shares.
+ * @param poses The pose plan of the score.
  * @returns The steps, which return the plan for `cameraAt()`.
  */
 export function prepareShotsSteps(
@@ -2952,8 +2960,9 @@ export function prepareShotsSteps(
   layout: SceneLayout,
   seed: number,
   models: ModelCache,
+  poses: PosePlan,
 ): Steps<ShotPlan> {
-  return planShotsSteps(score, layout, seed, models, null);
+  return planShotsSteps(score, layout, seed, models, null, poses);
 }
 
 /**
@@ -2976,6 +2985,7 @@ export function prepareShotsSteps(
  * @param seed The seed of the plan.
  * @param range The range of the traced cuts, in song seconds.
  * @param models The player models of the score, which the layout shares. A new cache by default.
+ * @param poses The pose plan of the score. The plan of the seed of the app by default.
  * @returns The plan and the trace of each cut of the range.
  */
 export function traceShots(
@@ -2984,8 +2994,9 @@ export function traceShots(
   seed: number,
   range: TraceRange,
   models = new ModelCache(),
+  poses = preparePoses(score, layout, POSE_SEED, models),
 ): ShotTrace {
   const sink: TraceSink = { range, cuts: [], kept: new Map(), cut: null, attempt: null };
-  const plan = runAll(planShotsSteps(score, layout, seed, models, sink));
+  const plan = runAll(planShotsSteps(score, layout, seed, models, sink, poses));
   return { plan, cuts: sink.cuts };
 }

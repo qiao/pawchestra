@@ -32,7 +32,7 @@ function* planSceneSteps(score: Score): Steps<ScoreScene> {
   const models = new ModelCache();
   const layout = yield* layoutSceneSteps(score, models);
   const plan = yield* preparePosesSteps(score, layout, POSE_SEED, models);
-  const shots = yield* prepareShotsSteps(score, layout, SHOT_SEED, models);
+  const shots = yield* prepareShotsSteps(score, layout, SHOT_SEED, models, plan);
   return { layout, models, plan, shots };
 }
 

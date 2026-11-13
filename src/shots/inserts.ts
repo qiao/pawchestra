@@ -8,6 +8,7 @@ import type { PlayerModel } from '../models/player.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import { lastAtOrBefore } from '../pose/blend.ts';
 import { conductorBeatPoint } from '../pose/conductor.ts';
+import type { PosePlan } from '../pose/plan.ts';
 import { mixHash, mulberry32 } from '../pose/random.ts';
 import type { Transport } from '../pose/types.ts';
 import { FOCUS_PULL, cameraAt, createCameraPose } from './camera-at.ts';
@@ -172,6 +173,8 @@ export interface InsertInputs {
   readonly music: ScoreMusic;
   readonly layout: SceneLayout;
   readonly models: ModelCache;
+  /** The pose plan of the score, for the play pose of each detail (design 5.6). */
+  readonly poses: PosePlan;
   readonly clearance: StageClearance;
   readonly bodies: readonly StageBody[];
   readonly heads: readonly StageHead[];
