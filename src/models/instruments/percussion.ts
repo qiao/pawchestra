@@ -387,11 +387,14 @@ export const SWITCHED_PIECES = ['tambourine', 'triangle', 'beater'] as const;
 export const TRIANGLE = {
   /**
    * The angle of the beater below the level in the bind pose, toward the fingers of the hanging
-   * paw, in radians: the beater runs 33° from the fingers. The beater strikes near the line of
-   * the forearm, and with {@link PAW_TILT}, the turn of the paw jumps up to 38° in 0.01 s.
+   * paw, in radians: the beater runs 56° from the fingers, under the curled claws, so that they
+   * close on it (`pnpm wind-grip percussionist`: the paw grasps in 88% of the play and in each
+   * lift and rest sample). At 1 (33° from the fingers), the claw tips stood 2.1 cm off the beater,
+   * and the paw grasped in no sample. With {@link PAW_TILT}, the turn of the paw jumped up to 38°
+   * in 0.01 s.
    */
   // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
-  malletTilt: 1 as number,
+  malletTilt: 0.6 as number,
   /** The grip of each mallet in the closed paw ({@link PAW_SPOT}). */
   malletSpot: PAW_SPOT,
   /**
