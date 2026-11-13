@@ -448,9 +448,11 @@ export const SPECIES = {
    * Reason: at the head height of the old mouse, its eyes stood 0.84 m high (old 0.69 m) and its
    * ears 1.03 m, and the seat search moved players of 14 of 18 demos. Its arms keep the length of
    * the source: each arm reaches 0.18 m from the shoulder joint to the wrist, less than the 0.27 m
-   * of the old mouse. So it keeps the smaller oboe, 0.45 of the oboe of the app. The scale of an
+   * of the old mouse. So it plays a smaller oboe, 0.5 of the oboe of the app. The scale of an
    * instrument is a factor of the instrument of the app, so the oboe keeps its size in meters when
-   * the body changes its size. It has no chair: it stands upright on its legs in the pose of the
+   * the body changes its size. With the reed between the lips at the front of the muzzle and the
+   * paws on the tone holes, the right paw reaches its grip with 1.1 cm to spare at 0.5, and with
+   * 0.2 cm at 0.55 (`pnpm hold-fit oboist`). The oboe of 0.5 moves no seat of a demo. It has no chair: it stands upright on its legs in the pose of the
    * source, at the seat height of its legs (the crotch). Its long tail goes back and down and lies on the floor behind it, and it stands as a
    * soloist. Its head height is the head of the studio body, and the seat height is the seat of
    * the studio body, in H.
@@ -458,7 +460,7 @@ export const SPECIES = {
   mouse: {
     body: 'studio-mouse',
     colors: SPECIES_COLORS.mouse,
-    oboeScale: 0.45,
+    oboeScale: 0.5,
     noChair: true,
     headHeight: STUDIO_HEIGHTS['studio-mouse'].headHeight,
     seatHeight:

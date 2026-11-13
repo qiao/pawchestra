@@ -810,14 +810,15 @@ const PANDA_TROMBONE = {
  * oboist. The reed at the front of the long muzzle stands 11 cm in front of the right shoulder
  * joint, so at 40° the right paw grasped the oboe in 14% of the play samples, and at 35° it reached
  * its grip with 0.3 cm to spare, with a straight arm (`pnpm hold-fit oboist`). The small mouse
- * plays a smaller oboe (`SpeciesParams.oboeScale`), so that the grips stay near the chest and the elbows bend near the
- * body: 0.45 of the oboe of the app. As on a real oboe, the left paw holds the upper joint near
- * the reed, and the right paw holds the lower joint above the bell, with a clear gap between the
- * paws: the left grip moves 0.03 H up the tube from the grip of {@link WIND_HOLDS}, and the right
- * grip moves 0.05 H down the tube (`gripShiftL`, `gripShiftR`). The oboe keeps its size in meters
- * and the body of 0.82 of the source scale is smaller, so with the right grip 0.1 H down, the right
- * paw missed its grip by 1.7 cm. With the left grip 0.3 H down, both paws lie together on the lower
- * half. Each grip also moves 0.06 H toward the axis and 0.05 H across it
+ * plays a smaller oboe (`SpeciesParams.oboeScale`), so that its short arms reach the grips. As on
+ * a real oboe, the left paw holds the upper joint at its tone holes, and the right paw holds the
+ * lower joint at its tone holes, above the bell, with a gap between the paws: each grip moves
+ * 0.08 H up the tube from the grip of {@link WIND_HOLDS} (`gripShiftL`, `gripShiftR`). The middle
+ * of the left paw then lies 6.5 cm from the reed tip, on the holes from 6 cm to 9 cm, and the
+ * middle of the right paw 15.6 cm from it, on the holes from 13.5 cm to 16.5 cm
+ * (`pnpm wind-grip oboist`). With the right grip 0.05 H down the tube, the right paw lay 1.8 cm
+ * below its lowest hole, at the top of the bell. With the left grip 0.06 H up the tube, the paws
+ * came within 0.3 cm of each other. Each grip also moves 0.06 H toward the axis and 0.05 H across it
  * toward the shoulder of its paw, so that each paw holds the tube from its own side. The arms of
  * the Tripo mouse reach 0.18 m from the shoulder joint to the wrist, so each shoulder bone turns
  * forward (`reach` 70° on the right, `reachL` 45° on the left), as the shoulder blades of a real
@@ -838,9 +839,10 @@ const PANDA_TROMBONE = {
  *
  * In the rest, the oboe stands upright in front of the belly, 0.29 H below the mouth point, as a
  * real oboist holds it vertical in a short rest. The rest place moves by the opposite step of the
- * reed (`restShift`), so the rest pose stays when the reed moves. Both paws stay on their grips of the play, the left paw
- * on the upper joint and the right paw on the lower joint, with a clear gap between them, so
- * that the lift and the lowering move the oboe with the paws, and no paw slides along the tube.
+ * reed (`restShift`), so the rest pose stays when the reed moves. Both paws stay on their grips of
+ * the play, the left paw on the upper joint and the right paw on the lower joint, with a clear gap
+ * between them, so that the lift and the lowering move the oboe with the paws, and no paw slides
+ * along the tube.
  * With the grips of the play, the oboe 0.45 H below the mouth puts an arm 1.3 cm to 1.9 cm into
  * the body. Both paws keep the aim and the roll of the play (`restAim`): with the roll of the
  * shoulder, the left paw turns 177° on its forearm at rest and flips in the lowering. The left
@@ -875,8 +877,8 @@ const MOUSE_OBOE = {
   poleR: [0.5, -1, -0.5],
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
-  gripShiftL: [-0.03, 0.06, -0.05],
-  gripShiftR: [0.05, 0.06, -0.05],
+  gripShiftL: [-0.08, 0.06, -0.05],
+  gripShiftR: [-0.08, 0.06, -0.05],
   restAim: 1,
   gripCurl: curls(130, 110),
 } as const satisfies WindHold;
