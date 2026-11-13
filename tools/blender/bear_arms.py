@@ -1,36 +1,20 @@
-"""Replays the Blender session that rebuilds the arms of the bear conductor.
+"""Gives the steps of the arm rebuild of a T-pose mesh, which `rhino_tpose_arms.py` runs with
+the settings of the rhino.
 
-The long thin faces of the arms of `bear-tpose.glb` fold into dark shards under the raised
-forearm, and the inner elbow of the bind collapses into a hollow. The rebuild uses loop edges,
-retopology, and extra bones to fix the arm and wrist twist. This script repeats the steps of
-`wind_arms.py` with the settings of the bear (`BEAR`):
+The steps are the steps of `wind_arms.py`, with these changes:
 
-1. Import the mesh and Merge by Distance.
-2. Replace the faces of each arm from the shoulder line to the wrist with a quad tube, wrap it onto
-   the source arm, bridge it to the trunk and to the paw, beautify the bridge triangles, and
-   collapse the thin faces at the cut loops.
-3. Give the new arm faces a UV layout, and bake the fur color of the source arm. Then make the
-   inner side of each upper arm a little flatter (`step_flatten()` of `elephant_arms.py`),
-   because the thick upper arm goes into the round belly when it comes down. Then transfer the
-   custom normals of the source surface.
-4. Keep the length and the cross-section of the arms (`factor` 1, `slim` 1), put the arm image in
-   a strip of the atlas, and write `bear-arms.glb`.
-5. Add the studio skeleton with the arm segments and the helpers, parent with automatic weights,
-   and paint the fixes with the Weight Paint tools.
-6. Write the weights for `paintedWeights` of the config (`bear-weights.json`).
+1. The wrist cut plane stands at a right angle to the last ring of the tube (`cut_planes()`).
+2. The clean steps run on the shoulder loops first, with a larger angle (`SHOULDER_ANGLE`).
+3. Smooth Vertices and a Shrinkwrap even the band of each wrist (`step_smooth_wrist()`).
+4. The inner side of each upper arm gets a little flatter after the bake (`step_flatten()` of
+   `elephant_arms.py`).
+5. The paint removes the head bone from the shoulders, and gives a share of the fingers weight to
+   the hand bone (`step_paint()`, the keys `head` and `fingers` of the settings).
 
-The faces of the paws, the trunk, the legs, and the head stay the faces of the source mesh. The
-source file, `bear-tpose.glb`, stays unchanged.
-
-Run it in a terminal from the root of the tree:
-
-    Blender -b --factory-startup -P tools/blender/bear_arms.py -- [<out dir>]
-
-In the live Blender of MCP, `run_steps()` runs one step at a time.
+The settings of a session have the keys of `ANIMALS` of `violin_arms.py` and `wind_arms.py`.
 """
 
 import importlib.util
-import json
 import os
 import sys
 
@@ -55,37 +39,6 @@ def load_elephant_arms():
 ea = load_elephant_arms()
 wa = ea.wa
 va = ea.va
-
-#: The settings of the bear, with the keys of `ANIMALS` of `violin_arms.py` and `wind_arms.py`,
-#: in the units of the studio (1 unit from the soles to the top). They are the settings of the
-#: polar bear (`polar_bear_arms.py` at cbc8db5e4), moved to the arm root of the bear: the arm is
-#: free of the trunk beyond |x| 0.18, from y 0.58 to 0.75. The shoulder cut stands at 0.2 of the
-#: upper arm, and the zone has the radius 0.12: nearer the trunk, or with a smaller radius, the cut
-#: found no closed loop around the arm. The forearm is 0.09 units long, so it has 4 inner rings. `flatten`
-#: moves the inner side of each upper arm toward its axis, along the mean direction of the corners
-#: that go into the belly.
-BEAR = {
-    'config': 'tools/mesh-rigs/bear.json',
-    'source': 'assets/models/bear/bear-tpose.glb',
-    'folder': 'assets/models/bear',
-    'factor': 1.0,
-    'slim': (1.0, 1.0),
-    'cut': {'shoulder': 0.2, 'tilt': 0.0, 'wrist': 0.3},
-    'zone': {'x': 0.12, 'radius': 0.12},
-    'gap': 0.022,
-    'wristGap': 0.016,
-    'upper': (0.3, 0.45, 0.6, 0.75),
-    'fore': 4,
-    'texture': 512,
-    'faces': 900,
-    'paint': {'trunk': {'x': 0.175, 'y': (0.4, 0.76)}, 'root': {'x': (0.135, 0.235),
-                                                                 'y': (0.6, 0.78)}},
-    'flatten': {'along': (0.3, 0.6), 'dir': (0.0, -0.2, 0.98), 'cone': 45.0,
-                'move': 0.015, 'size': 0.05},
-    'head': {'x': 0.12, 'y': 0.77},
-    'fingers': 0.5,
-}
-
 
 #: The smallest corner angle, in degrees, of a face at a shoulder loop and of a shoulder bridge
 #: face after the clean steps. The wrist loops keep the angle of `wind_arms.py` (12). With 12 at the
@@ -230,54 +183,18 @@ def step_paint(s):
     bpy.ops.object.mode_set(mode='OBJECT')
 
 
-def step_weights(s):
-    """Writes the weights file as `step_weights()` of `wind_arms.py` does, with a note that names
-    this script."""
-    count = wa.step_weights(s)
-    path = os.path.join(s.out_dir, s.animal + '-weights.json')
-    with open(path) as f:
-        data = json.load(f)
-    data['note'] = ('Weights of the bear with the rebuilt arms, painted in Blender on 2026-10-26 '
-                    '(tools/blender/bear_arms.py): automatic weights and Weight Paint fixes. '
-                    'Points in the units of the rig config.')
-    with open(path, 'w') as f:
-        json.dump(data, f, separators=(',', ':'))
-    return count
-
-
 #: The steps of the session: the steps of `wind_arms.py`, with the clean steps of the shoulder
-#: first, the flatter inner upper arms after the bake, the paint fixes above, and the weights file
-#: above. The bake casts its rays from 0.006 units out of the tube (`step_bake()` of
-#: `violin_arms.py`). A flatten before the bake moves the tube up to 0.015 units into the source
-#: arm, the rays miss the source, and the bake writes black under each armpit. After the bake, the
-#: flatten moves the vertices and keeps their texels.
+#: first, the flatter inner upper arms after the bake, and the paint fixes above. The bake casts
+#: its rays from 0.006 units out of the tube (`step_bake()` of `violin_arms.py`). A flatten before
+#: the bake moves the tube up to 0.015 units into the source arm, the rays miss the source, and the
+#: bake writes black under each armpit. After the bake, the flatten moves the vertices and keeps
+#: their texels.
 STEPS = tuple(
     out for step in wa.STEPS
-    for out in {wa.step_weights: (step_weights,), wa.step_paint: (step_paint,),
+    for out in {wa.step_paint: (step_paint,),
                 wa.step_cut_and_tube: (step_cut_and_tube,),
                 wa.step_clean_cut: (shoulder_first(wa.step_clean_cut),),
                 wa.step_clean_bridge: (shoulder_first(wa.step_clean_bridge), step_smooth_wrist),
                 va.step_bake: (va.step_bake, ea.step_flatten)}
     .get(step, (step,)))
 
-
-def run_steps(s, first=0, last=len(STEPS)):
-    """Runs the steps from `first` up to `last` (not included), and prints the result of each."""
-    for step in STEPS[first:last]:
-        print('%s: %s' % (step.__name__, step(s)))
-
-
-def main():
-    """Runs the steps of the session and writes the source mesh and the weights into the out dir
-    (`assets/models/bear/` by default)."""
-    argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
-    out_dir = os.path.abspath(argv[0]) if argv else None
-    wa.ANIMALS['bear'] = BEAR
-    va.clear_scene()
-    s = wa.Session('bear', out_dir)
-    run_steps(s)
-    print('bear_arms: wrote bear-arms.glb and bear-weights.json into %s' % s.out_dir)
-
-
-if __name__ == '__main__':
-    main()

@@ -69,9 +69,9 @@ va = ba.va
 
 #: The settings of the rhino, with the keys of `ANIMALS` of `violin_arms.py` and `wind_arms.py`,
 #: in the units of the studio (1 unit from the soles to the ear tips). They are the settings of the
-#: bear (`bear_arms.py`), moved to the arm root of the rhino: the arm is free of the trunk beyond
-#: |x| 0.19, from y 0.57 to 0.67. The upper arm is only 0.105 units long, so the shoulder cut
-#: stands at 0.4 of it (x 0.202), out of the joined root, as on the A-pose rhino
+#: bear (`bear_arms.py` at e34f47cba), moved to the arm root of the rhino: the arm is free of the
+#: trunk beyond |x| 0.19, from y 0.57 to 0.67. The upper arm is only 0.105 units long, so the
+#: shoulder cut stands at 0.4 of it (x 0.202), out of the joined root, as on the A-pose rhino
 #: (`rhino_arms.py`): at 0.2 (x 0.181), the cut loop runs over the trunk. The rings of the upper
 #: arm follow the cut. The forearm is 0.11 units long, so it has 4 inner rings. The paint boxes
 #: take the side of the trunk under the arm and the arm root, and the head bone leaves the
@@ -218,7 +218,7 @@ def step_weights(s):
 #: loops above, no flatten after the bake, the fixes of the paws, the neck, and the chest after
 #: the paint, and the weights file above.
 STEPS = tuple(
-    {ba.step_weights: step_weights, va.step_wrap: step_wrap}.get(step, step)
+    {wa.step_weights: step_weights, va.step_wrap: step_wrap}.get(step, step)
     for step in ba.STEPS
     if step is not ba.ea.step_flatten and step.__name__ != 'step_clean_cut')
 STEPS = STEPS[:STEPS.index(wa.step_clean_pit)] + (step_clean_cut,) + STEPS[
