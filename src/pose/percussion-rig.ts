@@ -24,7 +24,7 @@ import type { InstrumentOf } from './family.ts';
 import { hangingArm } from './hang.ts';
 import type { HangingArm } from './hang.ts';
 import { trunkFront } from './cello-place.ts';
-import { armRig } from './ik.ts';
+import { armRig, solveTwoBone } from './ik.ts';
 import type { ArmRig } from './ik.ts';
 import { TAMBOURINE_KEY } from './percussion-switch.ts';
 import { plantedLegs } from './side-move.ts';
@@ -872,22 +872,31 @@ export const PERCUSSION_PLACES = {
   crash: [0, -0.09, -1.1],
   /**
    * The clip of the triangle at the tip of the left thumb, from the left shoulder joint: a little
-   * above the shoulder and out to the left, below the long snout of the Tripo badger. The claws of
-   * the left paw then go 3.9 cm into the head in the play, and 5.3 cm with the clip at
-   * [0.36, 0.46, -0.87]. A real player holds the triangle near the eye level, but a higher clip
-   * puts the claws further into the snout.
+   * above the shoulder and out to the left, below the long snout of the Tripo badger. A real player
+   * holds the triangle near the eye level, but the claws of the left paw in line with its forearm
+   * ({@link trianglePaw}) go 5.8 cm into the snout with a clip 0.4 H higher, and 6.0 cm with a
+   * clip 0.7 H higher.
    */
   triangleClip: [0.4, 0.1, -0.8],
   /**
-   * The world rotation of the left hand that holds the triangle, from the bind pose: the thumb
-   * points down, so that the clip hangs from its tip, between the thumb and the curled fingers
-   * (`TRIANGLE_PINCH` of `models/instruments/percussion.ts`), and the triangle hangs in the plane
-   * x-y, turned 40° around the vertical. Thus the side of the triangle that the beater strikes
-   * faces the right hand.
+   * The world rotation of the triangle from the bind pose of the paw that holds it: the turn of
+   * the bind paw with the thumb down, so that the clip hangs from its tip, between the thumb and
+   * the curled fingers (`TRIANGLE_PINCH` of `models/instruments/percussion.ts`), and the triangle
+   * hangs in the plane x-y, turned 40° around the vertical. Thus the side of the triangle that the
+   * beater strikes faces the right hand. The paw at the trap table takes this turn. The paw in the
+   * play takes its own turn in line with its forearm ({@link trianglePaw}), and the triangle turns
+   * back to this turn around the pinch (`PercussionSide.piece`).
    */
-  // holdTurn(-90, 40) of pose/winds.ts: the paw turns 40° around z, so that it bends less on the
-  // forearm of the raised arm.
-  triangleHand: [-0.664463, 0.241845, 0.241845, 0.664463],
+  // holdTurn(-90, 40) of pose/winds.ts.
+  triangleTurn: [-0.664463, 0.241845, 0.241845, 0.664463],
+  /**
+   * The turn of the left paw that holds the triangle around its forearm, in radians, from the
+   * hand in line with the forearm with no twist from the bind pose ({@link trianglePaw}): the
+   * palm faces the clip (32° in `pnpm wind-grip percussionist`), and the paw twists 84° on its
+   * forearm. With no turn, the palm faced away from the clip (146°), and the paw twisted 175°.
+   */
+  // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
+  triangleTwist: 90 * MathUtils.DEG2RAD,
 } as const;
 
 /**
@@ -1056,6 +1065,12 @@ export type PercussionSide =
       readonly wrist: Vec3;
       /** The world rotation of the hand. */
       readonly hand: Quat;
+      /**
+       * The turn of the held piece in the hand from the bind pose: the local rotation of the
+       * `malletL` bone around the pinch of the clip, so that the triangle keeps its hang while the
+       * paw stays in line with its forearm ({@link trianglePaw}).
+       */
+      readonly piece: Quat;
     }
   | { readonly kind: 'free'; readonly arm: ArmRig };
 
@@ -1595,12 +1610,18 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
       // The left hand holds the clip of the triangle in front of the chest.
       const clip = fromShoulder(left, PERCUSSION_PLACES.triangleClip);
       const clipBind = model.skeleton.positions[boneIndex('malletL')] ?? toVec3(clip);
-      const hand = new Quaternion(...PERCUSSION_PLACES.triangleHand);
+      const hand = new Quaternion(...PERCUSSION_PLACES.triangleTurn);
       const bindWrist = new Vector3(...left.bind.wrist);
-      // Gives a bind point of the hand at the place of the hand that holds the triangle.
+      // Gives a bind point of the triangle at its hang from the pinch of the clip, from the wrist
+      // of the triangle turn.
       const held = (point: Vec3): Vector3 =>
         new Vector3(...point).sub(bindWrist).applyQuaternion(hand);
-      const wrist = toVec3(clip.sub(held(clipBind)));
+      // The paw in line with its forearm holds the pinch at the clip place.
+      const paw = trianglePaw(left, clip, new Vector3(...clipBind), hold.poleL);
+      const wrist = toVec3(clip.clone().sub(held(clipBind)));
+      const pawWrist = toVec3(
+        clip.clone().sub(new Vector3(...clipBind).sub(bindWrist).applyQuaternion(paw)),
+      );
       const barTarget = findTarget(model, (t) => t.kind === 'bar');
       const bar = bindTarget(model, barTarget);
       targets.set(0, {
@@ -1631,7 +1652,13 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
         });
       }
       sides = [
-        { kind: 'hold', arm: left, wrist, hand: PERCUSSION_PLACES.triangleHand },
+        {
+          kind: 'hold',
+          arm: left,
+          wrist: pawWrist,
+          hand: toQuat(paw),
+          piece: toQuat(paw.clone().invert().multiply(hand)),
+        },
         mallet(right, 'malletR'),
       ];
       break;
@@ -2006,4 +2033,39 @@ function towardPlayer(target: StrikeTarget, distance: number): StrikeTarget {
     return target;
   }
   return offsetTarget(target, [(-x / length) * distance, 0, (-z / length) * distance]);
+}
+
+/**
+ * Gives the world rotation of the left paw that holds the clip of the triangle (design 5.3): the
+ * hand in line with its forearm, as a real player holds the clip at the end of the raised
+ * forearm, turned around the forearm by `PERCUSSION_PLACES.triangleTwist`. The wrist follows the
+ * hand, so that the pinch of the thumb stays at the clip place, and the forearm follows the wrist,
+ * so the function solves the arm a few times.
+ *
+ * @param arm The left arm.
+ * @param clip The clip place, in the model axes.
+ * @param pinch The pinch of the clip in the bind pose: the origin of the `malletL` bone.
+ * @param pole The direction to which the elbow points.
+ * @returns The world rotation of the hand from the bind pose.
+ */
+function trianglePaw(arm: ArmRig, clip: Vector3, pinch: Vector3, pole: Vec3): Quaternion {
+  const shoulder = new Vector3(...arm.bind.shoulder);
+  const elbow = new Vector3(...arm.bind.elbow);
+  const bindWrist = new Vector3(...arm.bind.wrist);
+  const upper = elbow.distanceTo(shoulder);
+  const lower = bindWrist.distanceTo(elbow);
+  const bindFore = bindWrist.clone().sub(elbow).normalize();
+  const toPinch = pinch.clone().sub(bindWrist);
+  const poleAt = new Vector3(...pole);
+  const hand = new Quaternion(...PERCUSSION_PLACES.triangleTurn);
+  const twist = new Quaternion();
+  for (let pass = 0; pass < 4; pass++) {
+    const wrist = clip.clone().sub(toPinch.clone().applyQuaternion(hand));
+    const joints = solveTwoBone(shoulder, wrist, upper, lower, poleAt);
+    const fore = joints.wrist.clone().sub(joints.elbow).normalize();
+    hand
+      .setFromUnitVectors(bindFore, fore)
+      .premultiply(twist.setFromAxisAngle(fore, PERCUSSION_PLACES.triangleTwist));
+  }
+  return hand;
 }

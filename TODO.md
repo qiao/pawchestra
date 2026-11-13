@@ -430,10 +430,6 @@ passes.
       scaled bass drum beater. Ask the user if the scale of the badger applies to them too.
 - [ ] Badger bass drummer: between strikes, the paw keeps its turn in the world while the body
       sways, so its twist on the forearm moves 20° in about 1 s.
-- [ ] Tripo badger percussionist: the claws of the left paw, which holds the triangle up, go 3.9 cm
-      into the head in the play and 2.2 cm at rest (limit 1.5 cm, `pnpm hold-fit percussionist`). A
-      higher or wider clip puts them deeper, and a lower clip misses the strikes. Fit the turn of
-      the left paw (`triangleHand`), or ask the user for a triangle at the chest.
 - [ ] Tripo badger xylophonist: the left claws go 3.5 cm into the left shoulder in the play and 3.3
       cm in the lift (limit 1.5 cm, `pnpm hold-fit xylophonist`). Look at the left paw in a close
       view at the lowest bars.

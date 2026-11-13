@@ -348,7 +348,7 @@ export interface TablePlace {
 /**
  * The places of the switched pieces on the trap table (design 4.6, 5.3). The triangle hangs from
  * the hook of its stand with the turn of the left paw that holds it in the play
- * (`PERCUSSION_PLACES.triangleHand` of `pose/percussion-rig.ts`), so that the paw does not turn to
+ * (`PERCUSSION_PLACES.triangleTurn` of `pose/percussion-rig.ts`), so that the paw does not turn to
  * hang it there. The tambourine lies flat with the turn of the paw that holds it in the play
  * (`TAMBOURINE_HOLD` of `pose/percussion-rig.ts`), with its head turned up: a turn of -54° around
  * the vertical from the bind pose. It lies in the middle of the table and toward its far edge, so
@@ -441,7 +441,7 @@ export const TRIANGLE_CLIP = {
  * ({@link TRIANGLE_CLIP}), from the middle of the palm, in head heights `H`: toward the palm, down
  * along the fingers, and forward toward the thumb. The piece points forward, as a mallet does, so
  * that the triangle hangs down from the thumb when the paw takes its turn of the play, with the
- * thumb down (`PERCUSSION_PLACES.triangleHand`).
+ * thumb down (`PERCUSSION_PLACES.triangleTurn`).
  */
 const TRIANGLE_PINCH = {
   at: [0.03, -0.06, -0.15],

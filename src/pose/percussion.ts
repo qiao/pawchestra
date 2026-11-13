@@ -2,11 +2,12 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import { palmTurnAngle, studioForearmTurn, twistAngle } from '../models/studio-rig.ts';
 import type { PawBind } from '../models/studio-rig.ts';
+import { boneIndex } from '../models/rig.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import type { PlayerNote } from '../score/types.ts';
 import { NO_TURN, X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { lastAtOrBefore, mixPole, mixRotation } from './blend.ts';
-import { createFrame, setFromBasis } from './frames.ts';
+import { createFrame, setBoneRotation, setFromBasis } from './frames.ts';
 import type { Frame, TorsoFrames } from './frames.ts';
 import { hangingHand, hangingWrist } from './hang.ts';
 import { limitReach, poseShoulder, solveTwoBone, writeArm, writeCurl } from './ik.ts';
@@ -858,6 +859,11 @@ const corner = new Vector3();
 const level = new Vector3();
 const swing = new Quaternion();
 const inverse = new Quaternion();
+const piece = new Quaternion();
+const pieceTurn = new Quaternion();
+
+/** The index of the bone of the piece in the left paw: the triangle or the tambourine. */
+const MALLET_L = boneIndex('malletL');
 const strikeAlong = new Vector3();
 const forearm = new Vector3();
 const upperArm = new Vector3();
@@ -1421,6 +1427,13 @@ function poseHand(
   } else {
     wrist.copy(hanging);
     turn.copy(restHand);
+  }
+  // The triangle in the paw turns back around the pinch of the clip, so that it keeps its hang
+  // while the paw stays in line with its forearm. At the trap table, the turn fades out, because
+  // the places of the table hold the triangle as the bind pose does.
+  if (side.kind === 'hold' && state.swap.held[0] === 0) {
+    pieceTurn.slerpQuaternions(NO_TURN, piece.fromArray(side.piece), 1 - state.swap.table);
+    setBoneRotation(rotations, MALLET_L, pieceTurn);
   }
   // A hold with keepPaw keeps each paw that holds a piece on the hand of the player, so that the
   // piece stays where the bind pose holds it in the closed paw.
