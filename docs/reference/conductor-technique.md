@@ -2,8 +2,8 @@
 
 This file is the target of the expression of the bear conductor of the app. It describes how a
 real conductor shows the dynamics, the articulation, the breath before an entry, the accents, the
-climax, and the end of a held chord, with the baton, the left hand, and the body. Each fact has a
-source.
+climax, and the end of a held chord, with the baton, the left hand, and the body, and how the
+conductor bows at the end of a piece. Each fact has a source.
 
 **Upkeep.** This file is current. A change of the motion of the conductor updates section 8 "Use
 in the app" and each fact that it finds wrong, in the same commit. Each new fact gets its source.
@@ -91,7 +91,7 @@ sources. A fact with no mark comes from the text of the source.
 - Observers see the expression of a conductor in the kinematics of the beat, and the amplitude of
   the motion can show the size of the expression (abstract) [12].
 
-## 7. The fermata and the release
+## 7. The fermata, the release, and the bow
 
 - On a fermata, "the conductor just waits on the fermata" [3].
 - The left hand cuts off the sound, and "the right hand does nothing" [3].
@@ -100,6 +100,17 @@ sources. A fact with no mark comes from the text of the source.
 - A close of the fingers of the left hand can also release the sound. The release needs "a clear
   point of cessation of the music" [8].
 - The release gives "the character required of the final note" [8].
+- At the end of a piece, the conductor "turns around to bow and acknowledge the applause of the
+  audience", and so accepts the applause "on behalf of the ensemble" [13].
+- The players bring up the next piece "only after the director has turned back to face the
+  ensemble" [13]. Thus the conductor turns back to the players after the bow.
+- A bow is a bend "forward from the waist, keeping your back straight", with the feet together
+  [14].
+- "Look down as you bow, never up at the audience" [14].
+- A performer holds the instrument in a "natural and casual hold" in the bow, and the bow "should
+  not call attention to it" [14].
+- A bow after a short piece or a small applause is partial and "quite short". A long applause gets
+  a low bow, held "for several counts" [14].
 
 ## 8. Use in the app
 
@@ -162,6 +173,14 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
   its bottom, and the left hand closes at the end. Then the baton stops a little lower
   (`finalCircle`, `finalClose`). The right hand moves in the release of the app too, because the
   release of the last chord of a piece ends the piece, and the bow follows it.
+- **The end of the piece (section 7).** After the cut-off, the bear holds the release in the
+  silence, and lowers the arms to the sides (`END_BOW`, `pose/end-bow.ts`). Then it turns on the
+  podium to the audience with small steps, bows from the waist with the eyes down, and turns back
+  to the orchestra, as the conductor of source 13. The baton hangs in the right paw, as the
+  natural hold of the instrument of source 14. The bow is partial, 35°, and short (about 2 s down
+  and up), because a conductor bows for the orchestra and the app has no applause (derived from
+  14). No source gives the times of the silence, the lowering, and the turn (derived). The whole
+  end takes `END_BOW_SEC` (7.4 s), so it ends while the end card counts down to the next piece.
 - **Where the app differs.** The app shows an accent with the jolt, the dip, and the stroke, and
   the left hand does not close to a fist for a sforzato (section 5). The left hand does not turn in
   wider rounds for a crescendo (section 2). It rises open.
@@ -169,6 +188,7 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
 ## 9. Sources
 
 All sources opened on 2026-11-10, except the search summaries 10 and 11 and the abstract 12.
+Sources 13 and 14 opened on 2026-11-12.
 
 1. ConductIT. "1.7 Workbook Exercises." Module 1, Technique.
    https://mooc.conductit.eu/module-1-technique/1-7-workbook-exercises/
@@ -197,3 +217,7 @@ All sources opened on 2026-11-10, except the search summaries 10 and 11 and the 
 12. G. Luck, P. Toiviainen, and M. R. Thompson. "Perception of Expression in Conductors' Gestures:
     A Continuous Response Study." Music Perception 28(1), 2010, pp. 47 to 57.
     doi:10.1525/mp.2010.28.1.47
+13. M. Neel. "Festival Etiquette." Yamaha Music Educators, teaching tips, 2018-08-20.
+    https://hub.yamaha.com/music-educators/prof-dev/teaching-tips/festival-etiquette
+14. S. Aron. "Stage Deportment I: Why We Bow." Stephen Aron Studio, 2015-11-11.
+    https://stephen-aron.squarespace.com/stephenaronstudio/2015/11/stage-deportment-i-why-we-bow.html
