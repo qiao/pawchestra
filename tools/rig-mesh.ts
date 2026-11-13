@@ -2099,7 +2099,7 @@ async function baseForm(args: readonly string[]): Promise<FormJson | null> {
  * Blender prints only "Please select a file", and the rig fails with no clear cause.
  *
  * @param config The config.
- * @param label The name of the config in the message, such as `tools/mesh-rigs/mouse.json` or
+ * @param label The name of the config in the message, such as `tools/mesh-rigs/rhino.json` or
  *   `--set source=scratch/glb/deer.glb`.
  * @returns The absolute path of the source file.
  * @throws Error that names the path of the config and the absolute path, if no file exists there.

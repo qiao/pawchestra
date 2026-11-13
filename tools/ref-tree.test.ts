@@ -121,7 +121,7 @@ describe('withProbeTree', () => {
           expect(existsSync(join(dir, 'tools', 'pose-depth.ts'))).toBe(true);
           // Only the tree of the commit has the tests and the rig configs of tools/.
           expect(existsSync(join(dir, 'tools', 'ref-tree.test.ts'))).toBe(true);
-          expect(existsSync(join(dir, 'tools', 'mesh-rigs', 'mouse.json'))).toBe(true);
+          expect(existsSync(join(dir, 'tools', 'mesh-rigs', 'mannequin.json'))).toBe(true);
           expect(existsSync(join(dir, 'node_modules', 'three', 'package.json'))).toBe(true);
           return Promise.resolve();
         },

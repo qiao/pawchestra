@@ -83,7 +83,7 @@ describe('copiedTool', () => {
     expect(copiedTool(tools)).toBe(true);
     expect(copiedTool(join(tools, 'hold-reach.ts'))).toBe(true);
     expect(copiedTool(join(tools, 'mesh-rigs'))).toBe(true);
-    expect(copiedTool(join(tools, 'mesh-rigs', 'mouse.json'))).toBe(true);
+    expect(copiedTool(join(tools, 'mesh-rigs', 'mannequin.json'))).toBe(true);
     expect(copiedTool(join(tools, 'glb-bodies', 'bear.json'))).toBe(false);
   });
 });
@@ -118,7 +118,7 @@ describe('withGlbBody', () => {
       file,
       async (dir) => {
         copy = dir;
-        configs = readFileSync(join(dir, 'tools', 'mesh-rigs', 'mouse.json'), 'utf8');
+        configs = readFileSync(join(dir, 'tools', 'mesh-rigs', 'mannequin.json'), 'utf8');
         writeFileSync(
           join(dir, 'tools', 'print-source.ts'),
           [
@@ -134,7 +134,7 @@ describe('withGlbBody', () => {
 
     expect(code).toBe(0);
     expect(readFileSync(out, 'utf8')).toBe(relative(ROOT, file));
-    expect(configs).toBe(readFileSync(join(ROOT, 'tools', 'mesh-rigs', 'mouse.json'), 'utf8'));
+    expect(configs).toBe(readFileSync(join(ROOT, 'tools', 'mesh-rigs', 'mannequin.json'), 'utf8'));
     expect(studioBodyOf('studio-rabbit').source).not.toBe(relative(ROOT, file));
     expect(copy).not.toBe('');
     expect(existsSync(copy)).toBe(false);

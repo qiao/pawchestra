@@ -67,7 +67,7 @@ describe('pnpm hold-reach (design 4.6)', () => {
     const reach = violinReachAt('rabbit', 'chair', 1);
     const factor = reach.ruleFactor;
     if (factor === null) {
-      throw new Error('The rule gives no violin for the mouse.');
+      throw new Error('The rule gives no violin for the rabbit.');
     }
 
     const rebuilt = violinReachAt('rabbit', 'chair', reach.scale * factor);
@@ -275,12 +275,12 @@ describe('takeSizes', () => {
 
 describe('sizeReach (design 4.6)', () => {
   it('needs the reach of the arm at the size of the rule, and the arm factor of the rig there', () => {
-    const now = holdReach('mouse', 'violin', 'stand');
+    const now = holdReach('rhino', 'violin', 'stand');
     const rule = ruleSize(now);
     if (!rule) {
-      throw new Error('The rule gives no violin for the rabbit.');
+      throw new Error('The rule gives no violin for the rhino.');
     }
-    const report = sizeReach('mouse', 'stand', [rule.scale, 1]);
+    const report = sizeReach('rhino', 'stand', [rule.scale, 1]);
     const [fit, full] = report.sizes;
     expect(report.arm).toBeCloseTo(now.arms.L, 9);
     // At the size of the rule, the scroll lies in the palm of the current arm.
@@ -288,7 +288,7 @@ describe('sizeReach (design 4.6)', () => {
     expect(fit?.factor).toBeCloseTo(1, 6);
     // The arm of the app comes from the rig within 1% (pnpm rig-mesh --check).
     const rig = report.rig;
-    expect(rig?.file).toBe('tools/mesh-rigs/mouse.json');
+    expect(rig?.file).toBe('tools/mesh-rigs/rhino.json');
     expect(Math.abs((fit?.rigFactor ?? 0) / (rig?.armFactor ?? 1) - 1)).toBeLessThan(0.02);
     // The player rebuilt at each scale keeps its tail end, so the check agrees within 1 mm.
     for (const size of report.sizes) {
