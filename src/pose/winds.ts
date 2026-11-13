@@ -232,6 +232,12 @@ export interface FreePaw extends LapHand {
    * `HANG` when they are missing.
    */
   readonly hang?: HangAngles;
+  /**
+   * The turn of the hanging paw of a standing player around its long axis, in radians: a turn of
+   * the hand of `hangingHand()`, which turns the bind paw down along the forearm by the shortest
+   * turn. 0 when it is missing.
+   */
+  readonly hangRoll?: number;
 }
 
 /**
@@ -603,7 +609,10 @@ export const WIND_HOLDS = {
  * paw passes through the tube at the end of the lift and turns 175°. The elbows point down, a
  * little out, and back at rest. The left paw leaves its grip ({@link WindHold.restFreeL}) and rests
  * on the top of the left haunch. A standing fox hangs the left arm with a small bend of the elbow
- * ({@link FOX_HANG}).
+ * ({@link FOX_HANG}), and the hanging paw turns 150° around its long axis (`hangRoll`), so that
+ * the palm faces the side of the leg. With no turn, the hanging left paw twisted 138° on its
+ * forearm and the forearm 70° (`pnpm arm-check flutist`, p95 in the rest of the flute concerto),
+ * and with 150°, 35° and 19°. With 90°, they twisted 53° and 27°.
  *
  * A real flutist can rest the free hand on the thigh, but the top of the left thigh of the fox is
  * out of reach of the left arm. The wrist reaches 0.338 m from the shoulder joint, and the top of the thigh lies
@@ -663,6 +672,7 @@ const FOX_FLUTE = {
       forward: FOX_HANG[0] * MathUtils.DEG2RAD,
       bend: FOX_HANG[1] * MathUtils.DEG2RAD,
     },
+    hangRoll: 150 * MathUtils.DEG2RAD,
   },
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
@@ -1549,7 +1559,10 @@ function freeRestOf(
     return { kind: 'hang', hang: hangingArm(model, arm, angles), roll: null, arc };
   }
   if (model.support === 'stand') {
-    return { kind: 'hang', hang: hangingArm(model, arm, rest.hang), roll: null, arc };
+    const roll = rest.hangRoll
+      ? toQuat(new Quaternion().setFromAxisAngle(Y_AXIS, rest.hangRoll))
+      : null;
+    return { kind: 'hang', hang: hangingArm(model, arm, rest.hang), roll, arc };
   }
   return { kind: 'lap', ...lapHand(model, arm, rest), arc };
 }

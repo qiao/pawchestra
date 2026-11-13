@@ -257,7 +257,10 @@ count-in (5.4, 6.5), and lower them when the hold of `transport.holdSec` after a
   as a pianist sits on the front half of the bench (piano 2).
 - **Hanging arms.** A standing player with free hands hangs its arms (`HANG` of `pose/hang.ts`),
   with the palms at the height of the hips. The slim standing tan fox bends the free left elbow
-  less (`FOX_HANG`), because the full bend points its forearm forward into the air.
+  less (`FOX_HANG`), because the full bend points its forearm forward into the air. Its hanging
+  left paw turns around its long axis (`FreePaw.hangRoll`), so that the palm faces the leg.
+  Reason: the shortest turn of the bind paw down along the forearm twisted the paw 138° on its
+  forearm.
 
 The rest of each family:
 

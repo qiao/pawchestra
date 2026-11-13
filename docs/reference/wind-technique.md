@@ -453,7 +453,7 @@ The app follows these facts:
   the free left hand on the thigh, but the short arm of the fox does not reach the top of the thigh.
   So the seated fox rests the free left paw on the top of the left haunch near the hip, with the
   palm toward the body (`restFreeL`). A standing fox lets the free left arm hang down along the
-  side with a small bend of the elbow (`FOX_HANG`). The embouchure hole
+  side with a small bend of the elbow (`FOX_HANG`), with the palm toward the leg (`hangRoll`). The embouchure hole
   sits at the lower lip, under the long muzzle, and the lip plate presses the lips and the chin
   about 0.5 cm, as a flutist rests the plate against the chin (`lipShift`).
 - **The shared flute and clarinet (2.4, 3, `WIND_HOLDS`).** Each recast body plays the arm values
