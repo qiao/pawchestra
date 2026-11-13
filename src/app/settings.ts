@@ -7,7 +7,9 @@ import type { SectionSize } from '../score/types.ts';
  */
 export type QualitySetting = 'auto' | 'high' | 'medium' | 'low';
 
-/** The button of the setting "Quality" that names each tier: a step of the medium tier is Medium. */
+/**
+ * The button of the setting "Quality" that names each tier: a step of the medium tier is Medium.
+ */
 const SETTING_OF_TIER = {
   high: 'high',
   medium: 'medium',

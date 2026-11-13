@@ -146,8 +146,9 @@ function bodyMapOf(file: string, kind: BodyMapKind): BodyMap {
 
 /**
  * Loads the image of a map in the next animation frame, decodes it off the main thread at the
- * scale of the tier ({@link setBodyMapScale}), and turns the map on. A failed load leaves the colors of the faces, or the normals of the mesh. An
- * optional map with no file of the build ends the load with no message.
+ * scale of the tier ({@link setBodyMapScale}), and turns the map on. A failed load leaves the
+ * colors of the faces, or the normals of the mesh. An optional map with no file of the build ends
+ * the load with no message.
  *
  * @param file The image, relative to the repository.
  * @param map The map.
