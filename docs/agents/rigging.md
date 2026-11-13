@@ -269,7 +269,8 @@ Design 4.4 gives the rule and the reason of each config key.
   and join the wrist band again, with a `palm` for each side on the real palm. Then move the rest
   between the moments with the elbow poles of the hold, and center it with `hinges`. Keep each
   part within about 45°. The app takes the smooth normals from the bind, so keep the bind
-  supination near 0 when the twists stay far from 180°.
+  supination near 0 when the twists stay far from 180°. Keep the near ring out of the turn
+  (`move[A] = False`): a cut at the mean place of a slanted ring shears the wrist into a pinch.
 - When no weight rule or ring removes a fold, fit a `raise` shape after the hold with
   `pnpm raise-fit`. A shape fixes only the poses near its rule, and design 4.4 gives its limits.
 - A grip far in front of a deep chest turns the shoulder past any shape. Turn the shoulder bone
