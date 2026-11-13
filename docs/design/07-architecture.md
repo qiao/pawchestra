@@ -119,13 +119,18 @@ check the real motion and the sound of one role with no MIDI file.
   species with each instrument of its section, the standing soloist of each instrument whose
   soloist stands (4.5), and the recast roles of the instruments of the cast matrix (4.4).
   `testRoles()` of `test-page/roles.ts` makes it.
+- **Role panel.** A fixed panel at the left side lists the roles, with one group for each species
+  (`rolesBySpecies()`). The conductor is in the group of the bear, which comes first. A click on
+  the title of a group folds or unfolds it, and all groups start unfolded. The panel marks the
+  picked role (`aria-current`), and a click on a role picks it. The panel scrolls on its own, and
+  the stage fills the rest of the width.
 - **Phrase.** `phraseOf()` of `test-page/phrases.ts` gives each instrument a test note list of
   about 8 s: long notes, fast notes, string crossings or changes of the register, and rests.
   `partsFile()` writes it as a MIDI file, and the score rules read it. Thus the sound and the
   motion come from one `Score`.
 - **Conductor phrase.** `conductorPhrase()` of `test-page/conductor-phrase.ts` gives six sections
-  8 bars of 4/4 at 120 BPM, one player each, because a group of five or fewer has no
-  conductor (4.2). It holds each input of the conductor pose (5.4): a soft legato start, entries
+  8 bars of 4/4 at 120 BPM, one player each, because a group of five or fewer has no conductor
+  (4.2). It holds each input of the conductor pose (5.4): a soft legato start, entries
   after a rest that the left hand cues, a crescendo, a staccato forte with an accent, a tutti
   that the baton cues, a diminuendo, and a held final chord with a cut-off.
 - **Place.** The layout of the app puts the one player at the stage center (4.2). A role with
@@ -145,15 +150,15 @@ check the real motion and the sound of one role with no MIDI file.
   (`SilentClock`). The button "Start the sound" makes the `Player` in its click, and the
   `Player` then plays on from the song time of the clock.
 - **Camera.** The orbit controls of Free mode turn the camera (2.5). The presets Front, Side,
-  Back, and Close show for one frame as the camera of a shot, and Free mode keeps them. The
-  presets turn with the side that the animal faces (`ViewSubject.turn`), so the front view shows
-  the face of the conductor, who faces the orchestra. So each
+  Back, and Close show for one frame as the camera of a shot, and Free mode keeps them. So each
   preset target stays less than 1 m from the default target, and each camera stays outside the
-  near limit (`viewCamera()` of `test-page/views.ts`). The frame moves down by half the bar,
-  because the page has no bar.
-- **Panel.** A button at the top of the panel folds and unfolds the controls. On a screen of
-  600 px or less, the panel goes to the bottom, over the floor, and starts folded, so that it does
-  not cover the animal.
+  near limit (`viewCamera()` of `test-page/views.ts`). The presets turn with the side that the
+  animal faces (`ViewSubject.turn`), so the front view shows the face of the conductor, who faces
+  the orchestra. The frame moves down by half the bar, because the page has no bar.
+- **Panel.** The panel of the controls floats over the stage, at the right of the role panel. A
+  button at its top folds and unfolds the controls. On a screen of 600 px or less, the panel goes
+  to the bottom, over the floor, and starts folded, so that it does not cover the animal. The role
+  panel becomes a drawer there: a button at the top left opens it, and a pick closes it.
 - **Link.** The URL hash names the role, such as `/test#rabbit-violin`, so a reload or a shared
   link shows the same role.
 
@@ -170,6 +175,8 @@ export type TestRole = PlayerRole | ConductorRole;
 export interface PlayerRole {
   /** The name in the URL hash: `<species>-<instrument>`, and `-standing` for a soloist. */
   readonly id: string;
+  /** The text of the role under its species in the role panel: "violin (seated)". */
+  readonly part: string;
   readonly group: 'section' | 'soloist' | 'recast';
   readonly species: SpeciesId;
   /** The role species and the species of the seats. Their bodies load before the build. */
