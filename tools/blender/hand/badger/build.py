@@ -603,7 +603,9 @@ def segments(x, part, R):
 
 def arm_row(x, R):
     ctl = np.array(R['control'])
-    clav, elbow, wrist = (float(np.interp(x, ctl[:, 0], ctl[:, k])) for k in (1, 2, 3))
+    # The control rows hold x of the source: an arm of the edit armStretch maps back.
+    xs = float(ce.arm_source_x(x, P))
+    clav, elbow, wrist = (float(np.interp(xs, ctl[:, 0], ctl[:, k])) for k in (1, 2, 3))
     rest = 1 - clav - elbow - wrist
     row = {
         n: w * rest for n, w in segments(x, 'upper_arm' if x < R['elbow'] else 'forearm', R).items()
