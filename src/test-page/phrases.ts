@@ -307,32 +307,74 @@ export function phraseOf(instrument: PlayedInstrument): TestNote[] {
   }
 }
 
+/** A note of a part of a test file, with its velocity. */
+export interface PartNote extends TestNote {
+  /** The MIDI velocity, 1 to 127. {@link TEST_VELOCITY} when it is not given. */
+  readonly velocity?: number;
+}
+
+/** One part of a test file: an instrument and its notes. */
+export interface PhrasePart {
+  readonly instrument: PlayedInstrument;
+  readonly notes: readonly PartNote[];
+}
+
+/**
+ * Writes the Standard MIDI File of the parts of a test phrase (design 7.1, "Test page"): one track
+ * at 120 BPM. Each melodic part gets its own channel with the GM program of its instrument, from
+ * channel 1, and a drum part plays its key on the rhythm channel. The score rules of the app read
+ * the file, so the sound and the motion come from one `Score`.
+ *
+ * @param parts The parts. At most 15 melodic parts.
+ * @returns The bytes of the file.
+ * @throws Error if the file has more than 15 melodic parts.
+ */
+export function partsFile(parts: readonly PhrasePart[]): Uint8Array<ArrayBuffer> {
+  const tick = (sec: number): number => Math.round(sec * TICKS_PER_SEC);
+  const programs: TestEvent[] = [];
+  const notes: { tick: number; on: boolean; channel: number; key: number; velocity: number }[] = [];
+  let next = 0;
+  for (const part of parts) {
+    const source: PhraseSource = SOURCES[part.instrument];
+    let channel = RHYTHM_CHANNEL;
+    if (source.kind === 'program') {
+      channel = next === RHYTHM_CHANNEL ? next + 1 : next;
+      next = channel + 1;
+      if (channel > 15) {
+        throw new Error(`A test file has room for 15 melodic parts, not ${parts.length}.`);
+      }
+      programs.push({ tick: 0, bytes: [0xc0 | channel, source.program] });
+    }
+    for (const note of part.notes) {
+      const velocity = note.velocity ?? TEST_VELOCITY;
+      notes.push(
+        { tick: tick(note.start + note.length), on: false, channel, key: note.key, velocity },
+        { tick: tick(note.start), on: true, channel, key: note.key, velocity },
+      );
+    }
+  }
+  // At one tick, a note-off comes before a note-on, so that a repeated key sounds again.
+  const sorted = notes.toSorted((a, b) => a.tick - b.tick || Number(a.on) - Number(b.on));
+  const events: TestEvent[] = [
+    { tick: 0, bytes: TEMPO_120 },
+    ...programs,
+    ...sorted.map((note): TestEvent => ({
+      tick: note.tick,
+      bytes: note.on
+        ? [0x90 | note.channel, note.key, note.velocity]
+        : [0x80 | note.channel, note.key, 0],
+    })),
+  ];
+  return writeSmf({ format: 0, ticksPerQuarter: TICKS_PER_QUARTER, tracks: [events] });
+}
+
 /**
  * Writes the Standard MIDI File of the test phrase of an instrument (design 7.1, "Test page"):
- * one track at 120 BPM with the GM program of the instrument on channel 1, or the drum key on the
- * rhythm channel. The score rules of the app read it, so the sound and the motion come from one
- * `Score`.
+ * the one part of {@link partsFile}, on channel 1 or on the rhythm channel.
  *
  * @param instrument The instrument.
  * @returns The bytes of the file.
  */
 export function phraseFile(instrument: PlayedInstrument): Uint8Array<ArrayBuffer> {
-  const source: PhraseSource = SOURCES[instrument];
-  const channel = source.kind === 'drum' ? RHYTHM_CHANNEL : 0;
-  const tick = (sec: number): number => Math.round(sec * TICKS_PER_SEC);
-  // At one tick, a note-off comes before a note-on, so that a repeated key sounds again.
-  const notes = phraseOf(instrument).flatMap((note) => [
-    { tick: tick(note.start + note.length), on: false, key: note.key },
-    { tick: tick(note.start), on: true, key: note.key },
-  ]);
-  const sorted = notes.toSorted((a, b) => a.tick - b.tick || Number(a.on) - Number(b.on));
-  const events: TestEvent[] = [
-    { tick: 0, bytes: TEMPO_120 },
-    ...(source.kind === 'program' ? [{ tick: 0, bytes: [0xc0 | channel, source.program] }] : []),
-    ...sorted.map((note): TestEvent => ({
-      tick: note.tick,
-      bytes: note.on ? [0x90 | channel, note.key, TEST_VELOCITY] : [0x80 | channel, note.key, 0],
-    })),
-  ];
-  return writeSmf({ format: 0, ticksPerQuarter: TICKS_PER_QUARTER, tracks: [events] });
+  return partsFile([{ instrument, notes: phraseOf(instrument) }]);
 }
