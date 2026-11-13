@@ -470,7 +470,9 @@ The rest of each family:
   (`MONKEY_TRUMPET`) takes the rule with an own fit: the big head of the Tripo monkey puts its mouth
   farther than its arm from the shoulders, and with the head up, the straight arms stop short of the
   valves. Its spine also turns back in the play (`WindHold.lean`), and the trumpet turns further
-  down on the face (`play`), so the head bows only 4° to 6° from the vertical. Reason: the arms
+  down on the face (`play`), so the head stays near the vertical. The lean turns the trumpet up
+  with the chest, so the trumpet points only a little more down than the "slightly down" of a real
+  player (winds 2.1), and the grips do not change. Reason: the arms
   reach the valves of the trumpet of the app, while the head stays over the chest and the hips and
   the center of mass over the middle of the soles. The right paw lies on the valves below the
   mouth (`gripShiftR`), and the right forearm stays below the chin. Reason: a real player keeps

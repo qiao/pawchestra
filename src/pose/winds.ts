@@ -1223,14 +1223,17 @@ const WOLF_CLARINET = {
  * The right shoulder bone turns 70° forward and the left 50° (`reach`, `reachL`), as the shoulder
  * blades of a real player slide forward. The head bows 14.6° on the chest by the rule of the far
  * mouth (`farMouth` 0.85), and the trumpet turns down with the head, so that it keeps its angle to
- * the face. The trumpet turns 27° further down (`play`), so that the valves come lower and nearer
- * to the shoulders. The spine turns 7° back in the play (`lean`), as a real player stands erect, so
- * the head bows only 4° to 6° from the vertical, the line from the mouthpiece to the bell rim
- * points about 30° below the level, and the head center stays within 1.4 cm of the middle of the
- * soles. The paws then reach their grips with 5.3 cm (left) and 1.4 cm (right) to spare
- * (`pnpm hold-fit trumpeter`). With the spine of the body, the head bowed 14° to 16° from the
- * vertical, and the head center stood 6 cm to 8 cm in front of the soles, so the body read as if
- * it fell forward.
+ * the face. The trumpet turns 25° further down (`play`), so that the valves come lower and nearer
+ * to the shoulders. The spine turns 12° back in the play (`lean`), as a real player stands erect, so
+ * the head stays within about 2° of the vertical, and the line from the mouthpiece to the bell rim
+ * points about 23° below the level, near the "slightly down" of a real trumpet
+ * (`docs/reference/wind-technique.md` 2.1). The paws then reach their grips with 4.8 cm (left) and
+ * 1.6 cm (right) to spare (`pnpm hold-fit trumpeter`). The mean of the skin stands 2.3 cm in front
+ * of the middle of the soles, against 4.7 cm with 7° back and the trumpet 27° down, when the line
+ * pointed about 30° below the level. The arms and the trumpet move with the chest, so the lean
+ * turns the bell up with no change of the grips. With the spine of the body, the head bowed 14° to
+ * 16° from the vertical, and the head center stood 6 cm to 8 cm in front of the soles, so the body
+ * read as if it fell forward.
  *
  * The left palm faces the upright casings from the left, below the middle of their height
  * (`InstrumentGrips.tubeL` of `models/instruments/brass.ts`), the left paw points up along its
@@ -1239,11 +1242,13 @@ const WOLF_CLARINET = {
  * 1.1 cm off. The right palm lies above the valves at their right and faces down, and the right
  * paw points to the left across the valve tops: 0.7 of its aim is the side direction across the
  * valves (`aimSide`), and its fingers curl 92° down onto the valves. With 0.8, the right wrist
- * bends 75°, more than the 70° of the arm gate. The right grip moves 0.06 H along the valves
+ * bends 75°, more than the 70° of the arm gate. The right grip moves 0.08 H along the valves
  * toward the mouthpiece (`gripShiftR`), so that the right arm reaches it. The right paw then
  * lies on the valves below the mouth, as a real player keeps the right hand on the valves below
- * the face. In the chest axes, the top of the paw is 1.9 cm below the mouthpiece, the top of the
- * right forearm in front of the face 4.2 cm below it, and the chin 3.8 cm below it. With the
+ * the face. In the chest axes, the top of the paw is 1.0 cm below the mouthpiece, the top of the
+ * right forearm in front of the face 3.6 cm below it, and the chin 3.8 cm below it. With the
+ * trumpet 20° down and the grip 0.1 H toward the mouthpiece, the right paw grasps the valves in
+ * each play sample, but the top of the paw comes to the height of the mouthpiece. With the
  * trumpet 13° down and the grip 0.13 H toward the mouthpiece, the top of the paw stood 1.4 cm
  * above the mouthpiece, and the paw and the forearm covered the mouth in the front view. With the
  * trumpet 20° down, the grip 0.06 H toward the mouthpiece turned the right palm 72° from the
@@ -1275,13 +1280,13 @@ const MONKEY_TRUMPET = {
   farMouth: 0.85,
   reach: 70 * MathUtils.DEG2RAD,
   reachL: 50 * MathUtils.DEG2RAD,
-  play: holdTurn(-27, 0),
-  lean: -7 * MathUtils.DEG2RAD,
+  play: holdTurn(-25, 0),
+  lean: -12 * MathUtils.DEG2RAD,
   poleL: [-1, -1, 0],
   poleR: [1, -1, 0],
   faceTube: ['palm', 'palm'],
   aimSide: [0, 0.7],
-  gripShiftR: [-0.06, 0, 0],
+  gripShiftR: [-0.08, 0, 0],
   restShift: [0.1, -0.5, 0.12],
   restGripShiftL: [0, 0, 0.04],
   restAim: 1,
