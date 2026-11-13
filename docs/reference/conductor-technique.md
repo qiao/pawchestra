@@ -121,6 +121,21 @@ sources. A fact with no mark comes from the text of the source.
   2.22 s of stepping. Each step turned the foot by about 75° to 80° [15].
 - The peak separation of the head from the pelvis was about 22° in a fast turn [15].
 
+## 7a. The baton in the hand
+
+- "You hold the baton with your thumb and index finger", "the middle finger slightly closed but
+  loose", and "the thumb slightly forward" [16].
+- "The end lightly touches the palm of the hand but is not blocked" [16].
+- The baton is "as if it were a continuation of his arm, a fourth part" [16].
+- "Think of the baton as an extension of your lower arm", with "a sense of line going from inside
+  your elbow, through the arm and hand, into the baton" [17].
+- "It is important to avoid angles between lower arm and baton", and to avoid "gripping the
+  baton too tight or too loose" [17].
+- Max Rudolf holds the baton with the thumb and the first and second fingers, with the butt
+  against the palm (a search summary only) [10].
+- No source of section 9 gives the hold of the baton with the arms down. The hand keeps the grip
+  of the play, because the baton does not move in the hand (derived).
+
 ## 8. Use in the app
 
 The bear conductor follows these rules (design 5.4). `pose/conductor-expression.ts` reads the
@@ -138,6 +153,14 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
   goes down, and the knees bend (`softLean`, `softHead`, `softCrouch`), as the smaller body of
   section 6. The app keeps the beat below the chin, except at a climax (section 1). At beat 1,
   the right wrist is at the chest, a little below the shoulder joint (`CONDUCTOR_HOLD.beatPoint`).
+- **The baton in the paw (section 7a).** The butt lies in the heel of the palm (`BATON_GRIP` of
+  `models/instruments/baton.ts`), and the stick leaves the paw through the palm under the curled
+  claws, turned toward the thumb (`STICK_TO_THUMB`, `STICK_TO_PALM`), so that the closed paw
+  grips it. The fingers curl around it in the play, at rest, and in the bow
+  (`CONDUCTOR_HOLD.batonCurl`). The turn toward the palm also brings the paw near the line of
+  the forearm. The baton itself still stands at an angle to the forearm in the beat, because
+  the beat point and the pivot of the hold set it (`beatPoint`, `batonPivot`): the app differs
+  from the line of section 7a there.
 - **The rest pose.** Before the start and after the bow, the arms hang relaxed beside the body,
   and the baton points down, a little forward, and a little in (`CONDUCTOR_HOLD.restBaton`). No
   source of section 9 gives the rest place.
@@ -207,7 +230,7 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
 ## 9. Sources
 
 All sources opened on 2026-11-10, except the search summaries 10 and 11 and the abstract 12.
-Sources 13, 14, and 15 opened on 2026-11-12.
+Sources 13, 14, and 15 opened on 2026-11-12, and sources 16 and 17 on 2026-11-13.
 
 1. ConductIT. "1.7 Workbook Exercises." Module 1, Technique.
    https://mooc.conductit.eu/module-1-technique/1-7-workbook-exercises/
@@ -243,3 +266,7 @@ Sources 13, 14, and 15 opened on 2026-11-12.
 15. F. Khobkhun, M. Hollands, and J. Richards. "The Effect of Different Turn Speeds on Whole-Body
     Coordination in Younger and Older Healthy Adults." Sensors 21(8), 2827, 2021.
     doi:10.3390/s21082827
+16. Ilya Musin Society. "Orchestral conducting masterclass: the baton." 2018-01-31.
+    https://www.musinsociety.com/index.php/en/technique/46-orchestral-conducting-masterclass-the-baton.html
+17. ConductIT. "1.3 Baton." Module 1, Technique.
+    https://mooc.conductit.eu/module-1-technique/1-3-baton/
