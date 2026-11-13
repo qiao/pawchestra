@@ -83,17 +83,11 @@ passes.
       (cat, fox, panda, beaver, rabbit) and the polar bear. After each species, `pnpm hand-chain
       <s>` must give the rig.glb, the rig.json, the studio module, and the config of `HEAD` byte
       for byte.
-- [ ] Bear chain (4.4): its elbow rows keep a helper share of 0.75 at the elbow joint (0.25, 0.75,
-      0.75, 0.25), so the bend share jumps at the joint. Give it the continuous ramp of the other
-      chains (rise and fall over about one arm radius), and measure the elbow band.
 - [ ] Beaver bassoonist and panda trombonist (4.4): with the continuous elbow ramp, the arm gate
       gives folds p95 42 (37) on the right arm of the bassoonist and 86 (83) on the right arm of
       the trombonist (FAIL), while the dihedral angles of the elbow band fall (p95 at rest 106 to
       76 degrees, and 83 to 71 edges over 30 degrees). Find the folded faces with
       `pnpm fold-probe --faces`, and check them in 2x crops.
-- [ ] Cat violist (4.4): with the continuous elbow ramp, one edge of the right elbow band folds
-      in the lowering (largest angle 126 to 160 degrees at lower50), while the p95 falls.
-      Check the right elbow in the lowering in the app.
 - [ ] Badger (4.4): the elbow rings double the faces of the elbow, so the fold counts by face of
       `fold-probe` and the arm gate rise for some roles, while the bent elbow is round in the
       crops. Measure the folds by area, or by the dark pixels of the elbow, to compare.
@@ -179,10 +173,11 @@ passes.
 - [ ] Conductor bear: the rest baton hangs 27° forward of the vertical (`restBaton`, 5.4). A baton
       nearer the vertical (22°) turns the right wrist 2,794°/s at the start of a lift (limit
       3,000, the base 1,594). Spread the turn of the paw over the lift, then hang the baton lower.
-- [ ] Conductor bear: the left inner elbow (faces 443, 5222, 5223, 5226) folds from a bend of
-      about 45°, in the ready gesture and at a cue (4 faces). The pose keeps those arms nearly
-      straight (`readyReach`, `cueReach`). Add an elbow ring by an edge ring split in the bear
-      chain if a bent left arm is needed.
+- [ ] Conductor bear (5.4): with the continuous elbow rows, the left inner elbow faces 443, 5222,
+      5223, and 5226 no longer fold at a bend of about 45°. Try a more bent left arm in the ready
+      gesture and at a cue (`readyReach`, `cueReach`), and check the faces 4254, 4258, 4259, and
+      4262, which fold in up to 6 % of the play at bends of 89° to 142° (`pnpm fold-probe
+      conductor --faces`).
 - [ ] Conductor bear: in the held final chord and at a climax, the baton points up past the cheek
       in the view from the front right (The Ember Crown 172 s, Mozart K. 525 30.9 s). The sweep
       finds no depth, so measure the gap of the baton to the head.
@@ -876,10 +871,10 @@ passes.
 - [ ] Tripo pig: at rest and in the moves, the right upper arm goes 2.4 cm into the cap of the arm
       root (`pnpm pose-depth hornist`, limit 1.5 cm; 0.8 cm in the play). Check the right shoulder
       at rest in 2x crops, or accept the depth with its reason in the sweep of the hornist.
-- [ ] Pig hornist (4.4): the belly rows make the belly round under the chest, and it now hangs
-      a little over the thigh tops, with a shadow line in the lap in the front view of the seated
-      play. Check the lap in the app. The clavicle_L faces 4453 and 4454 still fold in each
-      sample of `pnpm fold-probe hornist`.
+- [ ] Pig hornist (4.4): the clavicle_L faces 4453 and 4454 fold in each sample of
+      `pnpm fold-probe hornist`. Check the left shoulder in 2x crops.
+- [ ] Pig hornist (4.4): the lap key `bind_belly` shows the darker fur of the lower belly in the
+      crotch of the front view, where the shadow hid it. Check the lap in the stage light.
 - [ ] Pig hornist: the right grip moves 0.11 H out of the horn bell (`gripShiftR`), so the note
       target of the right palm is 4.5 cm from the grip of the horn (`pnpm hold-fit hornist`, within
       5 mm). Move the grip of the horn to the mouth of the bell (`HORN_PALM_DEPTH`), or let the
