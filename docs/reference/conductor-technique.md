@@ -180,7 +180,9 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
   natural hold of the instrument of source 14. The bow is partial, 35°, and short (about 2 s down
   and up), because a conductor bows for the orchestra and the app has no applause (derived from
   14). No source gives the times of the silence, the lowering, and the turn (derived). The whole
-  end takes `END_BOW_SEC` (7.4 s), so it ends while the end card counts down to the next piece.
+  end takes `END_BOW_SEC` (7.4 s), and the end card shows after it. A play during the bow turns
+  the bear back from where it is, and the arms lift only when it nearly faces the orchestra
+  (`transportEndMotion()`, derived).
 - **Where the app differs.** The app shows an accent with the jolt, the dip, and the stroke, and
   the left hand does not close to a fist for a sforzato (section 5). The left hand does not turn in
   wider rounds for a crescendo (section 2). It rises open.
