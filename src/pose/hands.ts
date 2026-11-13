@@ -317,13 +317,19 @@ export const HANDS_HOLDS = {
   // meters is now 1.3 times the value of the fit that the comments give. The spine of the Tripo
   // fawn stays erect (`lean` 0): with a lean of 3°, its muzzle touched the neck of the harp
   // (`pnpm pose-depth harpist --gaps`), and erect, the gap is at least 2.3 cm. The pluck points
-  // lie at 0.37 of each string (`PLUCK.share`), so the bass strings are plucked low. The left palm lies 0.22 m above the pluck point, nearer to the shoulder, and
-  // 2 cm toward the player: at 0.14 m and 2 cm toward the column, the left paw misses the bass
-  // strings C2 to A2 by up to 4.5 cm, and at 0.14 m and 4 cm toward the player, the left paw bends
-  // 75° from the straight paw of the source (paw swing p95 of `pnpm arm-check`, limit 70°).
-  // The left palm faces the strings and 45° down (`faceL`), as the wrists of a harpist go a
-  // little down. The left shoulder lies 0.27 m from the plane of the strings, and the left upper
-  // arm is 0.2 m long, so the left forearm points into the strings. With the palm square to the
+  // lie at 0.37 of each string (`PLUCK.share`), so the bass strings are plucked low. The left
+  // palm lies 0.30 m above the pluck point, nearer to the shoulder, 16 cm left of the strings, and
+  // 2.6 cm toward the player. On the harp of the scale 0.85, with the palm 56° down, the fingers of
+  // the left paw went up to 3.0 cm through the strings with the palm 14 cm left of them, 1.8 cm
+  // with 16 cm (p95 0 cm), and 0.6 cm with 17 cm, where the left elbow bent to 74° (p5) against 76°
+  // (`scratch/dh/evalc.ts` of the round 2026-11-13). With the palm 45° down and 9 cm left of the
+  // strings, they went 6.1 cm through. On the old deer, the palm at 0.14 m above the pluck point
+  // and 2 cm toward the column missed the bass strings C2 to A2 by up to 4.5 cm.
+  // The left palm faces the strings and 56° down (`faceL`), as the wrists of a harpist go a
+  // little down. On the harp of the scale 0.85, the paw swing p95 is 74° at 45° down, 70° at 50°,
+  // 65° at 56°, and 59° at 63° (`pnpm arm-check harpist`, limit 70°), and at 63° the fingers go
+  // 3.9 cm through the strings. The left shoulder lies 0.27 m from the plane of the strings, and
+  // the left upper arm is 0.2 m long, so the left forearm points into the strings. With the palm square to the
   // strings, the left wrist bends back 58° to 60° in the rest, the lift, and the play, 88° from
   // the straight paw. With the palm 31° down, it bends back 26° to 31°, 58° from the straight
   // paw. With the group places of the fingering, the paw swing p95 is 57° at 45° down, 61° at
@@ -345,15 +351,18 @@ export const HANDS_HOLDS = {
   // the line from the shoulder and the palm square to the strings, the left paw bends 86° to 91°
   // on its bent bind forearm. The elbows point out and down, in the play and
   // at rest: with the elbows down, the left upper arm goes 6.3 cm into the chest when it reaches
-  // across to the strings. With the left elbow at [-1, -1, 0] in the play, the left upper arm goes
-  // flat (flat p5 of `pnpm arm-check` 0.77, against 0.83 with this elbow).
+  // across to the strings. The left elbow points down and a little back (`poleL`): with the left
+  // elbow at [-0.85, -1, 0] on the harp of the scale 0.85, the left paw went 4.4 cm into the body in
+  // 31 % of the samples, and with this elbow 1.1 cm (`scratch/dh/evalc.ts`). With the elbow at
+  // [-0.85, -1.5, 0.5], the left arm folded 7 faces (p95 of `pnpm arm-check harpist`), and with
+  // this elbow 6.
   harp: {
     action: 'pluck',
     keyPoint: harpStringPosition,
-    palmL: [-0.316993, 0.996262, 0.090569],
+    palmL: [-0.55, 1.05, 0.090569],
     palmR: [0.289, 0.35, 0.15],
-    // The highest strings of the left hand lie near the chest of the Tripo fawn, and the palm 0.22 m
-    // above their pluck points stands at the height of the shoulder. From C3 to D4, the left palm
+    // The highest strings of the left hand lie near the chest of the Tripo fawn, and the palm 0.30 m
+    // above their pluck points stands near the height of the shoulder. From C3 to D4, the left palm
     // moves up to 4 cm nearer to the strings, 6 cm down, and 6 cm toward the column. With the
     // harp place of 2026-11-13 and the move from F3 and 4 cm toward the column, the left paw went
     // 3.3 cm into the chest, and with this move 0.8 cm. The note targets do not change (`pnpm
@@ -366,7 +375,7 @@ export const HANDS_HOLDS = {
     // (p5, 180° is straight), and with this move to 99°. The note targets do not change
     // (`scratch/dh/evalc.ts` of the round 2026-11-13).
     highR: { from: 67, to: 96, offset: [0.090569, -0.6, 0] },
-    faceL: [1, -1, 0],
+    faceL: [1, -1.5, 0],
     faceR: [-1, -0.5, 0.4],
     aimL: [0, 1, 0.5],
     aimR: null,
@@ -386,7 +395,7 @@ export const HANDS_HOLDS = {
     span: 16,
     most: HARP_FINGERING.fingers,
     apart: 0,
-    poleL: [-0.85, -1, 0],
+    poleL: [-0.85, -1.2, 0.3],
     poleR: [1, -1, 0],
     curl: 15 * MathUtils.DEG2RAD,
     curlClosed: 60 * MathUtils.DEG2RAD,
