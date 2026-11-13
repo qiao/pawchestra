@@ -7,7 +7,7 @@ import type { StudioBody } from './studio-format.ts';
  * `pnpm studio-body` writes this file. Do not change it by hand.
  */
 export const STUDIO_HEIGHTS = {
-  'studio-badger': { headHeight: 0.243662, seatHeight: 0.059424 },
+  'studio-badger': { headHeight: 0.243662, seatHeight: 0.107901 },
   'studio-bear': { headHeight: 0.357761, seatHeight: null },
   'studio-beaver': { headHeight: 0.310441, seatHeight: 0.062187 },
   'studio-cat': { headHeight: 0.339381, seatHeight: 0.222242 },

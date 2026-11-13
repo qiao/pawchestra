@@ -74,6 +74,9 @@ const BODY_LOOPS = 2;
  *
  * - The polar bear: 16 open loops, the cuts to the two upper arms and the open loops of the source
  *   mesh and of its lids.
+ * - The badger: 7 open loops, the cuts to the two upper arms, the 3 open loops of the Tripo badger
+ *   (the socket and the open rim of the loose right eyeball, and a hole of 4 edges at the root of
+ *   the left ear), and the edges of the 2 lids.
  * - The beaver: 23 open loops, the cuts to the two upper arms, the 19 open loops of the Tripo
  *   beaver (the 2 eye sockets, the top of the teeth, and the 16 whisker strips), and the edges of
  *   the 2 lids.
@@ -103,6 +106,7 @@ const BODY_LOOPS = 2;
  * - The wolf: 5 open loops, the cuts to the two upper arms and 3 open loops of the Tripo wolf.
  */
 const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
+  ['assets/models/badger/tripo-hand/badger.rig.glb', 7],
   ['assets/models/polar-bear/tripo-hand/polar-bear.rig.glb', 16],
   ['assets/models/bear/tripo-hand/bear.rig.glb', 17],
   ['assets/models/beaver/tripo-hand/beaver.rig.glb', 23],
@@ -137,13 +141,6 @@ function bodyLoops(posed: PosedSkeleton, loops: number): number {
  * edge pairs of 1.4 cm and 2.8 cm at the right toes.
  */
 const MOUSE_BODY_LOOPS = 14;
-
-/**
- * The open loops of {@link BODY_BONES} of the badger mesh: the cuts to the two upper arms. The
- * rigid weights of the left shoulder join a loop of 4 edges at the left shoulder to the cut of the
- * left upper arm (29 edges in place of 25).
- */
-const BADGER_BODY_LOOPS = 2;
 
 /**
  * The open loops of {@link BODY_BONES} of the rhino mesh in a T-pose: the roots of the two upper
@@ -241,17 +238,6 @@ function bodySurface(posed: PosedSkeleton): ClosedSurface {
  */
 function mouseBodySurface(posed: PosedSkeleton): ClosedSurface {
   return closedPart(posed, BODY_BONES, MOUSE_BODY_LOOPS);
-}
-
-/**
- * The closed surface of the body of the badger mesh: {@link BODY_BONES} with a cap on each open
- * loop ({@link BADGER_BODY_LOOPS}).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function badgerBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, BADGER_BODY_LOOPS);
 }
 
 /**
@@ -1370,7 +1356,7 @@ function percussionSweep(
       { name: 'head', bones: ['head'] },
     ],
     obstacles: [
-      { name: 'body', surface: badgerBodySurface },
+      { name: 'body', surface: bodySurface },
       { name: 'instrument', surface: instrumentSurface },
     ],
     contact: CONTACT,

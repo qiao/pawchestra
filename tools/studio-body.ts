@@ -509,19 +509,21 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       glb: 'assets/models/mannequin/mannequin.rig.glb',
     },
   ],
-  // The percussion badger (design 4.4). It stands at each percussion
-  // instrument, so the export keeps the standing pose of the rig.
+  // The percussion badger (design 4.4): the hand rig of the Tripo P2 mesh
+  // (`assets/models/badger/tripo-hand/badger.blend`), by the route of the Tripo beaver, with no arm
+  // cut and no arm stretch. It stands at each percussion instrument in the pose of the source. Its
+  // `.blend` holds the facts of the body: the scale that keeps H of the badger of `badger.rig.glb`
+  // at aa8af0dd8, the crease angle 180°, and the seat width between the legs. The map paints a
+  // full eye with a light on each eyeball, so the eyes take the finish `varnish` and no eye light.
   [
     'badger',
     {
       landmark: 'shoulders',
-      height: 0.59685,
       seated: true,
       soloist: true,
       constant: 'STUDIO_BADGER',
-      crease: 35,
-      glb: 'assets/models/badger/badger.rig.glb',
-      headFloor: 0.76,
+      glb: 'assets/models/badger/tripo-hand/badger.rig.glb',
+      eyeFinish: 'varnish',
     },
   ],
   // The trumpet monkey (design 4.4): the candidate hand rig of the Tripo P2 macaque

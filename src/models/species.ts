@@ -561,13 +561,13 @@ export const SPECIES = {
       STUDIO_HEIGHTS['studio-rhino'].seatHeight / STUDIO_HEIGHTS['studio-rhino'].headHeight,
   },
   /**
-   * Badger, the percussion: a badger with a dark gray front, arms, and legs, a gray back and tail,
-   * and a white head with a black stripe over each eye, round ears with white rims, and light
-   * claws. It has the studio body of the mesh `assets/models/badger/badger.glb`, which `pnpm
-   * rig-mesh badger` rigs (design 4.4). It stands at each percussion instrument. Its head height is
-   * the head of the studio body, and the seat height is the seat of the studio body, in H. Its
-   * short arms cannot hold hand cymbals of a real size out of its round body, so it plays a
-   * suspended cymbal.
+   * Badger, the percussion: a dark brown badger with a cream face, a dark brown stripe over each
+   * eye, round ears with cream rims, a cream throat, and a cream tail. It has the studio body of
+   * the hand rig of the Tripo P2 badger (`assets/models/badger/tripo-hand/`, design 4.4), with the
+   * form and the colors of its source and short arms. It stands at each percussion instrument on
+   * its legs in the pose of the source. Its head height is the head of the studio body, and the
+   * seat height is the seat of the studio body between its legs, in H. Its short arms cannot hold
+   * hand cymbals of a real size out of its round body, so it plays a suspended cymbal.
    */
   badger: {
     body: 'studio-badger',
