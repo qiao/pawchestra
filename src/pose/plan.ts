@@ -343,8 +343,6 @@ export interface PosePlan {
    * `pulse`. The sway of a player changes its side at each one (design 5.1).
    */
   readonly pulses: Float64Array;
-  /** The song end, `Score.durationSec`. The conductor bows after it (design 5.4). */
-  readonly endSec: number;
 }
 
 /** The rigs of the player models of one score. Players of one kind share them. */
@@ -1091,7 +1089,6 @@ export function* preparePosesSteps(
     leader,
     beats,
     pulses: pulseTimes(score.beats),
-    endSec: score.durationSec,
   };
 }
 

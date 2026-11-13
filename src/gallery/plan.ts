@@ -151,7 +151,5 @@ export function galleryPlan(
     leader: null,
     beats: beatTimes,
     pulses: pulseTimes(beats),
-    // The gallery has no song end, so the conductor does not bow.
-    endSec: Infinity,
   };
 }
