@@ -109,8 +109,10 @@ in a line at the back, as the Vienna Philharmonic seats them. The diagram shows 
   (4.5, lanes). A new body with the same footprint can thus move the seats of other rows, because
   its eyes see other lanes and its head hides other sight lines. A body that replaces the body of
   a species thus keeps the eye height of the old body, as the Tripo mouse does (4.4, hand rig).
-  The form of its footprint can still move seats. For example, the tail of the Tripo mouse lies
-  straight back, and the tail of the old mouse curled to the side (`TODO.md`).
+  The form of its footprint and of its head can still move seats. For example, the tail of the
+  Tripo mouse lies straight back, and the tail of the old mouse curled to the side. The whiskers
+  of the fourth Tripo rabbit make its head box wider, and its ears hide other sight lines
+  (`TODO.md`).
 
 ## 4.3 Species
 
@@ -745,30 +747,19 @@ the simple route: `tools/blender/simple_rig.py` with a config of `tools/mesh-rig
 makes no cut, no cap, no remesh, and no rebuild, so the body keeps the form of its source. It
 writes the `.blend` of a hand rig, and `pnpm rig-export` and `pnpm studio-body` follow ("Hand
 rig"). The first Tripo P2 rabbit was a trial of this route that the app does not use. A hand rig
-of the third Tripo P2 rabbit (`assets/models/rabbit/tripo-p2/`) with no arm cut and no arm
+of the fourth Tripo P2 rabbit (`assets/models/rabbit/tripo-p2/`) with no arm cut and no arm
 stretch (`assets/models/rabbit/tripo-hand/`) is the body of the rabbit. Its source FBX is the
-target of its look, as for the Tripo wolf. It shows the color map of its Tripo FBX
-(`rabbit-color.webp`, `tools/rabbit-maps.py`) with no color change out of the eyes, and it keeps the
-eyeballs of the source in their sockets, with no bead eyes. Reason: the map paints a full eye on
-each eyeball (a black pupil, a brown iris, a light, and white). Its eyeballs and sockets are 0.93 of
-the source, so that each eye opening is 0.140 of the head width (0.149 in the source), and the balls
-keep their bulge. The map tool moves the iris of each eye on its own, with its pupil and its light,
-to the middle of its eye opening in a view from above the head (`VIEW_DOWN`), turned a little out
-(`GAZE_OUT`), with both pupils at one height (`shift_eyes()`), but only a small part of the way
-(`SHIFT_SHARE`), because the full move read wall-eyed. White of the same eye fills the place
-that the iris leaves, and the clean outer rim of the iris fills its nose rim. Reason: the source
-paints each pupil at the nose side of its opening, so the rabbit looked cross-eyed from the side,
-and its two eyes are not mirror images, so a mirrored shift showed a white seam. The target turns
-no farther out (`GAZE_OUT`). Reason: with a turn out, the right eye looked a little out, past the
-viewer, from the front. The map also lightens the dark lash line on the rim of each upper lid
-over the iris, and keeps the outer corner of the line (`soft_lash()`). Reason: in the stage light
-the line read as a hard dark wedge, and the face read stern. The eyes take the finish `eye` and the
-eye light. Reason: the painted light of the source lies under the upper lid, so the eyes showed no
-clear light from the front, and the face read blank. The corners of its mouth lift a little up and
-back, as on the Tripo cat (`assets/models/rabbit/README.md`, "Smile"). Reason: the mouth read flat.
-A lid on each eye blinks over it ("Hand rig"). Its arms reach 0.297 m, so its violin is 0.9 of the violin of the app (4.6,
-`violinScale`). The map holds no baked key light: the luma of its cream fur stays
-within about 7 % of its median on each part. A hand rig of the Tripo P2 bear
+target of its look, as for the Tripo wolf. It keeps the eyeballs of the source in their sockets,
+with no bead eyes, the finish `eye`, the eye light, and a blink lid on each eye ("Hand rig").
+Reason: the map paints a full eye on each eyeball (a black pupil, a brown ring, and a light). Its
+color map (`rabbit-color.webp`, `tools/rabbit-maps.py`) gives the fur the chroma of the sheet
+(`FUR_CHROMA`) and adds fur strands (`STRANDS`). The pink skin and the eyes keep the paint of the
+source. Reason: the source paints the fur cream and smooth, and the sheet and the reference images
+show a white rabbit. Its arms are thicker than in the source, with the girth of the third Tripo
+rabbit (the point edit `armGirth` of its chain). Reason: the arms of the source are 15% thinner,
+and thin arms read weak on the earlier Tripo bodies. Its seated eyes are at the height of the eyes
+of the third rabbit (`metersPerUnit` of its chain, 4.2). Its arms reach 0.299 m, so its violin is
+0.9 of the violin of the app (4.6, `violinScale`). A hand rig of the Tripo P2 bear
 (`assets/models/bear/tripo-hand/`) is the body of the conductor, in the same way. It stands
 with the bind of the bear of main, keeps the eyeballs of its mesh with lids, and keeps H of the bear
 of main. Its color map (`bear-color.webp` of `tools/bear-maps.py`) scales the fur, the muzzle, and
@@ -821,8 +812,7 @@ eyeballs and sockets are a little smaller and deeper than in the source, and the
 down a little. Reason: at the source size, the eye openings read too wide for the head
 (`assets/models/fox/README.md`, "Eyes"). A larger step made the eyes read sleepy. Its legs keep
 the length of the source, and its feet stay flat in the bind. Reason: a higher seat by a heel turn changes the sight pass of
-the layout (4.5) and moves most players of the demos. The Tripo rabbit moves each iris a part of
-the way to a gaze target ("Simple route"). The Tripo polar bear
+the layout (4.5) and moves most players of the demos. The Tripo polar bear
 (`assets/models/polar-bear/tripo-hand/`) keeps the eyeballs of its source, and its irises take the
 middle of the opening in the view of the play of the pianist (`gaze_targets()` of
 `tools/polar-bear-maps.py`), its painted light gives the `varnish` finish and no eye light, and
@@ -1011,15 +1001,14 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
 - The wider haunch of the cat sits on a wider chair (`seatWidth`), and its tail lies curled on
   the seat around the left side of the haunch (`studio.tailCurl` of the rig config). The rabbit
   sits with more room behind the back (`backRoom`), so that its back keeps off the chair back.
-- The Tripo rabbit of `tripo-hand/` keeps the legs of its mesh, so its chair is low
+- The Tripo rabbit of `tripo-hand/` keeps the legs of its mesh, and its chair fits them
   (`StudioBody.seatHeight`). It sits as a real
   violinist does: the thighs of its bind slope a little down, and the seat of its rig ends where
   the calves start to go below the thighs. So the seat carries most of each thigh, its front edge
   is a little behind the knees, and the back of the pelvis is near the chair back. Reason: with
   the steep thighs of the bind rules, only the haunch could sit on the seat. The shins stand
   nearly vertical and the heels are a little up, with the toes on the floor, so that the seat is
-  near the seat of the cat. Reason: with flat feet, the chair read too low. The higher eyes change
-  the sight pass of the layout (4.5) in three demos.
+  near the seat of the cat. Reason: with flat feet, the chair read too low.
 - The Tripo pig keeps the short legs of its mesh. Its bind turns each foot with the heel up, the
   hoof tips flat on the floor, as a pig stands on its hoof tips, and its shins stay vertical. So
   its seat is higher than with flat feet, and the front edge of the seat is nearer to the knees,
@@ -1329,8 +1318,8 @@ faces keep the shared shading.
   strands in either map, the fox fur read as smooth plastic beside the other bodies.
 
 The fur of the Tripo rabbit is near the shoulder of the tone curve, so the sheen adds little
-light at the outline. The color map already paints the strands, so the normal map adds little at
-the app view.
+light at the outline. Its source paints the fur smooth, so its maps tool adds strands, as for the
+fox.
 
 The stage has its own wood material (`createStageMaterial()` of `scene/stage.ts`). A test of its
 shader must not make a line thinner than one pixel inside a face. Reason: MSAA smooths only the
