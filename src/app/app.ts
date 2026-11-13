@@ -380,9 +380,6 @@ export class App {
         onSeatFlag: (seatIndex, flag) => {
           this.#toggleSeat(seatIndex, flag);
         },
-        onClearSeats: () => {
-          this.#setSeatFlags([]);
-        },
         onSectionSize: (size) => {
           this.#setSectionSize(size);
         },
@@ -1113,24 +1110,10 @@ export class App {
    */
   #toggleSeat(seatIndex: number, flag: SeatFlag): void {
     const piece = this.#piece;
-    if (piece) {
-      this.#setSeatFlags(toggleSeatFlag(piece.flags, seatIndex, flag));
-    }
-  }
-
-  /**
-   * Gives the seats of the current piece new mute and solo flags (design 6.6): a click on a
-   * toggle, or on "All seats" with no flags. The seats that change get the new value in the
-   * `Player` and in the poses.
-   *
-   * @param flags The new flags of each seat. A missing entry has no flag.
-   */
-  #setSeatFlags(flags: readonly SeatFlags[]): void {
-    const piece = this.#piece;
     if (!piece) {
       return;
     }
-    piece.flags = flags;
+    piece.flags = toggleSeatFlag(piece.flags, seatIndex, flag);
     const audible = seatsAudible(piece.flags, piece.score.seats.length);
     const changed = changedSeats(piece.audible, audible);
     piece.audibility = followAudibility(piece.audibility, audible, performance.now() / 1000);

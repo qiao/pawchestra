@@ -18,29 +18,19 @@ const GLOW_STEP = 0.01;
 interface SeatRow {
   /** The row. */
   readonly item: HTMLLIElement;
-  /** The dot in the fur color, with a glow ring while the seat plays. */
+  /** The dot in the fur color, which grows and glows while the seat plays. */
   readonly dot: HTMLSpanElement;
-  /** The button "Mute". */
+  /** The button "M". */
   readonly mute: HTMLButtonElement;
-  /** The button "Only this", the solo of the seat. */
+  /** The button "S". */
   readonly solo: HTMLButtonElement;
 }
 
-/** The text of the mute button of a seat row (design 2.8). */
-export const MUTE_TEXT = 'Mute';
-
-/** The text of the solo button of a seat row (design 2.8). */
-export const SOLO_TEXT = 'Only this';
-
-/** The text of the row above the seat list that clears each flag (design 2.8). */
-export const ALL_SEATS_TEXT = 'All seats';
-
 /**
- * Creates a toggle button of a seat row: "Mute" or "Only this" (solo).
+ * Creates a toggle button of a seat row: "M" (mute) or "S" (solo).
  *
  * @param text The text of the button.
- * @param label The `aria-label`, for example "Mute Violins 1". It starts with the text, so that a
- *   voice control finds the button by its text (WCAG 2.5.3).
+ * @param label The `aria-label`, for example "Mute Violins 1".
  * @param onClick The action of a click.
  * @returns The button.
  */
@@ -55,16 +45,11 @@ function createToggle(text: string, label: string, onClick: () => void): HTMLBut
 /**
  * The seat list of the drawer (design 2.3, 2.8): one row for each seat, with a dot in the fur
  * color of the species, the seat name, the animals, the source line for a screen reader, and the
- * toggle buttons "Mute" and "Only this". A silent seat shows a dim dot and dim text. The row "All
- * seats" above the list clears each flag. The tab "Seats" of the drawer holds it.
+ * toggle buttons "M" and "S". A silent seat shows dim text. The tab "Seats" of the drawer holds it.
  */
 export class SeatList {
   /** The list of the rows. */
   readonly element: HTMLUListElement;
-  /** The row "All seats" above the list. */
-  readonly head: HTMLElement;
-  /** The button "All seats". It is pressed while no seat has a flag. */
-  readonly #all: HTMLButtonElement;
   readonly #onFlag: (seatIndex: number, flag: SeatFlag) => void;
   readonly #tooltips: Tooltips;
   readonly #keepFocus: () => void;
@@ -76,14 +61,12 @@ export class SeatList {
    * Creates the list with no rows.
    *
    * @param onFlag The action of a click on a mute or a solo button.
-   * @param onClear The action of a click on "All seats": each seat loses its flags.
-   * @param tooltips The tooltips of the page. The toggle buttons show their labels in them.
+   * @param tooltips The tooltips of the page. The buttons "M" and "S" show their labels in them.
    * @param keepFocus Gives the focus to an element near the list, when a new piece removes the
    *   row with the focus.
    */
   constructor(
     onFlag: (seatIndex: number, flag: SeatFlag) => void,
-    onClear: () => void,
     tooltips: Tooltips,
     keepFocus: () => void,
   ) {
@@ -92,12 +75,6 @@ export class SeatList {
     this.#keepFocus = keepFocus;
     this.element = createElement('ul', 'list');
     this.element.setAttribute('aria-label', 'Seats');
-    this.#all = createButton('all-seats', ALL_SEATS_TEXT);
-    this.#all.textContent = ALL_SEATS_TEXT;
-    this.#all.setAttribute('aria-pressed', 'true');
-    this.#all.addEventListener('click', onClear);
-    this.head = createElement('div', 'seat-head');
-    this.head.append(this.#all);
   }
 
   /**
@@ -123,10 +100,10 @@ export class SeatList {
         createElement('small', '', row.animals),
         createElement('small', 'source', row.source),
       );
-      const mute = createToggle(MUTE_TEXT, `${MUTE_TEXT} ${row.name}`, () => {
+      const mute = createToggle('M', `Mute ${row.name}`, () => {
         this.#onFlag(seatIndex, 'muted');
       });
-      const solo = createToggle(SOLO_TEXT, `${SOLO_TEXT}: ${row.name}`, () => {
+      const solo = createToggle('S', `Solo ${row.name}`, () => {
         this.#onFlag(seatIndex, 'soloed');
       });
       for (const toggle of [mute, solo]) {
@@ -136,7 +113,6 @@ export class SeatList {
       return { item, dot, mute, solo };
     });
     this.#shown = new Float32Array(this.#rows.length).fill(-1);
-    setAttribute(this.#all, 'aria-pressed', 'true');
     this.element.replaceChildren(...this.#rows.map((row) => row.item));
     if (hadFocus) {
       this.#keepFocus();
@@ -150,8 +126,6 @@ export class SeatList {
    * @param audible True for each seat that sounds.
    */
   update(flags: readonly SeatFlags[], audible: readonly boolean[]): void {
-    const clear = flags.every((seat) => !seat.muted && !seat.soloed);
-    setAttribute(this.#all, 'aria-pressed', String(clear));
     for (const [i, row] of this.#rows.entries()) {
       const seat = flags[i] ?? NO_FLAGS;
       setAttribute(row.mute, 'aria-pressed', String(seat.muted));

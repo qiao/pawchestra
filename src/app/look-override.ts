@@ -43,7 +43,7 @@ export function soloFromQuery(app: App, scene: StageScene): void {
 
   const wait = (): void => {
     const buttons = document.querySelectorAll<HTMLButtonElement>(
-      '[aria-label="Seats"] button[aria-label^="Only this: "]',
+      '[aria-label="Seats"] button[aria-label^="Solo "]',
     );
     if (!app.plan || !layout || buttons.length === 0) {
       requestAnimationFrame(wait);

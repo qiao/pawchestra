@@ -51,8 +51,6 @@ interface UiActions extends BarActions {
   readonly onFile: (file: File) => void;
   /** A click on the mute or the solo button of a seat. */
   readonly onSeatFlag: (seatIndex: number, flag: SeatFlag) => void;
-  /** A click on "All seats": each seat loses its mute and solo flags. */
-  readonly onClearSeats: () => void;
   /** A click on a button of the setting "Section size". */
   readonly onSectionSize: (size: SectionSize) => void;
   /** A click on a button of the setting "Quality". */
@@ -162,10 +160,10 @@ export class Ui {
       this.demoList.element,
       new FilePicker(actions.onFile).element,
     );
-    this.seatList = new SeatList(actions.onSeatFlag, actions.onClearSeats, this.tooltips, () => {
+    this.seatList = new SeatList(actions.onSeatFlag, this.tooltips, () => {
       this.drawer.focusTab('seats');
     });
-    this.drawer.addTab('seats', 'Seats', this.seatList.head, this.seatList.element);
+    this.drawer.addTab('seats', 'Seats', this.seatList.element);
     this.settings = new Settings(actions.onSectionSize, actions.onQuality, actions.onFrameRate);
     // The link "Credits" is a button, because it opens a dialog and goes to no page (design 2.8).
     this.creditsDialog = new ModalDialog(

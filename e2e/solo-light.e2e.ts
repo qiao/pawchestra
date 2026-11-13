@@ -108,7 +108,7 @@ test.describe('the spotlight of a solo (design 2.4, 4.5)', () => {
     // The solo buttons are in the tab "Seats". The drawer stays open, so the frame does not move.
     await page.getByRole('tab', { name: 'Seats' }).click();
     const frame = await stillFrame(page);
-    const solo = page.locator('button[aria-label="Only this: Cellos"]');
+    const solo = page.locator('button[aria-label="Solo Cellos"]');
     const [conductor, cellos] = await measureStage(page, frame);
 
     await solo.click();

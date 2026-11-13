@@ -91,10 +91,10 @@ export function listText(items: readonly string[]): string {
 /**
  * Gives the name of each seat in the seat list (design 2.8). A seat of the section "piano" takes
  * the name of its first program, for example "Celesta". A seat with one player takes the singular,
- * for example "Flute", and the soloist that does not play a keyboard is "Flute soloist", because
- * "Solo flute" reads as an action. If more than one seat of a section has a name, the name gets
- * the number of the seat in that section, from 1: "Violins 1", "Violin 2". The soloist gets no
- * number.
+ * for example "Flute", and the soloist that does not play a keyboard is "Flute soloist". With the
+ * name "Solo flute", the solo button of the row would read "Solo Solo flute". If more than one seat
+ * of a section has a name, the name gets the number of the seat in that section, from 1:
+ * "Violins 1", "Violin 2". The soloist gets no number.
  *
  * @param seats The seats of a score, `Score.seats`.
  * @param counts The number of players of each seat, from {@link playerCounts}.

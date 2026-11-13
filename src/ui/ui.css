@@ -1315,13 +1315,12 @@ body.is-building #stage {
   color: var(--text-dim);
 }
 
-/* A compact control of the drawer (design 2.8). A toggle of a seat row has a word, so it is as
-   wide as its word. */
+/* A compact control of the drawer (design 2.8). */
 .toggle {
   min-width: var(--target-compact);
   min-height: var(--target-compact);
+  width: var(--target-compact);
   height: var(--target-compact);
-  padding: 0 10px;
 }
 
 .seat {
@@ -1330,8 +1329,8 @@ body.is-building #stage {
   grid-template-columns: 13px 1fr auto auto;
   align-items: center;
   column-gap: 12px;
-  /* The dot lines up with the text of the tabs and the demo rows, and the button "Only this"
-     keeps the inset of the length of a demo row. */
+  /* The dot lines up with the text of the tabs and the demo rows, and the button "S" keeps the
+     inset of the length of a demo row. */
   padding: 1px 10px;
   border-radius: var(--radius-button);
 }
@@ -1391,8 +1390,8 @@ body.is-building #stage {
   opacity: 0.8;
 }
 
-/* The buttons "Mute" and "Only this": a small box of the mockup in a control of the compact
-   size. The box is a layer behind the word, so that the target stays large. */
+/* The buttons "M" and "S": a small square of the mockup in a control of the compact size. The
+   square is a layer behind the letter, so that the target stays large. */
 .toggle {
   position: relative;
   isolation: isolate;
@@ -1404,7 +1403,7 @@ body.is-building #stage {
 .toggle::before {
   content: '';
   position: absolute;
-  inset: calc(50% - 11px) 3px;
+  inset: calc(50% - 11px) calc(50% - 12px);
   z-index: -1;
   border: 1px solid var(--line);
   border-radius: 5px;
@@ -1414,38 +1413,9 @@ body.is-building #stage {
     border-color 0.12s;
 }
 
-/* The boxes of "Mute" and "Only this" stand close, as in the mockup. The targets do not
-   overlap. */
+/* The squares of "M" and "S" stand close, as in the mockup. The targets do not overlap. */
 .toggle + .toggle {
-  margin-left: -4px;
-}
-
-/* The row "All seats" above the seat list (design 2.8). Its text lines up with the seat names.
-   While a seat has a flag, the text is in the accent color, because a click then clears each
-   flag. */
-.seat-head {
-  border-bottom: 1px solid var(--line-faint);
-}
-
-.all-seats {
-  width: 100%;
-  min-height: var(--target-compact);
-  place-items: center start;
-  padding: 0 10px 0 35px;
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.all-seats[aria-pressed='true'] {
-  color: var(--text-dim);
-  font-weight: 400;
-  cursor: default;
-}
-
-.all-seats[aria-pressed='true']:hover,
-.all-seats[aria-pressed='true']:active {
-  background: transparent;
+  margin-left: -8px;
 }
 
 .toggle:hover,
