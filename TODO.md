@@ -631,9 +631,6 @@ passes.
       dog (`raise` of `tools/mesh-rigs/dog.json` at cbc8db5e4) come from the old level elbow and are
       at full weight in nearly each play sample. Fit a shape to the low elbow (`pnpm raise-fit`), or
       move the inner elbow rings, then lower `DOG_HOLD.poleL` again.
-- [ ] Dog cellist inner elbow (4.4): the faces 1713 and 1714 at the inner left elbow fold in 15 of
-      18 rest samples and in 2% to 5% of the play samples, also before the elbow changes. Look at
-      them in the 2x crops of the rest, and fix them in the rig.
 - [ ] Cello rule (4.6): the elbow limit (`CELLO_ELBOW`) and the gap of the back
       (`BowedHold.fit`) come from the dog, with no source. Fifteen of 20 species (nine of the
       14 seated bodies) need a cello below a 1/10, and the rule clamps it. A new cellist species
