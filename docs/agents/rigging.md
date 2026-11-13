@@ -27,7 +27,7 @@ model folder gives the files of each step.
 | beaver | Hand rig. No chair: it stands on its short legs. | `bassoonist` |
 | pig | Hand rig. Stands as a soloist. | `hornist` |
 | wolf | Hand rig. | `clarinetist`, `violinist@wolf` (recast) |
-| badger | Arms freed in a copy (`badger_edit.py`), rebuilt arms, rigid shoulder faces (`rigidPainted`), triangle and recast `raise` shapes, a tail ball, a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
+| badger | Hand rig, a left eyeball fused to its socket (`fused_ball()`), a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
 | monkey | Hand rig at 1.2 times H of the older monkey, no chair, with the trumpet of the app. | `trumpeter` |
 | rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), elbow `raise` shapes, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
 | deer | Hand rig of the fawn, arms 1.3 times longer. Sits on the harp stool, with a smaller harp (`harpScale`). | `harpist` |
@@ -61,7 +61,7 @@ Three routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each 
 ("Models") gives the chain in a diagram.
 
 - **Mesh rig.** `arm_rebuild.py` or `<a>_arms.py` rebuilds the arms, and `pnpm rig-mesh` rigs
-  the mouse, the badger, the rhino, and the mannequin. A mesh whose arms join the trunk takes this
+  the mouse, the rhino, and the mannequin. A mesh whose arms join the trunk takes this
   route.
 - **Simple route.** `simple_rig.py` writes the `.blend` of a hand rig from a clean quad mesh with
   the arms apart (design 4.4). The skill `pawchestra-body` runs it in a candidate tree.

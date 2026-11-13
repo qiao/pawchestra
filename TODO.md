@@ -431,6 +431,20 @@ passes.
       scaled bass drum beater. Ask the user if the scale of the badger applies to them too.
 - [ ] Badger bass drummer: between strikes, the paw keeps its turn in the world while the body
       sways, so its twist on the forearm moves 20° in about 1 s.
+- [ ] Tripo badger bass drummer: the short arms (reach 0.195 m, 0.273 m on the old badger) miss
+      the strike spot by up to 58.9 mm (0 % within 5 mm, old 13.0 mm and 78 %), and the beater goes
+      3.7 cm into the drum (limit 1.5 cm, `pnpm hold-fit bass-drummer`). A nearer, lower, or wider
+      drum, a lean up to 0.3, or a strike spot nearer to the player gives 18 mm at best, with the
+      snout or the forearm in the drum. Ask the user: a fit of the whole hold, or longer arms
+      (`armStretch` 1.2 to 1.3, as the panda and the deer) with the drum place.
+- [ ] Tripo badger percussionist: the strikes miss by up to 32.0 mm (0 %, old 0.0 mm), and the
+      claws of the left paw, which holds the triangle up, go 2.4 to 3.8 cm into the head (limit
+      1.5 cm). Other triangle clip places do not fix it. Fit the triangle and tambourine holds to
+      the long snout and the short arms.
+- [ ] Tripo badger xylophonist: the mallets miss by up to 116.7 mm (53.9 % within 5 mm, old
+      39.5 mm and 94.1 %), and the left claws go 2.3 cm into the shoulder. Nearer or lower bars, a
+      larger lean, or homes nearer to the middle do not fix it. Fit the bars and the side move to
+      the short arms.
 - [ ] Close views: `pnpm close-views play` renders with no fill light. Add a fill to the play mode
       for the checks (9.8).
 - [ ] Recast roles: with `--base`, `pnpm arm-check --views` and `pnpm close-views` render the
@@ -446,10 +460,6 @@ passes.
       the old bind, `ACCEPTED_GRIPS`). The raised triangle upper arm of the badger goes 2.4 cm into
       the left shoulder (base 2.1 cm, accepted), and elbow variants of the triangle hold fold the
       arm root (L 8 to 10).
-- [ ] Badger with rebuilt arms: the straight bind narrows the bent elbows of the xylophonist to
-      2.7 cm (base 4.0 cm) and of the cymbalist to 3.2 cm (base 4.1 cm). Read the 2x elbow crops.
-- [ ] Badger recast roles: the freed round upper arms go 3.4 to 4.5 cm into the body in the shared
-      holds of the violin, the flute, the clarinet, and the trumpet (base 2.0 to 3.0 cm).
 - [ ] Hippo with the T-pose body: each recast cell of the cast matrix fails, as on `831beea4`. The
       left arm folds 10 to 13 faces (limit 8) in the violin, the clarinet, the trumpet, and the
       snare drum, and the right arm 18 in the cello. The flute recast turns the left paw

@@ -201,8 +201,8 @@ across the arm. A species script `tools/blender/<a>_arms.py` replaces it only fo
 does not fix.
 
 An arm that the mesh joins to the trunk needs a free section. A species script frees it with a
-side wall on the trunk (`cat_arms.py`), or splits it from the trunk along its crease in a copy
-(`beaver_edit.py`, `badger_edit.py`). An arm that joins the trunk only near the
+side wall on the trunk (`cat_arms.py`), or splits it from the trunk along its crease in a
+copy. An arm that joins the trunk only near the
 shoulder also takes the split, because the long thin faces above a low shoulder line fold when the
 arm lifts. A flat flipper has rays of different lengths with no trunk in the section, so the free
 test takes a larger ratio for it (`--spec` key `free`).
@@ -511,9 +511,9 @@ in Blender before the export. A pose in Blender skins from the T-pose and the ap
 `pnpm pose-preview` and `tools/blender/studio_preview.py` show the app pose of each moment on an
 export of the open `.blend`, with the bind as its rest.
 
-Fifteen species have the hand rig of a Tripo P2 mesh (`assets/models/<s>/tripo-hand/<s>.blend`).
+Sixteen species have the hand rig of a Tripo P2 mesh (`assets/models/<s>/tripo-hand/<s>.blend`).
 A chain of `tools/blender/hand/<s>/` makes each one, except the bear (`pnpm hand-chain <s>`). The
-mouse, the badger, the rhino, and the mannequin come from `rig-mesh`. Each paw of the polar bear
+mouse, the rhino, and the mannequin come from `rig-mesh`. Each paw of the polar bear
 has one digit bone for each claw (`DIGIT_BONES`,
 `digit1` at the thumb side to `digit5`), a child of the fingers with its head at the base of its
 claw. Each claw spike follows its digit, and its base at the fur rim and a base that two claws
@@ -903,7 +903,14 @@ folds showed as dark triangles on the back and the cheeks. Its paws and elbow ax
 each part of each arm takes at most 45° in the moments of the bassoonist. Its arms are short, so
 it plays a smaller bassoon, and its hold turns both shoulders forward (`BEAVER_BASSOON`, 5.3).
 The bassoon is the largest at which both paws reach their grips with the boot joint in front of the
-round belly. The Tripo panda (`assets/models/panda/tripo-hand/`) is the body of the
+round belly. The Tripo badger (`assets/models/badger/tripo-hand/`) is the body of the
+percussionist, by the rules of the beaver. Its right eyeball is a loose part in an open socket,
+and the source joins its left eyeball to the rim of the socket, so a sphere fit finds the faces of
+that ball (`fused_ball()` of its build). Both eyes keep the paint of the source, with the finish
+`varnish` and a blink lid. No arm band of the source is a clean quad ring, so the arms take no
+ring and no paw turn. It has no chair, and its bind keeps the legs, the trunk, and the tail of the
+source. Its arms are short, so the snare drum and the suspended cymbal stand nearer to it (4.6,
+5.3). The Tripo panda (`assets/models/panda/tripo-hand/`) is the body of the
 trombonist, by the same rules. Its eyeballs keep the paint and the size of the source, with the
 finish `varnish` and a blink lid. Its front paws are smaller than in the source (the point edit
 `paw`), as on the Tripo wolf. Reason: against its short arms, the paws of the source read too
@@ -1030,7 +1037,8 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   small beside the big head and paws. At the body size of 4.4, the arms reach the valves of the
   trumpet of the app with 1.4 cm to spare.
 - The hippo, the elephant, the badger, the rhino, and the penguin stand to play, in the standing
-  pose of their meshes. The rhino stands as a real tubist on a strap does. The Tripo elephant
+  pose of their meshes. The seat of the Tripo badger is the crotch between its legs
+  (`seatWidth`), and the app builds no chair under it. The rhino stands as a real tubist on a strap does. The Tripo elephant
   binds standing on the straight legs of its source, as the Tripo monkey, and keeps this stance
   at its timpani. Its center of mass then lies over the middle of its soles. Its seat height is
   the height of the back of its haunch over the floor, and the app builds no chair under it.
@@ -1808,7 +1816,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). A recast flute or clarinet takes the size rule of the winds. |
 | Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body, with the coil in front of the belly (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. A smaller trombone keeps the footprint of the trombone of the app, so that no seat moves. |
 | Timpani | Kettles of the real size in an arc. The kettles of the elephant move to its short arms, with a gap for its trunk (`TIMPANI`). |
-| Percussion | Drums, a xylophone, a triangle, and a tambourine within the reach of the badger, and a suspended cymbal (`cymbalForm`, `SUSPENDED_CYMBAL`). The section "Percussion" below gives their parts. |
+| Percussion | Drums, a xylophone, a triangle, and a tambourine within the reach of the badger, and a suspended cymbal (`cymbalForm`, `SUSPENDED_CYMBAL`). The snare drum and the suspended cymbal stand near the badger, as near as its short arms need to reach the strike spots (`SNARE_DRUM.forward`, `SUSPENDED_CYMBAL.forward`). The section "Percussion" below gives their parts. |
 | Choir folder | In both flippers, in front of the chest (`CHOIR_FOLDER`). |
 | Baton | Along the index finger, with its grip in the palm, as a conductor holds it (`BATON_ALONG`). |
 
