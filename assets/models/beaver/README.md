@@ -79,8 +79,8 @@ scripts follow the scripts of the Tripo cat (`../cat/README.md`). `make_config.p
 
 | Item | Value |
 |---|---|
-| Size | 379,395 bytes |
-| SHA-256 | `d9b1b0094645a36fe6b6cbe21f3f25cf9fb1d4ded8dce24a6662e9bef17d0579` |
+| Size | 380,241 bytes (each run writes other bytes) |
+| SHA-256 | `a01ac87709d83978b9f8ba1e2af7b691284e1c42603845628aff84f317f02593` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the beaver faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `beaver`: 3,639 vertices and 3,981 faces (3,003 quads and 978 triangles, 6,984 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 85 faces of the nose take the slot `fur` and the color map. The 136 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids the face attribute `lid`, and the 42 faces of the whiskers the face attribute `plain`. The UV map of the FBX, and the property `texture` (`assets/models/beaver/tripo-hand/beaver-color.webp`) |
 | Armature | `beaver_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -136,10 +136,13 @@ The weights, in the rest pose:
 1. Automatic Weights, then Limit Total 4 and Normalize All, on a copy of the mesh with no loose
    part.
 2. Arm rows: each vertex of a side with |x| from 0.17, within 0.08 units of the line of the rest
-   arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.17 to 0 at x
-   0.21, an elbow helper share that grows from 0 at x 0.235 to 1 at the elbow joint (x 0.27) and
-   falls to 0 at x 0.306,
-   and the rest on the 4 roll segments.
+   arm, takes one exact row (`sa.set_weight_row()`): a clavicle share of 0.60, 0.50, 0.40, 0.32,
+   0.22, and 0.08 at x 0.17, 0.18, 0.19, 0.2, 0.21, and 0.235, and 0 at x 0.27, an elbow helper
+   share that grows from 0 at x 0.235 to 1 at the elbow joint (x 0.27) and falls to 0 at x 0.306,
+   and the rest on the 4 roll segments. The bone heat rows inside x 0.17 give the front of each
+   armpit a clavicle share of about 0.6, so the soft clavicle ramp of the polar bear starts near
+   that share. The old first row of 0.4 dropped to 0 in 0.04 units, and the paws of the rest
+   bassoon pulled the front of the right armpit into a dark slot.
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.004 from 0.03 units before
    the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.0035 from
    0.02 units before the head of `fingers_<side>`.
@@ -241,7 +244,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/beaver.rig.glb` | 1,201,140 bytes | `a8f0e2221084e8ded42b5616d6aa3c1aad5529be1446e288efdf55be9204c814` |
-| `tripo-hand/beaver.rig.json` | 17,197 bytes | `a62cae542d5ce940bbe2957dd1b72a05719a08bb731972fd02a8f907bceccebd` |
+| `tripo-hand/beaver.rig.glb` | 1,201,140 bytes | `2784397be6ec89e01b9181ace2642243c6a3f63e659a34c568d236b9e1b49b9e` |
+| `tripo-hand/beaver.rig.json` | 17,197 bytes | `7bdabf53266601b41dc47d70b95726ef7affd2ba7efc1332b7bbe089ab300267` |
 | `tripo-hand/beaver-color.webp` | 199,904 bytes, 2048 × 2048 | `fc5a6f549bc676eefc6837d5398ad00f439d75cf9191a3921707f8034a35bfbc` |
 | `tripo-hand/beaver-normal.webp` | 84,258 bytes, 1024 × 1024 | `aa1edb196f4b423afb6bb80671a424e943ca4f3354f7ba3f01ad755ba0471982` |
