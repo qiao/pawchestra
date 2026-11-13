@@ -149,6 +149,17 @@ The weights, in the rest pose:
    -0.186, 167 vertices) takes {`hips` 1 - a, `tail` a}, with a = smoothstep(0, 0.02) of the length
    of the shortest edge path from the root of the tail. `tail_tip` takes no share, as on the Tripo
    monkey, so that the curl keeps its form.
+7. Belly rows (`belly_rows()`, `bellyRows` of the params), after the knee rows: each trunk vertex
+   (a thigh share below 0.5) with rest z above 0.30 keeps its thigh shares times f, with f linear
+   from 1 at z 0.30 to 0 at z 0.48, and the rest of its thigh share goes to `spine` (110
+   vertices). Bone heat gave the belly thigh shares of 0.13 to 0.19 up to z 0.48, and Limit Total
+   4 dropped them under the arms. The seated bind turns the thighs, so it pulled the belly 0.05
+   units back at z 0.48 and only 0.006 units at z 0.505. The chest then stood over the belly as a
+   ledge: a pale flat panel with a hard corner in front of each upper arm in the seated play and
+   rest (the right side in the hall view), and not in the stand. With the rows, the pull falls
+   evenly from 0.10 units at z 0.32 to 0.008 units at z 0.47, and the belly is round under the
+   chest. The belly now hangs a little over the thigh tops, with a shadow line in the lap in the
+   front view.
 
 **Smooth surface.** No relax and no region colors. The crease angle 180 gives each corner the mean
 normal of the faces at its vertex, as the smooth shading of an FBX viewer.
@@ -224,7 +235,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/pig.rig.glb` | 1,009,104 bytes | `230ae5a81924fa4d2996d40f057f1e3cbbed4f47ef9cf72ddb10b00339f0a786` |
-| `tripo-hand/pig.rig.json` | 16,376 bytes | `edfbb4d7d84fd1e47ade66fb0bbe13a816c4388fd4a2921efa10d72cf41dbeb8` |
+| `tripo-hand/pig.rig.glb` | 1,009,104 bytes | `4a126f44c43447143fd1d00a06a56928aba93f42ac17a0dfe6db000b84e2251a` |
+| `tripo-hand/pig.rig.json` | 16,377 bytes | `41b63b08c5e4888a863c610fef115dd63fba82ca33a0db489a1bc06cb7a0013e` |
 | `tripo-hand/pig-color.webp` | 54,072 bytes, 2048 × 2048 | `7e93b90c62901e98e717ea958be65306951c6bc7f8ea7ec50fa9f91cc97af295` |
 | `tripo-hand/pig-normal.webp` | 16,518 bytes, 1024 × 1024 | `1f67a4b13f0fcdb7950acf73470ee5d796e7d0a8487acd0a78fa044198b7065b` |
