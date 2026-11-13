@@ -853,8 +853,9 @@ const CELL = { width: 360, height: 450 } as const;
 const CLOSE_FILL_LUX = 2;
 
 /**
- * The flag that renders each close view with no fill light, in the light of the app (design
- * 9.8): the fill of {@link CLOSE_FILL_LUX} goes to 0.
+ * The flag that renders each close view with no fill light (design 9.8): the fill of
+ * {@link CLOSE_FILL_LUX} goes to 0. The gallery keeps its own light (design 7.1), so a frame of the
+ * mode `play` with `--at` shows the light of the app.
  */
 const NO_FILL_FLAG = '--no-fill';
 
