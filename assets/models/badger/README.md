@@ -180,7 +180,8 @@ the old badger, the crown stood 0.905 m high, because the head of the source is 
 body.
 
 **Maps** (`tools/badger-maps.py`). The tool scales the color map of the source to 2048 pixels
-(Lanczos), adds the fur strands of `tools/fox-maps.py` (`strands()`, the same values), and writes
+(Lanczos), adds the soft fur strands of `tools/fox-maps.py` (`strands()`, the same values: tilt
+0.03, luma 0.08, half length 11 texels), and writes
 WebP quality 60, method 6 (Pillow 13.0.0). The eyeball texels and 4 texels around them keep their
 colors. The normal map of the source is smooth (median tilt 0.012 at 1024 pixels, against 0.023
 to 0.028 on the cat, the wolf, and the rabbit), so the strands also go into `badger-normal.webp`:
@@ -200,5 +201,5 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 |---|---|---|
 | `tripo-hand/badger.rig.glb` | 1,235,312 bytes | `11b76f08f08164ef9d0fb35a19d029cfbac149cfc1d0777279d2d7bc49e77ee7` |
 | `tripo-hand/badger.rig.json` | 16,699 bytes | `15c95862a5e5ad57c81c53c2632a2040f348a570a0125bccbd775e95ba53e8c3` |
-| `tripo-hand/badger-color.webp` | 189,662 bytes, 2048 × 2048 | `c39783873dc1e304260f55305623864cf52b7a0479265ab0dce259d077f947b3` |
-| `tripo-hand/badger-normal.webp` | 192,290 bytes, 1024 × 1024 | `adefbb19c178bfd6977b1ef6ecdbe60553d7d6c9b65ee1a4543108e8f910b581` |
+| `tripo-hand/badger-color.webp` | 153,548 bytes, 2048 × 2048 | `11aac51d538ed6221ab83617e707062a40d1f895ec1e19de1710d821b02af718` |
+| `tripo-hand/badger-normal.webp` | 117,358 bytes, 1024 × 1024 | `88d50cb835488a10fc3dbff89e2bac000f8217715d117f2022de2efc1ce0dca0` |

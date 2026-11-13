@@ -31,7 +31,7 @@ NORMAL_LIMIT = 0.2
 NORMAL_GAIN = 4
 #: The texels of the eyeballs and this many texels around them keep their colors.
 EYE_MARGIN = 4
-#: The fur strands that the maps add (`strands()`), with the values of tools/fox-maps.py. The
+#: The fur strands that the maps add (`strands()`), with the soft values of tools/fox-maps.py. The
 #: normal map of the Tripo badger source is smooth: its median tilt at 1024 pixels is 0.012,
 #: against 0.023 to 0.028 on the Tripo cat, wolf, and rabbit, so its fur shows few strands in the
 #: app. The strands follow the direction of the faint strokes of the source maps, and they have
@@ -44,16 +44,17 @@ STRANDS = {
     'direction_sigma': 24.0,
     #: The sigma in texels at SIZE of the blur of the noise: the width of a strand.
     'width_sigma': 1.4,
-    #: The half length in texels at SIZE of a strand, and the step of its samples.
-    'half_length': 22.0,
+    #: The half length in texels at SIZE of a strand, and the step of its samples. Longer strands
+    #: lay long parallel grooves over the body, which read as carved wood or clay.
+    'half_length': 11.0,
     'step': 1.0,
     #: The sigma in texels at SIZE of the blur that the height of the strands loses (a high pass).
     'high_pass_sigma': 10.0,
     #: The root mean square of the x, y tilt of the strands in the normal map.
-    'tilt': 0.06,
+    'tilt': 0.03,
     #: The luma factor of the strands in the color map, for each standard deviation of the height:
     #: a strand crest is lighter, and a groove darker.
-    'luma': 0.16,
+    'luma': 0.08,
     #: The largest height of a strand, in standard deviations.
     'clip': 2.5,
 }
