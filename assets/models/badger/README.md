@@ -29,7 +29,8 @@ these files and the sections of this file about them.
 made by one build script in a headless Blender 5.2, by the route of the Tripo beaver
 (`../beaver/README.md`). The source FBX is the target of the look: the body keeps the form, the
 colors, the eye paint, and the eyes of the source, with a crease angle of 180° and only a scale to
-H. The arms keep the length of the source: no cut, no split from the trunk, and no stretch. The
+the crown of the old badger. The upper arms and the forearms are 1.2 times longer than in the
+source ("Arms"), with no cut and no split from the trunk. The
 `ANIMALS` entry of the badger in `tools/studio-body.ts` points to `tripo-hand/badger.rig.glb`.
 
 | File | Origin | Rebuild |
@@ -85,7 +86,7 @@ scripts are those of the Tripo beaver with the changes below. `make_config.py` w
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the badger faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `badger`: 3,645 vertices and 4,012 faces (3,139 quads and 873 triangles, 7,151 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the nose takes the slot `fur` and the color map. The 114 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/badger/tripo-hand/badger-color.webp`) |
 | Armature | `badger_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
-| Facts | `height` 0.554899 (the shoulder joints at 0.905218 m for each unit, so that H is 0.243662 m, the H of the badger of `aa8af0dd8`), `crease` 180, and `seatWidth` 0.07 ("Stance and seat") |
+| Facts | `height` 0.636469 (the shoulder joints at 1.038285 m for each unit, so that the crown stands 1.038 m high, as on the badger of `aa8af0dd8`, and H is 0.27948 m), `crease` 180, and `seatWidth` 0.07 ("Stance and seat") |
 | Eyes | The eyeballs of the source, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
 The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
@@ -99,8 +100,8 @@ left side):
 - **Folds.** `fold_relax()` with the rule of the beaver (`foldRelax` of the params): 27 fold
   triangles become 0 in 4 rounds. 31 vertices move, by 0.0014 units in the mean and 0.0027 units
   (2.4 mm) at most.
-- **No paw turn and no point edit.** The head, the eyes, the trunk, the arms, the paws, the legs,
-  and the tail keep the form of the source.
+- **Arm stretch.** The point edit `armStretch` ("Arms"). No paw turn and no other point edit:
+  the head, the eyes, the trunk, the paws, the legs, and the tail keep the form of the source.
 - **Surface.** `sa.add_surface(badger, 'badger', <base color>, eye_fans=False,
   config=<badger-tripo.json>)`. The 231 gloss faces of the nose box go back to the slot `fur`
   (`nose_trim()`), so that the nose takes the color map.
@@ -111,7 +112,8 @@ left side):
   0.0186 units about (0.0687, 0.8588, 0.1516). Its faces are the 50 faces that a flood from its
   pole (16 edges) reaches through faces with each corner within 1.06 radii of the middle. The 114
   ball faces take the face attribute `eye`.
-- **Armature.** The joints of the config: the shoulder at x 0.17, the elbow at x 0.263, the wrist
+- **Armature.** The joints of the source (the arm stretch moves the elbow to x 0.281, the wrist to
+  x 0.392, and the knuckles to x 0.447): the shoulder at x 0.17, the elbow at x 0.263, the wrist
   at x 0.356, the knuckles at x 0.41, and the tip at x 0.467, on the arm axis at y 0.613. The hip at
   (0.10, 0.25, 0.0), the knee at (0.11, 0.13, -0.025), the ankle at (0.115, 0.05, -0.03), and the
   toes from (0.125, 0.02, 0.09) to (0.13, 0.01, 0.175). The tail bone from (0, 0.28, -0.20),
@@ -143,7 +145,7 @@ bind keeps the legs, the trunk, and the tail of the source: the leg turns are no
 directions of the source (`studio.tailBind`). The property `seat` is {`prop` `chair`, `front`
 0.05, `back` -0.1, `halfWidth` 0.04}, inside the inner sides of the legs, and the fact `seatWidth`
 0.07 m gives the app seat the same width. So the seat height is the height of the crotch between
-the legs, 0.108 m. The old badger had the seat of its seated bind (0.059 m). The app reads neither,
+the legs, 0.124 m. The old badger had the seat of its seated bind (0.059 m). The app reads neither,
 because a percussion player stands.
 
 **Lids.** A lid on each eye: 13 × 13 points from psi -60 to 60 degrees and lam from -75 to 80
@@ -161,10 +163,21 @@ beaver (-60 to 65 degrees), up to 8 side edge points of the closing lids lay out
 paints a light on each ball, so the eyes take the finish `varnish` and no eye light, with one
 light in each eye. The mouth of the source reads as a slight smile, so it takes no smile edit.
 
-**Arms.** The arms of the source are short: the reach from the shoulder joint to the middle of the
-palm is 0.195 m, against 0.273 m on the old badger (`pnpm hold-reach badger`). The snare drum and
-the suspended cymbal stand nearer to the player (design 4.6), and their holds lean the spine
-(design 5.3). `TODO.md` gives the holds that do not reach yet.
+**Arms.** The point edit `armStretch` of `redits.py` (in `params.json`: `{"kind": "armStretch",
+"k": 1.2, "ramp": 0.01, "reach": [0.11, 0.13]}`), the edit of the panda and the deer
+(`../panda/README.md`, "Arm stretch"). Each vertex of a side with |x| over the shoulder joint moves
+along the line of the rest arm from the shoulder joint to the wrist joint (0.187 units), so that
+the upper arm and the forearm grow by 1.2, and the paw moves out by 0.037 units as one piece. The
+move fades from 1 at 0.11 units from the line to 0 at 0.13 units: the arm and the claws lie within
+0.11 units of the line, and the trunk 0.118 units or more from it. The control rows of the arm
+weights take the x of the source (`arm_source_x()`). Reason: the arms of the source are short. At
+the crown of the old badger, the reach from the shoulder joint to the middle of the palm was
+0.224 m, and it is now 0.262 m, against 0.273 m on the old badger (`pnpm hold-reach badger`).
+
+**Size.** `metersPerUnit` 1.038285 in `params.json`: 1.147 times the scale that gave the H of the
+old badger, so that the standing crown matches the crown of the old badger (1.038 m). At the H of
+the old badger, the crown stood 0.905 m high, because the head of the source is larger for its
+body.
 
 **Maps** (`tools/badger-maps.py`). The tool scales the color map of the source to 2048 pixels
 (Lanczos), adds the fur strands of `tools/fox-maps.py` (`strands()`, the same values), and writes
@@ -177,14 +190,15 @@ the slope of the strands added, the tilts times 4 in red and green, 255 in blue,
 
 **Differences from the source.** The app light is warm and comes from above, so the dark brown fur
 reads lighter and warmer than in the even gray light of an FBX viewer. The fold relax moves the
-surface by 2.4 mm at most. The crown stands 0.905 m high, against 1.038 m on the old badger and
-1.010 m on the Tripo beaver, because the head of the source is larger for its body.
+surface by 2.4 mm at most. The crown stands 1.038 m high, as on the old badger (the Tripo beaver
+1.010 m), so H is 0.279 m, 1.147 times the H of the old badger, because the head of the source is
+larger for its body. The upper arms and the forearms are 1.2 times longer than in the source.
 
 The export of the file and the maps. License of each file: CC BY-NC 4.0, as the FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/badger.rig.glb` | 1,235,308 bytes | `acbb94a995dd8754d11bcd7341f385bd8297ef965ac1b80fea3c8fedb3d88d65` |
-| `tripo-hand/badger.rig.json` | 16,695 bytes | `75070f4e2d490abdc654633ba26ec09785ccf15589da15825a31592e28f0b5a2` |
+| `tripo-hand/badger.rig.glb` | 1,235,312 bytes | `11b76f08f08164ef9d0fb35a19d029cfbac149cfc1d0777279d2d7bc49e77ee7` |
+| `tripo-hand/badger.rig.json` | 16,699 bytes | `15c95862a5e5ad57c81c53c2632a2040f348a570a0125bccbd775e95ba53e8c3` |
 | `tripo-hand/badger-color.webp` | 189,662 bytes, 2048 × 2048 | `c39783873dc1e304260f55305623864cf52b7a0479265ab0dce259d077f947b3` |
 | `tripo-hand/badger-normal.webp` | 192,290 bytes, 1024 × 1024 | `adefbb19c178bfd6977b1ef6ecdbe60553d7d6c9b65ee1a4543108e8f910b581` |
