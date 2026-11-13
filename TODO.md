@@ -1228,11 +1228,6 @@ Done when: the pose tests pass, and the pose and frame targets pass.
 - [ ] Make `pnpm keyboard` pass again. At 1440 × 900 the check "Tooltips of the speed menu and the
       volume slider" fails, and `checkHiddenBarTap` stops at a timeout, because the UI has no
       `.collapse` element now. Thus the run never reaches its last checks.
-- [ ] Give each demo row a cast line, such as "Penguin choir, full orchestra", from
-      `castBodies()` at build time (a `cast` field of `DemoInfo`). The design has the content in
-      "What it shows" of 8.2. Change the intro line to "An orchestra of animals plays classical
-      music. It also plays your MIDI file.", and name two sources of free MIDI files on `/about`
-      (2.8, 8.2).
 - [ ] Add a text button "Watch as a film" beside "Select music" on the first screen. It starts
       the piece in Cinematic mode. Free stays the start mode. Now the film starts only from an
       icon with no text or the key C, and a touch shows no tooltip (2.3, 2.8).
