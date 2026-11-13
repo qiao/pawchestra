@@ -124,16 +124,18 @@ def eyes(X, e, params):
 
 
 def eye_balls(X, params):
-    """The side of the eyeball of each point (1 left, -1 right, 0 none): the loose parts of 60
-    to 100 points (params['_part']), by the sign of their middle x. None with no parts."""
+    """The side of the eyeball of each point (1 left, -1 right, 0 none): the loose parts with a
+    point count inside `ballVerts` of the params (default 50 to 100, params['_part']), by the
+    sign of their middle x. None with no parts."""
     part = (params or {}).get('_part')
     if part is None:
         return None
     part = np.asarray(part)
+    lo, hi = params.get('ballVerts', (50, 100))
     out = np.zeros(len(X))
     for p in np.unique(part[part >= 0]):
         ids = part == p
-        if 50 < ids.sum() < 100:
+        if lo < ids.sum() < hi:
             out[ids] = np.sign(X[ids, 0].mean())
     return out
 
@@ -344,7 +346,25 @@ def smile(X, e, params):
     return X + D
 
 
+def arm_even(X, e, params):
+    """Moves the left paw of the source in along -x, so that the left arm takes the length of the
+    mirror of the right arm (the edit `armEven`, assets/models/fox/README.md, "Even arms"). The
+    left forearm of the Tripo mesh is longer by one long quad band before the paw. Each point of the
+    left arm (x over `table[0][0]`, y from `y[0]` to `y[1]`) moves by -s(x) along x, with s linear
+    between the rows of `table` ([x, s]) and constant past its last row, so the paw moves as one
+    piece. The joints of the config (params['_joints']) are places on the mirror of the right arm,
+    so they stay."""
+    if params.get('_joints'):
+        return X
+    tab = np.array(e['table'], float)
+    on = (X[:, 0] > tab[0, 0]) & (X[:, 1] > e['y'][0]) & (X[:, 1] < e['y'][1])
+    Y = X.copy()
+    Y[on, 0] -= np.interp(X[on, 0], tab[:, 0], tab[:, 1])
+    return Y
+
+
 EDITS = {
+    'armEven': arm_even,
     'mouthFill': mouth_fill,
     'headWide': head_wide,
     'legs': legs,

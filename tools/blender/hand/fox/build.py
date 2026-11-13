@@ -1,9 +1,9 @@
-"""Builds the hand rig of the new Tripo rabbit in headless Blender, from the FBX of the source, with the
+"""Builds the hand rig of the Tripo fox in headless Blender, from the FBX of the source, with the
 point edits, the rings, the surface, the rig, and the exact weight rows of params.json.
 
     blender -b --factory-startup --python tools/blender/hand/fox/build.py -- --out <file.blend>
 
-Each step is a scripted point edit on chosen vertices. assets/models/rabbit/README.md gives each
+Each step is a scripted point edit on chosen vertices. assets/models/fox/README.md gives each
 call and value.
 """
 
@@ -124,9 +124,35 @@ def limb_loops(bm, kind, sign):
     return [(abs(a), v) for a, v, closed, _ in out if closed]
 
 
+def open_band(bm, loop, sign):
+    """The edges of the quad band past a closed arm loop (toward the paw), when the band is a
+    clean quad edge ring: each loop vertex has one edge out to a vertex with a larger |x|, and the
+    band has one quad for each edge. The far row can hold poles, because the split runs along the
+    ring edges only. Else None."""
+    bm.verts.ensure_lookup_table()
+    inner = set(loop)
+    edges = []
+    for i in loop:
+        v = bm.verts[i]
+        x = sign * v.co.x
+        out = [
+            e
+            for e in v.link_edges
+            if e.other_vert(v).index not in inner and sign * e.other_vert(v).co.x > x
+        ]
+        if len(out) != 1:
+            return None
+        edges.append(out[0])
+    faces = {f for e in edges for f in e.link_faces}
+    if len(faces) != len(edges) or any(len(f.verts) != 4 for f in faces):
+        return None
+    return edges
+
+
 def subdivide(body):
     """Edge ring Subdivide of the clean quad bands of params rings: arms by x, legs by y. A band
-    is the band between two closed loops, at the given places (each within 0.004)."""
+    is the band between two closed loops, at the given places (each within 0.004). A band with no
+    second place (null) is the open band past the first loop (open_band())."""
     me = body.data
     for kind in ('arm', 'leg'):
         for sign in (1.0, -1.0):
@@ -135,6 +161,19 @@ def subdivide(body):
                 bm.from_mesh(me)
                 loops = limb_loops(bm, kind, sign)
                 la = min(loops, key=lambda r: abs(r[0] - a))
+                if b is None:
+                    if abs(la[0] - a) > 0.004:
+                        raise SystemExit(f'No loop at {a} of the {kind} ({sign}): {la[0]}')
+                    ring = open_band(bm, la[1], sign)
+                    if ring is None:
+                        raise SystemExit(f'The band past {a} of the {kind} is no clean quad ring.')
+                    bmesh.ops.subdivide_edges(bm, edges=ring, cuts=cuts, use_grid_fill=True)
+                    bm.to_mesh(me)
+                    bm.free()
+                    log(
+                        f'{kind} {"L" if sign > 0 else "R"}: open band past {a}, {len(ring)} edges, {cuts} cuts'
+                    )
+                    continue
                 lb = min(loops, key=lambda r: abs(r[0] - b))
                 if abs(la[0] - a) > 0.004 or abs(lb[0] - b) > 0.004:
                     raise SystemExit(
@@ -365,10 +404,15 @@ def own_eyes(body):
     for i, r in part.items():
         roots.setdefault(r, []).append(i)
     eyes = set()
+    low, high = P.get('ballVerts', (50, 100))
     for r, ids in roots.items():
         q = S[ids]
         q = q * [np.sign(q[:, 0].mean()) or 1, 1, 1]
-        if 50 < len(ids) < 100 and np.all(q.min(0) > lo - 0.005) and np.all(q.max(0) < hi + 0.005):
+        if (
+            low < len(ids) < high
+            and np.all(q.min(0) > lo - 0.005)
+            and np.all(q.max(0) < hi + 0.005)
+        ):
             eyes |= set(ids)
     faces = [p.index for p in me.polygons if all(v in eyes for v in p.vertices)]
     attr = me.attributes.get('eye') or me.attributes.new('eye', 'BOOLEAN', 'FACE')
