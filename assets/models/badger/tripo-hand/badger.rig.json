@@ -1,5 +1,5 @@
 {
- "sha256": "7f060adfd10e922d8def393ca2e30f986fd376071ded247bf1eb633e1ee6f1b2",
+ "sha256": "743c059eb0ce8a261fec9988cfdcfb5b7b931b581fad6996be9c38536da873c9",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -48,7 +48,7 @@
     -0.005
    ],
    "vertices": 102,
-   "weights": "be7903fd066343fa"
+   "weights": "93ff489612084060"
   },
   "neck": {
    "head": [
@@ -66,7 +66,7 @@
     0.0
    ],
    "vertices": 1437,
-   "weights": "c42ee2115b4f41b4"
+   "weights": "ac1d7884465828a1"
   },
   "ear_L": {
    "head": [
@@ -93,7 +93,7 @@
     0.02
    ],
    "vertices": 442,
-   "weights": "1ffebe8055533810"
+   "weights": "66ccccdc8f39a35b"
   },
   "upper_arm_L": {
    "head": [
@@ -147,7 +147,7 @@
     0.02
    ],
    "vertices": 452,
-   "weights": "9bac89ab2bc5f4d5"
+   "weights": "c5d17f67651bc6db"
   },
   "upper_arm_R": {
    "head": [
@@ -290,8 +290,8 @@
     0.613,
     0.02
    ],
-   "vertices": 90,
-   "weights": "bfcd68c3c01b7af6"
+   "vertices": 72,
+   "weights": "194867ace5cf3cd7"
   },
   "upper_arm_seg1_L": {
    "head": [
@@ -299,8 +299,8 @@
     0.609026,
     0.035646
    ],
-   "vertices": 91,
-   "weights": "b0dce5885ad5470f"
+   "vertices": 80,
+   "weights": "fa6d28057c0a417f"
   },
   "upper_arm_seg2_L": {
    "head": [
@@ -308,8 +308,8 @@
     0.605052,
     0.051292
    ],
-   "vertices": 63,
-   "weights": "542a9c2f15d69ae0"
+   "vertices": 61,
+   "weights": "bb020de49c89a7d3"
   },
   "upper_arm_seg3_L": {
    "head": [
@@ -380,8 +380,8 @@
     0.613,
     0.02
    ],
-   "vertices": 95,
-   "weights": "0946542ba37df68b"
+   "vertices": 78,
+   "weights": "d372b0863975ad4a"
   },
   "upper_arm_seg1_R": {
    "head": [
@@ -389,8 +389,8 @@
     0.609026,
     0.035646
    ],
-   "vertices": 76,
-   "weights": "4e0f406fc4f308bd"
+   "vertices": 68,
+   "weights": "ecfe5c91d112c0ec"
   },
   "upper_arm_seg2_R": {
    "head": [
@@ -398,8 +398,8 @@
     0.605052,
     0.051292
    ],
-   "vertices": 63,
-   "weights": "c515fc204baea6eb"
+   "vertices": 61,
+   "weights": "be748e78b377419f"
   },
   "upper_arm_seg3_R": {
    "head": [
@@ -466,8 +466,8 @@
   }
  },
  "shapes": {
-  "arm_down_L": 0.007377,
-  "arm_down_R": 0.007363,
+  "arm_down_L": 0.005328,
+  "arm_down_R": 0.005333,
   "legs_straight_L": 0.0,
   "legs_straight_R": 0.0
  },

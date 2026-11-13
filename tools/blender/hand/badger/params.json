@@ -247,5 +247,17 @@
    "cuts": 1
   }
  ],
- "ringSeedsNote": "The three bands of the elbow, from the upper arm to the forearm. Each band is a ring of quads around the arm through one triangle (at the inner upper arm, the back of the elbow, and the back of the forearm), and the source has no closed loop there. One cut halves each band, so that a ring stands each 0.3 arm radii over the bend. Each seed is the middle of one edge along the arm on the left side, in studio units of the source (seed_rings() of build.py)."
+ "ringSeedsNote": "The three bands of the elbow, from the upper arm to the forearm. Each band is a ring of quads around the arm through one triangle (at the inner upper arm, the back of the elbow, and the back of the forearm), and the source has no closed loop there. One cut halves each band, so that a ring stands each 0.3 arm radii over the bend. Each seed is the middle of one edge along the arm on the left side, in studio units of the source (seed_rings() of build.py).",
+ "backRows": {
+  "x": [
+   0.12,
+   0.2
+  ],
+  "y": [
+   0.53,
+   0.7
+  ],
+  "zMax": -0.06
+ },
+ "backRowsNote": "The back wall of each armpit, in studio units after the point edits: 25 trunk vertices on each side. Their arm shares go to the clavicle (back_rows() of build.py), so that a backward elbow does not pull them into a fold with a dark slit behind the upper arm."
 }
