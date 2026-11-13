@@ -1288,6 +1288,26 @@ def belly_key(body, rig):
     )
 
 
+def sit_key(body, rig):
+    """The key `bind_sit`: puts the underside of the haunch behind the hip joints onto the plane of
+    the thigh underside, so that the haunch rests on the seat (`sit_move()` of
+    tools/blender/bind_edit.py with the rule `sit` of the params). The log gives each moved vertex
+    with its move on z, in units."""
+    import bind_edit as be
+
+    restore = be.pose_bind(body, rig)
+    move, facts = be.sit_move(body, rig, P['sit'])
+    count = be.add_bind_move(body, rig, move, 'bind_sit')
+    restore()
+    moved = np.nonzero(move[:, 2])[0]
+    log(
+        f'sit key: {count} vertices move, down at most {-move[:, 2].min():.4f}; hip y '
+        f'{facts["hipY"]:.4f}, thigh plane z {facts["plane"]:.4f}, back y {facts["back"]:.4f}, '
+        f'lowest point over the seat z {facts["lowBefore"]:.4f} to {facts["lowAfter"]:.4f}'
+    )
+    log('sit moves:', ' '.join(f'{i}:{move[i, 2]:.4f}' for i in moved))
+
+
 def color_map(body, eyes):
     """Gives the mesh object the property `texture` (the web copy of the color map, design 4.5)
     and the faces of the loose parts other than the eyeballs (the whisker strips and the small
@@ -2013,6 +2033,8 @@ def main():
     round_lids(body)
     lids(body)
     belly_key(body, rig)
+    if 'sit' in P:
+        sit_key(body, rig)
     if domes:
         bead_eyes(body, rig, domes)
     if P.get('noseFur'):
