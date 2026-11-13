@@ -325,7 +325,7 @@ the facts of its body in its `.blend` ("Hand rig").
   app do not move the eye places. A test of the oval of the app pushed single eyes out, and it
   closed no notch, because the fur covers a notch at the rim, which the push leaves in the head.
 - A notch of the fur in a bead eye, or a crease beside it, comes from a few faces of the old eye
-  socket. A body fixes it with `eyeShift` when a move of both eyes clears it (the rhino), else with a point edit of its rig file (`<s>-edits.json`, the mouse and the elephant) or
+  socket. A body fixes it with `eyeShift` when a move of both eyes clears it (the rhino), else with a point edit of its rig file (`<s>-edits.json`, the elephant) or
   of its `.blend` (the polar bear).
 - A bead eye is an oval of `EYE_SEGMENTS` faces around its long axis and `EYE_RINGS` steps up, and
   its light has the faces of `LIGHT_BALL`. Fewer steps showed an octagon and a hexagon in a close
@@ -511,9 +511,9 @@ in Blender before the export. A pose in Blender skins from the T-pose and the ap
 `pnpm pose-preview` and `tools/blender/studio_preview.py` show the app pose of each moment on an
 export of the open `.blend`, with the bind as its rest.
 
-Sixteen species have the hand rig of a Tripo P2 mesh (`assets/models/<s>/tripo-hand/<s>.blend`).
+Seventeen species have the hand rig of a Tripo P2 mesh (`assets/models/<s>/tripo-hand/<s>.blend`).
 A chain of `tools/blender/hand/<s>/` makes each one, except the bear (`pnpm hand-chain <s>`). The
-mouse, the rhino, and the mannequin come from `rig-mesh`. Each paw of the polar bear
+rhino and the mannequin come from `rig-mesh`. Each paw of the polar bear
 has one digit bone for each claw (`DIGIT_BONES`,
 `digit1` at the thumb side to `digit5`), a child of the fingers with its head at the base of its
 claw. Each claw spike follows its digit, and its base at the fur rim and a base that two claws
@@ -1028,7 +1028,9 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   the back edge of the seat. Reason: with vertical shins, the higher seat moved players of the
   layout, and the hooves reached fewer strings.
 - The mouse, the beaver, and the monkey have no chair (`noChair`). Each keeps its seated pose at
-  the seat height of its legs, with its feet on the floor. The monkey stands erect, as a brass
+  the seat height of its legs, with its feet on the floor. The Tripo mouse and the Tripo beaver
+  bind standing on the legs of their sources, and the seat top is the lowest point of the body
+  between the legs, behind the shins (the crotch of the mouse). The monkey stands erect, as a brass
   player does: its hips stand over its feet, its knees bend a little, and its shoulders stay over
   its hips. Its center of mass thus stays over the middle of its soles. As a soloist, it keeps
   this stance, because the straight legs of its sheet put the center of mass off the middle.
@@ -1815,7 +1817,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | Cello, contrabass | The violin form with an end pin of a thin steel rod and a round rubber tip (`celloPinOf()`, `endPinLength()`, `END_PIN`). The cello leans back between the knees, at a place from the body (5.3). The contrabass has sloped shoulders and machine heads, and stands upright at the left side of the standing hippo, in front of its belly, at a place from the body (5.3). The hippo plays a smaller contrabass (`bassScale`) on a short end pin (`BASS_END_PIN`), so that the upper bout stands below the left shoulder and the left arm passes over it. |
 | Harp | The base on the floor with the pedals at the hooves, and the soundbox on the right shoulder. The deer plays a smaller harp (`harpScale`), upright, diagonal, near the stool, and to the right of its chest (`HARP_PLACE`): the largest harp at which the neck of the harp stays off its chin, with the base as near as its arms need to reach the strings, and the soundbox off the chest. The harp grows by the same factor as the body of the deer (4.4), so the fit stays. |
 | Piano | Larger than a real grand piano (`PIANO_SCALE`), on longer legs (`PIANO_LIFT`), so the forearms of the polar bear are almost level with the keys. The keys stand in front of its belly (`PIANO_FRONT_H`). |
-| Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). A recast flute or clarinet takes the size rule of the winds. |
+| Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). The mouse plays a smaller oboe (`oboeScale`), and its shoulders turn forward, so that the short arms of its source reach the grips (5.3). A recast flute or clarinet takes the size rule of the winds. |
 | Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body, with the coil in front of the belly (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. A smaller trombone keeps the footprint of the trombone of the app, so that no seat moves. |
 | Timpani | Kettles of the real size in an arc. The kettles of the elephant move to its short arms, with a gap for its trunk (`TIMPANI`). |
 | Percussion | Drums, a xylophone, a triangle, and a tambourine within the reach of the badger, and a suspended cymbal (`cymbalForm`, `SUSPENDED_CYMBAL`). The snare drum and the suspended cymbal stand near the badger, as near as its short arms need to reach the strike spots (`SNARE_DRUM.forward`, `SUSPENDED_CYMBAL.forward`). The section "Percussion" below gives their parts. |
