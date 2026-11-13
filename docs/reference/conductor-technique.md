@@ -111,6 +111,15 @@ sources. A fact with no mark comes from the text of the source.
   not call attention to it" [14].
 - A bow after a short piece or a small applause is partial and "quite short". A long applause gets
   a low bow, held "for several counts" [14].
+- No conducting source of section 9 describes the feet in the turn to the audience. A study of
+  standing turns of 180° gives the motion of a healthy person [15]. "Segment reorientation began
+  with the head followed by the rotation of the trunk and pelvis, then the lead and trail feet",
+  at each turn speed [15].
+- In a fast turn, younger adults started the head at 0.52 s, the pelvis at 0.57 s, the lead foot
+  at 0.69 s, and the trail foot at 0.89 s after the signal [15].
+- Younger adults took 2.95 steps in a fast turn and 3.43 steps in a moderate turn, in 1.72 s and
+  2.22 s of stepping. Each step turned the foot by about 75° to 80° [15].
+- The peak separation of the head from the pelvis was about 22° in a fast turn [15].
 
 ## 8. Use in the app
 
@@ -175,14 +184,22 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
   release of the last chord of a piece ends the piece, and the bow follows it.
 - **The end of the piece (section 7).** After the cut-off, the bear holds the release in the
   silence, and lowers the arms to the sides (`END_BOW`, `pose/end-bow.ts`). Then it turns on the
-  podium to the audience with small steps, bows from the waist with the eyes down, and turns back
+  podium to the audience with steps, bows from the waist with the eyes down, and turns back
   to the orchestra, as the conductor of source 13. The baton hangs in the right paw, as the
   natural hold of the instrument of source 14. The bow is partial, 35°, and short (about 2 s down
   and up), because a conductor bows for the orchestra and the app has no applause (derived from
-  14). No source gives the times of the silence, the lowering, and the turn (derived). The whole
+  14). No source gives the times of the silence and the lowering (derived). The whole
   end takes `END_BOW_SEC` (7.4 s), and the end card shows after it. A play during the bow turns
-  the bear back from where it is, and the arms lift only when it nearly faces the orchestra
-  (`transportEndMotion()`, derived).
+  the bear back from where it is with steps, and the arms lift only when it nearly faces the
+  orchestra (`transportEndMotion()`, derived).
+- **The steps of the turn (section 7, source 15).** The turn follows the fast standing turn of
+  source 15 (`TURN_STEPS`). The head starts first and leads the hips by about 20°
+  (`headLeadSec`), the hips start 0.12 s before the lead foot (`hipsLeadSec`), and the left foot
+  leads the turn to the left. The half turn takes three steps and a small step that closes the
+  feet, in about 1.4 s of stepping (`pitchSec`, `swingSec`), near the 2.95 steps in 1.72 s of source 15.
+  Each step turns a foot by 60° to 120° (`gap`), near the 75° to 80° of source 15. A foot moves
+  only in the air, so no planted foot slides or turns. Source 15 does not give the weight shift,
+  the knee bend, or the lift of the foot (`weight`, `knees`, `lift`, derived).
 - **Where the app differs.** The app shows an accent with the jolt, the dip, and the stroke, and
   the left hand does not close to a fist for a sforzato (section 5). The left hand does not turn in
   wider rounds for a crescendo (section 2). It rises open.
@@ -190,7 +207,7 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
 ## 9. Sources
 
 All sources opened on 2026-11-10, except the search summaries 10 and 11 and the abstract 12.
-Sources 13 and 14 opened on 2026-11-12.
+Sources 13, 14, and 15 opened on 2026-11-12.
 
 1. ConductIT. "1.7 Workbook Exercises." Module 1, Technique.
    https://mooc.conductit.eu/module-1-technique/1-7-workbook-exercises/
@@ -223,3 +240,6 @@ Sources 13 and 14 opened on 2026-11-12.
     https://hub.yamaha.com/music-educators/prof-dev/teaching-tips/festival-etiquette
 14. S. Aron. "Stage Deportment I: Why We Bow." Stephen Aron Studio, 2015-11-11.
     https://stephen-aron.squarespace.com/stephenaronstudio/2015/11/stage-deportment-i-why-we-bow.html
+15. F. Khobkhun, M. Hollands, and J. Richards. "The Effect of Different Turn Speeds on Whole-Body
+    Coordination in Younger and Older Healthy Adults." Sensors 21(8), 2827, 2021.
+    doi:10.3390/s21082827
