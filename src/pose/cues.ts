@@ -79,9 +79,13 @@ export const CUE_MOTION = {
    * or at the right puts the hand behind the head in the view from behind.
    */
   handLeft: 25 * MathUtils.DEG2RAD,
-  /** At the cue point, the left hand points this far up, at this part of the reach of the arm. */
+  /**
+   * At the cue point, the left hand points this far up, at this part of the reach of the arm: a
+   * nearly straight arm, as a conductor extends the arm to the section. At 0.85, the bent elbow of
+   * the Tripo bear folded about 9 faces at its inner side in each cue (`pnpm fold-probe`).
+   */
   cueLift: 30 * MathUtils.DEG2RAD,
-  cueReach: 0.85,
+  cueReach: 0.93,
   /** In the preparation, the hand is this much higher and this much nearer to the shoulder. */
   prepLift: 15 * MathUtils.DEG2RAD,
   prepPull: 0.1,
