@@ -159,11 +159,11 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
   grips it. The fingers curl around it in the play, at rest, and in the bow
   (`CONDUCTOR_HOLD.batonCurl`). The turn toward the palm also brings the paw near the line of
   the forearm. In the beat, the baton is a longer line of the forearm, a little in, as sources
-  16 and 17 give it: the baton points nearly straight forward at beat 1 (`batonPivot`), the arm
-  reaches out to the tip (`beatPoint`), and the elbow points out to the side (`poleR`). The
-  baton stands about 19° off the forearm (median of the play), and most of that angle is
-  inward. A fist of a bear paw holds the baton at an angle to the paw, so the app does not
-  reach a straight line.
+  16 and 17 give it: the baton points 12° in at beat 1 (`batonPivot`), the arm reaches out to
+  the tip (`beatPoint`), and the elbow points out to the side (`poleR`). The baton stands about
+  32° off the forearm (median of the play), and nearly all of that angle is inward. A fist of a
+  bear paw holds the baton at an angle to the paw, and a baton nearer to straight forward touched
+  the desk of the stand after a final chord, so the app does not reach a straight line.
 - **The rest pose.** Before the start and after the bow, the arms hang relaxed beside the body,
   and the baton hangs down beside the leg, about 27° forward of the vertical
   (`CONDUCTOR_HOLD.restBaton`), as the closed hand of section 7a hangs with the arm (derived).
