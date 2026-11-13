@@ -104,7 +104,9 @@ The UI has the style of a video player. The theme is dark only, because the scen
   drawer, a message, or the dialog. The keys do nothing in a text field, with Ctrl, Alt, or Meta,
   while the dialog is open, and when the focused control uses the key (`keyAction()` in
   `app/keys.ts`). C also acts on a focused button or slider, because no control uses it. A row of
-  the piece list uses only Enter, so Space plays and pauses after a click on a piece.
+  the piece list uses only Enter, so Space plays and pauses after a click on a piece. A button or
+  a tab that a click focused gives each key to the page (`keepKeysAfterClick()`), so Space pauses
+  after a click on the camera button. A focus from the keyboard keeps the keys of the control.
 - A solo moves the spotlight to the soloed players. The solo flags alone give the light, so a
   seek, a pause, and a mute keep it (4.5, 6.6).
 - A click on play starts a count-in of the conductor before the music (5.4, 6.5).
