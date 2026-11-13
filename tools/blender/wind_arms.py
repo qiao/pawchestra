@@ -1,9 +1,11 @@
-"""Replays the Blender session that rebuilds the arms of the mouse oboist.
+"""The shared steps of a Blender session that rebuilds the arms of a wind player.
 
 The rebuild uses loop edges, retopology, and extra bones to fix the arm and wrist twist. The
-session uses the steps of `violin_arms.py` on the mouse, in the live Blender through MCP, with an
-image after each step. This script repeats them in the same order with the settings of each
-animal (`ANIMALS`). The steps are the steps of `violin_arms.py`, with four changes (marked *):
+session used the steps of `violin_arms.py` on the old mouse oboist, in the live Blender through
+MCP, with an image after each step. This module repeats them in the same order with the settings
+of an animal (`ANIMALS`). `bear_arms.py` and `rhino_tpose_arms.py` build their sessions on these
+steps, and `rhino_tpose_arms.py` puts the settings of the rhino into `ANIMALS`. The steps are the
+steps of `violin_arms.py`, with four changes (marked *):
 
 1. Import the mesh and Merge by Distance.
 2. Replace the faces of each arm from the shoulder line to the wrist with a quad tube, wrap it onto
@@ -17,7 +19,7 @@ animal (`ANIMALS`). The steps are the steps of `violin_arms.py`, with four chang
    does, put the arm image in a strip of the atlas, and write `<animal>-arms.glb`.
 5. Add the studio skeleton with the arm segments and the helpers, parent with automatic weights,
    and paint the fixes with the Weight Paint tools.
-   * The paint has two more fixes for the mouse: the side of the trunk and the elbows
+   * The paint has more fixes: the side of the trunk, the elbows, and the front of the armpit
      (`step_paint()`).
 6. Write the weights for `paintedWeights` of the config (`<animal>-weights.json`).
    * Each point is in the units of the rig config (`config_points()`).
@@ -26,10 +28,6 @@ A config can scale the source (`proportions`) in `load_mesh()` of `rig_mesh.py`.
 joints are in the units of the scaled source. The session works in the units of the source:
 `source_units()` gives the arm joints there, and `step_weights()` writes each point in the units
 of the scaled source, as `rig_mesh.py` reads it.
-
-Run it in a terminal from the root of the tree:
-
-    Blender -b --factory-startup -P tools/blender/wind_arms.py -- <animal> [<out dir>]
 
 In the live Blender of MCP, `run_steps()` runs one step at a time.
 """
@@ -59,31 +57,11 @@ def load_violin_arms():
 
 va = load_violin_arms()
 
-#: The settings of each animal, with the keys of `ANIMALS` of `violin_arms.py`. `paint` can also
+#: The settings of each animal, with the keys of `ANIMALS` of `violin_arms.py`. A route that uses
+#: these steps puts the settings of its animal here. `paint` can also
 #: name the fixes of `step_paint()`: `side`, the side of the trunk below the armpit, `elbow`, the
 #: vertices near each elbow joint, and `pit`, the front of the armpit.
-ANIMALS = {
-    'mouse': {
-        'config': 'tools/mesh-rigs/mouse.json',
-        'source': 'assets/models/mouse/mouse.glb',
-        'folder': 'assets/models/mouse',
-        'factor': 1.25,
-        'slim': (1.0, 1.0),
-        'cut': {'shoulder': 0.6, 'tilt': 0.0, 'wrist': 0.1},
-        'zone': {'x': 0.06, 'radius': 0.08},
-        'gap': 0.0085,
-        'cleanPit': {'x': (0.08, 0.13), 'y': (0.48, 0.6)},
-        'upper': (0.7, 0.8),
-        'fore': 6,
-        'texture': 512,
-        'faces': 600,
-        'paint': {'trunk': {'x': 0.08, 'y': (0.3, 0.52)}, 'root': {'x': (0.08, 0.15),
-                                                                   'y': (0.48, 0.64)},
-                  'side': {'x': 0.115, 'y': (0.3, 0.545), 'repeat': 4},
-                  'elbow': {'radius': 0.05, 'repeat': 16},
-                  'pit': {'x': (0.08, 0.13), 'y': (0.5, 0.6), 'front': 0.05, 'repeat': 10}},
-    },
-}
+ANIMALS = {}
 
 
 _QUIET = {}
@@ -472,20 +450,3 @@ def run_steps(s, first=0, last=len(STEPS)):
     """Runs the steps from `first` up to `last` (not included), and prints the result of each."""
     for step in STEPS[first:last]:
         print('%s: %s' % (step.__name__, step(s)))
-
-
-def main():
-    """Runs the steps of the session and writes the source mesh and the weights into the out dir
-    (the folder of the animal in `assets/models/` by default)."""
-    argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
-    animal = argv[0] if argv else 'mouse'
-    out_dir = os.path.abspath(argv[1]) if len(argv) > 1 else None
-    va.clear_scene()
-    s = Session(animal, out_dir)
-    run_steps(s)
-    print('wind_arms: wrote %s-arms.glb and %s-weights.json into %s'
-          % (animal, animal, s.out_dir))
-
-
-if __name__ == '__main__':
-    main()
