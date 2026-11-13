@@ -140,6 +140,14 @@ The development Mac is an Apple M1 Max with Chrome.
   or for a change whose goal is speed, with the table in the report or the commit message. The
   reason: a run takes about 3 minutes, its guards often refuse the GPU phase while other work runs,
   and a run for each change cost more than it found. CI has no GPU, so this check is local.
+- A frame poses only the players that it can draw (`scene/pose-cull.ts`). Each player has a cull
+  sphere: its bind sphere plus `POSE_CULL.margin`, which is about two times the largest move of
+  its pose sphere past the bind sphere over all demos. The stage tests the sphere against the view
+  of the camera and the view of the key shadow after it sets both, and then calls `poseAt()` with
+  the flags of the needed players (`FramePoser`). A player outside both views gets no pose and no
+  bone matrices, and hides. The pose is a function of the song time (5.1), so a player that shows
+  again has the correct pose. No player reads the pose of another player, so the bone matrices of
+  a posed player do not change. The frozen shots keep each pixel.
 - The frame target leaves a margin of about 4 times for an integrated GPU of the Intel Iris Xe
   class. The manual test (9.4) checks on a real phone which step of the automatic tier (2.6) holds
   30 fps or more.
