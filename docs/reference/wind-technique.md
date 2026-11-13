@@ -484,11 +484,13 @@ The app follows these facts:
   holds them (`faceTube`, `aimSide`, design 5.3). With the roll of the shoulder, the right paw of
   a recast body stood up behind the valves, with its finger tips up.
 - **The oboe (2.3, `MOUSE_OBOE`).** The oboe hangs 30° from the vertical (`hanging()` of
-  `src/models/instruments/woodwinds.ts`). The reed goes between the lips at the front of the
-  long muzzle, on the middle line (`lipShift`), and the head stays up. The left paw holds the upper joint, and the right paw the
-  lower joint (`gripShiftL`, `gripShiftR`). The upper arms hang below the shoulders, with the
-  elbows a little out (`poleL`, `poleR`). The shoulders slide forward, so that the short arms of
-  the mouse reach the grips (`reach`, `reachL`).
+  `src/models/instruments/woodwinds.ts`). The reed goes between the lips at the front of the long
+  muzzle, on the middle line (`lipShift`), and the head stays up. The left paw holds the upper
+  joint at its tone holes, and the right paw the lower joint at its tone holes, above the bell
+  (`gripShiftL`, `gripShiftR`), as the fingers of a real oboist close the holes. The digits curl
+  over the front of the tube (`gripCurl`). The upper arms hang a little below the shoulders, with
+  the elbows a little out (`poleL`, `poleR`). The shoulders slide forward, so that the short arms
+  of the mouse reach the grips (`reach`, `reachL`).
 - **The clarinet (3, `WOLF_CLARINET`).** The clarinet is at the middle of the body, and the head
   does not tilt toward it. The mouthpiece goes 0.6 cm between the dark lips under the muzzle
   (`lipShift`). The elbows point down and out, a little away from the body (`poleL`, `poleR`), as
@@ -569,13 +571,18 @@ The app does not follow these facts:
 - **The flute body (2.4).** The chest faces the front. The head does not tilt to the right ear.
 - **The flute rest (2.4).** The right paw holds the flute higher than the right-hand keys, and the
   flute leans a little. Upright on the thigh, the right arm goes into the body.
-- **The oboe size (2.3).** The mouse plays a smaller oboe (`SpeciesParams.oboeScale`), in place of
-  longer arms. No source gives the size of a smaller oboe.
+- **The oboe size (2.3).** The mouse plays an oboe of half the size of the oboe of the app
+  (`SpeciesParams.oboeScale`), in place of longer arms. No source gives the size of a smaller
+  oboe. At 0.55 of the size, the right paw reaches the holes of the lower joint with 0.2 cm to
+  spare, with a straight arm.
 - **The oboe angle (2.3).** The oboe hangs 30° from the vertical, nearer to the body than 40° to
   45°. The long muzzle puts the reed 11 cm in front of the right shoulder joint, so at 40° the
   right paw does not reach its grip, and at 35° the right arm is straight.
 - **The oboe hands (2.3).** The paws reach forward at the height of the shoulders, because the big
-  head of the mouse puts the reed high above the shoulder joints.
+  head of the mouse puts the reed high above the shoulder joints and the long muzzle puts it 11
+  cm in front of them. The right elbow bends about 28° and the left about 49°. The digit block of
+  each paw has one bone and the thumb has none, so the digits close together, and the thumb lies
+  along the tube in place of under the thumb rest.
 - **The oboe rest (2.3).** The mouse stands, with no lap for the oboe. Thus the oboe stands
   upright in front of the belly, with both paws on their grips (`rest`, `restShift`).
 - **The oboe breath (2.3).** The app has no breath out of the stale air.
