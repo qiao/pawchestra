@@ -125,11 +125,10 @@ export const CONDUCTOR_HOLD = {
   readyLift: 34 * MathUtils.DEG2RAD,
   /**
    * In the ready gesture, the left wrist is this part of the reach of the arm from the shoulder
-   * joint, so that the left paw is as far forward as the right paw, and the side view shows one
-   * paw, as the sheet does. With the reach of a cue (0.85), the left paw is 0.25 H further
-   * forward than the right paw, and it shows in front of the muzzle in the side view.
+   * joint. With 0.75, the bent elbow of the Tripo bear folded 5 faces more at its inner side, and
+   * the ready gesture folded 28 faces of the left arm (`pnpm arm-check conductor`, lift, limit 8).
    */
-  readyReach: 0.75,
+  readyReach: 0.9,
   /**
    * In the ready gesture, the left hand points this far outward, to the left of the front, so
    * that the paw shows beside the head from behind, and the two paws are nearly at the same width,
