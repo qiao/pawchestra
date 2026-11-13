@@ -1384,17 +1384,13 @@ const CAT_HOLD = {
  *   with the -20° of {@link CELLO_HOLD}, the right arm of the Tripo beagle folds 22 faces in the
  *   play (11 with -5°).
  * - In the play, the left elbow points out to the left and a little down, (-1, -0.25, 0), so
- *   that the upper arm goes about 11° down from the shoulder in the mean of the play and the
- *   forearm rises from the elbow to the neck, as a cellist holds the left elbow out from the body
- *   (`docs/reference/string-technique.md`, section 1.8). With the nearly level elbow of
- *   {@link CELLO_HOLD}, the upper arm goes about 6° down. A lower elbow bends the inner elbow skin
- *   over: with (-1, -0.6, 0), the upper arm went about 20° down, and the faces 1711 and 1712 of
- *   the dog turned over into a dark wedge at the inner elbow in 1.2% of the play samples. An
- *   elbow further back, (-1, -0.15, -0.6), also lowers the arm with no wedge, but folds the faces
- *   2580 and 2581 at the back of the left armpit. The elbow turns up 15° further from the fourth
- *   position to the sixth position (`highElbow`), so that the forearm keeps out of the upper
- *   bout: with the 6° of {@link CELLO_HOLD}, the left forearm goes 1.7 cm into the cello in a high
- *   position of `boulanger-matin`.
+ *   that the forearm rises from the elbow to the neck, as a cellist holds the left elbow out from
+ *   the body (`docs/reference/string-technique.md`, section 1.8). The left upper arm of the Tripo
+ *   beagle is then about level in the play: from 1° up to 5° down in the mean of a play. A
+ *   cellist holds it lower (the task of the dog cellist left elbow in `TODO.md`). The elbow turns
+ *   up 15° further from the fourth position to the sixth position (`highElbow`), so that the
+ *   forearm keeps out of the upper bout: with the 6° of {@link CELLO_HOLD}, the left forearm goes
+ *   1.7 cm into the cello in a high position of `boulanger-matin`.
  * - At rest, the left elbow points out to the left and down, (-2, -1, 0): with the elbow of
  *   {@link CELLO_HOLD}, the left upper arm goes 3.2 cm into the chest, and the left forearm 1.5 cm
  *   into the cello.
