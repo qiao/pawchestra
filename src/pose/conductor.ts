@@ -112,10 +112,11 @@ export const CONDUCTOR_HOLD = {
   cueCurl: 10 * MathUtils.DEG2RAD,
   /**
    * The curl of the fingers of the left hand in the ready gesture: a loose fist, as the paws of
-   * `bear-views.png`. With the open hand of a cue, the claws point up. At 80°, the claws stay
-   * clear of the muzzle by at least 2 cm during count-in head turns to the left.
+   * `bear-views.png`. With the open hand of a cue, the claws point up. At 80°, the knuckle crease
+   * of the left paw of the Tripo bear folded about 16 faces in each sample of the ready gesture,
+   * as the right paw folds from a curl of about 57° (`batonCurl`).
    */
-  readyCurl: 80 * MathUtils.DEG2RAD,
+  readyCurl: 50 * MathUtils.DEG2RAD,
   /**
    * In the ready gesture of a count-in, the left hand points this far up, so that both paws are
    * up at the height of the chin, 0.63 H above the shoulder joints, as in `bear-views.png` (design
