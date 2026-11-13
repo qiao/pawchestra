@@ -36,8 +36,8 @@ QUALITY = 60
 NORMAL_LIMIT = 0.2
 NORMAL_GAIN = 4
 #: The step of the orange fur in the tan map: the Oklab lightness step, the hue step in degrees,
-#: and the chroma factor. The orange fur of the source has the median Oklab L 0.629, C 0.165, and
-#: h 48.2.
+#: and the chroma factor. The orange fur of the red map has the median Oklab L 0.612, C 0.166, and
+#: h 46.0.
 TAN_STEP = (0.06, 18.0, 1.0)
 #: The share of the step of a texel: a smoothstep of the Oklab chroma (C_RAMP), times 1 minus a
 #: smoothstep of the lightness (L_RAMP, the cream lies above), times 1 minus a smoothstep of the
@@ -52,16 +52,17 @@ EYE_MARGIN = 4
 #: The gaze shift of the eyes (tools/gaze_shift.py): the view in degrees above the forward axis of
 #: the head of the seated bind in which each iris lies in the middle of its eye opening, and the
 #: turn of each target out and up from that middle, in degrees. GAZE_SHIFT turns the shift on. It
-#: is off: the source of the fox with four-digit paws paints each iris where the gaze reads at the
-#: viewer in the play view and from the default camera.
+#: is off: the source paints each iris where the gaze reads at the viewer in the play view and from
+#: the default camera.
 VIEW_DOWN = 30.0
 GAZE_OUT = 4.0
 GAZE_UP = 0.0
 GAZE_SHIFT = False
 #: The fur strands that the maps add (`strands()`). The color map and the normal map of the Tripo
-#: fox source are painted smooth: the strand contrast of the color map is 0.017 and the median
-#: tilt of the normal map 0.006, against 0.09 to 0.17 and 0.023 to 0.028 on the Tripo cat, wolf, and
-#: rabbit. So the fur of the fox shows no strands in the app. The strands follow the direction of
+#: fox source are painted smooth: the median tilt of the normal map is 0.006, against 0.023 to 0.028
+#: on the Tripo cat, wolf, and rabbit, and the strand contrast of the color map is a third of that
+#: of the wolf (assets/models/fox/README.md, "Fur strands"). So the fur of the fox shows no strands
+#: in the app. The strands follow the direction of
 #: the faint strokes of the source maps, and they have the scale of the strands of the other maps
 #: (a wavelength of 8 to 10 texels at 1024 pixels across the strands).
 STRANDS = {
