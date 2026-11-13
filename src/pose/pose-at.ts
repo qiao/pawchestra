@@ -6,7 +6,7 @@ import { DIGITS } from '../models/studio-format.ts';
 import { X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { poseBowed } from './bowed.ts';
-import { END_BOW, createEndMotion, transportEndMotion } from './end-bow.ts';
+import { END_BOW, TURN_STEPS, createEndMotion, stepsLegs, transportEndMotion } from './end-bow.ts';
 import type { EndMotion } from './end-bow.ts';
 import { createIdleState, idleAt } from './idle.ts';
 import { poseConductor } from './conductor.ts';
@@ -64,7 +64,8 @@ import type { PercussionState } from './percussion.ts';
 import type { IdleState } from './idle.ts';
 import type { NoteLayer, PlayerPlan, PosePlan } from './plan.ts';
 import { clamp01, seatHeight, transportHeight } from './rest.ts';
-import { hipsOffset, plantFeet, sideMoveAt } from './side-move.ts';
+import { hipsOffset, plantFeet, sideMoveAt, stanceOffset, stepFeet } from './side-move.ts';
+import type { Stance } from './side-move.ts';
 import { createStrikeState, strikeStateAt } from './strikes.ts';
 import { createDampState, dampStateAt } from './damps.ts';
 import { bowStateAt, createBowState } from './strokes.ts';
@@ -234,8 +235,17 @@ const HEAD_SHARES = [
 
 const turn = new Quaternion();
 const second = new Quaternion();
-/** The lifts of the feet of the conductor in a step of its turn at the song end, in meters. */
-const stepLifts: [number, number] = [0, 0];
+/** The stance of the conductor in a turn with steps at the song end. Each frame writes it first. */
+const stance: Stance = {
+  turn: 0,
+  footL: 0,
+  footR: 0,
+  liftL: 0,
+  liftR: 0,
+  weight: 0,
+  shift: 0,
+  drop: 0,
+};
 const yawAxis = new Vector3();
 const rollAxis = new Vector3();
 
@@ -795,7 +805,8 @@ function poseAnimal(
       cue.headYaw *= arms;
       cue.headPitch *= arms;
       body.turn = cue.torsoYaw;
-      body.headTurn = cue.headYaw;
+      // In a turn with steps at the song end, the head turns ahead of the hips.
+      body.headTurn = cue.headYaw + end.headLead;
       // The body comes up from a forward lean for a cue of the left hand.
       const upright = 1 - EXPRESSION_MOTION.cueUpright * cue.hand;
       conductor.lean = expression.lean * arms * (expression.lean > 0 ? upright : 1);
@@ -806,22 +817,37 @@ function poseAnimal(
       body.twist = EXPRESSION_MOTION.cueTwist * cue.torsoYaw;
       body.headTurn -= body.twist;
       cue.handYaw += body.twist;
-      // The hips move against the side lean of the sway and drop with the knees. The feet stay.
-      hipsOffset(note.rig.legs, expression.shift * arms, pose.rootOffset);
-      pose.rootOffset[1] -= expression.drop * arms;
+      // The hips move against the side lean of the sway and drop with the knees. The feet stay,
+      // except in the steps of a turn at the song end.
+      const stepping = stepsLegs(end);
+      if (stepping) {
+        const height = note.rig.headHeight;
+        stance.turn = end.turn;
+        stance.footL = end.footL;
+        stance.footR = end.footR;
+        stance.liftL = end.stepL * TURN_STEPS.lift * height;
+        stance.liftR = end.stepR * TURN_STEPS.lift * height;
+        stance.weight = end.weight * TURN_STEPS.weight;
+        stance.shift = expression.shift * arms;
+        stance.drop = end.knees * TURN_STEPS.knees * height + expression.drop * arms;
+        stanceOffset(note.rig.legs, stance, pose.rootOffset);
+      } else {
+        hipsOffset(note.rig.legs, expression.shift * arms, pose.rootOffset);
+        pose.rootOffset[1] -= expression.drop * arms;
+      }
       conductor.shift = pose.rootOffset[0];
       conductor.drop = -pose.rootOffset[1];
-      // The bow at the song end bends the spine and the head forward, and the whole body turns
-      // around the root (design 5.4).
+      // The bow at the song end bends the spine and the head forward, and the body turns around
+      // the root over the feet (design 5.4).
       body.lean = end.bend + conductor.lean;
       body.sway = conductor.sway;
       body.lift = cue.headPitch - end.bend * END_BOW.head + expression.head * arms;
       setBoneRotation(pose.rotations, BONES.root, turn.setFromAxisAngle(Y_AXIS, end.turn));
       writeBody(pose, player, scratch);
-      if (conductor.drop > 0 || conductor.shift !== 0 || end.stepL > 0 || end.stepR > 0) {
-        stepLifts[0] = end.stepL * END_BOW.stepLift * note.rig.headHeight;
-        stepLifts[1] = end.stepR * END_BOW.stepLift * note.rig.headHeight;
-        plantFeet(note.rig.legs, pose.rootOffset, pose.rotations, stepLifts);
+      if (stepping) {
+        stepFeet(note.rig.legs, stance, pose.rootOffset, pose.rotations);
+      } else if (conductor.drop > 0 || conductor.shift !== 0) {
+        plantFeet(note.rig.legs, pose.rootOffset, pose.rotations);
       }
       poseConductor(note.rig, scratch.torso, conductor, arms, pose.rotations);
       break;

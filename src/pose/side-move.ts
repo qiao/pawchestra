@@ -186,31 +186,20 @@ const center = new Vector3();
 const middle = new Vector3();
 const half = new Vector3();
 
-/** The lifts of no step: both feet on the floor. */
-const NO_LIFTS = [0, 0] as const;
-
 /**
  * Writes the local rotations of the thigh, the shin, and the foot of each leg, so that each ankle
  * stays in its bind place and each foot stays flat while the root moves (design 5.3). The hips
- * keep the rotation of the bind pose. A lift raises an ankle straight up from its bind place, as
- * in a small step on the spot (design 5.4, the turn at the song end).
+ * keep the rotation of the bind pose.
  *
  * @param legs The legs.
  * @param root The offset of the root bone.
  * @param rotations The rotations of the pose to write.
- * @param lifts The lift of the left ankle and of the right ankle, in meters. None by default.
  */
-export function plantFeet(
-  legs: PlantedLegs,
-  root: Vec3,
-  rotations: Float32Array,
-  lifts: readonly [number, number] = NO_LIFTS,
-): void {
+export function plantFeet(legs: PlantedLegs, root: Vec3, rotations: Float32Array): void {
   for (let side = 0; side < 2; side++) {
     const leg = side === 0 ? legs.left : legs.right;
     hip.fromArray(leg.bind.shoulder).add(move.fromArray(root));
     ankle.fromArray(leg.bind.wrist);
-    ankle.y += lifts[side] ?? 0;
     solveArm(leg.bind, hip, NO_TURN, ankle, pole.fromArray(leg.pole), legPose);
     setBoneRotation(rotations, leg.thigh, legPose.upper);
     setBoneRotation(
