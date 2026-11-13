@@ -39,6 +39,8 @@ import { poseHands, sideLeanAt } from './hands.ts';
 import type { HandsState } from './hands.ts';
 import { gestureSize } from './loudness.ts';
 import { longRestHeight } from './long-rests.ts';
+import { plannedLookAt } from './looks.ts';
+import type { PlannedLook } from './looks.ts';
 import { activityAt } from './passages.ts';
 import { pedalLevelAt, posePedalFoot } from './pedal.ts';
 import { digitBendsAt } from './piano-digits.ts';
@@ -53,7 +55,7 @@ import { createSwitchState } from './percussion-switch.ts';
 import type { PercussionState } from './percussion.ts';
 import type { IdleState } from './idle.ts';
 import type { NoteLayer, PlayerPlan, PosePlan } from './plan.ts';
-import { END_BOW, endBowAt, seatHeight, smoothstep, transportHeight } from './rest.ts';
+import { END_BOW, clamp01, endBowAt, seatHeight, smoothstep, transportHeight } from './rest.ts';
 import { hipsOffset, plantFeet, sideMoveAt } from './side-move.ts';
 import { createStrikeState, strikeStateAt } from './strikes.ts';
 import { createDampState, dampStateAt } from './damps.ts';
@@ -101,6 +103,11 @@ const BODY_MOTION = {
   scale: 1.5,
   /** The part of a look that the neck turns. The head turns the rest. */
   lookNeck: NECK_SHARE,
+  /**
+   * The largest turn of the head around y of a wind player in a planned look while it plays: a
+   * small turn that keeps the mouthpiece on the lips.
+   */
+  peek: 4 * MathUtils.DEG2RAD,
   /** The turn of each ear at the top of a twitch. */
   ear: 12 * MathUtils.DEG2RAD,
   /** The turns of the two tail bones at the end of a sway. */
@@ -205,10 +212,15 @@ interface BodyAngles {
   /** The forward lean of the spine, in radians. */
   lean: number;
   /**
-   * The part of the idle look at the conductor that the head turns. A wind player does not turn
-   * the head from the mouthpiece while it plays.
+   * The part of the look at the conductor that the head turns. A wind player does not turn the
+   * head from the mouthpiece while it plays.
    */
   look: number;
+  /**
+   * The part of a planned look that a wind player turns as a small turn of the head, at most
+   * `BODY_MOTION.peek`, while it plays: the weight of the playing pose, or 0.
+   */
+  peek: number;
   /** The upward turn of the neck and the head, in radians. */
   lift: number;
   /** The turn of the chest around y, in radians: the sway of a singer. */
@@ -294,8 +306,12 @@ function writeBody(pose: WritablePose, player: PlayerPlan, scratch: FrameScratch
   );
   yawAxis.set(0, Math.cos(body.upright), Math.sin(body.upright));
   rollAxis.set(0, -Math.sin(body.upright), Math.cos(body.upright));
-  const yaw = player.lookYaw * idle.look * body.look + body.headTurn;
-  const pitch = player.lookPitch * idle.look * body.look + body.lift + body.nodHead;
+  // A planned look comes before an idle look, and the idle look fills the rest of the turn.
+  const { planned } = scratch;
+  const look = planned.weight + idle.look * (1 - clamp01(planned.weight));
+  const peek = MathUtils.clamp(player.lookYaw, -m.peek, m.peek) * planned.weight * body.peek;
+  const yaw = player.lookYaw * look * body.look + peek + body.headTurn;
+  const pitch = player.lookPitch * look * body.look + body.lift + body.nodHead;
   for (const [bone, part] of HEAD_SHARES) {
     turn.setFromAxisAngle(rollAxis, body.roll * part);
     turn.multiply(second.setFromAxisAngle(yawAxis, yaw * part));
@@ -307,7 +323,7 @@ function writeBody(pose: WritablePose, player: PlayerPlan, scratch: FrameScratch
   const tail = idle.tail * player.tailSway;
   setBoneRotation(r, BONES.tail1, turn.setFromAxisAngle(Y_AXIS, tail * m.tail1));
   setBoneRotation(r, BONES.tail2, turn.setFromAxisAngle(Y_AXIS, tail * m.tail2));
-  pose.blink = idle.blink;
+  pose.blink = Math.max(idle.blink, planned.blink);
   chainFrames(player.skeleton, r, scratch.chain, pose.rootOffset);
 }
 
@@ -363,6 +379,8 @@ interface FrameScratch {
   readonly torso: TorsoFrames;
   /** The idle motion of the current animal at the wall clock time. */
   readonly idle: IdleState;
+  /** The planned look of the current animal at the song time. */
+  readonly planned: PlannedLook;
   /** The body angles of the current animal. */
   readonly body: BodyAngles;
   readonly bow: BowState;
@@ -420,6 +438,8 @@ function poseAnimal(
   body.sway = note.family === 'conductor' ? 0 : swayOf(plan, player, noteTime, weight);
   body.lean = 0;
   body.look = 1;
+  body.peek = 0;
+  plannedLookAt(player.looks, noteTime, scratch.planned);
   body.lift = 0;
   body.twist = 0;
   body.turn = 0;
@@ -464,6 +484,7 @@ function poseAnimal(
       // it toward a far mouthpiece, and turn the spine back (design 5.3).
       body.lean = (note.rig.hold.lean - wind.breath * WIND_BODY.breath * player.amplitude) * weight;
       body.look = 1 - weight;
+      body.peek = weight;
       body.lift = WIND_BODY.headLift * (1 - weight) - note.rig.headBow * weight;
       body.headTurn = note.rig.hold.headTurn * weight;
       writeBody(pose, player, scratch);
@@ -761,10 +782,12 @@ export function poseAt(
     chain: [root, createFrame(), createFrame(), chest],
     torso: { root, chest },
     idle: createIdleState(),
+    planned: { weight: 0, blink: 0 },
     body: {
       sway: 0,
       lean: 0,
       look: 1,
+      peek: 0,
       lift: 0,
       twist: 0,
       turn: 0,

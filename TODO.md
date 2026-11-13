@@ -1196,10 +1196,6 @@ scene of each demo has its seats and stage size with no overlap.
       2.2°, about 2 pixels in the default view. Show the user a lineup at 1.5, 2, and 3 times.
       Then give each player a level and trend track, as the conductor has: a lean into a
       crescendo, a chest turn with a long bow, a bell lift at a phrase peak (5.1).
-- [ ] Plan the looks from the music: a look at the conductor before an entry after a long rest, at
-      a cue of `findCues()`, and at the final chord. Keep the idle look as the fallback. Start a
-      blink with each look (fast close, slower open). Now each look starts at a seeded wall-clock
-      time, and the sections do not answer a cue (`src/pose/idle.ts`) (5.1).
 - [ ] Give the ears and the tails overlap: a drag from the head angle at t and t - 0.08 s, with a
       limit, so that the pose stays stateless. Give the look a curve that passes its end by about
       10% and settles. Now the ears and the tail have only a twitch and a sine (5.1).

@@ -170,6 +170,15 @@ demo shows the same motion on each visit.
   stops. Its motions come at seeded times in windows of the wall clock, so they need no state
   (`IDLE_MOTION`). Hanging ears do not twitch, as a real hanging ear does not
   (`SpeciesParams.hangingEars`).
+- **Planned looks.** A real player looks up at the conductor for a reason, so most looks come
+  from the music (`planLooks()` of `pose/looks.ts`, `LOOK_PLAN`): before an entry after a rest of
+  at least `restSec`, at each cue of the conductor to the seat of the player (`findCues()`, 5.4),
+  and on the final chord (`findFinal()`). In a chamber group the target is the leader. The plan
+  keeps two song times for each look (`PlayerPlan.looks`), so the look is a function of the song
+  time. The idle look of the wall clock fills the time between the planned looks. A wind player
+  that plays turns only a little of a planned look (`BODY_MOTION.peek`), so that the mouthpiece
+  stays on the lips. Each planned look starts with a blink that closes in `LOOK_BLINK.closeSec`
+  and opens in `openSec`, as a real blink closes fast and opens slower.
 - **Blink.** A blink rises from 0 to 1 and falls back in `blinkSec`. A bead eye scales on y by
   `max(CLOSED_EYE_SCALE, 1 - blink)` about its eye bone. A body with lids (4.4, "Hand rig") turns
   each eye bone about the hinge axis of its lid, through the middle of the eyeball, by the share
@@ -578,7 +587,7 @@ The rest of each family:
 **Woodwinds and brass** (`pose/wind-notes.ts`, `pose/winds.ts`, winds 4):
 
 - A wind player shows one note, and breathes in before a phrase. The mouthpiece stays at the
-  mouth, so the look at the conductor does not turn the head.
+  mouth, so the look at the conductor turns the head only a little (`BODY_MOTION.peek`, 5.1).
 - **Mouthpiece on the lips.** The mouthpiece of each own hold touches the lips over the whole play,
   and the lift ends on the lips (winds 4.2): a brass rim presses the lips 0.2 cm to 0.3 cm, with its
   middle at or a little below the mouth line, so that it lies mostly on the upper lip. A reed or a
