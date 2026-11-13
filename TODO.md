@@ -450,11 +450,6 @@ passes.
       2.7 cm (base 4.0 cm) and of the cymbalist to 3.2 cm (base 4.1 cm). Read the 2x elbow crops.
 - [ ] Badger recast roles: the freed round upper arms go 3.4 to 4.5 cm into the body in the shared
       holds of the violin, the flute, the clarinet, and the trumpet (base 2.0 to 3.0 cm).
-- [ ] Arm rebuild: a cut plane less than about 0.4 mm from a source vertex leaves a cluster of
-      very small faces at its loop. `step_clean_flaps()` deletes the flaps, but the small faces
-      of the dog right shoulder line still turn over at rest (`rigidPainted` fixes them). A snap
-      of such a vertex onto the plane changes the bytes of the monkey, whose wrist planes pass
-      0.11 mm and 0.19 mm from a vertex.
 - [ ] Hippo with the T-pose body: each recast cell of the cast matrix fails, as on `831beea4`. The
       left arm folds 10 to 13 faces (limit 8) in the violin, the clarinet, the trumpet, and the
       snare drum, and the right arm 18 in the cello. The flute recast turns the left paw
@@ -514,16 +509,6 @@ passes.
 - [ ] Test mannequin: the forearm twist p95 of the left violin arm is 48 against 38 of the base
       (limit 80, margin 15), because the forearm segments spread the paw twist along the forearm.
       Decide if the margin holds against a base with no segments.
-- [ ] Arm rebuild: on the wolf clarinetist, `arm_rebuild.py` gives fewer folds than `wind_arms.py`,
-      but a flat p5 0.82 of the right arm in the lift (0.92 on `main`, margin 0.05). Find the
-      ring, then replace the species scripts one at a time after a review of the crops.
-- [ ] Arm rebuild: `arm_rebuild.py` has no cut along the seam with a side wall (`cat_arms.py`),
-      so an arm joined to the trunk down to the elbow (the fox and the deer) keeps
-      its species script.
-- [ ] Mesh intake: `pnpm mesh-intake` puts the shoulder line of the dog at 0.50 of the upper arm,
-      at its limit, but the arm of the old `dog.glb` joins the trunk down to 0.80 (the `README.md`
-      of the dog at cbc8db5e4). The rays from the bone do not see the seam faces outside the arm.
-      Count the faces that join the arm and the trunk.
 - [ ] Mesh intake: the limits `GAP`, `SPACING`, `TILT`, and `COLOR_FACES` of
       `tools/blender/mesh_intake.py` come only from the mannequin and the rebuilt arms. Check them
       on the first clean quad mesh, with `arm_rebuild.py --keep-faces` and the arm gate.
