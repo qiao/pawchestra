@@ -311,24 +311,18 @@ passes.
       (`reports/2026-11-05-polar-bear-seat/after-stage/`).
 - [ ] Close views: the pianist has no lift or lowering moment in `ROLE_VIEWS`, so `close-views
       pianist --moments lift50` fails. Give the role the moments of `halfMoves()`.
-- [ ] Bear: at rest, the arms stand out about 35° around the wide belly, and the upper arms go 2.2
-      cm into the body while the arms move.
-- [ ] Bear arm gate: with the straight bind, `pnpm arm-check conductor --base` fails the paw swing
-      (L 43, R 51 against 26, 31), the move twist (63, 58 against 60, 52), and the flat share
-      (0.84, 0.87 against 0.94, 0.92). They count from the bind. The world turns of the paws stay
-      within 0.2°, and the elbow ring is 0.5 cm thicker in the lift. Accept the new base values.
-- [ ] Bear forearm: one elbow axis serves the upper arm and the forearm, and the source forearm
-      lies about 4° out of the plane of the old bent bind. So the forearm frame turns 4.07° from
-      its old world turn in each pose. Give the forearm its own axis if a crop shows it.
-- [ ] Bear wrist folds: two faces of the right palm heel fold in 99% of the play (the base had
-      one), inside the crease, and two faces of the right forearm fold in 4% to 7%. No crop shows
-      them. From az150 at elevation 40, the left wrist shows a soft shade where it bends.
-- [ ] Bear: from az-150, a soft dark crease stays at the left arm root, most at rest. From az150, a
-      small dark pocket stays where the raised right arm meets the back.
-- [ ] Bear: the trunk faces of the notch below the caps of the cut face down under each raised arm.
-      No view shows them.
-- [ ] Bear: the cheeks and the brow show a few facets in the head crops. Try a larger blend on the
-      head only.
+- [ ] Bear: at rest, the arms swing 20° more out around the round belly (`restArm.extraOut`), and
+      the upper arms still go 3.7 cm into the sides of the chest (limit 4 cm). In the lift and the
+      lowering they go 4.0 cm in (limit 4 cm, the older bear 3.8 cm). Check the arm roots in 2x
+      crops from az150 and az-150.
+- [ ] Bear: in the play, the left upper arm root goes 2.4 cm into the trunk (limit 1.5 cm, the
+      older bear 0.0 cm, `boulanger-matin` 59.38 s). Check the armpit in a 2x crop.
+- [ ] Bear right paw: three thin faces of the knuckle crease (104, 105, 1769) fold in 99% of the
+      play at the baton curl, and one wrist face (1833) in 77% (`pnpm fold-probe conductor
+      --faces 6`). The fist hides them in the hall view. Check them in a 2x crop.
+- [ ] Bear maps: the color map and the normal map of the new bear are 215 KB and 217 KB (the
+      older bear 106 KB and 99 KB), because the fur strands add detail. They load after the first
+      frame. Try a lower WebP quality if the load time of a demo grows.
 - [ ] Bear and elephant: in the gallery light, each arm casts a black band of shadow on the trunk
       beside the belly. Check it in the stage light.
 - [ ] Cat violist: the faces at the back of the bow arm root (2461, 2462, 2342, and 2456, on
@@ -470,13 +464,6 @@ passes.
       recast folds 10 faces of the left arm (limit 8), and the snare drum recast twists the left
       forearm 82° (limit 80°, base 80°). The rest shape of the right arm keeps its rule from the
       bent bind, with 3 faces turned over in the rig log, as on `14ef3d67`.
-- [ ] Bear left bind paw: it supinates 25° in place of the rule value 51°, because 51° dents the
-      side of the left forearm of the conductor near the wrist at the beat (2x crops), and wider
-      skin normals and a dual quaternion bind did not remove the dent. The largest left paw twist
-      p95 of the cast roles is thus 136° in place of 110° (the violin and the flute). A fix of the
-      forearm form would let the left take the rule value.
-- [ ] Bear `raise` shapes: the rig log keeps 3 faces of the right shape turned over after the
-      relax (736, 737, 738), as on `37d5d5c7`.
 - [ ] Rhino right bind paw: it keeps no supination in place of the rule value 22°, because 22°
       takes the right forearm near the elbow 0.6 cm deeper into the tuba at rest, in the lift, and
       in the lowering (1.3 cm to 1.5 cm, limit 1.5 cm). The largest right paw twist p95 of the
@@ -712,14 +699,6 @@ passes.
 - [ ] Hand rig: the preview of `fit_eyes()` repeats `addEye()` and `eyeBend()` in Python
       (`tools/blender/studio_eyes.py`). On the cat, its bends match the module within 2e-4. A
       change of the bead eye of the app must change both, or the preview must come from the app.
-- [ ] Tripo bear conductor: with the cue facts (`cueHeadLeft` 35, `cueHeadRight` 30, `cueLift`
-      12), the paws still go up to 1.0 cm into the head in the play (the bear before it 0.3 cm).
-      Check the lower cue hand and the smaller head turn in the hall view.
-- [ ] Tripo bear conductor: the longer elbow blend moves the left flat p5 of the conductor from
-      0.88 to 0.86 (the bear before it 0.83, limit 0.55) and the left move turn max from 448 to
-      450 (the bear before it 484). Check the bent left elbow in the hall view.
-- [ ] Tripo bear conductor: the body is 9 % taller to the ear tips than the bear before it, with
-      the same H, and its belly and waist are about 9 % wider. Ask the user if the form stays.
 - [ ] Tripo cat (fourth Tripo cat, `tripo-hand/`): the body keeps the legs of the source, so its
       seat is 0.222 m (`seatHeight`, the cat before it 0.298 m). Check the chair against the
       string rows in the hall view.
