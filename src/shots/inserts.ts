@@ -996,7 +996,10 @@ function insertEnd(
  * - The detail moves with the music ({@link moves}). A detail of the lead wins, then the most
  *   activity, with a seeded jitter. The insert does not show the detail or the player of the
  *   insert before it, and a detail of the two inserts before it loses score.
- * - Its camera is clear ({@link insertClear}), and each of its two cuts keeps the 30° rule.
+ * - The player of the detail takes its play pose at the middle of the insert, and the camera
+ *   frames the posed detail. The camera passes the tests of the stage ({@link stageRefusal}) and
+ *   of the play pose ({@link poseRefusal}), and each of its two cuts keeps the 30° rule. A detail
+ *   with no such camera gives no insert.
  *
  * @param inputs The inputs of the plan.
  * @param shots The main shots, sorted.
