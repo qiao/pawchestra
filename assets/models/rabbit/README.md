@@ -99,8 +99,8 @@ FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit.rig.glb` | 1,131,560 bytes | `805686165f23f9602f4940ec70c86214203275c5733413b36476517dbef02cc7` |
-| `tripo-hand/rabbit.rig.json` | 16,013 bytes | `012f23244e23165c6b279aa2476b5eeb2a5778728902d6d20775f35cda1b7bb1` |
+| `tripo-hand/rabbit.rig.glb` | 1,131,560 bytes | `a1a0164122943b39f129655a9e690842aedf7903634ecf80a47b900fc84535e8` |
+| `tripo-hand/rabbit.rig.json` | 16,013 bytes | `efd4ce577c8b7c0602a35819cb6fdb3e372e69d7436b6fad637be7476d365a5b` |
 
 The chain of the body is in `tools/blender/hand/rabbit/` (`build.py`, `make_config.py`,
 `params.json`, `base-config.json`, `redits.py`, `rimport.py`, `rings.py`), and `pnpm hand-chain
@@ -148,10 +148,13 @@ The weights, in the order of the work, in the rest pose:
    linear between the control rows below, and the rest on the 4 roll segments of the upper arm or
    the forearm. The elbow bend spreads over x 0.127 to 0.188.
 
-   | x | 0.0755 | 0.0866 | 0.0955 | 0.1043 | 0.1143 | 0.1274 | 0.1385 | 0.1518 | 0.164 | 0.1773 | 0.1883 |
-   |---|---|---|---|---|---|---|---|---|---|---|---|
-   | Clavicle | 0.40 | 0.25 | 0.12 | 0.04 | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
-   | Elbow helper | 0 | 0 | 0 | 0 | 0 | 0 | 0.25 | 0.75 | 0.75 | 0.25 | 0 |
+   | x | 0.0755 | 0.0866 | 0.0955 | 0.1043 | 0.1143 | 0.1274 | 0.158 | 0.1883 |
+   |---|---|---|---|---|---|---|---|---|
+   | Clavicle | 0.40 | 0.25 | 0.12 | 0.04 | 0 | 0 | 0 | 0 |
+   | Elbow helper | 0 | 0 | 0 | 0 | 0 | 0 | 1 | 0 |
+
+   The helper share reaches 1 at the elbow joint (x 0.158), so that the bend share grows
+   linearly over the elbow.
 
 3. Wrist rows and knuckle rows: the bend share of the paw grows in 12 equal steps of 0.0035 from
    0.035 before the wrist joint, and the fingers share in 12 equal steps of 0.003 from 0.02 before
