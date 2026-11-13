@@ -467,10 +467,11 @@ export const PERCUSSION_HOLDS = {
     pitchR: 1,
     ready: true,
     // At rest, the felt balls lie on the heads (restPitch), as a real timpanist rests the mallets
-    // on a head (percussion 4), because the paws cannot hang beside the large kettles. With 0.45
-    // of the pitch, each ball touches its head (0.4 cm, hold-fit rest limit 1.5 cm). With 0, the
-    // balls went 2.4 cm into the heads.
-    restPitch: 0.45,
+    // on a head (percussion 4), because the paws cannot hang beside the large kettles. With 0.5
+    // of the pitch, each ball touches its head (0.1 cm, hold-fit rest limit 1.5 cm), and each paw
+    // grasps its mallet (wind-grip). With 0, the balls went 2.4 cm into the heads, and with 0.45,
+    // the left claws stood 0.7 cm off the shaft.
+    restPitch: 0.5,
     set: null,
     pair: true,
     gap: 0,
