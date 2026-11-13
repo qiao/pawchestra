@@ -763,12 +763,12 @@ back, as on the Tripo cat (`assets/models/rabbit/README.md`, "Smile"). Reason: t
 A lid on each eye blinks over it ("Hand rig"). Its arms reach 0.297 m, so its violin is 0.9 of the violin of the app (4.6,
 `violinScale`). The map holds no baked key light: the luma of its cream fur stays
 within about 7 % of its median on each part. A hand rig of the Tripo P2 bear
-(`assets/models/bear/tripo-hand/`) is a candidate body of the conductor, in the same way. It stands
+(`assets/models/bear/tripo-hand/`) is the body of the conductor, in the same way. It stands
 with the bind of the bear of main, keeps the eyeballs of its mesh with lids, and keeps H of the bear
 of main. Its color map (`bear-color.webp` of `tools/bear-maps.py`) scales the fur, the muzzle, and
 the claws of the source to the colors of the bear of main in the hall light (the claws dark grey),
 and paints the eyes dark, as the bead eyes of main: the white ball of the source read startled. A
-hand rig of the fourth Tripo P2 cat (`assets/models/cat/tripo-hand/`) is a candidate body of the cat
+hand rig of the fourth Tripo P2 cat (`assets/models/cat/tripo-hand/`) is the body of the cat
 violist, by the route of the Tripo wolf. The source FBX is the target of its look: no point edit
 changes its trunk, limbs, legs, or tail, its map keeps the colors of the source
 (`tools/cat-maps.py`), its crease angle is 180°, and it scales only to H of the cat of main. Its
@@ -815,12 +815,9 @@ eyeballs and sockets are a little smaller and deeper than in the source, and the
 down a little. Reason: at the source size, the eye openings read too wide for the head
 (`assets/models/fox/README.md`, "Eyes"). A larger step made the eyes read sleepy. Its legs keep
 the length of the source, and its feet stay flat in the bind. Reason: a higher seat by a heel turn changes the sight pass of
-the layout (4.5) and moves most players of the demos. The candidate rabbit of the second Tripo mesh
-moves each iris to the middle of its opening (`tools/gaze_shift.py`), because its source paints the
-irises at the inner side, and the rabbit looked to the side and down. Its source paints no light in
-the eyes, so its eyes take the `eye` finish and the eye light. Its successor keeps the iris place of
-its source ("Simple route"). The candidate Tripo polar bear
-(`assets/models/polar-bear/tripo-hand/`) keeps the source eyes in the same way: its irises take the
+the layout (4.5) and moves most players of the demos. The Tripo rabbit moves each iris a part of
+the way to a gaze target ("Simple route"). The Tripo polar bear
+(`assets/models/polar-bear/tripo-hand/`) keeps the eyeballs of its source, and its irises take the
 middle of the opening in the view of the play of the pianist (`gaze_targets()` of
 `tools/polar-bear-maps.py`), its painted light gives the `varnish` finish and no eye light, and
 its eyes keep the size of the source ball. Its map also gives each eye a darker iris and a softer
@@ -828,7 +825,7 @@ warm white (`far_tone()`), with the values of the dark iris of the earlier fox m
 each eye is a few pixels across, and the bright white read dim. Its source paints white only at the
 outer corner, so it takes no round iris. Its arm, leg, and trunk girths and
 its paws are those of the main polar bear, and its head keeps the round form of the sheet. The
-candidate Tripo wolf (`assets/models/wolf/tripo-hand/`) has no change of its map colors, and it
+Tripo wolf (`assets/models/wolf/tripo-hand/`) has no change of its map colors, and it
 scales only to H of the wolf of main. Reason: the look target of this body is its source FBX in an
 FBX viewer. Its one point edit makes the front paws smaller past the wrist (the edit `paw` of its
 build, `assets/models/wolf/README.md`, "Paw size"). Reason: against the distance of the shoulder
@@ -837,7 +834,7 @@ large on the short arms. Its source has no eyeball, so the head faces of each
 painted eye take the face attribute `eye`, the finish `varnish`, and a blink lid. Its crease angle
 is 180°, as the smooth shading of an FBX viewer. Its paws turn about the forearms by whole ring
 steps, so that each part of each arm takes at most about 45° in the moments of the clarinetist. The
-candidate Tripo beagle of the dog (`assets/models/dog/tripo-hand/`) follows the same rules, and it
+Tripo beagle of the dog (`assets/models/dog/tripo-hand/`) follows the same rules, and it
 scales to a larger H than the dog of main (`metersPerUnit` of its config). Reason: the beagle sits
 beside the Tripo cat of the violas, and it must read a little larger. The top of its head stands
 a little higher than the top of the head of the cat, seated and standing (the ears of the
@@ -854,7 +851,7 @@ change. Reason: against the width of the trunk, the head read too large, and lar
 of the Tripo cat.
 Its paws and elbow axes turn so that each part of each arm takes at most 45° in the play of the
 cellist. The rest of the bow forearm keeps a larger twist, because the cello hold sets it. The
-candidate Tripo monkey (`assets/models/monkey/tripo-hand/`) follows the same rules for the trumpet.
+Tripo monkey (`assets/models/monkey/tripo-hand/`) follows the same rules for the trumpet.
 It scales to 1.2 times H of the monkey of main (`metersPerUnit` of its config). Reason: at H of
 the monkey of main, it was one of the smallest bodies of the lineup, and its trumpet read small.
 Its source has eyeballs, so the faces of each ball take the face attribute `eye`, the finish
@@ -995,8 +992,8 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
 - The wider haunch of the cat sits on a wider chair (`seatWidth`), and its tail lies curled on
   the seat around the left side of the haunch (`studio.tailCurl` of the rig config). The rabbit
   sits with more room behind the back (`backRoom`), so that its back keeps off the chair back.
-- The candidate rabbit of `tripo-hand/` keeps the legs of its mesh, so its chair is lower than
-  the chair of the A-pose rabbit. It sits as a real
+- The Tripo rabbit of `tripo-hand/` keeps the legs of its mesh, so its chair is low
+  (`StudioBody.seatHeight`). It sits as a real
   violinist does: the thighs of its bind slope a little down, and the seat of its rig ends where
   the calves start to go below the thighs. So the seat carries most of each thigh, its front edge
   is a little behind the knees, and the back of the pelvis is near the chair back. Reason: with
@@ -1245,7 +1242,7 @@ The studio bodies smooth their fur, because their many small faces showed a crum
 under the hard key light.
 
 A studio body can show a color map of its fur in place of its face colors (`StudioBody.texture`,
-the candidate rabbit). The module holds the image path and the texture point of each fur corner.
+such as the Tripo rabbit). The module holds the image path and the texture point of each fur corner.
 A player of such a body takes a copy of the shared material with the map
 (`bodyMapMaterial()` of `scene/body-texture.ts`), and its geometry holds the points as `uv1`. The
 shader takes the texel in place of the vertex color of each corner with a point, so the light,
@@ -1256,15 +1253,15 @@ source and a painted light, as on the polar bear, takes `varnish` and no eye lig
 color, for the frames before the map loads. The first draw starts the load of the image (7.2). Until the
 image is on the GPU, the body shows its face colors.
 
-The candidate polar bear (`assets/models/polar-bear/tripo-hand/`) shows a map that
+The Tripo polar bear (`assets/models/polar-bear/tripo-hand/`) shows a map that
 `tools/polar-bear-maps.py` makes from the map of its Tripo FBX. The cream fur goes to the white
 of the main polar bear in the hall light (`FUR`), and the claws go dark (`CLAW`). Reason: the
 Tripo map paints a tan bear with brown claws, and the hall view sets the target, as for the fox.
 The painted brows keep half of their contrast to the fur (`soften_brows()`).
-The candidate wolf (`assets/models/wolf/tripo-hand/`) shows the map of its Tripo FBX at 2048 pixels
+The Tripo wolf (`assets/models/wolf/tripo-hand/`) shows the map of its Tripo FBX at 2048 pixels
 with no change of a color (`tools/wolf-maps.py`). Reason: the look target of this body is its
-source FBX. The candidate beagle of the dog (`assets/models/dog/tripo-hand/`) does the same with
-`tools/dog-maps.py`, and the candidate monkey (`assets/models/monkey/tripo-hand/`) with
+source FBX. The Tripo beagle of the dog (`assets/models/dog/tripo-hand/`) does the same with
+`tools/dog-maps.py`, and the Tripo monkey (`assets/models/monkey/tripo-hand/`) with
 `tools/monkey-maps.py`, for the same reason. The Tripo hippo (`assets/models/hippo/tripo-hand/`)
 does the same with `tools/hippo-maps.py`, the Tripo pig (`assets/models/pig/tripo-hand/`) with
 `tools/pig-maps.py`, the Tripo penguin (`assets/models/penguin/tripo-hand/`) with
@@ -1309,7 +1306,7 @@ faces keep the shared shading.
   map. The strand contrast and the tilts then match the cat and the wolf. Reason: with no
   strands in either map, the fox fur read as smooth plastic beside the other bodies.
 
-The fur of the candidate rabbit is near the shoulder of the tone curve, so the sheen adds little
+The fur of the Tripo rabbit is near the shoulder of the tone curve, so the sheen adds little
 light at the outline. The color map already paints the strands, so the normal map adds little at
 the app view.
 
