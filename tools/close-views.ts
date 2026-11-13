@@ -1360,7 +1360,7 @@ function scaleOf(value: string | null): number {
  * [--moments <moment,...>] [--zoom <n>] [--elevation <deg>] [--aim <x>,<z>,<height>] [--scale <n>]
  * [--probe <probe,...>] [--url <url>] [--glb <file>] [--set <changes>] [--lineup [--with
  * <role,...>] [--crop <n>] [--box <x>,<y>,<w>,<h>]] [--base <ref> [--pairs <view|cell,...> [--crop
- * <x>,<y>,<w>,<h>]] [--sheet [--box <x>,<y>,<w>,<h>]]]`. `--aim` points a line camera at a part,
+ * <x>,<y>,<w>,<h>]] [--sheet [--box <x>,<y>,<w>,<h>]]]`. `--aim` points the camera at a part,
  * such as a wrist of the conductor ({@link aimOf}). With `--lineup`, the views are
  * {@link LINEUP_VIEWS} and the moments {@link lineupMoments} unless `--views` and `--moments`
  * give others. `--sheet` gives one sheet for each view ({@link writeSheets}), with the cells of
@@ -1732,13 +1732,12 @@ async function pairImage(
  * Gives the close view of a role with the camera of the command line: the face crops of
  * `--target head` ({@link headViews}), the views of `--views` and the moments of `--moments`,
  * then the zoom of `--zoom` and the elevation of `--elevation` for each view, in place of the
- * values of the role. A line camera then looks at the point of `--aim`.
+ * values of the role. The camera then looks at the point of `--aim`.
  *
  * @param role The close view of the role.
  * @param args The zoom, the elevation, the target, the views, the moments, and the point of the
  *   command line.
  * @returns The close view.
- * @throws Error if `--aim` comes with a role whose camera is not a line camera.
  */
 function roleCamera(
   role: RoleViews,
@@ -1766,21 +1765,19 @@ function roleCamera(
 }
 
 /**
- * Gives a camera that looks at the point of `--aim`.
+ * Gives a camera that looks at the point of `--aim`. A body camera becomes a line camera with its
+ * zoom and its elevation, so that a close view can look at a part of a small body, such as the
+ * paws of the mouse.
  *
  * @param camera The camera of the role.
  * @param aim The point, or `null` to keep the camera.
  * @returns The camera.
- * @throws Error if the camera is not a line camera and a point comes.
  */
 function aimCamera(camera: BodyCamera | LineCamera, aim: LineAim | null): BodyCamera | LineCamera {
   if (aim === null) {
     return camera;
   }
-  if (camera.kind !== 'line') {
-    throw new Error('The option --aim needs a role with a line camera, such as the conductor.');
-  }
-  return { ...camera, ...aim };
+  return { kind: 'line', zoom: camera.zoom, elevation: camera.elevation, ...aim };
 }
 
 /**
