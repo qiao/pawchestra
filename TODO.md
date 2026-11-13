@@ -1224,18 +1224,10 @@ Done when: the pose tests pass, and the pose and frame targets pass.
       of a demo file, the SoundFont, the velocity curve, the mix, the hall, or the limiter (6.8).
 - [ ] Move the seat flags and the settings of `App` into small classes next to it, because
       `src/app/app.ts` is long. Do it after the work on the audio chain and the camera in `app.ts`.
-- [ ] Ask the user if a silent seat row needs a second cue. With one row soloed, the silent rows
-      look almost as bright as the solo row, and only the pressed "S" shows the solo (2.8).
-- [ ] Show the user the seat rings in play, and ask if the pulse of fast short notes is correct
-      (2.8). A tutti turns on each ring, so the rings then show no lead.
 - [ ] Check the seat rings in Safari, in Firefox, and on a real phone (2.8).
 - [ ] Make `pnpm keyboard` pass again. At 1440 × 900 the check "Tooltips of the speed menu and the
       volume slider" fails, and `checkHiddenBarTap` stops at a timeout, because the UI has no
       `.collapse` element now. Thus the run never reaches its last checks.
-- [ ] Make the seat rows read: keep the color dot at full size and color, and show the level only
-      by the glow ring. At rest the dot is 3.9 px wide at the opacity 0.3 (`src/ui/ui.css`). Add a
-      visible word to M and S in the wide drawer ("Mute", "Only this"), and a row "All seats"
-      above the list that clears each flag. This also answers the two seat row tasks above (2.8).
 - [ ] Give each demo row a cast line, such as "Penguin choir, full orchestra", from
       `castBodies()` at build time (a `cast` field of `DemoInfo`). The design has the content in
       "What it shows" of 8.2. Change the intro line to "An orchestra of animals plays classical
