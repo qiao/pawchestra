@@ -327,7 +327,10 @@ The rest of each family:
   paw, and rests the free left paw on the top of the left haunch near the hip (`FOX_FLUTE`). Each
   rest place of a free paw lies in the reach of its arm. Reason: the top of the thigh is out of
   reach of the short arm, and with a place out of reach, the arm stayed straight in the lift until
-  the paw came into reach, and then the elbow folded in a few frames.
+  the paw came into reach, and then the elbow folded in a few frames. The free left paw of the fox
+  hangs in line with its forearm, turned about its long axis to the turn at which its skin is
+  nearest to its bind (`restFreeL.palm`, `fingers`). Reason: the left paw turn of the fox chain
+  fits the violin, so a paw that faced the body bent at the wrist and twisted on its forearm.
   The panda holds the trombone upright in front of the body, below the mouth,
   with the slide down and a little forward (`PANDA_TROMBONE`), as a seated player holds the slide
   vertical in front of the knee (winds 1.7). Both paws keep the grip of the play on the instrument

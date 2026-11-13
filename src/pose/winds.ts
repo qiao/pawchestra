@@ -617,7 +617,14 @@ export const WIND_HOLDS = {
  * A real flutist can rest the free hand on the thigh, but the top of the left thigh of the fox is
  * out of reach of the left arm. The wrist reaches 0.338 m from the shoulder joint, and the top of the thigh lies
  * about 0.45 m below the joint. So the paw rests on the top of the haunch near the hip, as near to
- * the thigh as the arm reaches. The palm faces the body and the front, and the fingers point down.
+ * the thigh as the arm reaches. The paw hangs in line with the forearm, with no bend at the wrist,
+ * and turns 130° around its long axis from the forearm (`palm`, `fingers`), as a relaxed hand hangs
+ * from a loose arm (`docs/reference/wind-technique.md` 2.4). The left paw turn of the fox chain
+ * fits the violin, so at that turn the skin of the paw is nearest to its bind. With the palm toward
+ * the body and the front and the fingers down, the paw bent down at the wrist and twisted 77° on
+ * its forearm (`pnpm arm-check flutist`, p95 at rest), and the forearm 41°. In line with the
+ * forearm, the paw twists 124° with no turn, 47° with 80°, 27° with 120° and 140°, and the
+ * forearm 14° to 15°.
  * The palm lies 0.336 H above, 0.158 H out from, and 0.07 H behind the lap place, the top of the
  * thigh at 0.45 of the way to the knee. The palm then touches the skin (0.1 cm) at 0.905 of the
  * reach of the arm. At a rest place out of reach, the arm stays straight in the lift until the paw
@@ -637,9 +644,8 @@ export const WIND_HOLDS = {
  * flute in 69 % of the play samples. With -0.4, the palm turned 57° from the flute, and 5 % of the
  * samples lost the grasp. An elbow further out bends the paw less, but twists the forearm more.
  * The fingers curl 90° and 85° around the flute (`gripCurl`):
- * with 115° and 106°, the short paws of the mesh fold 13 to 23 faces in each play sample. The free
- * left paw faces the body and the front, (1, 0, -0.5): with the palm toward the body, (1, 0,
- * -0.15), the left forearm twists 52° at rest. The right rest elbow points back, (0.8, -1, 0.3), so
+ * with 115° and 106°, the short paws of the mesh fold 13 to 23 faces in each play sample. The right
+ * rest elbow points back, (0.8, -1, 0.3), so
  * that the right upper arm takes about half of the turn at rest: with (0.8, -1, 0.6), the right
  * forearm twisted 55° on the first Tripo fox. The rest grip of the right
  * paw keeps the distance of the play grip from the axis of the tube (`restGripShiftR`). The right
@@ -665,8 +671,8 @@ const FOX_FLUTE = {
   restPoleR: [0.8, -1, 0.3],
   restFreeL: {
     lap: { along: 0.45, offset: [-0.158, 0.336, 0.07] },
-    palm: [1, 0, -0.5],
-    fingers: [0, -1, -0.2],
+    palm: [-0.29, 0.37, -0.88],
+    fingers: [-0.01, -0.92, -0.38],
     arc: [0.1, 0.1, 0.4],
     hang: {
       forward: FOX_HANG[0] * MathUtils.DEG2RAD,
