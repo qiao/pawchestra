@@ -8,6 +8,7 @@ import { SHOT_BEAM_OPACITY } from './beam-opacity.ts';
 import { keyDistance, writeKeyPosition } from './camera-keys.ts';
 import { CAMERA_DRIFT, turnTarget, writeDrift } from './drift.ts';
 import { writeLookPoint } from './grammar.ts';
+import { writeShadowFit } from './shadow-fit.ts';
 import { SHOT_LIGHT, SHOT_SPOT } from './shot-light.ts';
 import { isCloseShot } from './types.ts';
 import type { CameraPose, CameraPoseBuffer, CameraView, Shot, ShotKey, ShotPlan } from './types.ts';
@@ -28,6 +29,7 @@ export function createCameraPose(): CameraPoseBuffer {
     light: 0,
     spot: 0,
     focusPull: 1,
+    shadowFit: [0, 0, 0, 0],
   };
 }
 
@@ -176,6 +178,8 @@ function copyPoint(from: Vec3, out: [number, number, number]): void {
  *    the kind of the shot, blended as the beam. With `still`, it does not drift.
  * 9. After a hard cut into a close shot, the focus pulls onto the subject ({@link FOCUS_PULL}).
  *    With `still`, the focus is on the subject.
+ * 10. A shot from the front of players fits the shadow map of the key light to a sphere around
+ *    its target (`writeShadowFit()`). A blend holds the spheres of both shots.
  *
  * @param plan The plan from `prepareShots()`.
  * @param songTime The song time, in seconds.
@@ -205,6 +209,7 @@ export function cameraAt(
     out.light = 0;
     out.spot = 0;
     out.focusPull = 1;
+    out.shadowFit[3] = 0;
     return out;
   }
   // The move of the first shot starts at the downbeat: its count-in holds the first camera.
@@ -224,6 +229,7 @@ export function cameraAt(
   const sinceCut = time - current.startSec;
   const share = CAMERA_DRIFT.shares[current.kind];
   if (still || !previous || current.blendSec <= 0 || sinceCut >= current.blendSec) {
+    writeShadowFit(current, null, out.shadowFit);
     if (!still && previous && current.blendSec <= 0 && out.close && sinceCut < FOCUS_PULL.seconds) {
       const pulled = smoothstep(Math.max(0, sinceCut) / FOCUS_PULL.seconds);
       out.focusPull = FOCUS_PULL.start + (1 - FOCUS_PULL.start) * pulled;
@@ -234,6 +240,7 @@ export function cameraAt(
     }
     return out;
   }
+  writeShadowFit(current, previous, out.shadowFit);
   const w = smoothstep(sinceCut / current.blendSec);
   const fov = writeShotCamera(plan, previous, 1, aspect, blendStart, blendLook);
   for (let k = 0; k < 3; k++) {

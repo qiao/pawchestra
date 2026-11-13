@@ -118,6 +118,12 @@ export interface CameraPose {
    * no value has the focus on the subject.
    */
   readonly focusPull?: number;
+  /**
+   * The sphere that the shadow map of the key light holds (design 4.5): the center and the radius,
+   * in meters. It is constant in a shot (`writeShadowFit()`). A radius of 0, or a pose with no
+   * value, holds the whole stage.
+   */
+  readonly shadowFit?: readonly [number, number, number, number];
 }
 
 /** A `CameraPose` with writable values. `cameraAt()` writes each frame into it. */
@@ -130,6 +136,7 @@ export interface CameraPoseBuffer {
   light: number;
   spot: number;
   focusPull: number;
+  shadowFit: [number, number, number, number];
 }
 
 /** The view of one frame. */
