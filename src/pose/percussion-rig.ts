@@ -288,14 +288,6 @@ interface PercussionHold {
    * the keyboard (`docs/reference/percussion-technique.md` 9).
    */
   readonly gripRise: number | null;
-  /**
-   * The least distance of the home of a mallet out from its target along x, in head heights `H`,
-   * or `null` for the home of {@link home} alone. A target out past the home of its hand moves the
-   * home further out, so that the mallet still points a little in to the target, as the shaft
-   * leaves the closed paw across the forearm. With no move, a mallet to an end bar points straight
-   * forward along the forearm, and the paw bends far on the forearm.
-   */
-  readonly homeOut: number | null;
   /** The turn of each mallet around its own axis in the paw. */
   readonly top: MalletTop;
   /**
@@ -470,7 +462,6 @@ export const PERCUSSION_HOLDS = {
     rim: 0.25,
     home: [0.66, -0.25, -0.2],
     gripRise: null,
-    homeOut: null,
     top: 'shoulder',
     across: { rest: -1.2, lift: 0.65, pitch: 0.3, peak: 4 },
     pitchR: 1,
@@ -560,7 +551,6 @@ export const PERCUSSION_HOLDS = {
     rim: 0,
     home: [0.5, -0.389, -0.146],
     gripRise: null,
-    homeOut: null,
     top: 'up',
     across: null,
     pitchR: 1,
@@ -626,7 +616,6 @@ export const PERCUSSION_HOLDS = {
     rim: 0,
     home: [0.4, -0.3, -0.5],
     gripRise: null,
-    homeOut: null,
     top: 'up',
     across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 5 },
     pitchR: 1,
@@ -662,7 +651,6 @@ export const PERCUSSION_HOLDS = {
     rim: 0,
     home: MALLET_HOME,
     gripRise: null,
-    homeOut: null,
     top: 'up',
     across: null,
     pitchR: 1,
@@ -698,7 +686,6 @@ export const PERCUSSION_HOLDS = {
     rim: 0,
     home: MALLET_HOME,
     gripRise: null,
-    homeOut: null,
     top: 'up',
     across: { rest: -0.6, lift: 0.3, pitch: null, peak: 1.35 },
     pitchR: 1,
@@ -768,10 +755,9 @@ export const PERCUSSION_HOLDS = {
     // to 10 cm below the shoulders, and the targets miss by at most 3.5 mm. With 0.2 H, a target
     // missed by 6.8 mm. The paws bend more on the forearms, and the arm gate counts more folded
     // faces at the wrists (L 35, R 24 in place of 22 and 15), which the 2x paw crops do not show.
-    // A home moved out to the end bars (homeOut 0.45 H) kept the folds at 19 and 12, but it spread
-    // the arms out to the sides as wings, 10 cm past the ends of the bars.
+    // A home moved out to the end bars by 0.45 H kept the folds at 19 and 12, but it spread the
+    // arms out to the sides as wings, 10 cm past the ends of the bars.
     gripRise: 0.25,
-    homeOut: null,
     top: 'up',
     across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 6 },
     // Both heads keep one height between strikes, because the paws do not pass each other.
@@ -858,7 +844,6 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   rim: 0,
   home: [0.45, -0.3, -0.5],
   gripRise: null,
-  homeOut: null,
   top: 'up',
   across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 5 },
   pitchR: 1,
@@ -1112,11 +1097,6 @@ export type PercussionSide =
        * limit (`PercussionHold.gripRise`).
        */
       readonly gripRise: number | null;
-      /**
-       * The least distance of the home out from the target along x, in meters, or `null`
-       * (`PercussionHold.homeOut`).
-       */
-      readonly homeOut: number | null;
       /** The turn of the mallet around its own axis in the paw (`PercussionHold.top`). */
       readonly top: MalletTop;
       /** The mallet across the forearm between strikes (`PercussionHold.across`). */
@@ -1620,7 +1600,6 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
       head: malletHead(bone),
       home: toVec3(fromShoulder(arm, homeOf(arm)).add(new Vector3(...place))),
       gripRise: hold.gripRise === null ? null : hold.gripRise * h,
-      homeOut: hold.homeOut === null ? null : hold.homeOut * h,
       top: hold.top,
       across:
         hold.across && hold.across.pitch !== null && arm.side === 'R'

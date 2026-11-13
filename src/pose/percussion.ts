@@ -1050,8 +1050,8 @@ function limitRise(direction: Vector3, side: Extract<PercussionSide, { kind: 'ma
 /**
  * Writes the wrist and the world rotation of a hand with a mallet across the forearm between
  * strikes (`PercussionHold.across`, design 5.3). At a strike, the mallet points from the home of
- * the hand to the target, and the grip stays at that place. A hold can move the home out
- * (`PercussionHold.homeOut`) and turn the mallet up ({@link limitRise}). The paw at rest holds the mallet
+ * the hand to the target, and the grip stays at that place. A hold can turn the mallet up
+ * ({@link limitRise}). The paw at rest holds the mallet
  * across the forearm, at its angle in the frame of the elbow, with the top of the grip along the
  * forearm toward the elbow, and the wrist lifts the head by `MalletAcross.lift`. Between the
  * two, the paw turns around the grip by a share of the smallest turn from the rest direction to
@@ -1087,13 +1087,7 @@ function acrossHand(
   if (!across) {
     return roll;
   }
-  offset.fromArray(side.home).add(shift);
-  // A target out past the home moves the home out (`PercussionHold.homeOut`).
-  if (side.homeOut !== null) {
-    const out = arm.side === 'L' ? -1 : 1;
-    offset.x = out * Math.max(out * offset.x, out * point.x + side.homeOut);
-  }
-  strikeAlong.copy(point).sub(offset).normalize();
+  strikeAlong.copy(point).sub(offset.fromArray(side.home).add(shift)).normalize();
   limitRise(strikeAlong, side);
   grip.copy(point).addScaledVector(strikeAlong, -side.length);
   shoulderBind.fromArray(arm.bind.shoulder);
