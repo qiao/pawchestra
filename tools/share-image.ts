@@ -1,8 +1,9 @@
 // Writes the share image of the site (design 7.4): a JPEG of 1200 × 630 of the default demo
 // during play, from a camera above and behind the conductor, with the light effects and the title
 // of `tools/share-card.ts`. The meta tags `og:image` of `index.html` name it. The target image is
-// `docs/reference/share-card.webp`. Run it with `pnpm share-image [--out <file>]`, which writes
-// the presets and the demos of `public/` first.
+// `docs/reference/share-card.webp`. Run it with `pnpm share-image [--out <file>] [--camera <JSON>]`,
+// which writes the presets and the demos of `public/` first. `--camera` replaces the position, the
+// target, and the field of view of `SHARE_CAMERA` for a trial, for example a close shot.
 //
 // The tool builds the site with the camera plugin of `pnpm close-views` (`aimPlugin()`) and with
 // `hideBeamPlugin()` into a temporary folder, and serves it (`startVariantSite()`). The page gets
@@ -141,8 +142,8 @@ const HIDE_UI = 'body > :not(#stage), body > :not(#stage) * { visibility: hidden
  * @throws Error when the frame hid no part of the stage beam, for example after a rename of a part
  *   in `src/scene/beam.ts`.
  */
-async function renderStage(site: Site, size: CardSize): Promise<Buffer> {
-  const aim = encodeURIComponent(JSON.stringify(SHARE_CAMERA));
+async function renderStage(site: Site, size: CardSize, camera: CameraPose): Promise<Buffer> {
+  const aim = encodeURIComponent(JSON.stringify(camera));
   const page = await openShot(
     site.browser,
     `${site.base}?aim=${aim}`,
@@ -231,16 +232,40 @@ async function encodeShare(browser: Browser, card: Buffer): Promise<Buffer> {
   }
 }
 
+/** The usage text of the tool. */
+const USAGE = 'Usage: pnpm share-image [--out <file>] [--camera <JSON>]';
+
 /**
- * Writes the share image: `pnpm share-image [--out <file>]`.
+ * Reads the camera of a trial from the option `--camera`: a JSON object with the fields
+ * `position`, `target`, and `fov` of a `CameraPose`.
+ *
+ * @param text The JSON text.
+ * @returns The camera of {@link SHARE_CAMERA} with the given fields.
+ * @throws Error if the text is no such object.
+ */
+function trialCamera(text: string): CameraPose {
+  const value: unknown = JSON.parse(text);
+  // oxlint-disable-next-line anti-slop/no-runtime-typeof -- the JSON text of `--camera` is an I/O boundary.
+  if (typeof value !== 'object' || value === null) {
+    throw new Error(`--camera needs a JSON object, and it is ${text}.`);
+  }
+  const { position, target, fov } = { ...SHARE_CAMERA, ...value };
+  return { ...SHARE_CAMERA, position, target, fov };
+}
+
+/**
+ * Writes the share image: `pnpm share-image [--out <file>] [--camera <JSON>]`.
  */
 async function main(): Promise<void> {
-  const out = optionValue(process.argv.slice(2), '--out');
-  if (out === undefined) {
-    console.error('Usage: pnpm share-image [--out <file>]');
+  const args = process.argv.slice(2);
+  const out = optionValue(args, '--out');
+  const cameraText = optionValue(args, '--camera');
+  if (out === undefined || cameraText === undefined) {
+    console.error(USAGE);
     process.exitCode = 1;
     return;
   }
+  const camera = cameraText === null ? SHARE_CAMERA : trialCamera(cameraText);
 
   const file = resolve(out ?? join(ROOT, 'public', SHARE_IMAGE.path));
   const size: CardSize = {
@@ -250,7 +275,7 @@ async function main(): Promise<void> {
   };
   const site = await startVariantSite([aimPlugin(ROOT), hideBeamPlugin(ROOT)]);
   try {
-    const stage = await renderStage(site, size);
+    const stage = await renderStage(site, size, camera);
     const card = await composeCard(site.browser, ROOT, stage, size);
     const image = await encodeShare(site.browser, card);
     await writeFile(file, image);
