@@ -220,8 +220,10 @@ source maps, as `tools/mouse-maps.py`:
 
 - The color map is the source scaled to 2048 pixels (Lanczos). The fur takes 0.35 of its Oklab
   chroma (`FUR_CHROMA`): the source paints it cream (C 0.055), and the sheet shows it white (C 0.014
-  to 0.021). Then the fur takes the strands of `tools/fox-maps.py` (`STRANDS`). The pink skin (Oklab
-  C 0.084 to 0.097, h 37 to 48, `SKIN`) and the eyeballs keep their color and take no strands.
+  to 0.021). Then the fur takes the strands of `tools/fox-maps.py` (`STRANDS`: the RMS tilt
+  0.03, the luma factor 0.08, and the half length 11 texels). The strands of double strength and
+  length read as carved grooves on the white fur. The pink skin (Oklab C 0.084 to 0.097, h 37 to
+  48, `SKIN`) and the eyeballs keep their color and take no strands.
   WebP quality 60, method 6 (Pillow 13.0.0).
 - The normal map: each x, y tilt of the normal map of the FBX limited to 0.2 (0.38 % of the
   texels), a box scale to 1024 pixels, the slopes of the strands added, the tilts times 4
@@ -230,8 +232,8 @@ source maps, as `tools/mouse-maps.py`:
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit-color.webp` | 241,912 bytes | `c5e0be18f2250c18a59953bcc04a15be7b16039abc6767d25ed9b7281267e7b4` |
-| `tripo-hand/rabbit-normal.webp` | 178,922 bytes | `0318484b0944f643c120730128d9fea88d708968b1d0676efdd3195ee0a69d39` |
+| `tripo-hand/rabbit-color.webp` | 193,496 bytes | `7ad607b6f3018b417b546cf5275b71e665631ded60efc545052aab04686ca9eb` |
+| `tripo-hand/rabbit-normal.webp` | 109,604 bytes | `97681ba8f061e3491efc37ddbb5d6ba3c910eb4bd04b6b7663c1c9eac5a35d4d` |
 
 **Fur color in the hall.** The lit fur of the seated rabbit in the hall view with no fill light
 (`close-views play --demo mozart-k525 --at rabbit --azimuth 40 --zoom 1.6 --time 10`, the

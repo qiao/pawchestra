@@ -1320,8 +1320,11 @@ faces keep the shared shading.
 - **Added strands.** A source that paints its fur smooth, such as the Tripo fox, gets strands
   from its maps tool (`STRANDS` of `tools/fox-maps.py`): seeded noise, smeared along the faint
   strokes of the source, gives a small luma step in the color map and its slope in the normal
-  map. The strand contrast and the tilts then match the cat and the wolf. Reason: with no
-  strands in either map, the fox fur read as smooth plastic beside the other bodies.
+  map. Reason: with no strands in either map, the fox fur read as smooth plastic beside the
+  other bodies. The strands of the fox and the rabbit are short, and their tilt and luma step
+  are about half of those of the Tripo cat and wolf. Reason: one height gives both maps, so
+  each dark groove of the color map is also a groove of the normals. With the strength and the
+  length of the cat and the wolf, the fur read as carved wood or clay.
 
 The fur of the Tripo rabbit is near the shoulder of the tone curve, so the sheen adds little
 light at the outline. Its source paints the fur smooth, so its maps tool adds strands, as for the
