@@ -624,7 +624,11 @@ The rest of each family:
   with the fingers curled over the front of the tube (`MOUSE_OBOE`). Both shoulder bones turn
   forward, the right more than the left (`reach`, `reachL`), as the shoulder blades of a real
   player slide forward. Reason: the arms of the Tripo mouse keep the length of its source, and
-  with square shoulders the paws missed their grips by 2.7 cm and 5.2 cm.
+  with square shoulders the paws missed their grips by 2.7 cm and 5.2 cm. The scale of an
+  instrument is a factor of the instrument of the app, so the oboe keeps its size in meters when
+  the body scale changes. On the body at the eye height of the older mouse (4.4), the right grip
+  thus sits higher on the tube, and the left grip moves up to keep a clear gap between the paws
+  (`gripShiftL`, `gripShiftR`).
 - **Flute and clarinet holds from the body.** The shared flute and clarinet holds (`WIND_HOLDS`)
   take the arm values of the accepted tan fox and wolf, as directions and in `H`, with the lip
   plate or the mouthpiece at the mouth landmark of the body. Each paw keeps the side sign of its
