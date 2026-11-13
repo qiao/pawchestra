@@ -1041,7 +1041,41 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   the swing out to the side sees the body only along x, so the rest arm adds a small extra swing
   (`restArm.extraOut`). Reason: with the swing of the search alone, both elbows go into the round
   belly.
-- **Bow.** At the song end, the bear bows to the orchestra (`END_BOW`).
+- **Bow** (`pose/end-bow.ts`, `END_BOW`). At the song end, the bear ends the concert as a real
+  conductor does ([conductor technique](../reference/conductor-technique.md) 8). It holds the
+  release in the silence, lowers the arms to the sides, and stands still. Then it turns on the
+  podium to the audience with small steps, bows from the waist with the eyes down, faces the
+  audience a moment, and turns back to the orchestra. The arms come down before the turn, so the
+  bow does not need the hold of `transport.holdSec` (5.2). `endMotionAt()` gives the motion from
+  the wall seconds after the stop at the song end, so the pose keeps no state, and a play to the
+  end after a seek gives the same pose. After `END_BOW_SEC`, the bear stands in the rest pose
+  that faces the orchestra, as after each other pause.
+
+  ```text
+  wall s  0     silence  lowerSec  stillSec  turnSec  down,hold,up  faceSec  turnSec  END_BOW_SEC
+          |release|arms down|still   |turn left|  bow   |  face  |turn back|  rest pose
+  ```
+
+  - The turn is the turn of the root bone from the facing of the conductor to the audience at +z
+    of the layout (`ConductorLayer.audienceTurn`). The bear turns to its left, past the first
+    violins. The feet step in place in the turn (`steps`, `stepLift` in `H`, `plantFeet()`), so a
+    body of another species takes the same motion.
+  - The bow faces away from the conductor stand. Reason: the bow to the orchestra bent the head
+    and the baton toward the desk, and the stand checks of two demos failed.
+  - The bow turns back to the orchestra. Reason: a conductor turns back to the players after the
+    bow, and the rest pose after the bow is then the same as after each other pause.
+  - The end card shows from 2 s after the end (2.8), so the turn and the bow show with the card.
+
+  ```typescript
+  /** The motion of the conductor at the song end at one time (`pose/end-bow.ts`). */
+  interface EndMotion {
+    arms: number; // the share of the playing pose that the arms keep, 1 to 0
+    turn: number; // the turn of the whole body around +y, positive to the left
+    bend: number; // the bend of the spine of the bow
+    stepL: number; // the lift of each foot in a step, 0 to 1
+    stepR: number;
+  }
+  ```
 - **Chamber group.** A chamber group has no conductor, so its leader gives the count-in with a
   breath and a nod, as in a string quartet (`leaderOf()`, `LEADER_NOD`).
 - **Cues.** The conductor cues each section entry, as a real conductor does (`findCues()`,
