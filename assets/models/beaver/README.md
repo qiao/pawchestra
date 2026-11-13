@@ -225,9 +225,11 @@ no cut, and no view shows it. The long joint passes beside the head, clear of th
 boot stays below and behind the music desk.
 
 **Maps** (`tools/beaver-maps.py`). The tool scales the color map of the source to 2048 pixels
-(Lanczos) and writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. It
-writes `beaver-normal.webp` from the normal map of the FBX: each x, y tilt limited to 0.2 (5.85 %
-of the texels), a box scale to 1024 pixels, the tilts times 4 in red and green, 255 in blue, and
+(Lanczos), keeps 0.7 of its detail finer than a blur of 2 texels (`DETAIL_SHARE`), and writes
+WebP quality 60, method 6 (Pillow 13.0.0). Reason: the full detail read as carved grooves in the
+hall light. The colors stay. It writes `beaver-normal.webp` from the normal map of the FBX: each
+x, y tilt limited to 0.2 (5.85 % of the texels), a box scale to 1024 pixels, the tilts times 0.5
+(`TILT_SHARE`) and 4 in red and green, 255 in blue, and
 `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
 
 **Differences from the source.** The app light is warm and comes from above, so the fur reads
@@ -240,5 +242,5 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 |---|---|---|
 | `tripo-hand/beaver.rig.glb` | 1,201,140 bytes | `cdd834c1fd362ac994d4659d6e271ae2d356536c22b08c86dc132f9ba03509fb` |
 | `tripo-hand/beaver.rig.json` | 17,197 bytes | `13248f972b56605b4c54f06172513325e3823b205d1e4352e8bf4ade23d4c6dd` |
-| `tripo-hand/beaver-color.webp` | 244,446 bytes, 2048 × 2048 | `53560d58439f5c6358c642df7b4de962d2d94faf99a35fdb78c8c69960103bed` |
-| `tripo-hand/beaver-normal.webp` | 164,994 bytes, 1024 × 1024 | `c74c2daf9e085135100bd78fd964449ec5d6a4b3142cc3619a1437fe7494d218` |
+| `tripo-hand/beaver-color.webp` | 199,904 bytes, 2048 × 2048 | `fc5a6f549bc676eefc6837d5398ad00f439d75cf9191a3921707f8034a35bfbc` |
+| `tripo-hand/beaver-normal.webp` | 84,258 bytes, 1024 × 1024 | `aa1edb196f4b423afb6bb80671a424e943ca4f3354f7ba3f01ad755ba0471982` |
