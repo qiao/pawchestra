@@ -1,3 +1,4 @@
+import { END_BOW_SEC } from '../pose/end-bow.ts';
 import { DEMO_IDS } from './demos.ts';
 import type { DemoId } from './demos.ts';
 
@@ -6,8 +7,12 @@ import type { DemoId } from './demos.ts';
  * bow of the conductor (5.4), and the countdown to the next demo starts with the card.
  */
 const END_CARD = {
-  /** The time after the end at which the fade in starts. The bow of the conductor shows first. */
-  inSec: 2,
+  /**
+   * The time after the end at which the fade in starts: when the conductor faces the orchestra
+   * again after the bow (5.4). The card stands in the middle of the view, over the podium, so an
+   * earlier card hides the turn and the bow.
+   */
+  inSec: END_BOW_SEC,
   /** The length of the fade in. */
   fadeInSec: 0.8,
   /** The length of the countdown to the next demo. */
