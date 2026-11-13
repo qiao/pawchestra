@@ -228,9 +228,10 @@ scripts run. `Title` keeps the header and its text nodes, because a new or a mov
 its text again as a later LCP candidate.
 
 The font file of the title (2.8) is not in the first download. The first paint
-shows the title in the local fallback face, and `Title` names Fraunces only after the first frame
-of the app. The request thus ends after the paint of the LCP element, and adds nothing to the
-simulated LCP. The fallback face has the width and the line metrics of Fraunces, so the swap moves
+shows the title in the local fallback face. The app names Fraunces only where the audio code
+loads (`Title.loadFont()` in `#startAudio()`), after the first frame of the first built piece.
+The request thus ends after the paint of the LCP element, adds nothing to the simulated LCP, and
+does not compete with the build of the first piece. The fallback face has the width and the line metrics of Fraunces, so the swap moves
 no text and adds no layout shift. Chrome counts a text node as an LCP candidate only at its first
 paint, so the swap makes no later LCP. The file is in `public/`, so the build copies it with its
 name, and `pnpm size` does not count it.

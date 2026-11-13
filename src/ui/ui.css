@@ -2,8 +2,8 @@
 
 /* The brand font of the piece title, the title card, and the end card (design 2.8): a static
    subset of Fraunces at the weight 600 (tools/title-font.py). Only the class `title-font` of the
-   root names it, and the title sets that class after the first frame (design 7.2). Thus the font
-   is not in the first download, and its request does not delay the first paint. */
+   root names it, and the app sets that class where the audio code loads (design 7.2). Thus the
+   font is not in the first download, and its request does not delay the first paint. */
 @font-face {
   font-family: Fraunces;
   src: url('/fonts/fraunces-title.woff2') format('woff2');

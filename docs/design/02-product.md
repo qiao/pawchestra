@@ -290,7 +290,7 @@ and the layout, and `reference/mockup.png` is the target of the look. The CSS of
 | `--github-mark` | `#c8c8c8` (the neutral gray of the GitHub mark, as the logo rules of GitHub ask) |
 | `--track` | `rgba(255, 240, 220, 0.2)` (the track of a slider, where it is not filled) |
 | Font | `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif` |
-| `--font-title` | `Fraunces, "Fraunces Fallback", var(--font-serif)` at the weight 600 (the piece title, the title card, and the end card). Before the first frame, the stack has no `Fraunces` |
+| `--font-title` | `Fraunces, "Fraunces Fallback", var(--font-serif)` at the weight 600 (the piece title, the title card, and the end card). Before the audio code loads, the stack has no `Fraunces` |
 | `--font-serif` | `"Palatino Linotype", Palatino, "Book Antiqua", "Iowan Old Style", Georgia, "Noto Serif", serif` (the credits) |
 | Font sizes | 12 px for times (tabular numbers), 13 px for secondary text, 14 px body. The piece title is `clamp(24px, 2.5vw, 36px)` (32 px at 1280 px), and the composer `clamp(13px, 1.15vw, 16px)` |
 | Radius | 10 px for panels, 12 px for the floating panel of the drawer and for the bar, 8 px for buttons |
@@ -303,8 +303,9 @@ and the layout, and `reference/mockup.png` is the target of the look. The CSS of
 The piece title, the title card, and the end card use the brand font Fraunces of the wordmark, so
 each platform shows the same title. The file `fonts/fraunces-title.woff2` is a static subset
 at the weight 600 (`tools/title-font.py`, `assets/fraunces/README.md`). The controls, the drawer,
-and the credits keep the fonts of the system. `Title` adds the class `title-font` to the root
-after the first frame, and only that class names Fraunces, so the font loads late (7.2). Until
+and the credits keep the fonts of the system. `Title.loadFont()` adds the class `title-font` to
+the root when the audio code loads, after the first frame of the first built piece. Only that
+class names Fraunces, so the font loads late (7.2). Until
 the swap (`font-display: swap`), the titles show the face `Fraunces Fallback`: Georgia Bold with
 `size-adjust` and the line metrics of Fraunces. The swap thus keeps the width, the line breaks,
 and the baseline of each title. A system with no Georgia shows `--font-serif` until the swap.
