@@ -333,8 +333,6 @@ passes.
       at the frog from the back (`reports/2026-11-05-cat-bow-arm/crops/pair-crossing-az120.png`,
       `pair-frog-az180.png`). At the tip, the small faces 817-850-848 and 817-818-850 fold, and the
       fourth `raise` shape is 0 there.
-- [ ] Rabbit, red fox, cat, and tan fox: the arm-down shape restores the twist loss of the bind left
-      forearm twice. Mask the forearm part of the shape on a supinated side.
 - [ ] Bind paws: the bind paws of most configs start pronated, so the cellist, the bassist, and the
       oboist twist the left paw near 170°. Try `studio.bindSupination`.
 - [ ] Red fox and tan fox: at rest, the crook of the right elbow keeps a soft fold, because the
