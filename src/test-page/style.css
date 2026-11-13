@@ -1,4 +1,5 @@
-/* The test page (design 7.1): the stage canvas and one panel, with the tokens of design 2.8. */
+/* The test page (design 7.1): the list of the roles at the left side, the stage canvas, and one
+   panel of controls, with the tokens of design 2.8. */
 
 :root {
   --panel-glass: rgba(21, 18, 16, 0.96);
@@ -12,6 +13,7 @@
   --radius-float: 12px;
   --radius-button: 8px;
   --target-compact: 32px;
+  --roles-width: 240px;
   color-scheme: dark;
   font-family:
     system-ui,
@@ -33,16 +35,79 @@ body {
 
 #stage {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: var(--roles-width);
   display: block;
-  width: 100%;
+  width: calc(100% - var(--roles-width));
   height: 100%;
+}
+
+/* The list of the roles stays at the left side, and it scrolls on its own. */
+#roles {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  width: var(--roles-width);
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 8px;
+  border-right: 1px solid var(--line);
+  background: var(--panel-glass);
+  font-size: 13px;
+}
+
+#roles h1 {
+  margin: 0 4px 8px;
+  color: var(--text-dim);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.species summary {
+  padding: 6px 4px;
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.species ul {
+  display: grid;
+  gap: 2px;
+  margin: 0 0 8px;
+  padding: 0 0 0 12px;
+  list-style: none;
+}
+
+.species button {
+  width: 100%;
+  min-height: 28px;
+  border-color: transparent;
+  background: transparent;
+  text-align: left;
+}
+
+.species button[aria-current='true'] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+#roles-toggle {
+  display: none;
+}
+
+#role-name {
+  margin: 0;
+  font-weight: 600;
 }
 
 #panel {
   position: fixed;
   top: 16px;
-  left: 16px;
+  left: calc(var(--roles-width) + 16px);
   display: grid;
   gap: 8px;
   width: 260px;
@@ -66,8 +131,35 @@ body {
 }
 
 /* A narrow screen puts the panel at the bottom, over the floor, so that it does not cover the
-   animal. The panel starts folded there (`foldPanel()` of `test-page/main.ts`). */
+   animal. The panel starts folded there (`foldPanel()` of `test-page/main.ts`). The list of the
+   roles becomes a drawer, which the button at the top left opens (`roleDrawer()`). */
 @media (max-width: 600px) {
+  #stage {
+    left: 0;
+    width: 100%;
+  }
+
+  #roles {
+    width: min(85%, 300px);
+    padding-top: 64px;
+    transition:
+      transform 160ms,
+      visibility 160ms;
+  }
+
+  #roles:not([data-open]) {
+    visibility: hidden;
+    transform: translateX(-100%);
+  }
+
+  #roles-toggle {
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    z-index: 3;
+    display: block;
+  }
+
   #panel {
     top: auto;
     right: 16px;
@@ -88,7 +180,6 @@ body {
   color: var(--text-dim);
 }
 
-select,
 button {
   min-height: var(--target-compact);
   border: 1px solid var(--line);
@@ -99,11 +190,6 @@ button {
   transition:
     background-color 120ms,
     color 120ms;
-}
-
-select {
-  width: 100%;
-  padding: 0 8px;
 }
 
 button {
@@ -211,14 +297,13 @@ pre {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  select,
-  button {
+  button,
+  #roles {
     transition: none;
   }
 }
 
 @media (pointer: coarse) {
-  select,
   button,
   #speed label,
   #mode label {

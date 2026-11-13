@@ -8,14 +8,20 @@
     <title>Pawchestra test page</title>
   </head>
   <body>
+    <nav id="roles" aria-labelledby="roles-title">
+      <h1 id="roles-title">Animals and roles</h1>
+      <div id="role-list"></div>
+    </nav>
+    <button id="roles-toggle" type="button" aria-expanded="false" aria-controls="roles">
+      Show the roles
+    </button>
     <canvas id="stage"></canvas>
     <form id="panel" aria-label="Test controls">
       <button id="panel-toggle" type="button" aria-expanded="true" aria-controls="panel-body">
         Hide the controls
       </button>
       <div id="panel-body">
-      <label for="role">Animal and role</label>
-      <select id="role"></select>
+      <p id="role-name"></p>
       <div class="buttons">
         <button id="play" type="button">Pause</button>
         <button id="sound" type="button">Start the sound</button>

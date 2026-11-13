@@ -9,8 +9,8 @@ import { conductorPhrase } from './conductor-phrase.ts';
 import type { PlayedInstrument } from './phrases.ts';
 
 /**
- * The group of a role in the list of the test page: the conductor, a player of a section, the
- * standing soloist of a section, or a recast role.
+ * The kind of a role of the test page: the conductor, a player of a section, the standing soloist
+ * of a section, or a recast role.
  */
 export type RoleGroup = 'conductor' | 'section' | 'soloist' | 'recast';
 
@@ -22,8 +22,10 @@ interface RoleFacts {
    * the instrument, so a recast role needs no suffix.
    */
   readonly id: string;
-  /** The text of the role in the list. */
+  /** The name of the role: "Rabbit: violin (seated)". */
   readonly label: string;
+  /** The text of the role under its species in the list: "violin (seated)". */
+  readonly part: string;
   readonly species: SpeciesId;
   /**
    * The species whose studio bodies load before the build: the species of the role, and the
@@ -49,13 +51,14 @@ export interface ConductorRole extends RoleFacts {
 /** One role of the test page (design 7.1). */
 export type TestRole = PlayerRole | ConductorRole;
 
-/** The title of each group in the list. */
-export const GROUP_TITLES = {
-  conductor: 'Conductor',
-  section: 'Section players',
-  soloist: 'Standing soloists',
-  recast: 'Recast roles',
-} as const satisfies Readonly<Record<RoleGroup, string>>;
+/** The roles of one species in the list (design 7.1). */
+export interface SpeciesRoles {
+  readonly species: SpeciesId;
+  /** The name of the species: "Red fox". */
+  readonly title: string;
+  /** The roles of the species, in the order of {@link testRoles}. */
+  readonly roles: readonly TestRole[];
+}
 
 /**
  * The instruments of the recast roles: the instruments of the roles of the cast matrix
@@ -116,6 +119,7 @@ function conductorRole(): ConductorRole {
   return {
     id: `${species}-conductor`,
     label: `${speciesName(species)}: conductor`,
+    part: 'conductor',
     group: 'conductor',
     species,
     bodies: [...new Set([species, ...seats])],
@@ -123,16 +127,21 @@ function conductorRole(): ConductorRole {
 }
 
 /**
- * Gives the label of a role in the list.
+ * Gives the name of a role and its text under its species in the list.
  *
  * @param species The species.
  * @param instrument The instrument.
  * @param form The form of the role in parentheses, or an empty text for none.
- * @returns For example "Rabbit: violin (seated)".
+ * @returns For example "Rabbit: violin (seated)" and "violin (seated)".
  */
-function labelOf(species: SpeciesId, instrument: PlayedInstrument, form: string): string {
-  const text = `${speciesName(species)}: ${instrument.replaceAll('-', ' ')}`;
-  return form === '' ? text : `${text} (${form})`;
+function labelOf(
+  species: SpeciesId,
+  instrument: PlayedInstrument,
+  form: string,
+): Pick<RoleFacts, 'label' | 'part'> {
+  const text = instrument.replaceAll('-', ' ');
+  const part = form === '' ? text : `${text} (${form})`;
+  return { label: `${speciesName(species)}: ${part}`, part };
 }
 
 /**
@@ -158,7 +167,7 @@ export function testRoles(): TestRole[] {
     const standing = supportOf(instrument, true);
     roles.push({
       id: `${species}-${instrument}`,
-      label: labelOf(species, instrument, seated === standing ? '' : 'seated'),
+      ...labelOf(species, instrument, seated === standing ? '' : 'seated'),
       group: 'section',
       species,
       bodies: [species, seatSpecies],
@@ -168,7 +177,7 @@ export function testRoles(): TestRole[] {
     if (standing !== seated) {
       roles.push({
         id: `${species}-${instrument}-standing`,
-        label: labelOf(species, instrument, 'standing soloist'),
+        ...labelOf(species, instrument, 'standing soloist'),
         group: 'soloist',
         species,
         bodies: [species, seatSpecies],
@@ -184,7 +193,7 @@ export function testRoles(): TestRole[] {
     for (const species of SPECIES_IDS.filter((id) => !owners.has(id))) {
       roles.push({
         id: `${species}-${instrument}`,
-        label: labelOf(species, instrument, 'recast'),
+        ...labelOf(species, instrument, 'recast'),
         group: 'recast',
         species,
         bodies: [species, seatSpecies],
@@ -211,4 +220,28 @@ export function roleOfHash(roles: readonly TestRole[], hash: string): TestRole |
     return null;
   }
   return roles.find((role) => role.id === id) ?? null;
+}
+
+/**
+ * Groups the roles by species for the list of the test page (design 7.1). The groups have the
+ * order of the first role of each species, so the bear of the conductor comes first.
+ *
+ * @param roles The roles, from {@link testRoles}.
+ * @returns One group for each species.
+ */
+export function rolesBySpecies(roles: readonly TestRole[]): SpeciesRoles[] {
+  const groups = new Map<SpeciesId, TestRole[]>();
+  for (const role of roles) {
+    const group = groups.get(role.species);
+    if (group) {
+      group.push(role);
+    } else {
+      groups.set(role.species, [role]);
+    }
+  }
+  return [...groups].map(([species, members]) => ({
+    species,
+    title: speciesName(species),
+    roles: members,
+  }));
 }

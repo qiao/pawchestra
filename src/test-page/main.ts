@@ -43,8 +43,8 @@ import { SilentClock } from './clock.ts';
 import type { SongClock } from './clock.ts';
 import { conductorPhrase } from './conductor-phrase.ts';
 import { partsFile, phraseFile, phraseOf } from './phrases.ts';
-import { GROUP_TITLES, roleOfHash, testRoles } from './roles.ts';
-import type { ConductorRole, PlayerRole, RoleGroup, TestRole } from './roles.ts';
+import { roleOfHash, rolesBySpecies, testRoles } from './roles.ts';
+import type { ConductorRole, PlayerRole, TestRole } from './roles.ts';
 import { soloLayoutSteps } from './solo-layout.ts';
 import { viewCamera } from './views.ts';
 import type { ViewName, ViewSubject } from './views.ts';
@@ -324,7 +324,10 @@ function notesText(role: TestRole): string {
 class TestPage {
   readonly #stage: StageScene;
   readonly #roles = testRoles();
-  readonly #select = element('#role', HTMLSelectElement);
+  readonly #list = element('#role-list', HTMLDivElement);
+  readonly #roleName = element('#role-name', HTMLParagraphElement);
+  /** The button of each role in the list, by the name of the role. */
+  readonly #roleButtons = new Map<string, HTMLButtonElement>();
   readonly #play = element('#play', HTMLButtonElement);
   readonly #sound = element('#sound', HTMLButtonElement);
   readonly #time = element('#time', HTMLInputElement);
@@ -371,9 +374,6 @@ class TestPage {
   constructor(stage: StageScene) {
     this.#stage = stage;
     this.#fillList();
-    this.#select.addEventListener('change', () => {
-      this.#pickId(this.#select.value);
-    });
     window.addEventListener('hashchange', () => {
       this.#pickHash(location.hash);
     });
@@ -408,19 +408,51 @@ class TestPage {
     this.#pickHash(location.hash);
   }
 
-  /** Fills the list with one option for each role, in one group for each kind of role. */
+  /**
+   * Fills the list of the roles: one group for each species, which a click on its title folds
+   * and unfolds, with one button for each role. All groups start unfolded.
+   */
   #fillList(): void {
-    const groups = new Map<RoleGroup, HTMLOptGroupElement>();
-    for (const role of this.#roles) {
-      let group = groups.get(role.group);
-      if (!group) {
-        group = document.createElement('optgroup');
-        group.label = GROUP_TITLES[role.group];
-        groups.set(role.group, group);
-        this.#select.append(group);
+    for (const { title, roles } of rolesBySpecies(this.#roles)) {
+      const group = document.createElement('details');
+      group.className = 'species';
+      group.open = true;
+      const summary = document.createElement('summary');
+      summary.textContent = title;
+      const items = document.createElement('ul');
+      for (const role of roles) {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = role.part;
+        button.title = role.label;
+        button.addEventListener('click', () => {
+          this.#pickId(role.id);
+        });
+        this.#roleButtons.set(role.id, button);
+        const item = document.createElement('li');
+        item.append(button);
+        items.append(item);
       }
-      group.append(new Option(role.label, role.id));
+      group.append(summary, items);
+      this.#list.append(group);
     }
+  }
+
+  /**
+   * Marks the button of the picked role in the list, and scrolls the list to it.
+   *
+   * @param role The picked role.
+   */
+  #markPicked(role: TestRole): void {
+    for (const [id, button] of this.#roleButtons) {
+      if (id === role.id) {
+        button.setAttribute('aria-current', 'true');
+        button.scrollIntoView({ block: 'nearest' });
+      } else {
+        button.removeAttribute('aria-current');
+      }
+    }
+    this.#roleName.textContent = role.label;
   }
 
   /**
@@ -513,7 +545,7 @@ class TestPage {
     }
 
     this.#picked = role;
-    this.#select.value = role.id;
+    this.#markPicked(role);
     this.#showLink(role);
     this.#notes.textContent = notesText(role);
     this.#showStatus(`Building ${role.label}.`);
@@ -799,8 +831,36 @@ function isViewName(text: string): text is ViewName {
   return text === 'front' || text === 'side' || text === 'back' || text === 'close';
 }
 
-/** A screen at or below this width starts with the panel folded (`style.css`). */
+/**
+ * A screen at or below this width starts with the panel folded, and shows the list of the roles
+ * as a drawer (`style.css`).
+ */
 const NARROW_SCREEN = '(max-width: 600px)';
+
+/**
+ * Lets the button at the top left of a narrow screen open and close the list of the roles as a
+ * drawer. A pick of a role closes the drawer, so the animal shows. On a wide screen, the list
+ * always shows at the left side, and the button does not show.
+ */
+function roleDrawer(): void {
+  const toggle = element('#roles-toggle', HTMLButtonElement);
+  const drawer = element('#roles', HTMLElement);
+  const narrow = window.matchMedia(NARROW_SCREEN);
+  const show = (open: boolean): void => {
+    drawer.toggleAttribute('data-open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.textContent = open ? 'Hide the roles' : 'Show the roles';
+  };
+  toggle.addEventListener('click', () => {
+    show(toggle.getAttribute('aria-expanded') !== 'true');
+  });
+  element('#role-list', HTMLDivElement).addEventListener('click', (event) => {
+    if (narrow.matches && event.target instanceof HTMLButtonElement) {
+      show(false);
+    }
+  });
+  show(false);
+}
 
 /**
  * Lets the button at the top of the panel fold and unfold the controls. On a narrow screen, such
@@ -852,4 +912,5 @@ function start(canvas: HTMLCanvasElement): void {
 }
 
 foldPanel();
+roleDrawer();
 start(element('#stage', HTMLCanvasElement));
