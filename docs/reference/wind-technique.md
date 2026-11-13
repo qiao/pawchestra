@@ -483,8 +483,8 @@ The app follows these facts:
   right palm faces the valve tops and the paw points a part of the way across them, as the monkey
   holds them (`faceTube`, `aimSide`, design 5.3). With the roll of the shoulder, the right paw of
   a recast body stood up behind the valves, with its finger tips up.
-- **The oboe (2.3, `MOUSE_OBOE`).** The oboe stands at about 40° from the body (`hanging()` of
-  `src/models/instruments/woodwinds.ts`, `play`). The reed goes between the lips at the front of the
+- **The oboe (2.3, `MOUSE_OBOE`).** The oboe hangs 30° from the vertical (`hanging()` of
+  `src/models/instruments/woodwinds.ts`). The reed goes between the lips at the front of the
   long muzzle, on the middle line (`lipShift`), and the head stays up. The left paw holds the upper joint, and the right paw the
   lower joint (`gripShiftL`, `gripShiftR`). The upper arms hang below the shoulders, with the
   elbows a little out (`poleL`, `poleR`). The shoulders slide forward, so that the short arms of
@@ -571,6 +571,9 @@ The app does not follow these facts:
   flute leans a little. Upright on the thigh, the right arm goes into the body.
 - **The oboe size (2.3).** The mouse plays a smaller oboe (`SpeciesParams.oboeScale`), in place of
   longer arms. No source gives the size of a smaller oboe.
+- **The oboe angle (2.3).** The oboe hangs 30° from the vertical, nearer to the body than 40° to
+  45°. The long muzzle puts the reed 11 cm in front of the right shoulder joint, so at 40° the
+  right paw does not reach its grip, and at 35° the right arm is straight.
 - **The oboe hands (2.3).** The paws reach forward at the height of the shoulders, because the big
   head of the mouse puts the reed high above the shoulder joints.
 - **The oboe rest (2.3).** The mouse stands, with no lap for the oboe. Thus the oboe stands

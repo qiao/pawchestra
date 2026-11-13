@@ -799,22 +799,18 @@ const PANDA_TROMBONE = {
 } as const satisfies WindHold;
 
 /**
- * The turn of the lower end of the oboe of the mouse forward while it plays, in degrees, from the
- * 30° of {@link WIND_HOLDS}. The value below 0 turns the lower end back toward the body.
- */
-const MOUSE_OBOE_FORWARD = 10;
-
-/**
  * The oboe hold of the mouse (design 5.3), the hold of a real oboist
  * (`docs/reference/wind-technique.md` 2.3). The mouth point of the body lies under the tip of the
  * nose, about 1.8 cm in front of the lips, so the reed tip sits 0.13 H further back and 0.005 H
  * lower than that point (`lipShift`): the reed goes about 1 cm between the lips at the front of the
  * muzzle, on the middle line, as a real oboist puts the reed at the middle of the lips. With the
  * reed tip 0.23 H back, the reed went into the underside of the muzzle 5.1 cm behind the mouth
- * point, and from the front left it stood at the corner of the mouth. The oboe hangs 40°
- * from the vertical, 10° further forward than in {@link WIND_HOLDS} ({@link MOUSE_OBOE_FORWARD}),
- * as a real oboist holds it about 40° from the body. The small mouse plays a smaller oboe
- * (`SpeciesParams.oboeScale`), so that the grips stay near the chest and the elbows bend near the
+ * point, and from the front left it stood at the corner of the mouth. The oboe hangs 30° from
+ * the vertical, as in {@link WIND_HOLDS}, a little nearer to the body than the 40° to 45° of a real
+ * oboist. The reed at the front of the long muzzle stands 11 cm in front of the right shoulder
+ * joint, so at 40° the right paw grasped the oboe in 14% of the play samples, and at 35° it reached
+ * its grip with 0.3 cm to spare, with a straight arm (`pnpm hold-fit oboist`). The small mouse
+ * plays a smaller oboe (`SpeciesParams.oboeScale`), so that the grips stay near the chest and the elbows bend near the
  * body: 0.45 of the oboe of the app. As on a real oboe, the left paw holds the upper joint near
  * the reed, and the right paw holds the lower joint above the bell, with a clear gap between the
  * paws: the left grip moves 0.03 H up the tube from the grip of {@link WIND_HOLDS}, and the right
@@ -875,7 +871,6 @@ const MOUSE_OBOE = {
   restShift: [0.1, -0.285, 0.05],
   restPoleL: [-1, -0.75, -1],
   restPoleR: [1.5, -0.75, 0.25],
-  play: holdTurn(MOUSE_OBOE_FORWARD, 0),
   poleL: [-0.5, -1, 0],
   poleR: [0.5, -1, -0.5],
   faceTube: ['palm', 'palm'],

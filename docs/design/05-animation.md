@@ -626,8 +626,10 @@ The rest of each family:
   with the fingers curled over the front of the tube (`MOUSE_OBOE`). The reed goes between the
   lips at the front of the muzzle, on the middle line (`lipShift`). Reason: a real oboist puts
   the reed at the middle of the lips (winds 2.3), and the reed under the muzzle further back
-  read as the corner of the mouth. Both shoulder bones turn
-  forward, the right more than the left (`reach`, `reachL`), as the shoulder blades of a real
+  read as the corner of the mouth. The oboe hangs 30° from the vertical, the angle of the shared
+  oboe. Reason: a real oboist holds it 40° to 45° from the body, but the reed at the front of the
+  long muzzle puts the grips of a larger angle out of the reach of the short arms. Both shoulder
+  bones turn forward, the right more than the left (`reach`, `reachL`), as the shoulder blades of a real
   player slide forward. Reason: the arms of the Tripo mouse keep the length of its source, and
   with square shoulders the paws missed their grips by 2.7 cm and 5.2 cm. The scale of an
   instrument is a factor of the instrument of the app, so the oboe keeps its size in meters when
