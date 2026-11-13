@@ -799,8 +799,8 @@ function addInside(piece: PieceBuilder, boardY: number): void {
       ),
     );
   }
-  piece.add(steelWire, INSTRUMENT_COLORS.pianoStrings, transform(), 'metal');
-  piece.add(bassWire, INSTRUMENT_COLORS.pianoBassStrings, transform(), 'metal');
+  piece.add(steelWire, INSTRUMENT_COLORS.pianoStrings, transform(), 'string');
+  piece.add(bassWire, INSTRUMENT_COLORS.pianoBassStrings, transform(), 'string');
   piece.add(dampers, INSTRUMENT_COLORS.pianoCase, transform(), 'polish');
 }
 

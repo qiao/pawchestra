@@ -9,6 +9,7 @@ import {
 } from 'three';
 import type { WebGLProgramParametersWithUniforms } from 'three';
 
+import { INSTRUMENT_COLORS } from '../models/colors.ts';
 import { FINISHES, FINISH_ORDER } from '../models/mesh.ts';
 import type { MeshData } from '../models/mesh.ts';
 import { shadeMesh } from '../models/shading.ts';
@@ -80,6 +81,56 @@ function addFinishReflection(shader: WebGLProgramParametersWithUniforms): void {
 }
 
 /**
+ * The fade of the piano strings (design 4.5): a string is 4 mm to 7 mm wide, so at a distance it
+ * is thinner than a pixel and the strings make a moiré that shimmers in a camera move. The shader
+ * fades each pixel of the finish `string` toward the color of the plate below the strings over a
+ * range of the size of a pixel on the surface, in meters.
+ */
+const STRING_FADE = {
+  /** The size of a pixel at which the fade starts: a treble string is 2 pixels wide. */
+  from: 0.002,
+  /** The size of a pixel at which the fade ends: a treble string is one pixel wide. */
+  to: 0.004,
+  /**
+   * The part of the color of the string that stays at the end of the fade. The plate shows
+   * between the strings, so the area keeps a little of their lighter color, and the moiré keeps
+   * this part of its contrast.
+   */
+  keep: 0.3,
+} as const;
+
+/**
+ * Fades the pixels of the finish `string` toward the color of the piano plate when a string is
+ * thinner than a pixel ({@link STRING_FADE}). `fwidth()` of the view position gives the size of
+ * a pixel on the surface. Call it in `onBeforeCompile`.
+ *
+ * @param shader The shader of the material.
+ * @throws Error if the shader has no color chunk of three.js that the patch knows.
+ */
+function addStringFade(shader: WebGLProgramParametersWithUniforms): void {
+  if (!shader.fragmentShader.includes('#include <color_fragment>')) {
+    throw new Error('The shader has no color chunk of three.js. Update addStringFade().');
+  }
+  const count = FINISH_ORDER.length;
+  const u = (FINISH_ORDER.indexOf('string') + 0.5) / count;
+  const plate = INSTRUMENT_COLORS.pianoPlate.map((channel) => channel.toFixed(4)).join(', ');
+  shader.fragmentShader = shader.fragmentShader.replace(
+    '#include <color_fragment>',
+    [
+      '#include <color_fragment>',
+      '#ifdef USE_ROUGHNESSMAP',
+      `if (abs(vRoughnessMapUv.x - ${u.toFixed(6)}) < ${(0.5 / count).toFixed(6)}) {`,
+      '\tfloat stringPixel = length(fwidth(vViewPosition));',
+      `\tfloat stringFar = smoothstep(${STRING_FADE.from.toFixed(4)}, ${STRING_FADE.to.toFixed(4)}, stringPixel);`,
+      `\tvec3 stringMean = mix(vec3(${plate}), diffuseColor.rgb, ${STRING_FADE.keep.toFixed(2)});`,
+      '\tdiffuseColor.rgb = mix(diffuseColor.rgb, stringMean, stringFar);',
+      '}',
+      '#endif',
+    ].join('\n'),
+  );
+}
+
+/**
  * Creates the material of design 4.5. It uses the crease normals and the vertex colors of
  * {@link createGeometry}. The `uv` of each vertex points at the texel of its finish, so one
  * material and one draw call give each triangle its own roughness and metalness.
@@ -110,6 +161,7 @@ export function createMaterials(
       addLightPool(shader, pool, 'players');
       addPlayerFill(shader);
       addFinishReflection(shader);
+      addStringFade(shader);
       if (shot) {
         addShotLight(shader, shot);
       }

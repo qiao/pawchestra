@@ -1232,6 +1232,7 @@ of three.js in the same order, so each bit stays (`FrameSkeleton` of `scene/play
 | `metal`   | Brass, bronze, copper, chrome, nickel silver, and silver. | Sharp highlights, and a half metal look with the color of the metal.  |
 | `eye`     | The eyeballs of a hand rig.                               | The gloss of `lacquer`, and the only finish that the eye light reaches. |
 | `polish`  | The case, the lid, the desk, the legs, and the lyre of the grand piano. | A mirror gloss with a weak reflection. With the reflection of `lacquer`, the warm lamps turned the black case brown. |
+| `string`  | The strings in the open piano.                            | The values of `metal`. A string thinner than a pixel fades toward the color of the plate below it (`STRING_FADE`), because the strings made a moiré at the pixel ratio 1. The plate shows between the strings, so the area is a little darker than the true mean. |
 
 Each finish also has a factor of the reflection of the environment (`reflection`). The red
 channel of the finish table holds it, and the player shader scales the reflection by it
