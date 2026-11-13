@@ -126,8 +126,8 @@ The weights, in the rest pose:
    part.
 2. Arm rows: each vertex of a side with |x| from 0.115, within 0.06 units of the line of the rest
    arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.115 to 0 at
-   x 0.155, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.205, 0.218, 0.232, and
-   0.245, and the rest on the 4 roll segments.
+   x 0.155, an elbow helper share that grows from 0 at x 0.195 to 1 at the elbow joint (x 0.225) and
+   falls to 0 at x 0.258, and the rest on the 4 roll segments.
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.0035 from 0.025 units before
    the head of `hand_<side>`. Knuckle rows: the fingers share grows in 10 equal steps of 0.003 from
    0.015 units before the head of `fingers_<side>`.
@@ -223,7 +223,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/mouse.rig.glb` | 1,168,048 bytes | `05fe01765647a9669efda3f91eb08478f5230bb1dbb25a6f746a490a6638cfa5` |
-| `tripo-hand/mouse.rig.json` | 17,320 bytes | `01c2822da13fefb835080fec61e7424f3bcdcdf56c72256fa66e96229e33b5d2` |
+| `tripo-hand/mouse.rig.glb` | 1,168,048 bytes | `97ac5589cc90eee884211052b41906154dc6ab4720884a5921e0cbf248573d2e` |
+| `tripo-hand/mouse.rig.json` | 17,320 bytes | `190ce16dfa014b9f2c3a97b6fa8a5454a82cf0d2ab7a7461b3041caced196104` |
 | `tripo-hand/mouse-color.webp` | 227,220 bytes, 2048 × 2048 | `91da719f0aa1a77655125e3034962a62b0708837d2b3fcef182a0aff337f2ab1` |
 | `tripo-hand/mouse-normal.webp` | 174,666 bytes, 1024 × 1024 | `a39faab17e9846fb1fd278a74e36eca974bf4d863583340df897b58d0779b3f3` |
