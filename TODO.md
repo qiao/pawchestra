@@ -83,6 +83,18 @@ passes.
       (cat, fox, panda, beaver, rabbit) and the polar bear. After each species, `pnpm hand-chain
       <s>` must give the rig.glb, the rig.json, the studio module, and the config of `HEAD` byte
       for byte.
+- [ ] Hand chains (4.4): the elbow rows of the other chains keep a helper share of 0.75 at the
+      elbow joint (such as 0.25, 0.75, 0.75, 0.25 on the monkey), so the bend share jumps at the
+      joint, as on the badger before its fix. Give each chain a helper share of 1 at the joint,
+      and compare the bent elbows in 2x crops.
+- [ ] Badger (4.4): the elbow rings double the faces of the elbow, so the fold counts by face of
+      `fold-probe` and the arm gate rise for some roles, while the bent elbow is round in the
+      crops. Measure the folds by area, or by the dark pixels of the elbow, to compare.
+- [ ] Rhino tubist (4.4): a faint part of the neck ledge stays at y 0.70 to 0.71 of the source,
+      in the back view. A smooth there moves the lowest head vertex and so H. Move only that row
+      of the ledge along the neck, or accept the change of H.
+- [ ] Monkey trumpeter: a dark band stays under each buttock in the back view: the round form of
+      the source that faces down, away from the key light.
 - [ ] Monkey trumpeter: two thin faces across the wrists (329 and 1090) fold in each play sample.
       Cut the thin faces, or count their pixels in a probe build.
 - [ ] Monkey trumpeter: from the front at the elevation 20, the right paw on the valve tops hides
