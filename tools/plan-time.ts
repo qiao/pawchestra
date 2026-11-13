@@ -25,6 +25,7 @@ import { join } from 'node:path';
 
 import { layoutScene } from '../src/models/layout-scene.ts';
 import { ModelCache } from '../src/models/model-cache.ts';
+import { preparePoses } from '../src/pose/plan.ts';
 import { buildScore } from '../src/score/score.ts';
 import { SHOT_SEED, prepareShots } from '../src/shots/prepare.ts';
 import { patchedDemos } from './patch-demos.ts';
@@ -60,6 +61,13 @@ interface PlanTimeArgs {
   /** True to time only the commits of `--base`, with no working tree. */
   readonly noTree: boolean;
 }
+
+/**
+ * The seed of the pose plan that the shot plan reads: the seed of the app (`POSE_SEED` of
+ * `src/pose/plan.ts`). A literal keeps the script valid on an older commit of `--base`, which
+ * has no such export.
+ */
+const TIMED_POSE_SEED = 1;
 
 /**
  * Reads the command line.
@@ -139,11 +147,13 @@ async function timeDemos(demos: readonly string[], runs: number): Promise<Record
     }
     const models = new ModelCache();
     const layout = layoutScene(result.score, models);
-    prepareShots(result.score, layout, SHOT_SEED, models);
+    // The app makes the pose plan before the shot plan, so the time leaves it out.
+    const poses = preparePoses(result.score, layout, TIMED_POSE_SEED, models);
+    prepareShots(result.score, layout, SHOT_SEED, models, poses);
     const each: number[] = [];
     for (let i = 0; i < runs; i++) {
       const start = performance.now();
-      prepareShots(result.score, layout, SHOT_SEED, models);
+      prepareShots(result.score, layout, SHOT_SEED, models, poses);
       each.push(performance.now() - start);
     }
     times[name] = median(each);
