@@ -304,8 +304,8 @@ The rest of each family:
   twists the left forearm in the moves.
 - **Winds.** The head lifts, and the instrument moves off the mouth. Both paws keep their grips
   (`restAim`), so no paw slides along the tube. A real player can rest the instrument on a leg,
-  but the round bellies of the mouse, the beaver, and the pig cover their thighs. So these
-  instruments stay in front of the belly. The beaver lowers the bassoon across its belly, flatter
+  but the mouse stands with no lap, and the round bellies of the beaver and the pig cover their
+  thighs. So these instruments stay in front of the belly. The beaver lowers the bassoon across its belly, flatter
   than in the play, with the reed to the left below the chin (`BEAVER_BASSOON`). Reason: its short
   arms reach no lower rest with both paws on the bassoon, and with the right paw alone on the
   bassoon upright at its side, the bassoon went through the head in the lift and into the right
@@ -620,6 +620,11 @@ The rest of each family:
   clarinetist holds the clarinet at about 45° with the elbows away from the sides (winds 3, 1.8),
   but the long muzzle of the wolf puts the mouthpiece far in front of the chest, and at 45° the
   arms do not reach the grips.
+- **Oboe of the mouse.** The left paw holds the upper joint and the right paw the lower joint,
+  with the fingers curled over the front of the tube (`MOUSE_OBOE`). Both shoulder bones turn
+  forward, the right more than the left (`reach`, `reachL`), as the shoulder blades of a real
+  player slide forward. Reason: the arms of the Tripo mouse keep the length of its source, and
+  with square shoulders the paws missed their grips by 2.7 cm and 5.2 cm.
 - **Flute and clarinet holds from the body.** The shared flute and clarinet holds (`WIND_HOLDS`)
   take the arm values of the accepted tan fox and wolf, as directions and in `H`, with the lip
   plate or the mouthpiece at the mouth landmark of the body. Each paw keeps the side sign of its

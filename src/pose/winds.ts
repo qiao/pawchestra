@@ -812,18 +812,24 @@ const MOUSE_OBOE_FORWARD = 10;
  * from the vertical, 10° further forward than in {@link WIND_HOLDS} ({@link MOUSE_OBOE_FORWARD}),
  * as a real oboist holds it about 40° from the body. The small mouse plays a smaller oboe
  * (`SpeciesParams.oboeScale`), so that the grips stay near the chest and the elbows bend near the
- * body: 0.45 of the oboe of the app, with the arms 1.25 times the arms of the mesh. On an oboe of
- * 0.62, the arms reach forward straight at 35° and 40°, and the oboe hangs 15° from the vertical.
- * As on a real oboe, the left paw holds the upper joint near the reed, and the right paw holds the
- * lower joint above the bell, with a clear gap between the paws: the left grip moves 0.05 H down
- * the tube and the right grip 0.15 H down (`gripShiftL`, `gripShiftR`). With the left grip 0.3 H
- * down, both paws lie together on the lower half. Each grip also moves 0.06 H toward the axis and
- * 0.05 H across it toward the shoulder of its paw, so that each paw holds the tube from its own
- * side. Each paw aims across the tube (`aimAcross`) with no side aim (`aimSide`), each palm faces
- * the tube (`faceTube`), and the fingers curl 100° (left) and 110° (right) over its front
+ * body: 0.45 of the oboe of the app. As on a real oboe, the left paw holds the upper joint near
+ * the reed, and the right paw holds the lower joint above the bell, with a clear gap of 0.1 H
+ * between the paws: the left grip stays at the grip of {@link WIND_HOLDS}, and the right grip moves
+ * 0.1 H down the tube (`gripShiftL`, `gripShiftR`). With the left grip 0.3 H down, both paws lie
+ * together on the lower half. Each grip also moves 0.06 H toward the axis and 0.05 H across it
+ * toward the shoulder of its paw, so that each paw holds the tube from its own side. The arms of
+ * the Tripo mouse reach 0.22 m from the shoulder joint to the wrist, so each shoulder bone turns
+ * forward (`reach` 60° on the right, `reachL` 45° on the left), as the shoulder blades of a real
+ * player slide forward. With the 20° and 0° of {@link WIND_HOLDS} and the right grip 0.15 H down,
+ * the left paw missed its grip by 2.7 cm and the right paw by 5.2 cm in the play
+ * (`pnpm hold-fit oboist`), and the left upper arm went 2.3 cm into the shoulder. Each paw aims
+ * across the tube (`aimAcross`) with no side aim (`aimSide`), each palm faces the tube
+ * (`faceTube`), and the fingers curl 130° (left) and 110° (right) over its front
  * (`gripCurl`). The thumbs then point up the oboe to the reed, as an oboist curves the fingers over
  * the keys with the thumb behind the tube (`docs/reference/wind-technique.md` 2.3). Both paws grasp
- * the oboe in each sample (`pnpm wind-grip oboist`). With the grips behind the tube and a side aim
+ * the oboe in each sample of the play, the lift, and the rest (`pnpm wind-grip oboist`). With a
+ * left curl of 100°, the tips of the short left digits of the Tripo mouse stood 1.6 cm off the
+ * tube at rest, and the left paw grasped it in no rest sample. With the grips behind the tube and a side aim
  * of half, each paw lies behind the tube with its palm to the audience and its thumb down the oboe.
  * With the left grip on the axis (0.04 H toward it), the roll to the tube has no direction, and the
  * paw turns over. With 60° on the right, the right arm folds 9 faces at rest (limit 8).
@@ -851,10 +857,12 @@ const MOUSE_OBOE_FORWARD = 10;
  * (`docs/reference/wind-technique.md` 2.3): the left upper arm hangs about 33° below the level,
  * and the left paw keeps its grip on the upper joint. With the elbow out and a little down, as at
  * rest, the left upper arm stands 3.5° below the level, and from ±35° and from the back the left
- * arm looks like a raised wing. The shoulder turns are those of {@link WIND_HOLDS}.
+ * arm looks like a raised wing.
  */
 const MOUSE_OBOE = {
   ...WIND_HOLDS.oboe,
+  reach: 60 * MathUtils.DEG2RAD,
+  reachL: 45 * MathUtils.DEG2RAD,
   lipShift: [0, -0.04, 0.23],
   rest: holdTurn(-30, 0),
   restShift: [0.1, -0.25, -0.05],
@@ -865,10 +873,10 @@ const MOUSE_OBOE = {
   poleR: [0.5, -1, -0.5],
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
-  gripShiftL: [0.05, 0.06, -0.05],
-  gripShiftR: [0.15, 0.06, -0.05],
+  gripShiftL: [0, 0.06, -0.05],
+  gripShiftR: [0.1, 0.06, -0.05],
   restAim: 1,
-  gripCurl: curls(100, 110),
+  gripCurl: curls(130, 110),
 } as const satisfies WindHold;
 
 /** The forward turns of the shoulder bones of the bassoon beaver while it plays, in degrees. */

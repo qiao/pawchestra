@@ -487,7 +487,8 @@ The app follows these facts:
   `src/models/instruments/woodwinds.ts`, `play`). The reed is in the mouth under the long muzzle
   (`lipShift`), and the head stays up. The left paw holds the upper joint, and the right paw the
   lower joint (`gripShiftL`, `gripShiftR`). The upper arms hang below the shoulders, with the
-  elbows a little out (`poleL`, `poleR`).
+  elbows a little out (`poleL`, `poleR`). The shoulders slide forward, so that the short arms of
+  the mouse reach the grips (`reach`, `reachL`).
 - **The clarinet (3, `WOLF_CLARINET`).** The clarinet is at the middle of the body, and the head
   does not tilt toward it. The mouthpiece goes 0.6 cm between the dark lips under the muzzle
   (`lipShift`). The elbows point down and out, a little away from the body (`poleL`, `poleR`), as
@@ -572,8 +573,8 @@ The app does not follow these facts:
   longer arms. No source gives the size of a smaller oboe.
 - **The oboe hands (2.3).** The paws reach forward at the height of the shoulders, because the big
   head of the mouse puts the reed high above the shoulder joints.
-- **The oboe rest (2.3).** The mouse stands, and its round belly covers the thighs. Thus the oboe
-  stands upright in front of the belly, with both paws on their grips (`rest`, `restShift`).
+- **The oboe rest (2.3).** The mouse stands, with no lap for the oboe. Thus the oboe stands
+  upright in front of the belly, with both paws on their grips (`rest`, `restShift`).
 - **The oboe breath (2.3).** The app has no breath out of the stale air.
 - **The clarinet angle (3).** The clarinet hangs 35° from the vertical, nearer to it than 45°
   (`hanging()`, `play`). The long muzzle puts the mouthpiece far in front of the chest, so at 45°
