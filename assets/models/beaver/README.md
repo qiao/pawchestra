@@ -110,9 +110,13 @@ left side):
   The step comes before the paw turn.
 - **Paws turned.** Each vertex past the arm ring at x 0.331 turns rigidly about the rest forearm
   axis by whole ring steps of 30 degrees: -120 degrees on the left (4 steps) and 30 degrees on the
-  right (1 step), 333 vertices on each side. New quads join the two rings with the step offset,
+  right (1 step), 328 vertices on each side. New quads join the two rings with the step offset,
   and the far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units). The new
   quads keep the UVs of the old band. The paws keep their form ("Arm twist").
+- **Wrist loop.** The ring at x 0.331 does not turn. It is slanted, so 5 of its 12 vertices lie
+  past its mean along the forearm axis. When they turned with the paw, the quads before the ring
+  sheared into a pinched wrist with a fan of stretched fur: 10 faces on the left and 12 on the right
+  had UV scale ratios of 2.6 to 14.5, against about 1.1 on the faces around them.
 - **Point edits.** None. The head, the eyes, the teeth, the trunk, the arms, the paws, the legs,
   and the tail keep the form of the source. In the app the paws read in proportion to the arms, so
   they take no paw edit.
@@ -244,7 +248,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/beaver.rig.glb` | 1,201,140 bytes | `2784397be6ec89e01b9181ace2642243c6a3f63e659a34c568d236b9e1b49b9e` |
-| `tripo-hand/beaver.rig.json` | 17,197 bytes | `7bdabf53266601b41dc47d70b95726ef7affd2ba7efc1332b7bbe089ab300267` |
+| `tripo-hand/beaver.rig.glb` | 1,196,840 bytes | `d0588f2d5bc6d06a593a0e271684aa4687d1c143f0367461d548042f698392ba` |
+| `tripo-hand/beaver.rig.json` | 17,197 bytes | `01e80b3e884748ed965b976382ecee134e2dd791d6c1c3ff782513c10020afaf` |
 | `tripo-hand/beaver-color.webp` | 199,904 bytes, 2048 × 2048 | `fc5a6f549bc676eefc6837d5398ad00f439d75cf9191a3921707f8034a35bfbc` |
 | `tripo-hand/beaver-normal.webp` | 84,258 bytes, 1024 × 1024 | `aa1edb196f4b423afb6bb80671a424e943ca4f3354f7ba3f01ad755ba0471982` |
