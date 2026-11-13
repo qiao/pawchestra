@@ -267,7 +267,12 @@ export const SPECIES = {
    * the eye height of the fox before, seated with its thighs on the seat and its tail back through
    * the chair, and standing as a soloist. Its color map keeps the hue of the source (`assets/models/fox/README.md`, "Color
    * map"). Its head height is the head of the studio body, and its chair fits its legs: the seat
-   * height is the seat of the studio body, in H. Its violin is almost the violin of the app.
+   * height is the seat of the studio body, in H. Its violin is 0.83 of the violin of the app, near
+   * a 3/4 violin. With 0.998, its short arm stopped the strings only from 0.63 of the fingerboard,
+   * over the upper bout, and the thick left paw went 2.4 cm into the violin in 45% of the play
+   * (limit 1.6 cm, `pnpm body-clip fox-red:violin`). No gap, tilt, elbow, shoulder turn, or stop
+   * range moved it. With 0.83, the paw stops from 0.31 and keeps within the limit, and with 0.85 it
+   * went 1.9 cm in in 3% of the play.
    *
    * The stick of the bow passes through the closed right paw, 50° from square toward the wrist,
    * along the line nearest to the middles of the turned paw. The skin of the long wrist of the fox
@@ -279,7 +284,7 @@ export const SPECIES = {
   'fox-red': {
     body: 'studio-fox',
     colors: SPECIES_COLORS['fox-red'],
-    violinScale: 0.998,
+    violinScale: 0.83,
     bowGrip: { at: [-0.0045, -0.0298, -0.1025], turn: 50 * (Math.PI / 180) },
     headHeight: STUDIO_HEIGHTS['studio-fox'].headHeight,
     seatHeight: STUDIO_HEIGHTS['studio-fox'].seatHeight / STUDIO_HEIGHTS['studio-fox'].headHeight,

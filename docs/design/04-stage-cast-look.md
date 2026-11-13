@@ -818,7 +818,9 @@ of this body is its source FBX. Its point edits serve only the rig and the holds
 arm (`armEven`), because the left forearm of the source has one longer quad band. The upper arms
 and the forearms are 1.25 times longer (`armStretch`). Reason: the source arm reached 0.82 H from
 the shoulder joint to the palm, and both flute grips lay out of reach. It now reaches 1.0 H, as
-the older fox. The fore paw past the wrist is smaller (the edit `paw`), about 1.3 wrist diameters
+the older fox. Its violin is 0.83 of the violin of the app (4.6, `violinScale`). Reason: with the
+full violin, the short arm stopped the strings only over the upper bout, and the thick left paw
+went into the violin. The fore paw past the wrist is smaller (the edit `paw`), about 1.3 wrist diameters
 wide, as the paw of the wolf, and its middle two digits stay the longest. Reason: the source paw
 was 1.9 wrist diameters wide. The legs and the right ear of the source are no mirrors of the left
 ones, so they take joints of their own. Its eyes are the flat eye domes of the mesh, because the

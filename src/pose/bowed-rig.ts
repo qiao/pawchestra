@@ -865,8 +865,9 @@ const SHOULDER_HOLD = {
  * neck. The arms of the Tripo fox are short: 0.348 m (1.0 H) from the shoulder joint to the middle
  * of the palm with the longer arms of its hand rig (`pnpm hold-reach fox-red --instrument
  * violin`). So the left shoulder bone turns 20° forward in the play (`reachL`), and the left paw
- * reaches the fingerboard of the full violin from 0.63 of its length from the nut. A violin of the
- * rule of a violin shop for this arm is 0.56 of the violin of the app. The top plate turns 25° toward up
+ * reaches the fingerboard of its violin of 0.83 (`violinScale`) from 0.31 of its length from the
+ * nut (0.63 with the full violin). A violin of the rule of a violin shop for this arm is 0.56 of
+ * the violin of the app. The top plate turns 25° toward up
  * (`violinTurn(-25, 5, 25)`), so that the violin lies about level and only a little down toward
  * the right: with the 50° of the chin hold, the bow at the frog stood up across the eye. The bow paw reaches 0.19 m of the
  * hair. The left paw tilts 10° over the neck (`tiltL`, 30° in the chin hold): with 20°, the left
