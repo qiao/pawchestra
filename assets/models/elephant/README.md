@@ -130,8 +130,8 @@ The weights, in the rest pose:
 2. Arm rows: each vertex of a side with |x| from 0.13, within 0.075 units of the line of the rest
    arm, takes one exact row (`sa.set_weight_row()`): a clavicle share of 0.8, 0.6, 0.4, 0.2, and
    0.05 at x 0.13, 0.15, 0.17, 0.19, and 0.21, linear between them and 0 from x 0.22 (`rows.control`
-   of `params.json`), an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.2325, 0.2475,
-   0.2625, and 0.2775, and the rest on the 4 roll segments ("Arm roots").
+   of `params.json`), an elbow helper share that grows from 0 at x 0.22 to 1 at the elbow joint (x 0.255) and
+   falls to 0 at x 0.29, and the rest on the 4 roll segments ("Arm roots").
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.003 from 0.03 units before
    the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.0025 from
    0.015 units before the head of `fingers_<side>`.
@@ -276,7 +276,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/elephant.rig.glb` | 1,088,320 bytes | `f7a20e453d3f22a0ccf38de3ae876c026a31e45fddffc4249c6fecc9ef7e63ce` |
-| `tripo-hand/elephant.rig.json` | 15,348 bytes | `7b5e4b73fa501a54b8e1bd6a7c87725c37795082c69506582c3e8a141b3c3805` |
+| `tripo-hand/elephant.rig.glb` | 1,088,320 bytes | `ad50236ba8eb5278a15d0491ec44ea52f6e89a1f834f94a949a941550cd4d1e6` |
+| `tripo-hand/elephant.rig.json` | 15,348 bytes | `8ff17f3d68bba37d0028e6d8520689d0a672e0708d400da8901080bab3d71183` |
 | `tripo-hand/elephant-color.webp` | 84,838 bytes, 2048 × 2048 | `f24ff816f2d47e08ec49aeb942005d56975e91a371b5bdd814076a322b5d4c68` |
 | `tripo-hand/elephant-normal.webp` | 67,098 bytes, 1024 × 1024 | `c3b6e219e1fd7d56bcbea4531e07b18d93469640152178810f9e3f876d68c564` |
