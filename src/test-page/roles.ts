@@ -1,42 +1,57 @@
-import { SECTION_INSTRUMENTS, SECTION_SPECIES, speciesOf } from '../models/cast.ts';
+import { CONDUCTOR, SECTION_INSTRUMENTS, SECTION_SPECIES, speciesOf } from '../models/cast.ts';
 import type { PlayingSection } from '../models/cast.ts';
 import { supportOf } from '../models/player.ts';
 import type { Support } from '../models/props.ts';
 import { SPECIES_IDS } from '../models/species.ts';
 import type { SpeciesId } from '../models/species.ts';
 import { animalText } from '../app/seat-text.ts';
+import { conductorPhrase } from './conductor-phrase.ts';
 import type { PlayedInstrument } from './phrases.ts';
 
 /**
- * The group of a role in the list of the test page: a player of a section, the standing soloist
- * of a section, or a recast role.
+ * The group of a role in the list of the test page: the conductor, a player of a section, the
+ * standing soloist of a section, or a recast role.
  */
-export type RoleGroup = 'section' | 'soloist' | 'recast';
+export type RoleGroup = 'conductor' | 'section' | 'soloist' | 'recast';
 
-/** One role of the test page: a species with an instrument and a support (design 7.1). */
-export interface TestRole {
+/** The facts of each role of the test page (design 7.1). */
+interface RoleFacts {
   /**
    * The name of the role in the URL hash: `<species>-<instrument>`, with the suffix `-standing`
-   * for a standing soloist. A recast species is never the own species of the instrument, so a
-   * recast role needs no suffix.
+   * for a standing soloist, or `<species>-conductor`. A recast species is never the own species of
+   * the instrument, so a recast role needs no suffix.
    */
   readonly id: string;
   /** The text of the role in the list. */
   readonly label: string;
-  readonly group: RoleGroup;
   readonly species: SpeciesId;
   /**
-   * The species that the score rules cast in the seat of the phrase: the first species of the
-   * section (`speciesOf()`). The layout builds its model before the role takes the place.
+   * The species whose studio bodies load before the build: the species of the role, and the
+   * species that the score rules cast in the seats of the phrase (`speciesOf()`). The layout
+   * builds the models of the seats before the role takes its place.
    */
-  readonly seatSpecies: SpeciesId;
+  readonly bodies: readonly SpeciesId[];
+}
+
+/** A role of a player: a species with an instrument and a support. */
+export interface PlayerRole extends RoleFacts {
+  readonly group: Exclude<RoleGroup, 'conductor'>;
   readonly instrument: PlayedInstrument;
   /** The chair, the stool, the bench, the riser, or `stand` for a player who stands. */
   readonly support: Support;
 }
 
+/** The role of the conductor: the bear on its podium, which conducts a small orchestra. */
+export interface ConductorRole extends RoleFacts {
+  readonly group: 'conductor';
+}
+
+/** One role of the test page (design 7.1). */
+export type TestRole = PlayerRole | ConductorRole;
+
 /** The title of each group in the list. */
 export const GROUP_TITLES = {
+  conductor: 'Conductor',
   section: 'Section players',
   soloist: 'Standing soloists',
   recast: 'Recast roles',
@@ -73,6 +88,41 @@ function speciesName(species: SpeciesId): string {
 }
 
 /**
+ * Gives the section of an instrument.
+ *
+ * @param instrument The instrument.
+ * @returns The first section that plays it.
+ * @throws Error if no section plays the instrument.
+ */
+function sectionOf(instrument: PlayedInstrument): PlayingSection {
+  const section = SECTIONS.find((s) =>
+    SECTION_INSTRUMENTS[s].some((played: PlayedInstrument) => played === instrument),
+  );
+  if (!section) {
+    throw new Error(`No section plays the ${instrument}.`);
+  }
+  return section;
+}
+
+/**
+ * Makes the role of the conductor (design 7.1). The bodies of the role are the bear and the first
+ * species of the section of each part of the phrase of the conductor.
+ *
+ * @returns The role.
+ */
+function conductorRole(): ConductorRole {
+  const species = CONDUCTOR.species;
+  const seats = conductorPhrase().map((part) => speciesOf(sectionOf(part.instrument), 0));
+  return {
+    id: `${species}-conductor`,
+    label: `${speciesName(species)}: conductor`,
+    group: 'conductor',
+    species,
+    bodies: [...new Set([species, ...seats])],
+  };
+}
+
+/**
  * Gives the label of a role in the list.
  *
  * @param species The species.
@@ -86,8 +136,8 @@ function labelOf(species: SpeciesId, instrument: PlayedInstrument, form: string)
 }
 
 /**
- * Lists each role of the test page (design 7.1): each species with each instrument of its section,
- * then the standing soloist of each instrument whose soloist stands, then each species in each
+ * Lists each role of the test page (design 7.1): the conductor, each species with each instrument
+ * of its section, then the standing soloist of each instrument whose soloist stands, then each species in each
  * recast instrument that is not its own.
  *
  * @returns The roles, in the order of the groups and of the sections of design 4.3.
@@ -102,7 +152,7 @@ export function testRoles(): TestRole[] {
       })),
     ),
   );
-  const roles: TestRole[] = [];
+  const roles: TestRole[] = [conductorRole()];
   for (const { species, seatSpecies, instrument } of own) {
     const seated = supportOf(instrument, false);
     const standing = supportOf(instrument, true);
@@ -111,7 +161,7 @@ export function testRoles(): TestRole[] {
       label: labelOf(species, instrument, seated === standing ? '' : 'seated'),
       group: 'section',
       species,
-      seatSpecies,
+      bodies: [species, seatSpecies],
       instrument,
       support: seated,
     });
@@ -121,7 +171,7 @@ export function testRoles(): TestRole[] {
         label: labelOf(species, instrument, 'standing soloist'),
         group: 'soloist',
         species,
-        seatSpecies,
+        bodies: [species, seatSpecies],
         instrument,
         support: standing,
       });
@@ -137,7 +187,7 @@ export function testRoles(): TestRole[] {
         label: labelOf(species, instrument, 'recast'),
         group: 'recast',
         species,
-        seatSpecies,
+        bodies: [species, seatSpecies],
         instrument,
         support: supportOf(instrument, false),
       });

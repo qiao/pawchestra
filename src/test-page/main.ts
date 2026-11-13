@@ -10,14 +10,18 @@ import { probeWebgl2 } from '../app/webgl.ts';
 import type { Player } from '../audio/player.ts';
 import { boundsOf } from '../gallery/items.ts';
 import { keyName } from '../gallery/notes.ts';
+import type { TestNote } from '../gallery/notes.ts';
 import { CONDUCTOR } from '../models/cast.ts';
+import { SMALLEST_STAGE, layoutSceneSteps } from '../models/layout-scene.ts';
 import type { SceneLayout } from '../models/layout.ts';
+import type { Vec3 } from '../models/tuples.ts';
 import { ModelCache } from '../models/model-cache.ts';
 import { SPECIES } from '../models/species.ts';
 import { POSE_SEED, headOf, preparePosesSteps } from '../pose/plan.ts';
 import type { PosePlan } from '../pose/plan.ts';
 import { createScenePose, poseAt } from '../pose/pose-at.ts';
 import type { ScenePoseBuffer } from '../pose/pose-at.ts';
+import type { ScenePose, Transport } from '../pose/types.ts';
 import { watchPixelRatio } from '../scene/pixel-ratio.ts';
 import { startTierOf } from '../scene/quality.ts';
 import { StageScene } from '../scene/stage-scene.ts';
@@ -31,9 +35,10 @@ import type { FrameCover } from '../shots/frame.ts';
 import type { CameraPose } from '../shots/types.ts';
 import { SilentClock } from './clock.ts';
 import type { SongClock } from './clock.ts';
-import { phraseFile, phraseOf } from './phrases.ts';
+import { conductorPhrase } from './conductor-phrase.ts';
+import { partsFile, phraseFile, phraseOf } from './phrases.ts';
 import { GROUP_TITLES, roleOfHash, testRoles } from './roles.ts';
-import type { RoleGroup, TestRole } from './roles.ts';
+import type { ConductorRole, PlayerRole, RoleGroup, TestRole } from './roles.ts';
 import { soloLayoutSteps } from './solo-layout.ts';
 import { viewCamera } from './views.ts';
 import type { ViewName, ViewSubject } from './views.ts';
@@ -71,7 +76,17 @@ interface Piece {
   readonly plan: PosePlan;
   readonly poses: ScenePoseBuffer;
   readonly prepared: PreparedLayout;
-  /** The player and its stage for the camera presets. */
+  /**
+   * The poses that the stage shows: all poses of the plan, or only the pose of the conductor when
+   * the stage hides the players of the phrase.
+   */
+  readonly shown: ScenePose;
+  /**
+   * The flags of the poses that `poseAt()` calculates when the stage shows only the conductor: 0
+   * for each player, then the flag of the conductor. `null` when the stage shows all poses.
+   */
+  readonly hidden: Uint8Array | null;
+  /** The animal and its stage for the camera presets. */
   readonly subject: ViewSubject;
 }
 
@@ -106,22 +121,33 @@ function element<T extends Element>(selector: string, type: abstract new () => T
 }
 
 /**
- * Builds the score of the test phrase of a role, its layout, its pose plan, and its 3D scene, in
- * steps (design 7.1, "Test page"). The score rules of the app read the phrase, so the sound and
- * the motion come from one `Score`.
+ * Builds the score of a test file with the score rules of the app, in steps.
+ *
+ * @param file The bytes of the test file.
+ * @param role The role, for the error text.
+ * @returns The steps, which return the score.
+ * @throws Error if the score rules refuse the file.
+ */
+function* scoreSteps(file: Uint8Array, role: TestRole): Steps<Score> {
+  const result = yield* buildScoreSteps(file, 'one-per-part');
+  if (!result.ok) {
+    throw new Error(`The test phrase of ${role.id} is not valid: ${result.error}.`);
+  }
+  return result.score;
+}
+
+/**
+ * Builds the score of the test phrase of a player role, its layout, its pose plan, and its 3D
+ * scene, in steps (design 7.1, "Test page"). The score rules of the app read the phrase, so the
+ * sound and the motion come from one `Score`.
  *
  * @param role The role.
  * @param stage The 3D scene of the page.
  * @returns The steps, which return the piece.
  * @throws Error if the score rules refuse the phrase, or if the layout has no player.
  */
-function* pieceSteps(role: TestRole, stage: StageScene): Steps<Piece> {
-  const result = yield* buildScoreSteps(phraseFile(role.instrument), 'one-per-part');
-  if (!result.ok) {
-    throw new Error(`The test phrase of ${role.id} is not valid: ${result.error}.`);
-  }
-
-  const { score } = result;
+function* playerPieceSteps(role: PlayerRole, stage: StageScene): Steps<Piece> {
+  const score = yield* scoreSteps(phraseFile(role.instrument), role);
   const models = new ModelCache();
   const layout = yield* soloLayoutSteps(score, role, models);
   const plan = yield* preparePosesSteps(score, layout, POSE_SEED, models);
@@ -144,7 +170,126 @@ function* pieceSteps(role: TestRole, stage: StageScene): Steps<Piece> {
     stageSide: layout.stageSide,
     playersTop: head + HEAD_ROOM,
   };
-  return { role, score, layout, plan, poses, prepared, subject };
+  return { role, score, layout, plan, poses, prepared, shown: poses, hidden: null, subject };
+}
+
+/**
+ * Moves each place of a layout so that the podium center is at the stage center.
+ *
+ * @param layout The layout of an orchestra.
+ * @returns The moved layout.
+ */
+function podiumAtCenter(layout: SceneLayout): SceneLayout {
+  const [px, , pz] = layout.podium;
+  const move = <T extends { readonly position: Vec3 }>(place: T): T => {
+    const [x, y, z] = place.position;
+    return { ...place, position: [x - px, y, z - pz] };
+  };
+  return {
+    ...layout,
+    podium: [0, layout.podium[1], 0],
+    conductor: layout.conductor ? move(layout.conductor) : null,
+    players: layout.players.map(move),
+    stands: layout.stands.map(move),
+  };
+}
+
+/**
+ * Builds the piece of the conductor in steps (design 7.1, "Test page"): the score of the phrase of
+ * the conductor (`conductorPhrase()`), the layout of the app with the podium at the stage center,
+ * and the pose plan of all its animals. The stage shows only the podium and the conductor on the
+ * smallest stage, so that the conductor is at the center of the views as a player is. The sound
+ * plays all parts, and the cues turn to the places of the hidden players.
+ *
+ * @param role The role of the conductor.
+ * @param stage The 3D scene of the page.
+ * @returns The steps, which return the piece.
+ * @throws Error if the score rules refuse the phrase, or if the layout has no conductor.
+ */
+function* conductorPieceSteps(role: ConductorRole, stage: StageScene): Steps<Piece> {
+  const score = yield* scoreSteps(partsFile(conductorPhrase()), role);
+  const models = new ModelCache();
+  const layout = podiumAtCenter(yield* layoutSceneSteps(score, models));
+  const { conductor } = layout;
+  if (!conductor) {
+    throw new Error(`The layout of ${role.id} has no conductor.`);
+  }
+  const plan = yield* preparePosesSteps(score, layout, POSE_SEED, models);
+  const poses = createScenePose(plan);
+  poseAt(plan, 0, 0, STOPPED.transport, [], poses);
+  yield;
+  const alone = { ...layout, stageSide: SMALLEST_STAGE, players: [], stands: [], risers: [] };
+  const prepared = yield* stage.prepareSteps(alone, models);
+
+  const model = models.get(CONDUCTOR.species, CONDUCTOR.instrument);
+  const subject = {
+    top: conductor.position[1] + boundsOf([model.mesh]).max[1],
+    turn: Math.PI,
+    stageSide: alone.stageSide,
+    // The stage takes the top of its players for the near limit, and it shows no player.
+    playersTop: 0,
+  };
+  const hidden = new Uint8Array(plan.players.length + 1);
+  const shown = { players: [], conductor: poses.conductor };
+  return { role, score, layout, plan, poses, prepared, shown, hidden, subject };
+}
+
+/**
+ * Builds the piece of a role in steps (design 7.1, "Test page").
+ *
+ * @param role The role.
+ * @param stage The 3D scene of the page.
+ * @returns The steps, which return the piece.
+ */
+function pieceSteps(role: TestRole, stage: StageScene): Steps<Piece> {
+  return role.group === 'conductor'
+    ? conductorPieceSteps(role, stage)
+    : playerPieceSteps(role, stage);
+}
+
+/**
+ * Poses the animals of a piece for one frame (design 5.1). When the stage shows only the
+ * conductor, the frame poses only the conductor.
+ *
+ * @param piece The piece.
+ * @param songTime The song time, in seconds.
+ * @param wallTime The wall clock time, in seconds.
+ * @param transport The play state of the pose.
+ * @param needed The flags of the stage: one for each shown player, then one for the conductor.
+ * @returns The poses that the stage shows.
+ */
+function posePiece(
+  piece: Piece,
+  songTime: number,
+  wallTime: number,
+  transport: Transport,
+  needed: Uint8Array,
+): ScenePose {
+  const { plan, poses, hidden } = piece;
+  if (!hidden) {
+    return poseAt(plan, songTime, wallTime, transport, [], poses, needed);
+  }
+  hidden[plan.players.length] = needed[0] ?? 1;
+  poseAt(plan, songTime, wallTime, transport, [], poses, hidden);
+  return piece.shown;
+}
+
+/**
+ * Gives the notes of the test phrase of a role as text: one line for each note, with the start
+ * and the length in seconds, and the key. A line of the conductor also names the instrument.
+ *
+ * @param role The role.
+ * @returns The text.
+ */
+function notesText(role: TestRole): string {
+  const text = (note: TestNote): string =>
+    `${note.start.toFixed(3)} ${note.length.toFixed(3)} ${keyName(note.key)}`;
+  if (role.group !== 'conductor') {
+    return phraseOf(role.instrument).map(text).join('\n');
+  }
+  return conductorPhrase()
+    .flatMap((part) => part.notes.map((note) => `${part.instrument} ${text(note)}`))
+    .join('\n');
 }
 
 /**
@@ -258,9 +403,7 @@ class TestPage {
     history.replaceState(null, '', `#${role.id}`);
     this.#link.href = `#${role.id}`;
     this.#link.textContent = `Link to this role: ${location.pathname}#${role.id}`;
-    this.#notes.textContent = phraseOf(role.instrument)
-      .map((note) => `${note.start.toFixed(3)} ${note.length.toFixed(3)} ${keyName(note.key)}`)
-      .join('\n');
+    this.#notes.textContent = notesText(role);
     this.#showStatus(`Building ${role.label}.`);
     const build = this.#lastBuild.then(async () => this.#build(role));
     this.#lastBuild = build.catch(() => undefined);
@@ -281,7 +424,7 @@ class TestPage {
     if (role !== this.#picked) {
       return;
     }
-    const species = [role.species, role.seatSpecies, CONDUCTOR.species];
+    const species = [...role.bodies, CONDUCTOR.species];
     await loadStudioBodies([...new Set(species.map((id) => SPECIES[id].body))]);
     const stage = this.#stage;
     const piece = await runSliced(pieceSteps(role, stage), () => role === this.#picked);
@@ -518,10 +661,9 @@ class TestPage {
       this.#loopArmed = true;
     }
 
-    const { plan, poses } = piece;
     const transport = this.#state.transport;
     this.#stage.render(this.#view, PAGE_COVER, null, (needed) =>
-      poseAt(plan, songTime, wallTime, transport, [], poses, needed),
+      posePiece(piece, songTime, wallTime, transport, needed),
     );
     this.#view = null;
     const shown = Math.min(Math.max(0, songTime), durationSec);
