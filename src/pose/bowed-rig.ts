@@ -849,16 +849,14 @@ const SHOULDER_HOLD = {
  * left, down, and to the front, (-1, -0.6, -0.5), with the hair in and a little down,
  * (-1, -0.3, 0), and the grip moves 0.3 H out, 0.2 H up, and 0.3 H to the front (`restBow.via`),
  * so that the tip passes below the snout, in front of the belly, and to the left of the violin.
- * With the grip 0.2 H out, 0.5 H up, and 0.1 H to the front, the roll of the bow paw toward the
- * elbow changed side at the start of each lift, and the paw turned on its forearm at up to
- * 5,563°/s (limit 3,000, `pnpm arm-check fox-violinist`). With this grip, the largest turn is
- * about 1,100°/s, and the right claws go 2.2 cm into the violin in a lowering (2.5 cm before).
- * The rest grip is near the end of the reach of the short arm. The grip
- * moves up and to the front in the move, so that the wrist comes into the reach early in the
- * lift and the elbow bends over the rest of the move. With the grip 0.4 H out and 0.5 H to the
- * front, the wrist was 1.55 arm lengths from the shoulder in the middle of the move: the arm stayed
- * straight up to 0.7 of the lift, and then the elbow bent 22° in 1/60 s, so that the forearm
- * turned 29° in one frame of 1/30 s. With the tip
+ * With no move of the grip, the bow goes 2.0 cm into the violin in a lowering (1.1 cm) and the
+ * right forearm 1.3 cm into the body in the lift (0.4 cm) (`pnpm hold-fit fox-violinist`). The
+ * roll of the bow paw mixes from the roll of the rest arm (`restRollOf()` of `pose/bowed.ts`).
+ * The bow path leaves the reach of the short arm in the middle of the move, so each elbow keeps
+ * a bend there (`moveReach`): the wrist comes no further than 0.9 of the arm length from the
+ * shoulder joint. With no limit, the bow arm locked straight in each move and then folded its
+ * elbow at up to 1.5 m/s, and the carrying left arm unfolded from straight in one step of 0.01 s.
+ * With the tip
  * forward and a little up, (0.4, 0.3, -1), the bow stood up across the snout and the mouth in the
  * middle of each move. With the tip (-1, -0.2, -0.8) and the grip 0.3 H to the front, the bow went
  * 1.6 cm into the violin in a lowering. With the hair of the via down, (0, -1, 0), and of the rest
@@ -936,6 +934,7 @@ const FOX_HOLD = {
   restPlace: 0.37,
   rest: { ...LAP_VIOLIN, lap: { along: 0.6, offset: [0, -0.14, -0.2] } },
   liftReach: [-0.1, 0.22, -0.15],
+  moveReach: 0.9,
   restPawTurnL: 25 * MathUtils.DEG2RAD,
   restYawL: -45 * MathUtils.DEG2RAD,
   restGapL: -0.013158,

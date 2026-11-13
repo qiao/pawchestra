@@ -621,6 +621,9 @@ The app does not follow these facts:
   below the snout, and its grip moves out and to the front (`restBow.via`). The roll of the paw
   on the stick mixes from the roll of the rest arm to the roll of the play (`restRollOf()`), so
   the paw does not roll over where the stick points near the elbow.
+- **The elbows in the lift.** No source gives the path of the arms in the lift. The short arms
+  of the red fox keep each elbow bent in the move (`BowedHold.moveReach`, `keepMoveBend()`), so
+  that no arm locks straight and then folds its elbow in a few frames.
 
 ### 3.3 The cello on the chair and at rest
 

@@ -315,8 +315,8 @@ The rest of each family:
   makes the instrument jump into the paw. Thus the red fox stands the violin near the hip, and
   rests the bow upright beside the right thigh at the reach of its short arm. Its bow tip turns to
   the left below the snout in a move (`FOX_HOLD.restBow.via`), so that the bow does not cross the
-  snout. The grip also moves up toward the shoulder in the move. Reason: the rest grip is out of
-  the reach of the short arm, and a wrist that comes into the reach late bends the elbow in a jump.
+  snout. The grip also moves out and to the front in the move, and the elbows keep a bend
+  ("Bent elbows in the moves").
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
   the right knee with the tip up, as a cellist does. Its grip lies low and out, and both elbows
   point out, so that the round upper arms stay off the chest (5.3, "Free round arms"). The hippo
@@ -470,8 +470,9 @@ The rest of each family:
   went out of reach of a short arm, as on the dog, and a straight arm puts the round root of the
   upper arm into the chest. A bent elbow follows its pole, so the elbow turn of the rule holds the
   upper arm off the trunk. A real player keeps the upper arm away from the torso (winds 1.8). A paw
-  that holds the instrument or the bow keeps its path: a limit would move it off the instrument,
-  and on the bow arm of the cat it cleared no clip.
+  that holds the instrument or the bow keeps its path in a shared hold: a limit would move it off
+  the instrument, and on the bow arm of the cat it cleared no clip. A hold of short arms can keep
+  each elbow bent with a soft limit (5.2, "Bent elbows in the moves").
 - **Far mouth in a shared hold.** A long snout or a big head puts the mouth far in front of the
   shoulder joints, so the paws of a heavy body miss the valves of the trumpet, also at the smallest
   size. The shared trumpet hold takes the rule of the far mouth (`WindHold.farMouth`): the mouth
