@@ -1264,6 +1264,20 @@ each control.
       skill `pawchestra-film`. A phone in portrait shows the frame in 19.8% of the screen height,
       and only a hint asks to turn the phone. It changes the rule of 2.5 that a piece gives the
       same film on each screen.
+- [ ] Ask the user about the inserts of the printed music and of the out of focus lamps. The
+      music faces the players, so a camera within the line of 5.6 sees the back of the desk, and
+      the lamps are the hall lamps, which the inserts do not show. No source gives either
+      cutaway (`camera-technique.md`, section 6).
+- [ ] Take the detail point of an insert from the play pose, in place of the bind pose. A standing
+      trumpet holds its bell lower than in the bind pose, so its own stand covers the lower third
+      of the insert (`bach-bwv1047` at 17 s, `beethoven-9` at 12 s). Add a cover test of the
+      stand of the player to the insert camera (5.6).
+- [ ] Find a camera for the cello and the double bass fingers and for more woodwinds. Their left
+      paw travels along the neck, and most woodwind cameras fail the head floor or the line of
+      sight. The keys insert shows the near shoulder of the pianist large and soft (5.6).
+- [ ] Count the inserts of each demo with a rule check in `pnpm shot-trace --rules`: no entry in
+      an insert, the lead kept, the rate, and the 30° rule at both cuts. `boulanger-matin` gets
+      only 2 inserts, `bach-bwv1047` gets 7 (5.6).
 
 Done when: the tests of 5.6 pass for each demo, the shot targets and the frame target of 9.7
 pass, and the smoke test checks the camera.
