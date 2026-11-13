@@ -254,17 +254,19 @@ forward right rest elbow (`restR.pole`) rolls the right upper arm 58 to 59 degre
 the arms of 1.2 and of 1.3 times the source. The left forearm spreads 59 degrees from the chord
 to the rest, so no hoof step of 32.7 degrees centers it better.
 
-**Harp fit.** The harp is 0.975 of the concert harp of the app (`harpScale`, 1.27 m high): 1.3
-times the harp 0.75 of the fit below, as the body is 1.3 times the body of the fit ("Size"). The
-meter offsets of the harp hold grow by 1.3 too, so each depth below grows by 1.3. Its base
-stands 0.15 m in front of the floor point at the scale 1 and 0.22 H to the right of it, turned 46
-degrees (`HARP_PLACE`), and the top of its soundbox and the end of its neck are slim (`SOUNDBOX`,
-`NECK` of `src/models/instruments/harp.ts`). The left hand plays up to D4 (`reach.leftHighest` 62
-of the harp hold), and the spine stays erect (`lean` 0). Against the old deer and the first fawn
-(H of the old deer, no arm stretch, harp scale 1.3), from `pnpm pose-depth harpist --gaps`,
-`pnpm hold-fit harpist`, and `pnpm arm-check harpist` (columns 2 to 4, with the base
-`204632d8d`), and from `pnpm pose-depth harpist` and `pnpm hold-fit harpist` (column 5, the
-arms of 1.3 times the source and the harp of 2026-11-13; the arm gate did not run):
+**Harp fit.** The harp is 0.85 of the concert harp of the app (`harpScale`, 1.11 m high). Its
+base stands 0.19 m in front of the floor point at the scale 1 and 0.22 H to the right of it,
+turned 48 degrees (`HARP_PLACE`), and the top of its soundbox and the end of its neck are slim
+(`SOUNDBOX`, `NECK` of `src/models/instruments/harp.ts`). The top of the soundbox stands at the
+right side of the chest, below the right shoulder, and the right arm hangs outside it. The last
+table of this section gives the fit of 2026-11-13. The other measures come from the harp 0.75 of
+the fit at 1/1.3 of the size ("Size") and from the harp 0.975. The left hand plays up to D4
+(`reach.leftHighest` 62 of the harp hold), and the spine stays erect (`lean` 0). Against the old
+deer and the first fawn (H of the old deer, no arm stretch, harp scale 1.3), from
+`pnpm pose-depth harpist --gaps`, `pnpm hold-fit harpist`, and `pnpm arm-check harpist`
+(columns 2 to 4, with the base `204632d8d`), and from `pnpm pose-depth harpist` and
+`pnpm hold-fit harpist` (column 5, the arms of 1.3 times the source and the harp 0.975; the arm
+gate did not run):
 
 | Measure | Old deer | First fawn | Fawn, arms 1.2 | Fawn, arms 1.3 |
 | --- | --- | --- | --- | --- |
@@ -291,6 +293,26 @@ arm goes up to 1.1 cm into the top of the soundbox (0.5 % of the play) and 1.0 c
 went 2.4 to 2.7 cm into the soundbox in each sample. The long ears and the neck stay off the
 harp, and no hoof goes more than 0.6 cm into the frame of the harp (`claws in harp` of
 `pnpm pose-depth harpist`).
+
+The fit of 2026-11-13 (`scratch/dh/evalc.ts` and `scratch/dh/plane.ts` of the round, every 0.5 s
+or 0.1 s of `boulanger-matin` with the lift, the rest, and the lowering; `pnpm body-clip`,
+`pnpm hold-fit`, `pnpm arm-check harpist --base 6dcadfb9e`). The angle of an elbow is 180 degrees
+when the arm is straight.
+
+| Measure | Harp 0.975 | Harp 0.85 and its hold |
+| --- | --- | --- |
+| Right elbow angle, p5 and p50 | 57, 75 degrees | 99, 103 degrees |
+| Right upper arm out from the trunk, p50 and p95 | 46, 72 degrees | 33, 44 degrees |
+| Left elbow angle, p5 and p50 | 75, 86 degrees | 76, 86 degrees |
+| Fingers through the strings, left and right | 6.7, 4.7 cm | 1.9, 1.7 cm |
+| Paws past the strings by more than 1 cm, left and right | 79, 83 % | 2.4, 2.9 % |
+| Arm parts through the frame of the strings | 0 % | 0 % |
+| Palm targets within 5 mm | 100 % | 100 % |
+| Deepest region in a harp part or the stool (limit 1.3 cm) | 2.4 cm, right hoof in the base | 1.3 cm, left shin in the stool |
+| Clips of `pnpm body-clip harpist` | 5 | 0 |
+| Folds p95, left and right (limit 8) | 4, 5 | 6, 2 |
+| Paw swing p95, left and right (limit 70) | 66, 27 | 67, 27 |
+| Right grip turn p50 (limit 45) | 11 | 40 |
 
 **Color map** (`tools/deer-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and writes
 WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color.
