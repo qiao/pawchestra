@@ -1316,9 +1316,8 @@ navigation menu at the top of the mockup is out of scope.
       a close shot. Show the user a lineup (4.5, 9.7).
 - [ ] Test KTX2 body maps with the transcoder after the first frame. The high tier keeps the
       maps at full size: 386 MB of GPU memory in `boulanger-matin` (2.6).
-- [ ] Put two steps between the medium and the low tier: medium at the pixel ratio 1.25, then 1.0.
-      Now one slow window of 2 s drops a phone to the low tier, with no bloom and no depth of
-      field, for the session (`src/scene/quality.ts`, `src/app/settings.ts`) (2.6).
+- [ ] Measure on a real phone which step of the automatic tier holds 30 fps: medium, medium at
+      the pixel ratio 1.25 or 1.0, or low (2.6, 9.4).
 - [ ] Give the thin ears a warm light from behind: in `RIM_VERTEX`, a factor from the skin weights
       of the ear bones. Show the user a lineup (4.5).
 - [ ] Ask the user for instrument surface detail: a wood grain from a 3D noise in bind space on the
