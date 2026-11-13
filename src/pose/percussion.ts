@@ -1026,9 +1026,32 @@ function gripRoll(
 const GRIP_FADE = [30 * MathUtils.DEG2RAD, 10 * MathUtils.DEG2RAD] as const;
 
 /**
+ * Turns the strike direction of a mallet up, so that its grip is at most the height of
+ * `PercussionHold.gripRise` over its target (design 5.3). The heading of the mallet on the floor
+ * plane stays. A mallet that slopes down less, or a hold with no limit, keeps its direction.
+ *
+ * @param direction The unit direction of the mallet at the strike, from the grip to the head. The
+ *   function changes it.
+ * @param side The hand with a mallet.
+ */
+function limitRise(direction: Vector3, side: Extract<PercussionSide, { kind: 'mallet' }>): void {
+  if (side.gripRise === null) {
+    return;
+  }
+  const most = MathUtils.clamp(side.gripRise / side.length, 0, 1);
+  const flat = Math.hypot(direction.x, direction.z);
+  if (-direction.y <= most || flat < 1e-6) {
+    return;
+  }
+  const scale = Math.sqrt(1 - most * most) / flat;
+  direction.set(direction.x * scale, -most, direction.z * scale);
+}
+
+/**
  * Writes the wrist and the world rotation of a hand with a mallet across the forearm between
  * strikes (`PercussionHold.across`, design 5.3). At a strike, the mallet points from the home of
- * the hand to the target, and the grip stays at that place. The paw at rest holds the mallet
+ * the hand to the target, and the grip stays at that place. A hold can move the home out
+ * (`PercussionHold.homeOut`) and turn the mallet up ({@link limitRise}). The paw at rest holds the mallet
  * across the forearm, at its angle in the frame of the elbow, with the top of the grip along the
  * forearm toward the elbow, and the wrist lifts the head by `MalletAcross.lift`. Between the
  * two, the paw turns around the grip by a share of the smallest turn from the rest direction to
@@ -1064,7 +1087,14 @@ function acrossHand(
   if (!across) {
     return roll;
   }
-  strikeAlong.copy(point).sub(offset.fromArray(side.home).add(shift)).normalize();
+  offset.fromArray(side.home).add(shift);
+  // A target out past the home moves the home out (`PercussionHold.homeOut`).
+  if (side.homeOut !== null) {
+    const out = arm.side === 'L' ? -1 : 1;
+    offset.x = out * Math.max(out * offset.x, out * point.x + side.homeOut);
+  }
+  strikeAlong.copy(point).sub(offset).normalize();
+  limitRise(strikeAlong, side);
   grip.copy(point).addScaledVector(strikeAlong, -side.length);
   shoulderBind.fromArray(arm.bind.shoulder);
   elbowBind.fromArray(arm.bind.elbow);

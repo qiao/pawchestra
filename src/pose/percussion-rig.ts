@@ -274,6 +274,23 @@ interface PercussionHold {
    * mallet slants down. The x points to the out side of each hand: -x for the left hand.
    */
   readonly home: Vec3;
+  /**
+   * The largest height of the grip of a mallet over its target at a strike, in head heights `H`,
+   * or `null` for no limit. A target far out from the home turns the mallet steeply down from
+   * there, and the grip goes up toward the shoulder. With a limit, the mallet slopes down by at
+   * most the angle that puts the grip at this height, and it keeps its heading on the floor
+   * plane, so that the wrist stays low over the bars, as a real player keeps the hands low over
+   * the keyboard (`docs/reference/percussion-technique.md` 9).
+   */
+  readonly gripRise: number | null;
+  /**
+   * The least distance of the home of a mallet out from its target along x, in head heights `H`,
+   * or `null` for the home of {@link home} alone. A target out past the home of its hand moves the
+   * home further out, so that the mallet still points a little in to the target, as the shaft
+   * leaves the closed paw across the forearm. With no move, a mallet to an end bar points straight
+   * forward along the forearm, and the paw bends far on the forearm.
+   */
+  readonly homeOut: number | null;
   /** The turn of each mallet around its own axis in the paw. */
   readonly top: MalletTop;
   /**
@@ -441,6 +458,8 @@ export const PERCUSSION_HOLDS = {
     poleR: [0.8, -1, 0.2],
     rim: 0.25,
     home: [0.66, -0.25, -0.2],
+    gripRise: null,
+    homeOut: null,
     top: 'shoulder',
     across: { rest: -1.2, lift: 0.65, pitch: 0.3, peak: 4 },
     pitchR: 1,
@@ -523,6 +542,8 @@ export const PERCUSSION_HOLDS = {
     poleR: [0, -0.5, 0.4],
     rim: 0,
     home: [0.5, -0.389, -0.146],
+    gripRise: null,
+    homeOut: null,
     top: 'up',
     across: null,
     pitchR: 1,
@@ -586,6 +607,8 @@ export const PERCUSSION_HOLDS = {
     poleR: [0.3, -1, 0.5],
     rim: 0,
     home: [0.4, -0.3, -0.5],
+    gripRise: null,
+    homeOut: null,
     top: 'up',
     across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 5 },
     pitchR: 1,
@@ -619,6 +642,8 @@ export const PERCUSSION_HOLDS = {
     poleR: [0.5, -1, 0.3],
     rim: 0,
     home: MALLET_HOME,
+    gripRise: null,
+    homeOut: null,
     top: 'up',
     across: null,
     pitchR: 1,
@@ -652,6 +677,8 @@ export const PERCUSSION_HOLDS = {
     poleR: POLE_R,
     rim: 0,
     home: MALLET_HOME,
+    gripRise: null,
+    homeOut: null,
     top: 'up',
     across: { rest: -0.6, lift: 0.3, pitch: null, peak: 1.35 },
     pitchR: 1,
@@ -709,6 +736,8 @@ export const PERCUSSION_HOLDS = {
     // shoulder, and with the new tilt the forearms went 2.6 cm into the belly. With 0.3 H, the
     // forearms went 1.7 cm in.
     home: [0.35, -0.2, -0.75],
+    gripRise: null,
+    homeOut: null,
     top: 'up',
     across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 6 },
     // Both heads keep one height between strikes, because the paws do not pass each other.
@@ -786,6 +815,8 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   poleR: [0.6, -1, 0.3],
   rim: 0,
   home: [0.45, -0.3, -0.5],
+  gripRise: null,
+  homeOut: null,
   top: 'up',
   across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 5 },
   pitchR: 1,
@@ -1033,6 +1064,16 @@ export type PercussionSide =
       readonly head: Vec3;
       /** The place from which the mallet points to its target (`PercussionHold.home`). */
       readonly home: Vec3;
+      /**
+       * The largest height of the grip over its target at a strike, in meters, or `null` for no
+       * limit (`PercussionHold.gripRise`).
+       */
+      readonly gripRise: number | null;
+      /**
+       * The least distance of the home out from the target along x, in meters, or `null`
+       * (`PercussionHold.homeOut`).
+       */
+      readonly homeOut: number | null;
       /** The turn of the mallet around its own axis in the paw (`PercussionHold.top`). */
       readonly top: MalletTop;
       /** The mallet across the forearm between strikes (`PercussionHold.across`). */
@@ -1533,6 +1574,8 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
       arm,
       head: malletHead(bone),
       home: toVec3(fromShoulder(arm, homeOf(arm)).add(new Vector3(...place))),
+      gripRise: hold.gripRise === null ? null : hold.gripRise * h,
+      homeOut: hold.homeOut === null ? null : hold.homeOut * h,
       top: hold.top,
       across:
         hold.across && hold.across.pitch !== null && arm.side === 'R'
