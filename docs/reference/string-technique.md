@@ -549,6 +549,14 @@ The app follows these facts:
   side and the upper arm keeps near the turn of its bind, and closes its paw around the neck.
   The red fox stands its violin near the hip, so that its short left arm reaches the rest grip,
   and holds the bow upright beside the right thigh with the upper arm near the side (`FOX_HOLD`).
+- **The long rest (2.9).** In a rest of at least `LONG_REST.minSec` of the bowed family
+  (`src/pose/long-rests.ts`), the violin goes upright onto the lap [75], and a cellist keeps the
+  cello and rests the bow. The viola and the contrabass keep the playing pose
+  (`LONG_REST.keepUp`), because their moves and the rest pose of the contrabass clip more.
+  The lift ends at least one beat before the entry. In a shorter rest, the player keeps the
+  instrument up. No source gives the shortest rest in which a violinist lowers the violin, so the
+  app uses a rest longer than the rest of the winds, because the carry of the violin is a larger
+  move.
 
 The app does not follow these facts:
 

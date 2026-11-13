@@ -591,7 +591,7 @@ function* preparePlayerSteps(
   );
   const restSec = LONG_REST.minSec[note.family];
   const longRests =
-    restSec === undefined
+    restSec === undefined || LONG_REST.keepUp.has(place.cast.instrument)
       ? new Float64Array()
       : findLongRests(notes, beats, inputs.endSec ?? Infinity, restSec, motion);
   return {

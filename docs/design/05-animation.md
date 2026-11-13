@@ -202,8 +202,12 @@ count-in (5.4, 6.5), and lower them when the hold of `transport.holdSec` after a
   `transport.before` (`changeTransport()` of `app/transport.ts`).
 - **Count-in.** The slowest lift ends before the downbeat. A shorter count-in scales all lifts by
   one factor (`liftScale()`). A pause in the count-in lowers the instruments at once.
-- **Long rests.** A player lowers its instruments in a long rest of its own part, as a real wind
-  player does (winds 4). `playerWeight()` multiplies a third height from the song time
+- **Long rests.** A wind or string player lowers its instruments in a long rest of its own part,
+  as a real player does (winds 4, strings 3.2). The strings need a longer rest, because the carry
+  of the violin is a larger move. The viola and the contrabass keep the playing pose
+  (`LONG_REST.keepUp`), because their moves and the rest pose of the contrabass clip more. The
+  percussion has its own set position, and the piano, the harp, and the choir keep the playing
+  pose. `playerWeight()` multiplies a third height from the song time
   (`longRestHeight()` of `pose/long-rests.ts`), so a seek gives the same pose. A rest of at least
   `LONG_REST.minSec` of its family counts, also before the first note and after the last note.
   The instrument stays up for `LONG_REST.holdSec`, then goes down with the seeded lowering of the

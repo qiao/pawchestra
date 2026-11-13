@@ -1187,11 +1187,10 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Tool: `pnpm fold-probe` prints a wrong "Source middle (u)" for some faces. For face 133 of the
       deer it gives (-0.1721, 0.3031, 0.0644), but entry 133 of the corners file of the rig gives
       (-0.1909, 0.2710, 0.0843), the point that fixed the face in `weights.rigidPainted`.
-- [ ] Lower the instrument in a long rest, and lift it one beat before the entry. Multiply a third
-      factor into `playerWeight()` (`src/pose/pose-at.ts`) from the long rests of the player, as a
-      function of the song time only. Start with the winds and the brass, with rests of 8 s or
-      more. In `boulanger-matin`, 41% of the seat time is in a rest of 10 s or more, and the tuba
-      holds its mouthpiece for 120 s with no note (5.2, 5.5).
+- [ ] Let the viola and the contrabass lower in a long rest (`LONG_REST.keepUp`). In a long rest
+      of the viola, the right paw of the cat goes 2.7 cm into the viola (0.1 cm deeper than the
+      lowering after a pause), and the rest pose of the contrabass puts the left paw of the hippo
+      4.4 cm into the neck (5.2).
 - [ ] Give `swayOf()` a seeded sign, phase lag, and pulse level for each player. The sway of the 14
       string players of `beethoven-5-4` correlates at 0.991 or more, and the spine turns at most
       2.2°, about 2 pixels in the default view. Show the user a lineup at 1.5, 2, and 3 times.

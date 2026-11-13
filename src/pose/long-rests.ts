@@ -1,3 +1,4 @@
+import type { InstrumentId } from '../models/instruments/types.ts';
 import type { PlayerNote } from '../score/types.ts';
 import { beatLengthAt } from './count-in.ts';
 import type { MotionFamily } from './family.ts';
@@ -15,6 +16,12 @@ interface LongRestRules {
   readonly holdSec: number;
   /** The lift ends at least this many conducted beats before the entry. */
   readonly liftEndBeats: number;
+  /**
+   * The instruments that keep the playing pose in each rest of the music. In a long rest of the
+   * viola, the right paw of the cat went 0.1 cm deeper into the viola than in the lowering after a
+   * pause. The rest pose of the contrabass puts the left paw of the hippo 4.4 cm into the neck.
+   */
+  readonly keepUp: ReadonlySet<InstrumentId>;
 }
 
 /**
@@ -23,9 +30,10 @@ interface LongRestRules {
  * the entry (`docs/reference/wind-technique.md`, "Use in the app").
  */
 export const LONG_REST: LongRestRules = {
-  minSec: { woodwind: 8, brass: 8 },
+  minSec: { woodwind: 8, brass: 8, bowed: 12 },
   holdSec: 1,
   liftEndBeats: 1,
+  keepUp: new Set<InstrumentId>(['viola', 'contrabass']),
 };
 
 /**
