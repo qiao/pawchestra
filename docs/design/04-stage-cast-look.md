@@ -1097,8 +1097,8 @@ interface SeatExtras {
   pose of the player in each frame. The skeleton of the player has each arm straight down,
   because the pose code reads a hanging arm in the bind pose (5.2). Each paw turns toward the
   forearm up to `PAW_TURN`, because the skin bends well only near its clips. A pose can give a
-  paw its own turn (`pawTurnL`, `pawBendR`). Each shape takes its weight from the pose alone
-  (`raiseWeight()`), so the rule of stateless poses holds.
+  paw its own turn (`pawTurnL`, `pawTurnR`, `pawBendR`). Each shape takes its weight from the pose
+  alone (`raiseWeight()`), so the rule of stateless poses holds.
 - **Render.** The fur gets smooth normals within the crease angle of the body (`crease` of
   `ANIMALS`, `studioNormals()`). The bears take a larger angle and a color blend
   (`colorBlend`), so they look round with soft facets, and the edges of the muzzle and the claws

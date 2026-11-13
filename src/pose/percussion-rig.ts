@@ -584,7 +584,10 @@ export const PERCUSSION_HOLDS = {
     damp: null,
     curl: GRIP_CURL,
     strikeRoll: true,
-    keepPaw: false,
+    // The paws keep the turn of the hands, so that the curled claws close on the sticks in each
+    // sample (`pnpm wind-grip snare-drummer`). With the turn of the retarget of 24° to 35° in the
+    // play, the claw tips stood 3.3 cm off the sticks, and the paws grasped in 5% of the samples.
+    keepPaw: true,
   },
   // The lift is the half of the gap between the inner faces of the two cymbals. The elbows point
   // down and a little out, so that fewer faces of the left shoulder of the badger mesh fold in the

@@ -677,6 +677,10 @@ The rest of each family:
   and keeps one roll on the shaft through the stroke (`MalletSpot`, `gripRoll()`). The palm of
   each stump paw of the timpanist faces down, and the shaft crosses the lower side of the stump,
   as in the German grip (`TIMPANI.malletTilt`).
+- **Kept paws.** A hold with `PercussionHold.keepPaw` keeps each paw that holds a piece on the
+  hand of the player: the pose gives the paw the turn 0 in the plane of its palm (`pawTurnL`,
+  `pawTurnR`, design 4.4). Reason: the piece follows the hand of the player, and the turn of the
+  retarget toward the forearm moved the claws of the badger off its sticks.
 - A mallet lifts before a strike, comes down at full speed at the note start, and rebounds
   (`STRIKE_MOTION`). A strike within `legatoSec` of the strike before it of the same hand is a
   legato stroke: the mallet lifts at once after the strike before, to the top of the new strike,
