@@ -918,12 +918,59 @@ def relax(body, rounds=10, lam=0.5, mu=-0.53, clip=0.01):
     )
 
 
+def trunk_belly(body, rig, rest, X, rule):
+    """Gives the belly back a part of the form of the trunk in the posed bind. Bone heat gives the
+    thighs shares far up the belly and the flanks (0.1 at the chest line, 0.7 on the flank at the
+    hips). The seated thighs turn forward, so those shares pull the belly back up to 0.1 units,
+    and a hard diagonal ridge goes from each armpit down to the knee. For each vertex with rest y
+    below y[1]: X += s (M_hips - M_leg) r, summed over its leg bones with their weights, with r
+    its rest place and M the bind matrix of a bone. s = share * ss(z) * (1 - ss(y)), with ss(z) a
+    smoothstep of the rest z from z[0] to z[1] and ss(y) a smoothstep of the rest y from y[0] to
+    y[1]. With top, s also fades to 0 from top[0] to top[1] in rest z, so that the chest under the
+    arms keeps the bind and the upper arms keep their room. Thus the lap, the chest, and the back
+    keep the bind, and the weights do not change. Gives the new points and the moved vertices."""
+    names = {g.index: g.name for g in body.vertex_groups}
+    M = {
+        pb.name: np.array(pb.matrix @ pb.bone.matrix_local.inverted())
+        for pb in rig.pose.bones
+        if pb.bone.use_deform
+    }
+    legs = {n for n in M if n.startswith(('thigh', 'shin', 'foot', 'toe'))}
+    z0, z1 = rule['z']
+    y0, y1 = rule['y']
+    s = (
+        rule['share']
+        * ce.smoothstep(z0, z1, rest[:, 2])
+        * (1 - ce.smoothstep(y0, y1, rest[:, 1]))
+    )
+    if 'top' in rule:
+        s = s * (1 - ce.smoothstep(rule['top'][0], rule['top'][1], rest[:, 2]))
+    X = X.copy()
+    moved = []
+    for v in body.data.vertices:
+        i = v.index
+        if s[i] <= 0:
+            continue
+        r = np.r_[rest[i], 1.0]
+        d = np.zeros(3)
+        for g in v.groups:
+            name = names[g.group]
+            if name in legs and g.weight > 0:
+                d += g.weight * ((M['hips'] - M[name]) @ r)[:3]
+        if d.any():
+            X[i] += s[i] * d
+            moved.append(i)
+    log(f'trunk belly: {len(moved)} vertices move toward the trunk form')
+    return X, np.array(moved, int)
+
+
 def belly_key(body, rig):
     """The key `bind_belly`: relaxes the posed bind of the lower belly along the normals, as the
     rabbit and the fox (assets/models/rabbit/README.md, "Belly"), then moves the lower belly
     forward (the fox "Lap"). S: each vertex with rest z (Blender) from lo to hi, rest y below 0,
-    theta = atan2(|x|, -y) at most 60 degrees, and a distance from the z axis below 0.2. Each
-    round: P[i] += 0.5 ((mid - P[i]) . n[i]) n[i] for each i of S at the same time, with mid the
+    theta = atan2(|x|, -y) at most 60 degrees, and a distance from the z axis below radius
+    (default 0.2). With the rule trunk, trunk_belly() first moves the belly toward the trunk form.
+    Each round: P[i] += 0.5 ((mid - P[i]) . n[i]) n[i] for each i of S at the same time, with mid the
     middle of the mean of the edge neighbors above and the mean of those below (rest z more than
     0.01 apart), and n the vertex normal of the bind before the key. Then each vertex of S moves
     along -y (forward) by lap * ss(a, b, zb) * (1 - ss(c, d, zb)) * (1 + cos(pi theta / 60)) / 2,
@@ -943,7 +990,7 @@ def belly_key(body, rig):
         & (rest[:, 2] <= hi)
         & (rest[:, 1] < 0)
         & (theta <= 60)
-        & (np.hypot(rest[:, 0], rest[:, 1]) < 0.2)
+        & (np.hypot(rest[:, 0], rest[:, 1]) < rule.get('radius', 0.2))
     )[0]
     restore = be.pose_bind(body, rig)
     Pb = be.bind_points(body)
@@ -987,9 +1034,12 @@ def belly_key(body, rig):
 
     X = Pb.copy()
     moved = S
+    if 'trunk' in rule:
+        X, T = trunk_belly(body, rig, rest, X, rule['trunk'])
+        moved = np.union1d(moved, T)
     if crotch:
         X, C = smooth_crotch(X, crotch['z'], crotch['rounds'])
-        moved = np.union1d(S, C)
+        moved = np.union1d(moved, C)
         if crotch.get('rim'):
             # The faces of the crotch take the face attribute rim: the app gives each corner the
             # mean of the normals of the fur faces at its vertex with no crease angle, so the fold
