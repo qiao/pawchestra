@@ -724,28 +724,28 @@ passes.
 - [ ] Hand rig: the preview of `fit_eyes()` repeats `addEye()` and `eyeBend()` in Python
       (`tools/blender/studio_eyes.py`). On the cat, its bends match the module within 2e-4. A
       change of the bead eye of the app must change both, or the preview must come from the app.
-- [ ] Tripo bear candidate: with the cue facts (`cueHeadLeft` 35, `cueHeadRight` 30, `cueLift` 12),
-      the paws still go up to 1.0 cm into the head in the play (main 0.3 cm). Check the lower cue
-      hand and the smaller head turn in the hall view.
-- [ ] Tripo bear candidate: the longer elbow blend of round 12 moves the left flat p5 of the
-      conductor from 0.88 to 0.86 (main 0.83, limit 0.55) and the left move turn max from 448 to
-      450 (main 484). Check the bent left elbow in the hall view.
-- [ ] Tripo bear candidate: the body is 9 % taller than the bear of main to the ear tips, with the
-      same H, and its belly and waist are about 9 % wider. Ask the user if the form stays.
-- [ ] Cat candidate (fourth Tripo cat, `tripo-hand/`): the body keeps the legs of the source, so
-      its seat is 20.1 cm (the cat of main 29.8 cm), and its chair is lower than the chairs
-      around it. Check the string rows in the hall view.
-- [ ] Cat candidate: the thighs of the seated bind spread 20° so that the belly does not cover the
+- [ ] Tripo bear conductor: with the cue facts (`cueHeadLeft` 35, `cueHeadRight` 30, `cueLift`
+      12), the paws still go up to 1.0 cm into the head in the play (the bear before it 0.3 cm).
+      Check the lower cue hand and the smaller head turn in the hall view.
+- [ ] Tripo bear conductor: the longer elbow blend moves the left flat p5 of the conductor from
+      0.88 to 0.86 (the bear before it 0.83, limit 0.55) and the left move turn max from 448 to
+      450 (the bear before it 484). Check the bent left elbow in the hall view.
+- [ ] Tripo bear conductor: the body is 9 % taller to the ear tips than the bear before it, with
+      the same H, and its belly and waist are about 9 % wider. Ask the user if the form stays.
+- [ ] Tripo cat (fourth Tripo cat, `tripo-hand/`): the body keeps the legs of the source, so its
+      seat is 0.222 m (`seatHeight`, the cat before it 0.298 m). Check the chair against the
+      string rows in the hall view.
+- [ ] Tripo cat: the thighs of the seated bind spread 20° so that the belly does not cover the
       lap point. Check the knees against the music stand and the next seat in the hall view.
-- [ ] Cat candidate: the arms are near the limit of 45°: the left upper arm rolls 42.5° in the
+- [ ] Tripo cat: the arms are near the limit of 45°: the left upper arm rolls 42.5° in the
       stroke and -42.0° at rest, and the right forearm twists -42.9° at the tip. Check the
       shoulder and the wrist skin in the app.
-- [ ] Cat candidate: the map keeps the gray of the source, and the fur reads light tan in the close
+- [ ] Tripo cat: the map keeps the gray of the source, and the fur reads light tan in the close
       views with the fill light (gray in the play view and the hall view). Check the look in the
       app.
-- [ ] Cat candidate: the clearance of the arms and the viola has only renders. `pnpm pose-depth
+- [ ] Tripo cat: the clearance of the arms and the viola has only renders. `pnpm pose-depth
       violist` did not run on the fourth mesh.
-- [ ] Cat candidate: the smaller eyes and the lower upper lids have only ray checks of the lids (no
+- [ ] Tripo cat: the smaller eyes and the lower upper lids have only ray checks of the lids (no
       lid point leaves the head in a blink step). Check a blink in the app.
 - [ ] Tripo red fox violinist: the rest frog of the bow is 16 cm over the right thigh, because the
       short arm does not reach it (best reach 7.7 cm, and there the forearm goes into the belly).
@@ -772,7 +772,7 @@ passes.
       of `tools/fox-maps.py`), so they curve in places on the back, and they cross the painted
       mouth line. A flow field from the mesh (down the trunk, back on the head, out along the
       limbs and the tail) would give straighter strands.
-- [ ] Tripo fox candidate: the tan map moves the orange fur only by a lightness and a hue step
+- [ ] Tripo fox: the tan map moves the orange fur only by a lightness and a hue step
       (`TAN_STEP` of `tools/fox-maps.py`), so the tan fur keeps the chroma of the source and reads
       golden. A chroma step would read nearer the pale tan of the reference image.
 - [ ] Third Tripo rabbit: the seat is 0.196 m high, with the shins 6° forward and the heels 15°
@@ -832,7 +832,7 @@ passes.
       and the trunk slimmer (chest 0.30 m against 0.38 m). Also confirm the arms 1.3 times longer.
 - [ ] Tripo fawn: the eyeballs and their sockets are at 0.8 of the source, so that each eye opening
       is about 0.14 of the head width. Ask the user to confirm the eye size against the FBX.
-- [ ] Tripo beagle candidate: the right paw twists 66° on its forearm at rest (`pnpm arm-check
+- [ ] Tripo beagle cellist: the right paw twists 66° on its forearm at rest (`pnpm arm-check
       cellist`, paw twist p95), 92° before the rest grip of `f5031198e`. No rest grip, rest
       elbow, or bow turn of the scan took it to 45° or less. In one lowering at the end of
       `boulanger-matin` (280.67 s), the right paw turns 3,818°/s (limit 3,000). Check the bow
@@ -843,7 +843,7 @@ passes.
       knuckles of the chain `tools/blender/hand/dog/` that bend without a fold allow that curl.
 - [ ] Tripo beagle cellist folds: in the arm gate, the left arm folds 20 faces and the right arm
       12 (limit 8) now that both arms reach the strings. The left paw swings 75° (limit 70).
-- [ ] Tripo beagle candidate: the front of each elbow has one long quad band between 2 poles, with
+- [ ] Tripo beagle cellist: the front of each elbow has one long quad band between 2 poles, with
       no ring split. Check the inner elbow fold of the bow arm in the app.
 - [ ] Tripo beagle seats (4.5): the larger beagle and its 1/2 cello make the footprint of the
       cellist larger, so the layout moves the seats. In 12 of the 18 demos the stage side grows by
@@ -853,20 +853,18 @@ passes.
 - [ ] Tripo beagle cello size (4.6): the reach of the left arm fails the cello rule at each size,
       so the rule gives the clamp of a 1/10, and the 1/2 of the dog comes from the body scale by
       hand. Fit `CELLO_ELBOW` or the reach test to the hold of the dog (`DOG_HOLD`).
-- [x] Tripo beagle candidate: the cello size and place fit the smaller body (a 1/10 cello at the
-      place from the body, `DOG_HOLD.fit`).
 - [ ] Violist grip turn: with the level viola of 0.925, the left paw of the cat turns 64° from its
       accepted grip (p50, limit 45, 49° with the viola of 0.74, `ACCEPTED_GRIPS` of
       `tools/arm-check.ts`). Check the left paw in 2x crops, and give the new median to
       `ACCEPTED_GRIPS` if it is good.
-- [ ] Tripo monkey candidate: the eye whites read smaller, and the pupils larger and darker, in the
+- [ ] Tripo monkey: the eye whites read smaller, and the pupils larger and darker, in the
       app than in the FBX viewer (`reports/2026-11-11-monkey/panel.png`, face rows). Find whether
       the map scale, the finish `varnish`, or the light makes the change.
-- [ ] Tripo monkey candidate: the source has small notches at the back of the knees and under the
+- [ ] Tripo monkey: the source has small notches at the back of the knees and under the
       haunch, which show as dark marks in the back views. The look rule allows no point edit of
       the legs, so ask before any fix.
-- [ ] Tripo monkey candidate: the right hand closes under the valve casing, with no finger tip on a
-      valve cap (the hold constants of the monkey of main). Check the grip against the trumpet
+- [ ] Tripo monkey: the right hand closes under the valve casing, with no finger tip on a
+      valve cap (the hold constants of the monkey before it). Check the grip against the trumpet
       technique (`docs/reference/wind-technique.md` 2.1).
 - [ ] Tripo hippo: in the pizzicato of `brahms-2` (108 s to 114 s), the right upper arm and the
       right forearm each twist about 62°. A bow tip down keeps both near 47°, but the bow then
