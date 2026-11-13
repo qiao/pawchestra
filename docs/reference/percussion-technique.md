@@ -108,6 +108,8 @@ from the V).
   head [58].
 - The frame tilts the drum from vertical to horizontal. Rolls take a tilt of about 45°, but the
   drum does not lie flat [14] [28].
+- The player focuses on the movement of the conductor, which gives the pulse, and moves to mimic
+  it, because the percussion section is the farthest section from the conductor [68].
 - In the photos of the set-up and the grip, the hand holds the mallet at the near rim of the
   head, with the mallet along the head toward its middle, and the back of the hand away from the
   head [13 (photo)].
@@ -296,7 +298,9 @@ The app follows these facts:
 
 - **The grip (section 1).** The curled claws (`GRIP_CURL`) hold the shaft on the palm side, and
   the head leaves the front of the fist at the thumb side (`PAW_SPOT`, `PAW_TILT`). The butt end
-  sticks out behind the paw (`malletButt()`, `MALLET_BUTT`).
+  sticks out behind the paw (`malletButt()`, `MALLET_BUTT`). Each paw keeps the turn of the hand
+  of the player (`PercussionHold.keepPaw`), so the claws stay closed on the shaft
+  (`pnpm wind-grip`).
 - **The bass drum (section 5).** The beater has the size of a real one [44], and the drum the depth
   of a real one [43], at the scale of the badger, its head top over the mean height of an adult [45]
   (`BASS_DRUM`). The badger stands behind the drum, and the right paw holds the beater at the near
@@ -307,6 +311,9 @@ The app follows these facts:
   palm and fingers on the far head and goes back before the next note, as a player muffles the back
   head with the free hand [13] [58] (`PalmDamp`). The right upper arm hangs beside the body with the
   elbow down and back (section 3, `poleR`), so that the round rebuilt arm stays out of the belly.
+  The neck and the head turn back up by the lean of the spine, so that the badger looks ahead to
+  the conductor over the drum, as a player focuses on the movement of the conductor [68]
+  (`PercussionHold.headUp`).
 - **The snare drum (section 6).** The head is at about the height of the wrists (`SNARE_DRUM`).
   The sticks make a V and slant down a little at a strike. Between strikes, each tip stays about
   4 cm above the head, with the stick almost level, as in the ready position
@@ -315,9 +322,9 @@ The app follows these facts:
   strike, the ball at the tip touches the head (`SNARE_DRUM.tip`). Each paw holds its stick one
   third up from the butt (`SNARE_DRUM.malletButt`). The stick is 0.45 m long, a little longer
   than a real stick, because a shorter stick in front of the grip put the tips out of the reach
-  of the short arms. The elbows stand about a fist
-  from the body [17] (`poleL`, `poleR`), so that the round rebuilt upper arms stay out of the
-  belly. At rest, the sticks lie across the body in front of the waist, 3° and 8° from level,
+  of the short arms. The elbows point down and a little forward, about a fist from the body [17]
+  (`poleL`, `poleR`): the upper arms stand about 20° out from the side of the body, as the
+  hanging arms do. At rest, the sticks lie across the body in front of the waist, 3° and 8° from level,
   with the tips 3.5 cm and 6.8 cm above the head and about 1 cm in from the near rim, as the set
   position of a drumline [37] (`PercussionHold.set`). The two heights keep the sticks 3 cm apart. The sticks also go there in a long rest of the
   music, of at least 6 beats: one beat after the last strike, and back from 2 beats to 1 beat
@@ -412,11 +419,13 @@ The app does not follow these facts:
 - **The hand cymbals (section 7).** The angle of the flam is 15° at each loudness, smaller than
   the 35° to 45° of [60]: a small angle that keeps the plates not parallel [61]. The plates tilt 15° from vertical [16]. No concert source gives the rest place: in a long
   rest, the arms hang with the plates at the sides, as a marching method holds them [24].
-- **The xylophone grip (section 9).** The paws hang low in front of the belly, so each shaft runs
-  near the line of its forearm and leaves the paw under the curled claws. The right elbow points
-  far out, and each mallet points from a place out from its shoulder (`PercussionHold.home`), so
-  that the round rebuilt arms stay out of the leaning belly. The mallets thus point a little
+- **The xylophone grip (section 9).** The wrists stay about 13 cm over the bars, and the mallets
+  slope down to the bars. A real player keeps the hands at most one inch over the keyboard [39]. Each mallet points from a place out from its
+  shoulder (`PercussionHold.home`), so that the forearms stay out of the leaning belly. Lower
+  wrists put the forearms 2.4 cm to 3.1 cm into the belly. The mallets thus point a little
   further in. No source gives this choice.
+- **The rest at the xylophone (section 9).** No source gives it. The mallets lie across the body
+  as the snare sticks (`PercussionHold.set`).
 - **The lean over the xylophone (section 9).** The spine leans forward over the bars
   (`PercussionHold.lean`), because the short arms do not reach the bars from an upright body. The
   hips keep their place, because a small move of the hips tilts the short legs far.
@@ -457,7 +466,8 @@ The models of `percussion.ts` follow these facts of real concert instruments (de
 
 Sources 1 to 12 opened on 2026-10-19, sources 13 to 33 on 2026-10-20, sources 36 to 42 on
 2026-10-25, sources 43 to 45 on 2026-10-28, sources 46 to 52 on 2026-11-06, and sources 53 to 67
-on 2026-11-08, except where a source says "a search summary only".
+on 2026-11-08, and source 68 on 2026-11-12, except where a source says "a search summary
+only".
 
 1. "3 Timpani Grips", The Instrumentalist, December 2014.
    https://theinstrumentalist.com/december-2014/3-timpani-grips/
@@ -593,3 +603,5 @@ on 2026-11-08, except where a source says "a search summary only".
     https://theinstrumentalist.com/october-november-2020/tambourine-technique/
 67. A. Hugill, "The Orchestra: A User's Manual", Percussion Section.
     https://andrewhugill.com/OrchestraManual/section_percussion.html
+68. J. Campbell, "Fix It: Bass Drum Teaching Tips", Yamaha.
+    https://hub.yamaha.com/music-educators/instruments/perc/bass-drum-pedagogy/
