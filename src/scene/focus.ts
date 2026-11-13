@@ -1,8 +1,8 @@
 import type { Vec3 } from '../models/tuples.ts';
 
 /**
- * The lens of the depth of field (design 4.5, post effects). The focus follows the point that the
- * camera looks at. A close camera has the full aperture and a shallow depth of field. The aperture
+ * The lens of the depth of field (design 4.5, post effects). The focus follows the nearer eye of
+ * the hero of a shot, else the point that the camera looks at. A close camera has the full aperture and a shallow depth of field. The aperture
  * closes between two focus distances, so that the wide views keep the full stage sharp, as in
  * `scene.png`.
  */
@@ -107,6 +107,9 @@ export function apertureAt(distance: number, stageSide: number): number {
  * @param stageSide The stage side `S`, in meters.
  * @param pull The factor of the focus distance of a focus pull, 1 on the point. The aperture
  *   follows the distance to the point, so a pull does not open or close it.
+ * @param depth The view depth of the point in focus, such as an eye of the hero
+ *   ({@link heroFocusDepth}), or `null` for the point that the camera looks at. The aperture
+ *   follows the distance to the point that the camera looks at, so the eye does not open it.
  * @returns The focus.
  */
 export function focusOf(
@@ -116,14 +119,140 @@ export function focusOf(
   far: number,
   stageSide: number,
   pull = 1,
+  depth: number | null = null,
 ): Focus {
   const toPoint = Math.max(
     0.1,
     Math.hypot(target[0] - position[0], target[1] - position[1], target[2] - position[2]),
   );
-  const distance = toPoint * pull;
+  const distance = Math.max(0.1, depth ?? toPoint) * pull;
   const scale = blurScale(distance, fovDegrees, apertureAt(toPoint, stageSide));
   return { distance, scale, active: blurAt(far, distance, scale) > LENS.sharpBlur };
+}
+
+/**
+ * The rule of the focus on an eye (design 4.5, 5.6). A focus puller keeps the eyes of a face in a
+ * close shot sharp, and with a shallow depth of field the eye nearer to the camera
+ * (`camera-technique.md`).
+ */
+export const EYE_FOCUS = {
+  /**
+   * An eye shows when the front of the head turns at most about 100° away from the camera: the
+   * cosine between the front of the head and the line from the eye to the camera is at least this
+   * value. Thus a profile keeps the focus on its nearer eye, and a head seen from behind focuses on
+   * the middle of the head.
+   */
+  facing: -0.17,
+  /**
+   * A body whose eye bones lie nearer than this to the middle of its head, in meters, has no eye
+   * facts. Its focus goes to the middle of the head.
+   */
+  eyeOffset: 0.01,
+} as const;
+
+/** The middles of the eyes and of the head of a posed hero, in world axes. */
+export interface HeroHead {
+  /** The middle of the left eye. */
+  readonly eyeL: Vec3;
+  /** The middle of the right eye. */
+  readonly eyeR: Vec3;
+  /** The middle of the head. */
+  readonly head: Vec3;
+}
+
+/** The view of a camera for {@link heroFocusDepth}. */
+export interface FocusView {
+  /** The camera position. */
+  readonly position: Vec3;
+  /** The point that the camera looks at. */
+  readonly target: Vec3;
+  /** The vertical field of view, in degrees. */
+  readonly fov: number;
+  /** The width of the frame divided by its height. */
+  readonly aspect: number;
+}
+
+/**
+ * Gives the view depth of a point, and tells if the point is in the frame of a camera.
+ *
+ * @param view The camera.
+ * @param point The point.
+ * @returns The depth along the view axis, in meters, or `null` for a point out of the frame.
+ */
+function depthInFrame(view: FocusView, point: Vec3): number | null {
+  const { position: c, target: t } = view;
+  let fx = t[0] - c[0];
+  let fy = t[1] - c[1];
+  let fz = t[2] - c[2];
+  const length = Math.hypot(fx, fy, fz);
+  if (length <= 0) {
+    return null;
+  }
+  fx /= length;
+  fy /= length;
+  fz /= length;
+  // The right axis is level, as the camera of a shot has no roll: forward × up. Up is right ×
+  // forward.
+  const flat = Math.hypot(fx, fz) || 1;
+  const rx = -fz / flat;
+  const rz = fx / flat;
+  const ux = -fy * rz;
+  const uy = rz * fx - rx * fz;
+  const uz = fy * rx;
+  const dx = point[0] - c[0];
+  const dy = point[1] - c[1];
+  const dz = point[2] - c[2];
+  const depth = dx * fx + dy * fy + dz * fz;
+  const tanV = Math.tan((view.fov * Math.PI) / 360);
+  const tanH = tanV * view.aspect;
+  const inside =
+    depth > 0 &&
+    Math.abs(dx * rx + dz * rz) <= depth * tanH &&
+    Math.abs(dx * ux + dy * uy + dz * uz) <= depth * tanV;
+  return inside ? depth : null;
+}
+
+/**
+ * Gives the view depth of the focus on the hero of a shot (design 4.5, 5.6), as a focus puller
+ * focuses on the eye nearer to the camera:
+ *
+ * 1. The nearer eye, when it is in the frame and the front of the head turns toward the camera
+ *    ({@link EYE_FOCUS}).
+ * 2. Else, out of a detail insert, the middle of the head when it is in the frame: a head seen
+ *    from behind, or a body with no eye facts.
+ * 3. Else `null`: the focus stays on the point that the camera looks at, such as the detail of an
+ *    insert.
+ *
+ * The front of the head goes from the middle of the head to the middle of the eyes, so the rule
+ * reads only the eye places of the body.
+ *
+ * @param view The camera of the frame.
+ * @param hero The posed head of the hero.
+ * @param detail True in a detail insert.
+ * @returns The view depth, in meters, or `null`.
+ */
+export function heroFocusDepth(view: FocusView, hero: HeroHead, detail: boolean): number | null {
+  const { eyeL, eyeR, head } = hero;
+  const c = view.position;
+  const near = Math.hypot(eyeL[0] - c[0], eyeL[1] - c[1], eyeL[2] - c[2]);
+  const far = Math.hypot(eyeR[0] - c[0], eyeR[1] - c[1], eyeR[2] - c[2]);
+  const eye = near <= far ? eyeL : eyeR;
+  const fx = (eyeL[0] + eyeR[0]) / 2 - head[0];
+  const fy = (eyeL[1] + eyeR[1]) / 2 - head[1];
+  const fz = (eyeL[2] + eyeR[2]) / 2 - head[2];
+  const front = Math.hypot(fx, fy, fz);
+  if (front >= EYE_FOCUS.eyeOffset) {
+    const tx = c[0] - eye[0];
+    const ty = c[1] - eye[1];
+    const tz = c[2] - eye[2];
+    const toCamera = Math.hypot(tx, ty, tz) || 1;
+    const facing = (fx * tx + fy * ty + fz * tz) / (front * toCamera);
+    const depth = facing >= EYE_FOCUS.facing ? depthInFrame(view, eye) : null;
+    if (depth !== null) {
+      return depth;
+    }
+  }
+  return detail ? null : depthInFrame(view, head);
 }
 
 /**

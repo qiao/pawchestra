@@ -33,7 +33,9 @@ import { headOf } from '../pose/plan.ts';
 import type { ScenePose } from '../pose/types.ts';
 import { freeBeamOpacity } from '../shots/beam-opacity.ts';
 import type { FrameCover, ScreenBox, ViewFrame } from '../shots/frame.ts';
+import { CONDUCTOR_OWNER } from '../shots/clearance.ts';
 import type { CameraPose } from '../shots/types.ts';
+import { CINEMA_ASPECT } from '../shots/view.ts';
 import type { ModelCache } from '../models/model-cache.ts';
 import { buildSceneProps } from '../models/props.ts';
 import { STAGE_THICKNESS, buildSheets } from '../models/stage.ts';
@@ -47,8 +49,8 @@ import {
   createEnvironmentSteps,
 } from './environment.ts';
 import type { CaptureOptions } from './environment.ts';
-import { FREE_LENS, focusOf, freeFocusDistance, freeFocusOf } from './focus.ts';
-import type { Focus, FocusSpot } from './focus.ts';
+import { FREE_LENS, focusOf, freeFocusDistance, freeFocusOf, heroFocusDepth } from './focus.ts';
+import type { Focus, FocusSpot, FocusView } from './focus.ts';
 import { createMaterials } from './geometry.ts';
 import { createHall, setHallCamera } from './hall.ts';
 import { BeamDepth, setBeamFrame } from './beam.ts';
@@ -78,8 +80,9 @@ import {
   holdSkeletons,
   releaseSkeletons,
   sharedGeometryOf,
+  writeHeadPoints,
 } from './player.ts';
-import type { PlayerSpot } from './player.ts';
+import type { HeadPoints, PlayerSpot } from './player.ts';
 import { createPoseCull, markNeeded } from './pose-cull.ts';
 import type { PoseCull } from './pose-cull.ts';
 import { setBandViewHeight } from './harp-strings.ts';
@@ -239,6 +242,42 @@ function cameraView(camera: PerspectiveCamera, out: Frustum): Frustum {
   camera.updateMatrixWorld();
   viewProjection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
   return out.setFromProjectionMatrix(viewProjection, camera.coordinateSystem, camera.reversedDepth);
+}
+
+/**
+ * Gives the index of the mesh of a hero in {@link LayoutView}.players.
+ *
+ * @param view The layout of the frame.
+ * @param hero The hero of a shot (`Shot.hero`): a player, `CONDUCTOR_OWNER`, or `null`.
+ * @returns The index, or `null` for no hero or a hero with no mesh.
+ */
+function heroMeshIndex(view: LayoutView, hero: number | null): number | null {
+  if (hero === null) {
+    return null;
+  }
+  const index = hero === CONDUCTOR_OWNER && view.layout.conductor ? view.players.length - 1 : hero;
+  return index >= 0 && index < view.players.length ? index : null;
+}
+
+/** The head of the hero of a frame, which {@link heroDepth} writes before it reads it. */
+const heroHead: HeadPoints = { eyeL: [0, 0, 0], eyeR: [0, 0, 0], head: [0, 0, 0] };
+
+/**
+ * Gives the view depth of the focus on the nearer eye of the hero of a shot, from its posed head
+ * (`heroFocusDepth()`, design 4.5, 5.6). The frame must have posed the hero.
+ *
+ * @param view The layout of the frame.
+ * @param camera The camera of the frame.
+ * @param hero The hero of the shot, or `null`.
+ * @returns The depth, in meters, or `null` for no hero, or for a hero out of the frame.
+ */
+function heroDepth(view: LayoutView, camera: FocusView, hero: number | null): number | null {
+  const index = heroMeshIndex(view, hero);
+  const mesh = index === null ? undefined : view.players[index];
+  if (!mesh || !writeHeadPoints(mesh, heroHead)) {
+    return null;
+  }
+  return heroFocusDepth(camera, heroHead, false);
 }
 
 /** The flags of a seat that the solo light reads (design 2.4): `SeatFlags` of the app. */
@@ -1174,7 +1213,7 @@ export class StageScene {
     const beamGroup = view.lights.children.find((child) => child instanceof Group);
     const depthPass = beamGroup instanceof Group;
     if (depthPass) {
-      this.#holdPose(view, poser);
+      this.#holdPose(view, poser, shot);
       const hidden = [...view.effects, view.hall];
       this.#beamDepth.crop(postView.rect);
       this.#beamDepth.render(this.#renderer, view.scene, camera, hidden, this.#variants);
@@ -1188,12 +1227,13 @@ export class StageScene {
       });
     }
     setHallCamera(view.hall, view.stageSide, camera.position, this.#beamDepth.size[1]);
+    if (!depthPass) {
+      this.#holdPose(view, poser, shot);
+    }
+    // The focus reads the posed head of the hero of the shot.
     const live = this.#focusOf(view, shot, performance.now());
     const focus = shown.focus ? blendFocus(shown.focus, live, share) : live;
     this.#shown = { cinema, beam, light, spot, focus };
-    if (!depthPass) {
-      this.#holdPose(view, poser);
-    }
     renderScenePass(this.#renderer.shadowMap, depthPass, () => {
       if (this.#post) {
         const haze = depthPass ? this.#hazeOf(view) : null;
@@ -1241,8 +1281,10 @@ export class StageScene {
    *
    * @param view The layout of the frame.
    * @param poser The poses of the frame, or `null` to keep the poses. Then all players show.
+   * @param shot The camera of the shot of the frame, or `null` in Free mode. The frame poses its
+   *   heroes, because the focus reads their heads (design 4.5, 5.6).
    */
-  #holdPose(view: LayoutView, poser: FramePoser | null): void {
+  #holdPose(view: LayoutView, poser: FramePoser | null, shot: CameraPose | null): void {
     const cull = view.poseCull;
     const needed = cull.needed;
     if (poser) {
@@ -1254,6 +1296,12 @@ export class StageScene {
         views.push(shadow);
       }
       markNeeded(cull, views);
+      for (const hero of [shot?.hero, shot?.heroFrom]) {
+        const index = heroMeshIndex(view, hero ?? null);
+        if (index !== null) {
+          needed[index] = 1;
+        }
+      }
       applyScenePose(view.players, poser(needed), needed);
     } else {
       needed.fill(1);
@@ -1358,6 +1406,17 @@ export class StageScene {
     const target = view.camera.target;
     let focus: Focus;
     if (shot) {
+      const focusView = { position, target, fov: camera.fov, aspect: CINEMA_ASPECT };
+      const to = heroDepth(view, focusView, shot.hero ?? null);
+      const from = heroDepth(view, focusView, shot.heroFrom ?? shot.hero ?? null);
+      const share = shot.heroShare ?? 1;
+      // During a blend, the focus goes from the eye of the hero of the previous shot. A hero with
+      // no eye or head in the frame takes the point that the camera looks at.
+      const toPoint = camera.position.distanceTo(new Vector3(...target));
+      const depth =
+        to === null && from === null
+          ? null
+          : (from ?? toPoint) + ((to ?? toPoint) - (from ?? toPoint)) * share;
       focus = focusOf(
         position,
         target,
@@ -1365,6 +1424,7 @@ export class StageScene {
         camera.far,
         view.stageSide,
         shot.focusPull ?? 1,
+        depth,
       );
     } else {
       let distance = freeFocusDistance(position, target, view.stageSide, view.spots);

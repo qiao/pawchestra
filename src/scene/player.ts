@@ -8,6 +8,7 @@ import {
   Mesh,
   Skeleton,
   SkinnedMesh,
+  Vector3,
 } from 'three';
 import type { Matrix4Tuple, MeshStandardMaterial, Object3D } from 'three';
 
@@ -698,6 +699,82 @@ function readPoseLocals(mesh: SkinnedMesh): void {
     skeleton.readLocals(player.pose.matrices, mesh, group);
     mesh.remove(group);
   }
+}
+
+/** The middles of the eyes and of the head of a posed player, in world axes (design 4.5, 5.6). */
+export interface HeadPoints {
+  /** The middle of the left eye: the posed head of the eye bone `eye_L`. */
+  readonly eyeL: [number, number, number];
+  /** The middle of the right eye: the posed head of the eye bone `eye_R`. */
+  readonly eyeR: [number, number, number];
+  /** The middle of the head: the posed `headCenter` of the body. */
+  readonly head: [number, number, number];
+}
+
+/** The indices of the studio bones of {@link HeadPoints}. */
+const HEAD_POINT_BONES = {
+  eyeL: STUDIO_BONES.indexOf('eye_L'),
+  eyeR: STUDIO_BONES.indexOf('eye_R'),
+  head: STUDIO_BONES.indexOf('head'),
+} as const;
+
+/** The pose matrix of one bone, which {@link writePosedPoint} writes before it reads it. */
+const posedMatrix = new Matrix4();
+
+/** The point of {@link writePosedPoint}, which it writes before it reads it. */
+const posedPoint = new Vector3();
+
+/**
+ * Writes a point of a studio body in the bind pose at its place in the pose of the last frame, in
+ * world axes.
+ *
+ * @param mesh The player mesh. Its world matrix must be ready.
+ * @param matrices The pose matrices of the studio bones of the mesh (`StudioPose.matrices`).
+ * @param bone The index of the studio bone that the point follows.
+ * @param bind The point in the bind pose, in the model axes.
+ * @param out The point to write.
+ */
+function writePosedPoint(
+  mesh: SkinnedMesh,
+  matrices: Float32Array,
+  bone: number,
+  bind: Vec3,
+  out: [number, number, number],
+): void {
+  posedMatrix.fromArray(matrices, bone * 16);
+  posedPoint
+    .set(...bind)
+    .applyMatrix4(posedMatrix)
+    .applyMatrix4(mesh.matrixWorld);
+  out[0] = posedPoint.x;
+  out[1] = posedPoint.y;
+  out[2] = posedPoint.z;
+}
+
+/**
+ * Writes the middles of the eyes and of the head of a player in the pose of the last frame, for
+ * the focus of a shot (design 4.5, 5.6). Each body gives the bind place of its eye bones: the
+ * middle of a bead eye, or of the sphere of an eye of its mesh (design 4.4). The pose matrix of
+ * an eye bone keeps the middle of the eye at its place in a blink. Thus the points need no
+ * constant of a species.
+ *
+ * @param mesh A mesh of {@link createPlayerMesh}, posed by {@link applyPose}. Its world matrix
+ *   must be ready.
+ * @param out The points to write.
+ * @returns True if it wrote the points, or false for a mesh with no studio body.
+ */
+export function writeHeadPoints(mesh: SkinnedMesh, out: HeadPoints): boolean {
+  const player = studioPlayers.get(mesh);
+  if (!player) {
+    return false;
+  }
+
+  const { heads, headCenter } = player.rig.body;
+  const { matrices } = player.pose;
+  writePosedPoint(mesh, matrices, HEAD_POINT_BONES.eyeL, heads.eye_L, out.eyeL);
+  writePosedPoint(mesh, matrices, HEAD_POINT_BONES.eyeR, heads.eye_R, out.eyeR);
+  writePosedPoint(mesh, matrices, HEAD_POINT_BONES.head, headCenter, out.head);
+  return true;
 }
 
 /**
