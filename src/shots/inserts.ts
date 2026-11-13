@@ -5,25 +5,30 @@ import type { PlayTarget } from '../models/instruments/types.ts';
 import type { PlayerPlace, SceneLayout } from '../models/layout.ts';
 import type { ModelCache } from '../models/model-cache.ts';
 import type { PlayerModel } from '../models/player.ts';
+import { boneIndex } from '../models/rig.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import { lastAtOrBefore } from '../pose/blend.ts';
 import { conductorBeatPoint } from '../pose/conductor.ts';
 import type { PosePlan } from '../pose/plan.ts';
+import { createScenePose, poseAt } from '../pose/pose-at.ts';
+import type { ScenePoseBuffer } from '../pose/pose-at.ts';
 import { mixHash, mulberry32 } from '../pose/random.ts';
 import type { Transport } from '../pose/types.ts';
 import { FOCUS_PULL, cameraAt, createCameraPose } from './camera-at.ts';
 import { keyDistance, writeKeyPosition } from './camera-keys.ts';
-import { CONDUCTOR_OWNER, bodyBoxes, cameraClear } from './clearance.ts';
-import type { StageClearance } from './clearance.ts';
 import {
-  ANIMAL_FLOOR,
-  animalTooNear,
-  foregroundHead,
-  foregroundObject,
-  inFrame,
-} from './foreground.ts';
+  CLEARANCE,
+  CONDUCTOR_OWNER,
+  bodyBoxes,
+  segmentClear,
+  targetLineClear,
+} from './clearance.ts';
+import type { Segment, StageClearance } from './clearance.ts';
+import { ANIMAL_FLOOR, animalTooNear, foregroundHead, inFrame, lensScale } from './foreground.ts';
 import type { StageBody, StageHead } from './foreground.ts';
 import { FILM_GRAMMAR, keepsLine } from './grammar.ts';
+import { INSERT_FRAME, cutsFace, insertCover, posePlayer, posedPoint } from './insert-frame.ts';
+import type { InsertDetailPart, InsertView, PosedPlayer } from './insert-frame.ts';
 import { entriesIn, musicIn } from './music.ts';
 import type { ScoreMusic, WindowMusic } from './music.ts';
 import { frontOf, onStage } from './subjects.ts';
@@ -95,6 +100,17 @@ export const INSERT_LENS = {
   offset: [10, 35],
   /** The range of the seeded elevation above the detail, in degrees. */
   elevation: [12, 24],
+  /** The step to which the seeded azimuth snaps, in degrees. */
+  turnStep: 12,
+  /** The step to which the seeded elevation snaps, in degrees. */
+  riseStep: 6,
+  /**
+   * The step of the grid to which the point of a detail in the play pose snaps, in meters. The
+   * tests of the stage at one point then serve the inserts of a detail at its other times.
+   */
+  snap: 0.04,
+  /** The factors of the frame size of each detail (`INSERT_SIZES`) that the search tries in turn. */
+  sizes: [1],
   /** The steps of the search around the seeded azimuth, in degrees, to both sides. */
   azimuthSteps: [0, 12, 24, 36, 48, 60, 72],
   /** The steps of the search above the seeded elevation, in degrees. */
@@ -152,12 +168,24 @@ interface DetailSpot {
   readonly front: number;
   /** The elevation that the detail adds to the seeded elevation, in degrees. */
   readonly lift: number;
-  /** The point of the detail, or the low end of a line of keys or bars. */
+  /**
+   * The point of the detail, or the low end of a line of keys or bars, in the model axes of the
+   * bind pose.
+   */
   readonly point: Vec3;
   /** The high end of a line of keys or bars, or `null` for a point. */
   readonly end: Vec3 | null;
   /** The MIDI keys at `point` and at `end`, or `null` for a point. */
   readonly keys: readonly [number, number] | null;
+  /**
+   * The bone of the player that the point follows, as an index in `BONE_NAMES`, or -1 for a
+   * point that keeps its bind place on the stage: the beat point of the baton.
+   */
+  readonly bone: number;
+  /** The player model. */
+  readonly model: PlayerModel;
+  /** The place of the player on the stage. */
+  readonly place: Pick<PlayerPlace, 'position' | 'facing'>;
 }
 
 /** The camera of an insert at its detail, with no time. */
@@ -166,6 +194,8 @@ interface InsertCamera {
   readonly to: ShotKey;
   /** The camera at the start of the move. */
   readonly camera: Vec3;
+  /** Half the height of the frame at the detail, in meters. */
+  readonly half: number;
 }
 
 /** The inputs of {@link planInserts}. */
@@ -215,6 +245,16 @@ function targetPoint(model: PlayerModel, target: PlayTarget, at: number): Vec3 |
   return placePoint(model.pieces, { bone: target.bone, at: point });
 }
 
+/** One detail of a player model, in the model axes of the bind pose. */
+interface ModelDetail {
+  readonly detail: InsertDetail;
+  readonly point: Vec3;
+  readonly end: Vec3 | null;
+  readonly keys: readonly [number, number] | null;
+  /** The bone of the player that the point follows, as an index in `BONE_NAMES`. */
+  readonly bone: number;
+}
+
 /**
  * Finds the details of one player in the model axes: the keys of a piano, the bow and the left
  * paw of a string player, the strings of a harp, the paws of a woodwind, the slide of a trombone,
@@ -223,29 +263,25 @@ function targetPoint(model: PlayerModel, target: PlayTarget, at: number): Vec3 |
  * @param model The player model.
  * @returns The details, each with a point, or a line with its keys.
  */
-function modelDetails(model: PlayerModel): {
-  detail: InsertDetail;
-  point: Vec3;
-  end: Vec3 | null;
-  keys: readonly [number, number] | null;
-}[] {
+function modelDetails(model: PlayerModel): ModelDetail[] {
   const { targets, grips, id } = model.instrument;
   const of = (kind: PlayTarget['kind']): PlayTarget[] => targets.filter((t) => t.kind === kind);
+  const instrument = boneIndex('instrument');
   const palm = (side: 'palmL' | 'palmR'): Vec3 | null => {
     const grip = grips[side];
     return grip?.bone === 'instrument' ? placePoint(model.pieces, grip) : null;
   };
-  const out: ReturnType<typeof modelDetails> = [];
+  const out: ModelDetail[] = [];
   const line = (detail: InsertDetail, target: PlayTarget | undefined): void => {
     const a = target ? targetPoint(model, target, 0) : null;
     const b = target ? targetPoint(model, target, 1) : null;
     if (target && a && b) {
-      out.push({ detail, point: a, end: b, keys: target.keys });
+      out.push({ detail, point: a, end: b, keys: target.keys, bone: boneIndex(target.bone) });
     }
   };
-  const point = (detail: InsertDetail, at: Vec3 | null): void => {
+  const point = (detail: InsertDetail, at: Vec3 | null, bone = instrument): void => {
     if (at) {
-      out.push({ detail, point: at, end: null, keys: null });
+      out.push({ detail, point: at, end: null, keys: null, bone });
     }
   };
   const [contact] = of('bow-contact');
@@ -286,12 +322,20 @@ function modelDetails(model: PlayerModel): {
       break;
     }
     case 'trombone':
-      point('slide', slide ? targetPoint(model, slide, 0.5) : null);
+      point(
+        'slide',
+        slide ? targetPoint(model, slide, 0.5) : null,
+        boneIndex(slide?.bone ?? 'slide'),
+      );
       break;
     case 'horn':
     case 'trumpet':
     case 'tuba':
-      point('bell', bell ? targetPoint(model, bell, 0) : null);
+      point(
+        'bell',
+        bell ? targetPoint(model, bell, 0) : null,
+        boneIndex(bell?.bone ?? 'instrument'),
+      );
       break;
     case 'timpani':
     case 'snare-drum':
@@ -333,14 +377,13 @@ function stageDetails(layout: SceneLayout, models: ModelCache): DetailSpot[] {
     for (const d of modelDetails(model)) {
       const keys = d.detail === 'keys' ? INSERT_LENS.keyboard : null;
       spots.push({
-        detail: d.detail,
+        ...d,
         seat,
         owner: index,
         front: frontOf(place.facing) + (keys?.turn ?? 0) * DEG,
         lift: keys?.lift ?? 0,
-        point: onStage(d.point, place),
-        end: d.end ? onStage(d.end, place) : null,
-        keys: d.keys,
+        model,
+        place,
       });
     }
   }
@@ -353,9 +396,12 @@ function stageDetails(layout: SceneLayout, models: ModelCache): DetailSpot[] {
       // The bear faces the orchestra, so the camera of its baton stands on the audience side.
       front: 0,
       lift: 0,
-      point: onStage(conductorBeatPoint(bear), layout.conductor),
+      point: conductorBeatPoint(bear),
       end: null,
       keys: null,
+      bone: -1,
+      model: bear,
+      place: layout.conductor,
     });
   }
   return spots;
@@ -391,25 +437,44 @@ function notesIn(music: ScoreMusic, seat: number, from: number, to: number): [nu
   return [count, count > 0 ? sum / count : 0];
 }
 
+/** The detail of an insert in the play pose: the point that the camera looks at, and its part. */
+interface PosedDetail {
+  /** The point of the detail on the stage: the middle of the frame. */
+  readonly target: Vec3;
+  /** The point or the line of the detail with its reach, for the cover test. */
+  readonly part: InsertDetailPart;
+}
+
 /**
- * Gives the point of a detail at a time: the point, or the place of the mean key of the notes of
- * the insert on a line of keys or bars, where the paws or the mallets play.
+ * Gives the point of a detail in the play pose of the middle of the insert (design 5.6): the
+ * point, or the place of the mean key of the notes of the insert on a line of keys or bars, where
+ * the paws or the mallets play. The bell of a played trumpet hangs lower than in the bind pose, so
+ * a frame at the bind point cut the head of the player through the eyes.
  *
  * @param spot The detail.
+ * @param posed The player of the detail in the pose of the middle of the insert.
  * @param meanKey The mean MIDI key of the notes of the insert, or 0 for none.
- * @returns The point.
+ * @returns The posed point and the part of the detail.
  */
-function detailPoint(spot: DetailSpot, meanKey: number): Vec3 {
-  const { point, end, keys } = spot;
-  if (!end || !keys || meanKey <= 0) {
-    return end ? middle(point, end) : point;
+function detailAt(spot: DetailSpot, posed: PosedPlayer, meanKey: number): PosedDetail {
+  const { point, end, keys, bone } = spot;
+  const place = (p: Vec3): Vec3 => (bone < 0 ? onStage(p, spot.place) : posedPoint(posed, bone, p));
+  const reach = INSERT_FRAME.detailReach * INSERT_SIZES[spot.detail];
+  const from = place(point);
+  if (!end) {
+    return { target: from, part: { from, to: from, reach } };
   }
-  const t = Math.min(1, Math.max(0, (meanKey - keys[0]) / Math.max(1, keys[1] - keys[0])));
-  return [
-    point[0] + (end[0] - point[0]) * t,
-    point[1] + (end[1] - point[1]) * t,
-    point[2] + (end[2] - point[2]) * t,
+  const to = place(end);
+  const t =
+    keys && meanKey > 0
+      ? Math.min(1, Math.max(0, (meanKey - keys[0]) / Math.max(1, keys[1] - keys[0])))
+      : 0.5;
+  const target: Vec3 = [
+    from[0] + (to[0] - from[0]) * t,
+    from[1] + (to[1] - from[1]) * t,
+    from[2] + (to[2] - from[2]) * t,
   ];
+  return { target, part: { from, to, reach } };
 }
 
 /** The camera of a main shot at a cut of an insert. */
@@ -431,6 +496,21 @@ const SAMPLE_TRANSPORT: Transport = {
   seekStart: false,
   endedAtSong: false,
   holdSec: 0,
+  leadSec: Infinity,
+};
+
+/**
+ * The transport of the play pose of a detail: a play from the song start, with the instruments
+ * up.
+ */
+const PLAYING: Transport = {
+  playing: true,
+  changedAtWall: 0,
+  before: null,
+  startSec: 0,
+  seekStart: false,
+  endedAtSong: false,
+  holdSec: 3,
   leadSec: Infinity,
 };
 
@@ -488,45 +568,94 @@ function cutKeepsGrammar(main: MainCamera, camera: Vec3, target: Vec3, half: num
   return angle >= FILM_GRAMMAR.jumpAngle;
 }
 
+/** A detail of an insert in the play pose of the middle of the insert. */
+interface DetailView {
+  readonly spot: DetailSpot;
+  /** The posed point and the part of the detail. */
+  readonly detail: PosedDetail;
+  /** The player of the detail in the pose of the middle of the insert. */
+  readonly posed: PosedPlayer;
+  /** The radius of a sphere around the head of the player, with the snout, in meters. */
+  readonly headRadius: number;
+}
+
+/** The test that refuses a camera of an insert. */
+type InsertRefusal =
+  | 'line'
+  | 'beam'
+  | 'sight'
+  | 'floor'
+  | 'head-floor'
+  | 'head'
+  | 'cover'
+  | 'soft'
+  | 'detail'
+  | 'face';
+
 /**
- * Tells if a camera of an insert is clear (design 5.6): it keeps the line of the stage, stays on
- * one side of the beam, sees its detail, keeps {@link INSERT_FLOOR} from each body and
- * `ANIMAL_FLOOR` from each head in its frame, and has no head or other object in its foreground.
+ * Finds the first test of the stage that refuses a camera of an insert (design 5.6). These tests
+ * read only the point of the detail, so the planner keeps their results for each point. A clear
+ * camera keeps the line of the stage, stays on one side of the beam, sees its detail, keeps
+ * {@link INSERT_FLOOR} from each body and `ANIMAL_FLOOR` from each head in its frame, and has no
+ * head of another player in its foreground. The line of sight skips the boxes of the player of
+ * the detail, because they hold its arms in the bind pose: the cover test reads its posed body.
  *
  * @param inputs The inputs of the plan.
  * @param spot The detail.
  * @param target The point of the detail.
  * @param near The camera at the end of the push-in.
  * @param far The camera at the start of the move.
- * @returns True if the camera is clear.
+ * @returns The refusal, or `null` for a clear camera.
  */
-function insertClear(
+function stageRefusal(
   inputs: InsertInputs,
   spot: DetailSpot,
   target: Vec3,
   near: Vec3,
   far: Vec3,
-): boolean {
+): InsertRefusal | null {
   const { fov, beamMargin } = INSERT_LENS;
   const aspect = CINEMA_ASPECT;
   const S = inputs.stageSide;
+  const { clearance } = inputs;
   for (const camera of [near, far]) {
     if (!keepsLine(camera, target)) {
-      return false;
+      return 'line';
     }
   }
   const sides = [near, far].map((c) =>
     insideBeam(S, c, beamMargin) ? 1 : insideBeam(S, c, -beamMargin) ? 0 : -1,
   );
   if (sides.includes(0) || sides[0] !== sides[1]) {
-    return false;
+    return 'beam';
   }
-  if (!cameraClear(inputs.clearance, target, near, far, bodyBoxes(inputs.clearance, target))) {
-    return false;
+  const held = bodyBoxes(clearance, target);
+  const seen = new Set(held);
+  for (const obstacle of clearance.obstacles) {
+    if (obstacle.owner === spot.owner) {
+      for (const box of obstacle.boxes) {
+        seen.add(box);
+      }
+    }
+  }
+  const path: Segment = {
+    ax: near[0],
+    ay: near[1],
+    az: near[2],
+    bx: far[0],
+    by: far[1],
+    bz: far[2],
+  };
+  if (
+    Math.min(near[1], far[1]) < CLEARANCE.height ||
+    !targetLineClear(clearance, target, far, seen) ||
+    !segmentClear(clearance, path, 'clearance', held)
+  ) {
+    return 'sight';
   }
   for (const camera of [near, far]) {
     if (animalTooNear(inputs.bodies, camera, target, fov, aspect, INSERT_FLOOR)) {
-      return false;
+      return 'floor';
     }
     for (const head of inputs.heads) {
       const d = Math.hypot(
@@ -535,83 +664,205 @@ function insertClear(
         head.center[2] - camera[2],
       );
       if (d - head.radius < ANIMAL_FLOOR && inFrame(head.center, camera, target, fov, aspect)) {
-        return false;
+        return 'head-floor';
       }
     }
-    const members = [spot.owner];
-    if (foregroundHead(inputs.heads, members, target, camera, target, fov, aspect)) {
-      return false;
-    }
-    if (foregroundObject(inputs.clearance, members, target, camera, target, fov, aspect)) {
-      return false;
+    if (foregroundHead(inputs.heads, [spot.owner], target, camera, target, fov, aspect)) {
+      return 'head';
     }
   }
-  return true;
+  return null;
 }
 
 /**
- * Lists the clear cameras of an insert at a point, in the order of the search: the seeded azimuth
- * and elevation, then the steps around them (design 5.6).
+ * Finds the first test of the play pose that refuses a camera of an insert (design 5.6). The
+ * objects in front of the detail, also the posed body of its player, cover at most
+ * `INSERT_FRAME.coverShare` of the frame and leave the detail free. The frame shows both eyes of
+ * the player of the detail, or no part of its head.
  *
  * @param inputs The inputs of the plan.
- * @param spot The detail.
- * @param target The point of the detail.
- * @param random The seeded generator of the insert.
- * @returns The clear cameras.
+ * @param view The detail in the play pose.
+ * @param near The camera at the end of the push-in.
+ * @param far The camera at the start of the move.
+ * @returns The refusal, or `null` for a clear camera.
  */
-function insertCameras(
+function poseRefusal(
   inputs: InsertInputs,
-  spot: DetailSpot,
-  target: Vec3,
+  view: DetailView,
+  near: Vec3,
+  far: Vec3,
+): InsertRefusal | null {
+  const { spot, detail, posed } = view;
+  for (const camera of [near, far]) {
+    const frame: InsertView = {
+      camera,
+      target: detail.target,
+      fov: INSERT_LENS.fov,
+      aspect: CINEMA_ASPECT,
+      lens: lensScale(camera, detail.target, INSERT_LENS.fov, inputs.stageSide),
+    };
+    const cover = insertCover(frame, posed, spot.owner, detail.part, inputs.clearance);
+    if (cover.share > INSERT_FRAME.coverShare) {
+      return 'cover';
+    }
+    if (cover.soft > INSERT_FRAME.softShare) {
+      return 'soft';
+    }
+    if (cover.detail) {
+      return 'detail';
+    }
+    if (cutsFace(frame, posed, view.headRadius)) {
+      return 'face';
+    }
+  }
+  return null;
+}
+
+/**
+ * Finds the first clear camera of an insert at its detail that the cuts accept, in the order of
+ * the search: the seeded azimuth and elevation, then the steps around them (design 5.6). The
+ * seeded values snap to the steps of the search, so the results of the tests of the stage at one
+ * point serve each insert of the detail.
+ *
+ * @param inputs The inputs of the plan.
+ * @param view The detail in the play pose.
+ * @param random The seeded generator of the insert.
+ * @param accept The test of the cuts into and out of the insert.
+ * @param known The results of the tests of the stage at the point of the detail, by the turn
+ *   and the elevation of the camera. The call adds its new results.
+ * @param refused The refusals of the tests of the play pose of the detail at its earlier
+ *   inserts, by the turn and the elevation of the camera. The call adds its new refusals.
+ * @returns The camera, or `null`.
+ */
+function insertCamera(
+  inputs: InsertInputs,
+  view: DetailView,
   random: () => number,
-): InsertCamera[] {
+  accept: (camera: InsertCamera) => boolean,
+  known: Map<number, InsertRefusal | null>,
+  refused: Map<number, InsertRefusal>,
+): InsertCamera | null {
   const k = INSERT_LENS;
-  const half = INSERT_SIZES[spot.detail];
+  const { spot } = view;
+  const { target } = view.detail;
+  const S = inputs.stageSide;
   const side = random() < 0.5 ? -1 : 1;
-  const offset = (k.offset[0] + (k.offset[1] - k.offset[0]) * random()) * side;
-  const elevation = k.elevation[0] + (k.elevation[1] - k.elevation[0]) * random() + spot.lift;
-  const out: InsertCamera[] = [];
-  for (const rise of k.elevationSteps) {
-    for (const step of k.azimuthSteps) {
-      for (const sign of step === 0 ? [1] : [1, -1]) {
-        const turn = offset + sign * step;
-        if (Math.abs(turn) > k.maxFromFront || elevation + rise > k.maxElevation + spot.lift) {
-          continue;
-        }
-        const from: ShotKey = {
-          azimuth: spot.front + turn * DEG,
-          elevation: (elevation + rise) * DEG,
-          zoom: 1,
-          fov: k.fov,
-        };
-        const to: ShotKey = { ...from, zoom: k.pushIn };
-        const far: [number, number, number] = [0, 0, 0];
-        const near: [number, number, number] = [0, 0, 0];
-        const S = inputs.stageSide;
-        writeKeyPosition(
-          target,
-          from.azimuth,
-          from.elevation,
-          keyDistance(S, half, from, CINEMA_ASPECT),
-          far,
-        );
-        writeKeyPosition(
-          target,
-          to.azimuth,
-          to.elevation,
-          keyDistance(S, half, to, CINEMA_ASPECT),
-          near,
-        );
-        if (insertClear(inputs, spot, target, near, far)) {
-          out.push({ from, to, camera: far });
-          if (out.length >= 3) {
-            return out;
+  const snap = (value: number, step: number): number => Math.round(value / step) * step;
+  const offset = snap((k.offset[0] + (k.offset[1] - k.offset[0]) * random()) * side, k.turnStep);
+  const elevation = snap(
+    k.elevation[0] + (k.elevation[1] - k.elevation[0]) * random() + spot.lift,
+    k.riseStep,
+  );
+  for (const [index, size] of k.sizes.entries()) {
+    const half = INSERT_SIZES[spot.detail] * size;
+    for (const rise of k.elevationSteps) {
+      for (const step of k.azimuthSteps) {
+        for (const sign of step === 0 ? [1] : [1, -1]) {
+          const turn = offset + sign * step;
+          const up = elevation + rise;
+          if (Math.abs(turn) > k.maxFromFront || up > k.maxElevation + spot.lift) {
+            continue;
+          }
+          const from: ShotKey = {
+            azimuth: spot.front + turn * DEG,
+            elevation: up * DEG,
+            zoom: 1,
+            fov: k.fov,
+          };
+          const to: ShotKey = { ...from, zoom: k.pushIn };
+          const far: [number, number, number] = [0, 0, 0];
+          const near: [number, number, number] = [0, 0, 0];
+          writeKeyPosition(
+            target,
+            from.azimuth,
+            from.elevation,
+            keyDistance(S, half, from, CINEMA_ASPECT),
+            far,
+          );
+          writeKeyPosition(
+            target,
+            to.azimuth,
+            to.elevation,
+            keyDistance(S, half, to, CINEMA_ASPECT),
+            near,
+          );
+          const camera: InsertCamera = { from, to, camera: far, half };
+          if (!accept(camera)) {
+            continue;
+          }
+          const id = (index * 1000 + Math.round(turn) + 500) * 1000 + Math.round(up);
+          let refusal = known.get(id);
+          if (refusal === undefined) {
+            refusal = stageRefusal(inputs, spot, target, near, far);
+            known.set(id, refusal);
+          }
+          refusal ??= refused.get(id) ?? null;
+          if (refusal === null) {
+            refusal = poseRefusal(inputs, view, near, far);
+            if (refusal !== null) {
+              refused.set(id, refusal);
+            }
+          }
+          if (refusal === null) {
+            return camera;
           }
         }
       }
     }
   }
-  return out;
+  return null;
+}
+
+/**
+ * Snaps a point to the grid of {@link INSERT_LENS}.snap, so that the tests of the stage at the
+ * point serve each insert whose detail comes near it.
+ *
+ * @param point The point.
+ * @returns The snapped point.
+ */
+function snapPoint(point: Vec3): Vec3 {
+  const step = INSERT_LENS.snap;
+  return [
+    Math.round(point[0] / step) * step,
+    Math.round(point[1] / step) * step,
+    Math.round(point[2] / step) * step,
+  ];
+}
+
+/**
+ * Poses the player of a detail at a song time, and gives its detail in that pose (design 5.6).
+ *
+ * @param inputs The inputs of the plan.
+ * @param spot The detail.
+ * @param poses The pose buffer of the scene, which the call writes.
+ * @param time The song time: the middle of the insert.
+ * @param meanKey The mean MIDI key of the notes of the insert, or 0 for none.
+ * @returns The detail in the play pose.
+ */
+function detailView(
+  inputs: InsertInputs,
+  spot: DetailSpot,
+  poses: ScenePoseBuffer,
+  time: number,
+  meanKey: number,
+): DetailView {
+  const { players } = inputs.poses;
+  const needed = new Uint8Array(players.length + 1);
+  needed[spot.owner === CONDUCTOR_OWNER ? players.length : spot.owner] = 1;
+  const scene = poseAt(inputs.poses, time, time, PLAYING, [], poses, needed);
+  const pose = spot.owner === CONDUCTOR_OWNER ? scene.conductor : scene.players[spot.owner];
+  if (!pose) {
+    throw new Error(`The pose plan has no pose of the player ${spot.owner}.`);
+  }
+  const posed = posePlayer(spot.model, pose, spot.place);
+  const head = inputs.heads.find((h) => h.owner === spot.owner);
+  const detail = detailAt(spot, posed, meanKey);
+  return {
+    spot,
+    detail: { ...detail, target: snapPoint(detail.target) },
+    posed,
+    headRadius: head?.radius ?? 0,
+  };
 }
 
 /**
@@ -760,7 +1011,9 @@ export function planInserts(inputs: InsertInputs, shots: readonly Shot[]): Shot[
     inserts: [],
     insertStarts: new Float64Array(0),
   };
-  const cameras = new Map<string, InsertCamera[]>();
+  const poses = createScenePose(inputs.poses);
+  const stageResults = new Map<string, Map<number, InsertRefusal | null>>();
+  const poseRefusals = new Map<string, Map<number, InsertRefusal>>();
   const inserts: Shot[] = [];
   let nextFrom = -Infinity;
   let last: DetailSpot | null = null;
@@ -814,20 +1067,31 @@ export function planInserts(inputs: InsertInputs, shots: readonly Shot[]): Shot[
         )
         .toSorted((a, b) => b.score - a.score);
       for (const { spot, meanKey } of ranked) {
-        const target = detailPoint(spot, meanKey);
-        const key = `${spot.owner} ${spot.detail} ${target.map((v) => v.toFixed(2)).join(',')}`;
-        let found = cameras.get(key);
-        if (!found) {
-          found = insertCameras(inputs, spot, target, insertRandom(seed, 0, key));
-          cameras.set(key, found);
-        }
-        const half = INSERT_SIZES[spot.detail];
+        const view = detailView(inputs, spot, poses, (start + end) / 2, meanKey);
+        const { target } = view.detail;
         const into = mainCamera(main, start);
         const back = mainCamera(main, end);
-        const camera = found.find(
+        const point = `${spot.owner} ${spot.detail} ${target.map((v) => v.toFixed(2)).join(',')}`;
+        let known = stageResults.get(point);
+        if (!known) {
+          known = new Map();
+          stageResults.set(point, known);
+        }
+        const spotKey = `${spot.owner} ${spot.detail}`;
+        let refusedBySpot = poseRefusals.get(spotKey);
+        if (!refusedBySpot) {
+          refusedBySpot = new Map();
+          poseRefusals.set(spotKey, refusedBySpot);
+        }
+        const camera = insertCamera(
+          inputs,
+          view,
+          insertRandom(seed, start, `${spot.owner} ${spot.detail}`),
           (c) =>
-            cutKeepsGrammar(into, c.camera, target, half) &&
-            cutKeepsGrammar(back, c.camera, target, half),
+            cutKeepsGrammar(into, c.camera, target, c.half) &&
+            cutKeepsGrammar(back, c.camera, target, c.half),
+          known,
+          refusedBySpot,
         );
         if (!camera) {
           continue;
@@ -840,7 +1104,7 @@ export function planInserts(inputs: InsertInputs, shots: readonly Shot[]): Shot[
           seats: spot.seat === null ? [] : [spot.seat],
           part: null,
           target,
-          halfHeight: half,
+          halfHeight: camera.half,
           composition: null,
           from: camera.from,
           to: camera.to,
