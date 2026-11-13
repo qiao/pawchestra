@@ -93,8 +93,9 @@ corner takes the weight row of its new vertex in `rhino-tpose-weights.json`.
 
 | Item | Value |
 |---|---|
-| Size | 741,668 bytes |
-| SHA-256 | `aef0c622b929ce01e4470150777d06dbc8c303b9eee38ca7e2bb61f4e03864a9` |
+| Size | 741,720 bytes |
+| SHA-256 | `3aaf2129972bf34253ed1ad29861f2d463fdb5fe8ec1713b1eebdba79c223475` |
+| Smooth | The source has a ledge around the back and the sides of the neck and a ledge around the top of each thigh, which showed as hard step rings. Three rules of `smooth` of the config relax the source before the weights: a neck box (57 vertices, 0.023 units at most) that keeps the chin and the throat, so that H stays, and two thigh boxes with no vertex of the middle plane (54 and 49 vertices, 0.035 units at most). The rhino stands, and the shapes `legs_straight` give the source form back, so a relax of the seated bind does not reach the standing body |
 | Bind | The role-neutral bind (design 4.4): the arms of the source, straight (`studio.straightArms` of the config), with the elbow axes of the old bind with the elbows bent forward (`studio.bindArms`). The left bind paw is supinated by the rule of the cast matrix and the tuba. The right bind paw keeps no supination, because the value of the rule takes the right forearm deeper into the tuba (`studio.bindSupination`) |
 | Shapes | The arm-down shape of each arm, the straight legs of each side, and a `raise` shape of each bent elbow of the tuba hold |
 
