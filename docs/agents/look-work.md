@@ -31,6 +31,10 @@ their traps. The head comment of each tool file gives its options.
 
 ## Traps
 
+- **Gallery light.** The role views of `pnpm close-views` show the gallery (design 7.1). It has no
+  hall, no back-row lights, no rim lights, and no post effects, so it has no contact shade. Prove
+  a fault of the light in a frame of the app (`pnpm close-views play <dir> --at <species>`) before
+  a fix. No player takes the occlusion bake of `src/models/shading.ts`.
 - **Pixel sets.** The white-fur mask (a saturation below 0.4) moves with the color of the light,
   so the pixel counts of two variants can differ by a factor of 2 or more. Compare variants on one
   pixel set, as `pnpm look-variants` and the row "pixel sets of base" of `pnpm look-lab` do.
