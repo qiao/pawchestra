@@ -126,15 +126,17 @@ hold `HANDS_HOLDS.harp` of `src/pose/hands.ts`.
 
 The app follows these facts:
 
-- **The size (section 1).** The deer plays a harp of 0.975 of the concert harp of the app
-  (`SpeciesParams.harpScale`), 1.27 m high. The harp grows by the same factor as the body of the
-  deer, and the palm offsets of the hold are in H, so the fit stays. Its base stands on the floor, so the
-  pedals lie at the hooves. A larger harp brings its neck to the chin of the deer. The crown and
-  the neck near it stand lower than on a concert harp (`HARP.column`), so the muzzle of the deer
-  stays at least 5.5 cm above the neck, as the head does not rest on the harp (section 2).
+- **The size (section 1).** The deer plays a harp of 0.85 of the concert harp of the app
+  (`SpeciesParams.harpScale`), 1.11 m high, as a smaller harp of a child. On a larger harp, the
+  treble strings lay so near the right shoulder that the right elbow folded back around the top of
+  the soundbox. Its base stands on the floor, so the pedals lie at the hooves. A larger harp also
+  brings its neck to the chin of the deer. The crown and the neck near it stand lower than on a
+  concert harp (`HARP.column`), so the muzzle of the deer stays at least 5.5 cm above the neck,
+  as the head does not rest on the harp (section 2).
 - **The place (section 2).** The base stands in front of the deer, a little to the right of the
-  middle, and the top of the soundbox rests at the right shoulder. The harp is diagonal to the
-  deer, with the column at the front left (`HARP_PLACE.turn`).
+  middle, and the top of the soundbox stands at the right side of the chest, below the right
+  shoulder. The harp is diagonal to the deer, with the column at the front left
+  (`HARP_PLACE.turn`).
 - **The knees (section 2).** The harp stands between the knees. The left hoof rests to the left of
   the base, behind the foot of the soundbox, with the knee out and forward (`LEG_RESTS` of
   `src/pose/harp-feet.ts`).
@@ -142,11 +144,11 @@ The app follows these facts:
   brings the long muzzle to the neck of the harp.
 - **The registers (section 3).** The left hand plays the bass strings from the left side, and the
   right hand the treble strings from the right side (`faceL`, `faceR`).
-- **The elbows (section 4).** The elbows point out and down (`poleL`, `poleR`). The right elbow
-  points out more than down, as the elbows of a harpist rise, so the right upper arm only touches
-  the top of the soundbox.
-- **The wrists (section 4).** The left palm faces the strings and a little down (`faceL`), so
-  that the left wrist bends only a little, as the wrists of a harpist go a little down. A palm
+- **The elbows (section 4).** The elbows point out and down (`poleL`, `poleR`). The right arm hangs
+  outside the top of the soundbox and reaches the strings from the right side, and no arm goes
+  through the plane of the strings.
+- **The wrists (section 4).** The left palm faces the strings and down (`faceL`), so that the
+  left wrist bends only a little, as the wrists of a harpist go a little down. A palm
   square to the strings bends the left wrist of the short arm far back, because the left forearm
   points into the strings. The right palm also faces a little down, and a little back to the deer
   (`faceR`), so that the right forearm twists at most 45°.
@@ -182,13 +184,14 @@ The app follows these facts:
 
 The app does not follow these facts:
 
-- **The shoulder (section 2).** The top of the soundbox lies at the outer side of the right
-  shoulder, and the harp stands to the right of the chest, because a harp near the neck of the
-  deer went into its chest. The top of the soundbox and the end of the neck are slim
-  (`SOUNDBOX`, `NECK`), so the right upper arm only touches them: it goes more than 1.0 cm into
-  them in less than 1 % of the play.
+- **The shoulder (section 2).** The top of the soundbox stands at the right side of the chest,
+  below the right shoulder, and the harp stands to the right of the chest. The chest of the deer
+  stands about 17 cm in front of its shoulder joints, so with the soundbox on the shoulder, the
+  strings lay 15 to 19 cm further forward, out of the reach of its arms of 36 cm (derived from the
+  body of the deer). The top of the soundbox and the end of the neck are slim (`SOUNDBOX`, `NECK`),
+  so the right upper arm only touches them: it goes at most 1.2 cm into them.
 - **The tilt (section 2).** The harp stands upright (`HARP_PLACE.tilt`). The soundbox of the
-  model leans toward the player, and a tilt back puts the forearms of the deer into its body.
+  model leans toward the player, and a tilt back puts the left paw of the deer into its body.
 - **The reach (section 3).** The arms of the deer are short, also at 1.3 times the arms of the
   source mesh, so the base stands near the stool, and the left hand plays only up to D4. A harpist reaches the column with the stretched left arm,
   and the left hand plays up to about C5.
