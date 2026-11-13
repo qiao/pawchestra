@@ -1403,8 +1403,9 @@ const CAT_HOLD = {
  * - At rest, the left elbow points out to the left and down, (-2, -1, 0): with the elbow of
  *   {@link CELLO_HOLD}, the left upper arm goes 3.2 cm into the chest, and the left forearm 1.5 cm
  *   into the cello.
- * - At rest, the left paw holds the cello at 0.3 of the fingerboard (`restPlace`): at 0.6, the
- *   paw went 4.4 cm into the upper bout at rest and in the moves. A gap of the left paw off the
+ * - At rest, the left paw holds the cello at 0.25 of the fingerboard (`restPlace`): at 0.6, the
+ *   paw went 4.4 cm into the upper bout at rest and in the moves, and at 0.3, 2.1 cm in 10% of
+ *   the lowering (`pnpm body-clip cellist`, limit 1.9 cm). A gap of the left paw off the
  *   strings (`gapL`) of 1.5 cm kept the claws further out of the neck, but the paw then bent
  *   sideways on the wrist up to 79° (p95) in the play.
  * - The bow paw turns in the plane of its palm around the grip on the stick, so that the forearm
@@ -1437,7 +1438,7 @@ const DOG_HOLD = {
   curlR: 65 * MathUtils.DEG2RAD,
   roundArms: null,
   girthFit: null,
-  restPlace: 0.3,
+  restPlace: 0.25,
   restBow: {
     ...LAP_CELLO_BOW,
     tip: [0.2, 1, -0.6],
