@@ -161,10 +161,9 @@ export class SeatList {
   }
 
   /**
-   * Shows the level of each seat in the glow ring of its dot (design 2.8). The level sets the
-   * ring and the glow through `--glow`, and the class `playing` shows the full ring with reduced
-   * motion. The dot keeps its size and its color. The ring shows only between the start and the
-   * end of the piece.
+   * Grows the dot of each seat that plays (design 2.8). The level sets the opacity, the size, and
+   * the glow of the dot through `--glow`, and the class `playing` makes the dot full with reduced
+   * motion. The dot grows only between the start and the end of the piece.
    *
    * @param levels The level of each seat, from 0 to 1, from `seatLevels()`.
    * @param inPiece True while the song time is after the start and before the end of the piece.

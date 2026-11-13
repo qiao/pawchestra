@@ -1340,24 +1340,19 @@ body.is-building #stage {
   background: var(--line-faint);
 }
 
-/* The dot of a seat (design 2.8) keeps its full size and its fur color, because it links the row
-   to the animals on the stage. --glow, the level of the seat, sets only the ring around the dot
-   and its soft glow, in --ring, the fur color or a lighter mix of it (ringColor() in
-   app/seat-text.ts). */
+/* The dot of a seat (design 2.8). --glow, the level of the seat, sets its opacity, its size, and
+   its glow: a seat that does not play has a very small, faint dot, and a seat that plays has a
+   full dot with a soft glow in --ring, the fur color or a lighter mix of it (ringColor() in
+   app/seat-text.ts). The dot keeps its layout space at all levels. */
 .dot {
   position: relative;
   width: 13px;
   height: 13px;
   border-radius: 50%;
-  outline: 2px solid color-mix(in srgb, var(--ring) calc(100% * var(--glow, 0)), transparent);
-  outline-offset: 2px;
-  box-shadow: 0 0 calc(12px * var(--glow, 0)) calc(2px * var(--glow, 0))
-    color-mix(in srgb, var(--ring) calc(70% * var(--glow, 0)), transparent);
-}
-
-/* A silent seat has a dim dot, as a second cue beside its dim text. */
-.seat.silent .dot {
-  opacity: 0.5;
+  box-shadow: 0 0 calc(10px * var(--glow, 0)) calc(2px * var(--glow, 0))
+    color-mix(in srgb, var(--ring) calc(100% * var(--glow, 0)), transparent);
+  opacity: calc(0.3 + 0.7 * var(--glow, 0));
+  transform: scale(calc(0.3 + 0.7 * var(--glow, 0)));
 }
 
 /* The sound-only seat has no animal, so its dot has no fur color. Its glow has the color of its
@@ -2059,15 +2054,17 @@ body:has(.first-screen:not([hidden])):has(.drawer:not([hidden])) .messages {
     transform: scaleY(var(--still)) !important;
   }
 
-  /* The ring of a seat dot shows or hides, with no fade. */
+  /* The dot of a seat is small and faint or full, with no fade. */
   .dot {
-    outline-color: transparent;
     box-shadow: none;
+    opacity: 0.3;
+    transform: scale(0.3);
   }
 
   .dot.playing {
-    outline-color: var(--ring);
     box-shadow: 0 0 10px 2px var(--ring);
+    opacity: 1;
+    transform: none;
   }
 }
 
