@@ -177,8 +177,10 @@ demo shows the same motion on each visit.
   keeps two song times for each look (`PlayerPlan.looks`), so the look is a function of the song
   time. The idle look of the wall clock fills the time between the planned looks. A wind player
   that plays turns only a little of a planned look (`BODY_MOTION.peek`), so that the mouthpiece
-  stays on the lips. Each planned look starts with a blink that closes in `LOOK_BLINK.closeSec`
-  and opens in `openSec`, as a real blink closes fast and opens slower.
+  stays on the lips. Each look, planned or idle, starts with a blink that closes in
+  `LOOK_BLINK.closeSec` and opens in `openSec`, as a real blink closes fast and opens slower. Each
+  turn of a look passes its end by `LOOK_OVERSHOOT.size` and settles (`overshoot()`), as a real
+  head passes the end of a fast turn a little.
 - **Blink.** A blink rises from 0 to 1 and falls back in `blinkSec`. A bead eye scales on y by
   `max(CLOSED_EYE_SCALE, 1 - blink)` about its eye bone. A body with lids (4.4, "Hand rig") turns
   each eye bone about the hinge axis of its lid, through the middle of the eyeball, by the share

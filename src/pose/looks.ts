@@ -1,6 +1,6 @@
 import type { PlayerNote } from '../score/types.ts';
 import { beatLengthAt } from './count-in.ts';
-import { smoothstep } from './rest.ts';
+import { clamp01, smoothstep } from './rest.ts';
 
 /**
  * The planned looks of a player at the conductor, or at the leader of a chamber group (design
@@ -23,6 +23,32 @@ export const LOOK_PLAN = {
   /** Two looks closer than this join into one. */
   joinSec: 1,
 } as const;
+
+/**
+ * The curve of a turn of the head (design 5.1): it passes its end by about `size`, and settles.
+ * A real head passes the end of a fast turn a little.
+ */
+export const LOOK_OVERSHOOT = {
+  /** The part of the turn by which the head passes its end. */
+  size: 0.1,
+  /** The main turn ends at this part of the time. */
+  mainShare: 0.6,
+  /** The pass over the end starts at this part of the time. */
+  passShare: 0.35,
+} as const;
+
+/**
+ * Eases a turn of the head past its end (design 5.1): 0 at the start, about 1.1 at 0.68 of the
+ * time, and 1 at the end. The turn starts and ends with no speed.
+ *
+ * @param x The linear progress. Below 0 it gives 0, and above 1 it gives 1.
+ * @returns The eased progress.
+ */
+export function overshoot(x: number): number {
+  const o = LOOK_OVERSHOOT;
+  const pass = Math.sin(Math.PI * clamp01((x - o.passShare) / (1 - o.passShare)));
+  return smoothstep(x / o.mainShare) + o.size * pass * pass;
+}
 
 /** The blink at the start of a look (design 5.1). A real blink closes fast and opens slower. */
 export const LOOK_BLINK = {
@@ -48,7 +74,7 @@ export function lookBlink(dt: number): number {
 
 /** The planned look of a player at one song time. */
 export interface PlannedLook {
-  /** The weight of the look, from 0 to 1. */
+  /** The weight of the look, from about -0.1 to about 1.1 with the pass over the end. */
   weight: number;
   /** The closure of the eyes in the blink at the start of the look. */
   blink: number;
@@ -96,7 +122,8 @@ export function planLooks(
 
 /**
  * Gives the planned look of a player at a song time (design 5.1). The head turns to the target in
- * {@link LOOK_PLAN.turnSec} before the look, and back after it. A blink starts
+ * {@link LOOK_PLAN.turnSec} before the look, and back after it, each time a little past its end
+ * ({@link overshoot}). A blink starts
  * with the turn to the target.
  *
  * @param looks The looks of the player ({@link planLooks}).
@@ -131,5 +158,5 @@ export function plannedLookAt(looks: Float64Array, time: number, out: PlannedLoo
     return;
   }
   out.blink = lookBlink(time - start);
-  out.weight = time < off ? smoothstep((time - start) / turn) : 1 - smoothstep((time - off) / turn);
+  out.weight = time < off ? overshoot((time - start) / turn) : 1 - overshoot((time - off) / turn);
 }

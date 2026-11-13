@@ -1,5 +1,5 @@
 import { hashUnit, mulberry32 } from './random.ts';
-import { smoothstep } from './rest.ts';
+import { lookBlink, overshoot } from './looks.ts';
 
 /** The values of the idle layer (design 5.1). Its clock is the wall clock. */
 export const IDLE_MOTION = {
@@ -15,8 +15,11 @@ export const IDLE_MOTION = {
   lookChance: 0.45,
   /** The length of a look, with the turns of the head. */
   lookSec: 2.4,
-  /** The time of the turn of the head to the conductor and back. */
-  lookTurnSec: 0.4,
+  /**
+   * The time of the turn of the head to the conductor and of the turn back, each with a pass over
+   * its end (`overshoot()`).
+   */
+  lookTurnSec: 0.5,
   /** An ear twitch can start in each window of this length. */
   earWindowSec: 6,
   earChance: 0.4,
@@ -41,7 +44,7 @@ export interface IdleState {
   breath: number;
   /** 0 is open eyes, 1 is closed eyes. */
   blink: number;
-  /** The weight of the look at the conductor, from 0 to 1. */
+  /** The weight of the look at the conductor, from about -0.1 to about 1.1 with the pass over the end. */
   look: number;
   /** The twitch of the ears, from 0 to 1. */
   ear: number;
@@ -129,10 +132,15 @@ export function idleAt(params: IdleParams, wallTime: number, out: IdleState): vo
     m.lookChance,
     m.lookSec,
   );
-  out.look =
-    look < 0
-      ? 0
-      : smoothstep(look / m.lookTurnSec) * smoothstep((m.lookSec - look) / m.lookTurnSec);
+  // The head turns a little past each end of the look and settles, and a blink starts the turn.
+  if (look >= 0) {
+    const back = m.lookSec - m.lookTurnSec;
+    out.look =
+      look < back ? overshoot(look / m.lookTurnSec) : 1 - overshoot((look - back) / m.lookTurnSec);
+    out.blink = Math.max(out.blink, lookBlink(look));
+  } else {
+    out.look = 0;
+  }
 
   const ear = windowEvent(params.seed ^ SALT.ear, wallTime, m.earWindowSec, m.earChance, m.earSec);
   out.ear = ear < 0 ? 0 : Math.sin((Math.PI * ear) / m.earSec);
