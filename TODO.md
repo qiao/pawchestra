@@ -329,19 +329,6 @@ passes.
       head only.
 - [ ] Bear and elephant: in the gallery light, each arm casts a black band of shadow on the trunk
       beside the belly. Check it in the stage light.
-- [ ] Cat: face 832 at the front of the right armpit folds in most of the play. Arm segments allow
-      no `raise` shape there.
-- [ ] Cat: the armpit line at the lower back of each arm root folds a little in the play (faces 729,
-      688, and 728 on the right), and 11 to 12 hidden faces of the lines turn over.
-- [ ] Cat: a soft fold stays at the front of the left arm root, and a notch at rest. Put the socket
-      front and the first ring front of the copy onto the trunk surface before the weights.
-- [ ] Cat: at the ends of each armpit line, the wall meets the trunk at up to 108°, and a small
-      point shows from az ±150. Clean the 14 thin faces of the right line.
-- [ ] Cat: near the elbow, the left forearm is 0.89 of the tube in the play, because the linear
-      blend turns the paw about 100° from the bind over three forearm segments.
-- [ ] Cat: from the back, a dark band in a V lies on the lower back above the seat. Find the faces
-      and the light that make it.
-- [ ] Cat tail: 4 faces stay turned over against the bone turn after the bind. No image shows them.
 - [ ] Cat: the A-pose body keeps the bent bind of the viola hold (4.4, "Role-neutral bind"). The
       straight bind (L 106, R 47) folded the inner right elbow of the violist (folds p95 R 8, base
       2, margin 2), and six tries of a shape of the bent right elbow failed
