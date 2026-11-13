@@ -206,7 +206,10 @@ License of both files: CC BY-NC 4.0, as the FBX file. Two runs of the chain give
 ### Conductor
 
 `CONDUCTOR_HOLD` of `src/pose/conductor.ts` keeps its values, except the extra swing of the rest
-arms (`restArm.extraOut`, design 5.4) and the curl of the baton paw (`batonCurl`). The baton
+arms (`restArm.extraOut`, design 5.4), the curl of the baton paw (`batonCurl`), and the values of
+the baton line and the left arm (design 5.4): `beatPoint`, `batonPivot`, `poleR`, `poleL`,
+`restBaton`, `readyCurl`, `readyReach`, the fade place of `LEFT_HAND_PLACES`, and `cueReach` of
+`CUE_MOTION`. The rig and its weights did not change for them. The baton
 grip fits this paw (`BATON_GRIP`, `STICK_TO_THUMB`, `STICK_TO_PALM` of
 `src/models/instruments/baton.ts`): the butt lies in the heel of the palm, and the stick leaves
 the paw through the palm under the curled claws. The measures of `pnpm hold-fit conductor` and
@@ -215,16 +218,21 @@ the paw through the palm under the curled claws. The measures of `pnpm hold-fit 
 | Measure | Older bear | This body |
 |---|---|---|
 | Paws in the body or the head, play | 0.1 cm | 0.0 cm |
-| Upper arms in the body, play | 0.0 cm | 2.4 cm (the left arm root, limit 1.5 cm) |
+| Upper arms in the body, play | 0.0 cm | 1.4 cm (the left arm root, limit 1.5 cm) |
 | Forearms in the body, lift, lowering, and rest | 1.9 cm | 0.0 cm |
-| Upper arms in the body, lift and lowering | 3.8 cm | 4.0 cm (limit 4 cm) |
+| Upper arms in the body, lift and lowering | 3.8 cm | 3.7 cm (limit 4 cm) |
 | Upper arms in the body, rest | 3.2 cm | 3.7 cm (limit 4 cm) |
-| Samples of the play with a folded face | 56.2 % | 30.3 % |
+| Samples of the play with a folded face | 56.2 % | 25.3 % |
 | Faces that fold at rest | 7 | 7 |
-| Paw twist on the forearm in the play, L / R | 20° / -3° | 0° / 11° |
+| Paw twist on the forearm in the play, L / R | 20° / -3° | -10° / 21° |
 | Body in the baton (`pnpm body-clip conductor`) | PASS, no point | PASS, no point |
 
 Three thin faces of the knuckle crease of the right paw (104, 105, 1769) fold from a curl of
 about 57°, so the baton paw curls 50° (`batonCurl`). The paw near the line of the forearm also
 takes away the fold of the wrist face 1833. The paw stays closed around the baton at rest and in
 the bow.
+
+The arm gate of the left arm (`pnpm arm-check conductor`) gives a stretch p95 of 0.29 (limit
+0.35) and 7 folded faces in the lift (limit 8). The left inner elbow (faces 443, 5222, 5223, and
+5226) folds from a bend of about 45°, so the ready gesture and the cue point keep the left arm
+nearly straight.
