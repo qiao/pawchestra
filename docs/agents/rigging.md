@@ -5,12 +5,11 @@ round.
 
 ## Bodies and roles
 
-Each species has a studio body (`'studio-<a>'`) with the role-neutral bind (design 4.4), except the
-cat, which keeps the bind of the viola hold. "Hand rig" means the hand rig of a Tripo P2 mesh in
-`assets/models/<s>/tripo-hand/`, with no arm cut and no stretch. A chain in
-`tools/blender/hand/<s>/` makes each one, except the bear. "Rebuilt arms" means quad arm tubes,
-Blender weights, and arm segments of the mesh rig. The `README.md` of each model folder gives the
-files of each step.
+Each species has a studio body (`'studio-<a>'`) with the role-neutral bind (design 4.4). "Hand
+rig" means the hand rig of a Tripo P2 mesh in `assets/models/<s>/tripo-hand/`, with no arm cut and
+no stretch. A chain in `tools/blender/hand/<s>/` makes each one, except the bear. "Rebuilt arms"
+means quad arm tubes, Blender weights, and arm segments of the mesh rig. The `README.md` of each
+model folder gives the files of each step.
 
 | Species | Body | Role |
 | --- | --- | --- |

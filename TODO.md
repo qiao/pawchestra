@@ -329,11 +329,6 @@ passes.
       head only.
 - [ ] Bear and elephant: in the gallery light, each arm casts a black band of shadow on the trunk
       beside the belly. Check it in the stage light.
-- [ ] Cat: the A-pose body keeps the bent bind of the viola hold (4.4, "Role-neutral bind"). The
-      straight bind (L 106, R 47) folded the inner right elbow of the violist (folds p95 R 8, base
-      2, margin 2), and six tries of a shape of the bent right elbow failed
-      (`reports/2026-11-02-cat-neutral/`, `reports/2026-11-02-cat-bend/`). The open choice: a
-      fifth shape (`STUDIO_RAISES`).
 - [ ] Cat violist: a small dark pinch stays behind the bow arm root at the crossing from az120 and
       at the frog from the back (`reports/2026-11-05-cat-bow-arm/crops/pair-crossing-az120.png`,
       `pair-frog-az180.png`). At the tip, the small faces 817-850-848 and 817-818-850 fold, and the
