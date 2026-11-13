@@ -739,10 +739,9 @@ passes.
       (`pnpm fold-probe violist`, L 42 of 44, in each of the 17 rest samples). The right arm root
       folds faces 2461 and 2462 (`upper_arm_seg0_R`) in 89 % and 88 % of the play samples. Wait
       for the next body of the cat before a fix.
-- [ ] Tripo red fox violinist: the rest frog of the bow is 16 cm over the right thigh, because the
-      short arm does not reach it (best reach 7.7 cm, and there the forearm goes into the belly).
-      At rest the left upper arm goes 3.4 cm into the belly (upperArmL 0.50), and in mozart-k525
-      also in 26 % of the lift and 57 % of the lowering.
+- [ ] Tripo red fox violinist: the rest frog of the bow is 38.7 cm over the right thigh (16.3 cm
+      on the fox of 62bf447f4), because the short arm does not reach it. At rest the left upper arm
+      goes 1.8 cm into the left shoulder (3.0 cm into the belly before).
 - [ ] Tripo red fox violinist: the last lowering of boulanger-matin starts from the pizzicato pose
       (tip up and to the right), and the bow passes 15 cm to 20 cm in front of the face for 0.41 s
       (0.22 s before the via reach of 2026-11-12). The cause is the pizzicato tip
@@ -751,15 +750,31 @@ passes.
 - [ ] Tripo tan fox flutist: the free left paw rests on the haunch beside the hip, because the
       arm does not reach the top of the thigh or the flute at rest. In the lowering the right rest
       grip grasps the flute in only 37 % of the samples.
-- [ ] Tripo fox with four-digit paws: the seat is 0.249 m with flat feet. A heel turn for a taller
-      chair moves 318 to 421 of the 459 players of the demos (sight pass, 4.5), so it waits for a
-      layout rule that keeps the seats.
-- [ ] Tripo fox with four-digit paws: the four digits share one fingers bone, so they curl as one
+- [ ] Tripo fox: the new body at the eye height of the fox of 62bf447f4 moves seats in each of the
+      18 demos, by up to 1.25 m (a red fox of beethoven-7-4 and beethoven-8-4, a horn pig of
+      beethoven-1 1.07 m), and by 4 cm in pachelbel-p37, where the fox itself stays. Causes: the deeper trunk
+      gives a chair 0.386 m deep (0.318 m before) and another footprint, and the head and the trunk
+      hide other sight lines. With the old footprint and the old sight eye the large demos still
+      move up to 1.64 m. The seat is 0.179 m (0.249 m before). Decide with the user: accept the
+      moves, or a layout rule that keeps the seats.
+- [ ] Tripo tan fox flutist: the left upper arm goes 2.9 cm into its arm root at each moment of
+      `pnpm hold-fit flutist` (1.3 cm before), and 29 faces of the right arm fold at rest (none
+      before). Try the clavicle rows and the rest elbows of `FOX_FLUTE`, and check 2x crops.
+- [ ] Tripo red fox violinist: the paws go up to 2.5 cm into the violin and the left forearm 2.0
+      cm (`pnpm body-clip fox-red:violin`, limit 0.045 H), as on the fox before (2.3 cm).
+- [ ] Tripo red fox: `bowGrip` of `src/models/species.ts` is the grip of the paw of the fox of
+      62bf447f4. The bow sits in the new right paw in the close views. Measure the stick against
+      the middles of the new paw, and refit the grip if it misses.
+- [ ] Tripo fox: in the last 4 of the 21 steps of the blink, 3 to 7 points of the upper inner
+      corner of the left lid stand out of the head near the brow. The flat eye domes put the lid
+      middles near the middle plane. Check the blink in the app.
+- [ ] Tripo fox: from the front the face reads calmer than the fox of 62bf447f4, because the
+      painted smile line lies on the sides of the muzzle and the painted brows read dark under
+      the top light. It reads happy in the 3/4 and side views. Ask the user.
+- [ ] Tripo fox: the tail tip lies on the floor behind the chair at rest (gap 0.0 cm, 7.5 cm
+      before), because the new tail is longer and the seat lower. Check it from the back.
+- [ ] Tripo fox: the four digits of each fore paw share one fingers bone, so they curl as one
       piece. Check the grip of each digit on the neck, the stick, and the flute in the app.
-- [ ] Tripo fox with the smaller paw: the left paw slides 1.3 mm on the violin in one step of
-      1/240 s at the start of the lift, and 2.3 mm at the end of the lowering (0.2 mm and 0.1 mm
-      with the larger paw), so the rest grip of the neck (`restHandAt()`) moved. Check it in the
-      app, and refit `FOX_HOLD` if the step shows.
 - [ ] Tripo fox fur strands: the strands follow the faint strokes of the source maps (`STRANDS`
       of `tools/fox-maps.py`), so they curve in places on the back, and they cross the painted
       mouth line. A flow field from the mesh (down the trunk, back on the head, out along the
