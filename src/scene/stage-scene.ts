@@ -50,6 +50,7 @@ import type { Focus, FocusSpot } from './focus.ts';
 import { createMaterials } from './geometry.ts';
 import { createHall, setHallCamera } from './hall.ts';
 import { BeamDepth, setBeamFrame } from './beam.ts';
+import { setBodyMapScale } from './body-texture.ts';
 import { letterbox, mixBox, uvRectOf } from './letterbox.ts';
 import type { UvRect } from './letterbox.ts';
 import { blendFocus, blendShare, mix, modeBlendWeight } from './mode-blend.ts';
@@ -64,7 +65,7 @@ import {
 } from './lights.ts';
 import { createPoolUniforms, defaultAim, setPoolAim } from './light-pool.ts';
 import type { LightAim } from './light-pool.ts';
-import { tierPixelRatio } from './quality.ts';
+import { TIER_SETTINGS, tierPixelRatio } from './quality.ts';
 import type { QualityTier } from './quality.ts';
 import {
   applyScenePose,
@@ -459,6 +460,7 @@ export class StageScene {
   constructor(canvas: HTMLCanvasElement, options: StageSceneOptions) {
     this.#canvas = canvas;
     this.#tier = options.tier;
+    setBodyMapScale(TIER_SETTINGS[options.tier].bodyMapScale);
     this.#reducedMotion = options.reducedMotion;
     this.#devicePixelRatio = options.devicePixelRatio;
     // A GPU with no target of floats renders with no post effects, so its canvas has the MSAA
@@ -940,6 +942,7 @@ export class StageScene {
       return;
     }
     this.#tier = tier;
+    setBodyMapScale(TIER_SETTINGS[tier].bodyMapScale);
     if (this.#view) {
       setLightsTier(this.#view.lights, tier);
     }

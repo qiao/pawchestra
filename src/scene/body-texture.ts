@@ -41,6 +41,51 @@ interface BodyMap {
 /** The map of each image file, made on its first use. */
 const maps = new Map<string, BodyMap>();
 
+/**
+ * The scale of the side of each map that a load starts after now (`TIER_SETTINGS.bodyMapScale`,
+ * design 2.6). A map keeps the size of its load: a later drop of the tier does not load it
+ * again, because the tier drops for a slow GPU and a load costs more frames.
+ */
+let loadScale = 1;
+
+/**
+ * Sets the scale of the side of the maps of the next loads (design 2.6). The stage calls it with
+ * the value of its tier.
+ *
+ * @param scale 1 for the size of the file, or a smaller part of each side.
+ */
+export function setBodyMapScale(scale: number): void {
+  loadScale = scale;
+}
+
+/** The options of each decode: the map keeps its bytes, with no color change and no alpha. */
+const DECODE = { colorSpaceConversion: 'none', premultiplyAlpha: 'none' } as const;
+
+/**
+ * Decodes an image off the main thread, at a scale of each side. The resize of
+ * `createImageBitmap()` needs the size of the image, so a smaller map decodes the file first and
+ * then resizes that bitmap. A browser that ignores the resize gives the full size.
+ *
+ * @param blob The image file.
+ * @param scale The scale of each side: 1, or a smaller part.
+ * @returns The bitmap.
+ */
+async function decodeMap(blob: Blob, scale: number): Promise<ImageBitmap> {
+  const full = await createImageBitmap(blob, DECODE);
+  if (scale >= 1) {
+    return full;
+  }
+
+  const small = await createImageBitmap(full, {
+    ...DECODE,
+    resizeWidth: Math.max(1, Math.round(full.width * scale)),
+    resizeHeight: Math.max(1, Math.round(full.height * scale)),
+    resizeQuality: 'high',
+  });
+  full.close();
+  return small;
+}
+
 /** The material with the color map of each shared material and image file. */
 const materials = new WeakMap<MeshStandardMaterial, Map<string, MeshStandardMaterial>>();
 
@@ -100,8 +145,8 @@ function bodyMapOf(file: string, kind: BodyMapKind): BodyMap {
 }
 
 /**
- * Loads the image of a map in the next animation frame, decodes it off the main thread, and
- * turns the map on. A failed load leaves the colors of the faces, or the normals of the mesh. An
+ * Loads the image of a map in the next animation frame, decodes it off the main thread at the
+ * scale of the tier ({@link setBodyMapScale}), and turns the map on. A failed load leaves the colors of the faces, or the normals of the mesh. An
  * optional map with no file of the build ends the load with no message.
  *
  * @param file The image, relative to the repository.
@@ -109,6 +154,7 @@ function bodyMapOf(file: string, kind: BodyMapKind): BodyMap {
  */
 function startLoad(file: string, map: BodyMap): void {
   map.started = true;
+  const scale = loadScale;
   const load = async (): Promise<void> => {
     const url = mapUrls()[`../../${file}`];
     if (!url) {
@@ -121,10 +167,7 @@ function startLoad(file: string, map: BodyMap): void {
     if (!response.ok) {
       throw new Error(`The map ${file} gave the status ${response.status}.`);
     }
-    const bitmap = await createImageBitmap(await response.blob(), {
-      colorSpaceConversion: 'none',
-      premultiplyAlpha: 'none',
-    });
+    const bitmap = await decodeMap(await response.blob(), scale);
     map.texture.image = bitmap;
     map.texture.needsUpdate = true;
     map.on.value = 1;

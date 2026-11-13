@@ -35,6 +35,12 @@ interface TierSettings {
   readonly surfaceLevel: 1 | 2;
   /** True for the floor gloss of the surface pass (`FLOOR_GLOSS` of `surface.ts`). */
   readonly floorGloss: boolean;
+  /**
+   * The scale of the side of each color map and normal map of a studio body on the GPU
+   * (`body-texture.ts`): 1 for the size of the file, 0.5 for half the side and a quarter of the
+   * memory.
+   */
+  readonly bodyMapScale: 1 | 0.5;
 }
 
 /**
@@ -44,7 +50,10 @@ interface TierSettings {
  * The high tier has the surface pass of the contact shade and the floor gloss at half size. The
  * medium tier has only a cheap contact shade, at a quarter size with fewer samples, so that a
  * phone does not look flat. The floor gloss traces a ray for each floor pixel, so it stays on the
- * high tier.
+ * high tier. The medium and the low tiers load the body maps at half size: the maps of a large
+ * cast took about 390 MB of GPU memory at full size, and a phone can lose the WebGL context
+ * with so much. A head of a close shot on a phone is about 350 pixels high, so half size is
+ * enough.
  * No tier has the shadows of the side lights: they cost about 0.9 ms of GPU time in each frame of
  * `perf-60.mid`, and they changed only small shadows on the players.
  */
@@ -65,6 +74,7 @@ export const TIER_SETTINGS = {
     contactSamples: 10,
     surfaceLevel: 1,
     floorGloss: true,
+    bodyMapScale: 1,
   },
   medium: {
     shadowMapSize: 1024,
@@ -78,6 +88,7 @@ export const TIER_SETTINGS = {
     contactSamples: 6,
     surfaceLevel: 2,
     floorGloss: false,
+    bodyMapScale: 0.5,
   },
   low: {
     shadowMapSize: 512,
@@ -91,6 +102,7 @@ export const TIER_SETTINGS = {
     contactSamples: 0,
     surfaceLevel: 1,
     floorGloss: false,
+    bodyMapScale: 0.5,
   },
 } as const satisfies Readonly<Record<QualityTier, TierSettings>>;
 
