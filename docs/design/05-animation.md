@@ -282,7 +282,7 @@ The rest of each family:
   arm root. On the new rabbit body, the lap places at the knees made both arms reach nearly
   straight forward. The rabbit holds its violin upright on the lap with the left elbow near the
   side. Its right paw rests at the top of the right thigh near the hip, with the elbow bent near
-  the side, and holds the bow at the frog with the tip up, out, and a little forward
+  the side, and holds the bow at the frog with the tip up, out, and forward
   (`RABBIT_HOLD.restArms`, `restBow`). In a move, its bow tip turns out to the right through the
   front (`restBow.via`). Reason: a seated violinist rests the bow pointing up, with a fist around
   the frog (strings 2.9). A tip only a little out stood in front of the cheek, and a tip that

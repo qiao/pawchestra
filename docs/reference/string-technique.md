@@ -547,7 +547,7 @@ The app follows these facts:
   clear the body, and the elbows bend forward (`BowedHold.restArms`). The upright violin then stands at the left paw in
   front of the thigh, and the upright bow at the right paw. The rabbit holds its violin upright on
   the lap with the left elbow near the side. Its right paw rests at the top of the right thigh near
-  the hip and holds the bow at the frog in a closed paw, with the tip up, out, and a little
+  the hip and holds the bow at the frog in a closed paw, with the tip up, out, and
   forward, away from the music desk and the face (`RABBIT_HOLD`, [86]). In a move, its bow tip
   turns out to the right, so that the bow does not cross the eyes. The cat rests the viola nearer
   to the hip and at the outer side of the thigh, so that its shorter arm bends with the elbow near
