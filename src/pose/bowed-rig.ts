@@ -299,10 +299,10 @@ export interface BowedHold {
    */
   readonly restGapL: number;
   /**
-   * The move of the left paw of a floor instrument from the neck, along the normal of its palm, in
-   * head heights `H`, in the play, the rest, and the moves between them (`poseBowed()` of
-   * `pose/bowed.ts`). The grip puts the middle of the finger block on the strings, so the thick
-   * wrist of a short paw goes into the back of the neck. 0 keeps the grip on the strings.
+   * The move of the left paw from the neck, along the normal of its palm, in head heights `H`
+   * (`poseBowed()` of `pose/bowed.ts`): in the play, and for a floor instrument also in the rest
+   * and the moves between them. The grip puts the middle of the finger block on the strings, so
+   * the thick wrist of a short paw goes into the back of the neck. 0 keeps the grip on the strings.
    */
   readonly gapL: number;
   /**
@@ -1604,6 +1604,11 @@ const HIPPO_HOLD = {
  * short arc by 43° (`pnpm carry-check violinist`), and with this elbow by 29°. A move of the wrist
  * further out to the left took the violin less deep into the head at the start of the lowering,
  * but it left the short arc by up to 57°.
+ *
+ * In the play, the left paw lies 0.03 H off the strings along the normal of its palm (`gapL`), so
+ * that the thick paw keeps out of the neck and the upper bout: with the grip on the strings, the
+ * left paw went 1.9 cm into the violin in 79% of the play, and with this gap, 1.5 cm in 6%
+ * (`pnpm body-clip violinist`).
  */
 const RABBIT_HOLD = {
   ...SHOULDER_HOLD,
@@ -1617,6 +1622,7 @@ const RABBIT_HOLD = {
     R: { forward: 10 * MathUtils.DEG2RAD, bend: 50 * MathUtils.DEG2RAD },
   },
   poleL: [0, -1, -0.5],
+  gapL: 0.03,
   restPoleL: [-1, -0.9, -0.2],
   restPawTurnL: 90 * MathUtils.DEG2RAD,
   restGapL: 0.050251,
