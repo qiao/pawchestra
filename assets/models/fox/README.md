@@ -106,7 +106,7 @@ instruments:
   axis by whole ring steps of 360/14 degrees: 180 degrees on the left (7 steps) and 102.9 degrees
   on the right (4 steps). The turned part is each vertex that the edges join to the next ring with
   no step through the ring at x 0.2105. New quads join the two rings with the step offset, the far ring takes the
-  form of the ring before the turn (a fade to 0 at 0.02 units), and the 28 new quads take the
+  form of the ring before the turn (a fade to 0 at 0.035 units, `turnFit`), and the 28 new quads take the
   planar UVs of the dark sock patch at UV (0.8786, 0.7657) ("Arm twist").
 - **Even arms.** The edit `armEven` moves each point of the left arm past x 0.199 in by s(x): 0 at
   x 0.199, 0.001 at 0.235, 0.023 at 0.262, 0.027 at 0.30, and 0.03 at 0.37, linear between ("Even

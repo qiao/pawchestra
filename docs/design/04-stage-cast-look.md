@@ -984,7 +984,9 @@ of roll or twist in the moments of both roles. Reason: one body plays the violin
 with the paws and the holds of the fox of main, a forearm twisted up to 168°. The turn takes each
 vertex that the edges join to the far ring of the turned band, and no vertex of the near ring.
 Reason: a cut by the place along the forearm also turned vertices of the slanted near ring, and
-they made fins and slits at the wrist. An arm that the mesh
+they made fins and slits at the wrist. Past the far ring, the turned part changes from the form of
+the ring before the turn to its own turned form over `turnFit`. Reason: over a shorter fade, the
+turn of the right paw left a step on the edge of the forearm. An arm that the mesh
 joins to the trunk needs a cut,
 so such a mesh takes the mesh rig ("Mesh rig").
 
