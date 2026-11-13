@@ -458,16 +458,24 @@ passes.
       22° on the hanging arms). With the elbow poles of the snare drum ([±0.3, -1, 0.5]), the upper
       arms went 3.5 cm into the body (limit 2.5 cm). Fit the homes, or the spots a little in from
       opposite each other, as a real player rolls (percussion-technique 7, [31]).
-- [ ] Badger xylophonist: the wrists stay about 13 cm over the bars, and a real player keeps the
-      hands at most one inch over them (percussion-technique 9). Lower homes put the forearms 2.4 cm
-      to 3.1 cm into the leaning belly. A target misses by up to 2.1 mm, and the left paw grasps its
-      mallet in 35% of the lift (`pnpm wind-grip xylophonist`).
+- [ ] Badger xylophonist: the grip stays up to 7 cm over its bar (`gripRise`), and a real player
+      keeps the hands at most one inch over them (percussion-technique 9). With 0.2 H, a target
+      missed by 6.8 mm. The limit bends the paws more on the forearms: the arm gate counts 35 (L)
+      and 24 (R) folded faces at the wrists in place of 22 and 15, which the 2x paw crops of
+      `reports/2026-11-13-perc-holds/crops/` do not show. A home moved out to the end bars kept the
+      folds low, but spread the arms out as wings.
+- [ ] Badger xylophonist: a fast run between the lowest and the highest bars keeps the body in the
+      middle (`side`), so both paws reach wide. Try a larger side lean for a run at one end.
 - [ ] Badger bass drummer: the free left paw hangs open beside the body while the badger plays,
       because a real player muffles only in the rests (percussion-technique 5). Ask the user if the
       paw must wait at the far rim.
-- [ ] Badger percussionist: the claws of the right paw stand 2.1 cm off the beater, and the left
-      claws 3.0 cm off the clip (`pnpm wind-grip percussionist`). The beater runs 33° from the
-      fingers (`TRIANGLE.malletTilt`). With `PAW_TILT`, the paw turned 38° in 0.01 s.
+- [ ] Badger percussionist: the left paw curls 118° on the triangle clip, so the arm gate counts
+      16 to 17 folded faces at the knuckles inside the fist (10 at 75°). The left paw grasps the
+      clip in 79% of the play and the lift, and the right paw the beater in 88% of the play.
+- [ ] Badger percussionist: the triangle stays up in the left paw at rest, because the trap table
+      stands under it. A rest with the triangle on its stand and the beater on the table
+      (`restSwitch()` trial) bent the empty left paw 123° on the forearm, or turned it over 178°
+      between the hanging arm and the stand (16,423°/s). Ask the user for the rest place.
 - [ ] Close views: `pnpm close-views play` renders with no fill light. Add a fill to the play mode
       for the checks (9.8).
 - [ ] Recast roles: with `--base`, `pnpm arm-check --views` and `pnpm close-views` render the
@@ -1098,8 +1106,12 @@ scene of each demo has its seats and stage size with no overlap.
       band of reach and the bars nearer.
 - [ ] Xylophone: on a chord of two near bars, the shafts of the two mallets touch in 0.1% of the
       samples.
-- [ ] Elephant timpanist: the left paw grasps in 68% of the lift, and its largest twist step is 29°
-      in 0.01 s.
+- [ ] Elephant timpanist: the left paw grasps its mallet in 84% of the play and 71% of the lift,
+      and the right paw in 0% of the lowering (wind-grip, as on main). The largest twist step of
+      the left paw was 29° in 0.01 s before the grip change: measure it again.
+- [ ] Elephant timpanist: at rest, the felt balls lie on the heads, each on its own kettle,
+      because each paw reaches only the front kettle of its side. Add a source for the rest of a
+      timpanist to `docs/reference/percussion-technique.md`, and check the rest against it.
 - [ ] Elephant timpanist: dark lines and areas show on the chest beside the raised arms, where the
       upper arm of the mesh lies on the side of the body.
 - [ ] Elephant timpanist: a roll stays in one hand, and the outer kettles stand out of reach
