@@ -416,17 +416,20 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       eyeFinish: 'varnish',
     },
   ],
-  // The oboe mouse (design 4.4). It stands as a soloist.
+  // The oboe mouse (design 4.4): the hand rig of the Tripo P2 mesh
+  // (`assets/models/mouse/tripo-hand/mouse.blend`), by the route of the Tripo beaver, with no arm
+  // cut and no arm stretch. It has no chair, and it stands on its legs in the pose of the source.
+  // Its `.blend` holds the facts of the body: the scale that keeps H of the mouse of
+  // `mouse.rig.glb` at aa8af0dd8, and the crease angle 180°. The source paints no light in the
+  // eyes, so the eyes take the finish `eye` and the eye light.
   [
     'mouse',
     {
       landmark: 'shoulders',
-      height: 0.507635,
       seated: true,
       soloist: true,
       constant: 'STUDIO_MOUSE',
-      crease: 35,
-      glb: 'assets/models/mouse/mouse.rig.glb',
+      glb: 'assets/models/mouse/tripo-hand/mouse.rig.glb',
     },
   ],
   // The timpani elephant (design 4.4): the hand rig of the Tripo P2 mesh

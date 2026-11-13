@@ -439,14 +439,16 @@ export const SPECIES = {
       STUDIO_HEIGHTS['studio-panda'].seatHeight / STUDIO_HEIGHTS['studio-panda'].headHeight,
   },
   /**
-   * Mouse, the oboes: a gray-brown mouse with a cream belly, large round ears, and a long pink
-   * tail. It has the studio body of the mesh `assets/models/mouse/mouse.glb`, which `pnpm rig-mesh
-   * mouse` rigs (design 4.4), with arms 1.25 times the arms of the mesh. It plays a smaller oboe,
-   * 0.45 of the oboe of the app, in place of longer arms. It has no chair: the round belly hides
-   * the short thighs, so it stands on its hind legs with bent knees, in the seated pose at the seat
-   * height of its legs. Its long tail goes back and lies on the floor behind it, and it stands
-   * upright as a soloist. Its head height is the head of the studio body, and the seat height is
-   * the seat of the studio body, in H.
+   * Mouse, the oboes: a gray-taupe mouse with a cream belly, large round pink ears, whiskers, pink
+   * paws, and a long thin pink tail. It has the studio body of the hand rig of the Tripo P2 mouse
+   * (`assets/models/mouse/tripo-hand/`, design 4.4), with the form, the colors, and the eyes of
+   * its source, and the head height of the mouse of the old mesh. Its arms keep the length of the
+   * source: each arm reaches 0.22 m from the shoulder joint to the wrist, less than the 0.27 m of
+   * the old mouse. So it keeps the smaller oboe, 0.45 of the oboe of the app. It has no chair: it
+   * stands upright on its legs in the pose of the source, at the seat height of its legs (the
+   * crotch). Its long tail goes back and down and lies on the floor behind it, and it stands as a
+   * soloist. Its head height is the head of the studio body, and the seat height is the seat of
+   * the studio body, in H.
    */
   mouse: {
     body: 'studio-mouse',
