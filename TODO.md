@@ -383,6 +383,22 @@ passes.
       `upper_arm_seg0_R`) fold in 74% to 89% of the play and in 74% to 75% of the lift
       (`pnpm fold-probe violist --faces 25`). Look at them in 2x crops from az120 and az180, and
       fix them in the chain of the cat.
+- [ ] Cat violist: a light shard at the right elbow, a dark dot on the right forearm, and a
+      stretched texture at the right elbow at rest (pose audit L9). The rest hold of the right arm
+      did not change in the string round, so look at the chain of the cat in 2x crops.
+- [ ] Cat violist: with the viola of 0.85, the viola turns 69° off the short arc in one lift of
+      `bach-bwv1048` (40° with 0.925, `pnpm carry-check violist`), and the left arm gate folds 45
+      faces at rest (42 before, the curled rest paw). Look at the lift in 2x crops.
+- [ ] Rabbit violinist: the left forearm goes 2.3 cm into the back of the violin in 80% of the
+      play and 63% of the lowering (limit 1.4 cm, `pnpm body-clip violinist`). No place, elbow,
+      tilt, gap, or turn of the violin changes it, and a violin of 0.8 lowers it only to 2.0 cm.
+      The paw reaches the fingerboard only from 0.64, near the upper bout.
+- [ ] Hippo bassist: the left forearm goes 2.9 cm into the contrabass in 50% of the play (limit
+      2.3 cm). A higher left elbow, (-1, 0.3, 0), lowers it to 6%, but the left paw swing fails
+      (77°, limit 70) and the folds grow from 29 to 42 (`pnpm arm-check bassist`).
+- [ ] Hippo bassist: at rest, the right arm still lies along the round belly in the right view
+      (2.9 cm in the belly, `pnpm hold-fit bassist --sets rest`). Try a rest bow in front of the
+      belly in a look round.
 - [ ] Bind paws: the bind paws of most configs start pronated, so the cellist, the bassist, and the
       oboist twist the left paw near 170°. Try `studio.bindSupination`.
 - [ ] Red fox and tan fox: at rest, the crook of the right elbow keeps a soft fold, because the
