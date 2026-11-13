@@ -138,8 +138,8 @@ The weights, in the rest pose:
    no eyeball.
 2. Flipper rows: each vertex of a side with |x| from 0.16, within 0.075 units of the line of the
    rest flipper, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.16
-   to 0 at x 0.20, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.25, 0.26, 0.27, and
-   0.28, and the rest on the 4 roll segments.
+   to 0 at x 0.20, an elbow helper share that grows from 0 at x 0.21 to 1 at the elbow joint (x 0.265) and
+   falls to 0 at x 0.295, and the rest on the 4 roll segments.
 3. Wrist rows: the bend share of the flipper tip grows in 12 equal steps of 0.004 from 0.04 units
    before the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of
    0.0035 from 0.02 units before the head of `fingers_<side>`. The paw bones thus take the outer
@@ -227,7 +227,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/penguin.rig.glb` | 1,093,568 bytes | `6848aa20f4147e41579e0ed48281645ad0b943f7cf36f28bb5a85be95d46174b` |
-| `tripo-hand/penguin.rig.json` | 17,143 bytes | `01fb55b911ce0f5763b033adfeabeb27b3484508b3387f094756fbd648228d00` |
+| `tripo-hand/penguin.rig.glb` | 1,093,568 bytes | `67e5e82f63a5498124d07df58c88af04b2960e33556145d4d6b2118df790f068` |
+| `tripo-hand/penguin.rig.json` | 17,143 bytes | `1bf81ef2d128c109ccb9336432b4d3a1cc11204e8baca1137b4f2ca1c2fc1e2c` |
 | `tripo-hand/penguin-color.webp` | 157,932 bytes, 2048 × 2048 | `e6d5fe8c012bc9b6ffded679d001c714ab45713427a78bfcfff2cfa53686013d` |
 | `tripo-hand/penguin-normal.webp` | 29,206 bytes, 1024 × 1024 | `de0f7717703072644cdd941a6e1850f61480830b61081392e3c79b47fa63e189` |
