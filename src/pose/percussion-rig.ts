@@ -657,7 +657,9 @@ export const PERCUSSION_HOLDS = {
     // bends the left wrist 53° at the lowest bars, and 2 cm 49°.
     offsetL: [0, 0, 0.02],
     offsetR: [0, 0, -0.02],
-    poleL: [-0.8, -1, 0.3],
+    // The left elbow points out and back, so that the left claws of the Tripo badger go less far
+    // into the left shoulder: 3.5 cm, and 4.4 cm with [-0.8, -1, 0.3].
+    poleL: [-0.8, -1, 0.8],
     // The rebuilt round arms of the badger are free of the trunk (design 5.3, "Free round arms").
     // The right elbow points further out, and each mallet points from a place out from the
     // shoulder, so that the paws stay out from the leaning belly. With the home 0.3 H out, the
@@ -680,8 +682,12 @@ export const PERCUSSION_HOLDS = {
     // low heads, a pass of one bar put one shaft on the head of the other mallet for 2.8 s of
     // the test score, and a lift of the passing head over the other head did not clear it.
     pass: 0,
-    reach: 2.175144,
-    lean: 0.2,
+    // A bar more than 1.7 H from the shoulder joint goes to the other paw. With 2.175 H, the right
+    // mallet of the Tripo badger missed the highest bars by up to 12.5 cm.
+    reach: 1.7,
+    // The spine leans 14° over the bars, so that the paws reach the far bars: with 11°, the
+    // mallets missed them by up to 2.6 cm.
+    lean: 0.25,
     // The short legs tilt far with a small move of the hips, and the foot skin then sinks into
     // the floor, so the hips keep their place, and the spine takes the whole move. A lean of 12°
     // moves the shoulders 5.5 cm toward the notes, so that both paws reach more bars of a run. At

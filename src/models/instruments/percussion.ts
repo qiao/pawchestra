@@ -116,7 +116,7 @@ export const TIMPANI = {
 /**
  * The xylophone, in meters (design 4.6). It has 30 bars from C5 to F7: the natural bars in the
  * front row near the player, and the sharp bars in the back row, 0.02 m higher. The bars are
- * below the shoulders of the badger (0.55 m), so that the mallets slant down to them. At 0.72 m,
+ * below the shoulders of the badger (0.64 m), so that the mallets slant down to them. At 0.72 m,
  * the mallets strike the bars from below. The bars are smaller than real bars, because the short
  * arms of the badger reach the bars only in a band about 0.12 m deep: nearer bars put the paws
  * into the belly, and the arms do not reach farther bars. With bars of a real size (0.30 m to
@@ -125,7 +125,11 @@ export const TIMPANI = {
  */
 export const XYLOPHONE = {
   keys: [72, 101],
-  barHeight: 0.4,
+  /**
+   * The height of the bars: below the shoulder joints of the Tripo badger (0.64 m), so that the
+   * mallets slant down to them. With 0.40 m, the mallets missed the far bars by up to 1.2 cm.
+   */
+  barHeight: 0.44,
   /** The width of a natural bar with its gap. */
   pitch: 0.03,
   /**
