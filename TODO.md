@@ -858,6 +858,11 @@ passes.
       (mozart-k417), 1.5 m (bach-bwv1050), and 1.3 m (a monkey trumpeter of beethoven-7-4 and
       beethoven-8-4). The key `bind_sit` alone moves no player. Check the moves in the app with the
       item above.
+- [ ] Tripo fox tail root: the thin faces 6133 and 6114 (corners of 7° and 6°, between the
+      `tail` 1.0 vertex 3220 and the `hips` vertices 3215 and 3218) fold in the tail sway. In the
+      play of the violinist (`pnpm fold-probe fox-violinist`), 6133 folds in 38 % of the samples
+      (6 % before the tail turn), and both fold in 1 of 18 rest samples. Give the root rows of
+      the tail a softer step there, and check the root in 2x crops from behind.
 - [ ] Tripo tan fox flutist: the left upper arm goes 2.9 cm into its arm root at each moment of
       `pnpm hold-fit flutist` (1.3 cm before), and 27 faces of the right arm fold at rest (none
       before). Try the clavicle rows and the rest elbows of `FOX_FLUTE`, and check 2x crops.
