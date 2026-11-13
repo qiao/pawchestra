@@ -275,17 +275,17 @@ export const SPECIES = {
    * went 1.9 cm in in 3% of the play.
    *
    * The stick of the bow passes through the closed right paw, 50° from square toward the wrist,
-   * along the line nearest to the middles of the turned paw. The skin of the long wrist of the fox
-   * moves the middle of the paw by up to 3.8 cm on its bone (2.1 cm with this grip), so one line
-   * keeps the seated paw within 1.2 cm and the hanging paw of a soloist within 2.2 cm. A turn of
-   * 60° folds face 184 of the right arm in 43% of the play samples. With the grip of `BOW_GRIP`,
-   * the stick lies 4.0 cm to 5.3 cm out from the middle of the paw, under the paw.
+   * within 0.4 cm of the middle of the seated paw in the play, the lift, the rest, and the
+   * lowering. The fore paw of the chain is 0.42 H long and lies at its wrist joint, so the grip of
+   * the shorter paw put the stick 1.2 cm from the middle, past the 1 cm of a fist. A turn of 60°
+   * folds face 184 of the right arm in 43% of the play samples. With the grip of `BOW_GRIP`, the
+   * stick lies 4.0 cm to 5.3 cm out from the middle of the paw, under the paw.
    */
   'fox-red': {
     body: 'studio-fox',
     colors: SPECIES_COLORS['fox-red'],
     violinScale: 0.83,
-    bowGrip: { at: [-0.0045, -0.0298, -0.1025], turn: 50 * (Math.PI / 180) },
+    bowGrip: { at: [-0.0145, -0.0148, -0.0875], turn: 50 * (Math.PI / 180) },
     headHeight: STUDIO_HEIGHTS['studio-fox'].headHeight,
     seatHeight: STUDIO_HEIGHTS['studio-fox'].seatHeight / STUDIO_HEIGHTS['studio-fox'].headHeight,
   },
