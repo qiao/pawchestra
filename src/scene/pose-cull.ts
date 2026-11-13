@@ -12,9 +12,10 @@ import type { BoneSpheres } from './bounds.ts';
 export const POSE_CULL = {
   /**
    * The margin of the sphere of a player over its bind sphere, in meters. Over each demo and
-   * `perf-60.mid`, in play, rest, lift, lowering, and the end bow, the fitted pose sphere went at
-   * most 0.39 m past the bind sphere (the bow of the conductor), and 0.23 m for a player. The
-   * margin is about two times that value.
+   * `perf-60.mid`, in play, rest, lift, lowering, the end bow, and a play during the bow, the
+   * fitted pose sphere went at most 0.35 m past the bind sphere (the conductor, in the turn back
+   * after a play during the bow), and 0.24 m for a player. The margin is more than two times that
+   * value.
    */
   margin: 0.8,
 } as const;
