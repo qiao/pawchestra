@@ -145,14 +145,15 @@ export const CONDUCTOR_HOLD = {
    * more. With the angles of a standing player (20° and 60°), the forearms of the Tripo bear lie
    * on the top of its belly, and the paws point at the players. With 20° and 11.5°, and the
    * search from 22° with 3° more, the upper arms stand 31° and 34° out, as in the bind A-pose.
-   * With no extra swing, the right elbow goes 4.2 cm into the belly at rest, past the limit of
-   * 4 cm (`pnpm pose-depth conductor`). With 4°, it goes 3.2 cm into it.
+   * The upper arms of the Tripo bear keep the girth of its source, so with 4° the upper
+   * arm goes 4.8 cm into the side of the chest at rest, past the limit of 4 cm (`pnpm
+   * hold-fit conductor`). With 15°, it goes 4.1 cm into it, and with 20° 3.7 cm.
    */
   restArm: {
     forward: 30 * MathUtils.DEG2RAD,
     bend: 20 * MathUtils.DEG2RAD,
     minOut: 16 * MathUtils.DEG2RAD,
-    extraOut: 4 * MathUtils.DEG2RAD,
+    extraOut: 20 * MathUtils.DEG2RAD,
   },
   /**
    * The left elbow of the rest pose points down and back. The elbow of the hanging arm is the
