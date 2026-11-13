@@ -57,8 +57,8 @@
   "seatWidth": 0.07
  },
  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
- "metersPerUnit": 0.905218,
- "metersPerUnitNote": "The scale of the app: H of the badger of main (assets/models/badger/badger.rig.glb at aa8af0dd8), 0.243662 m.",
+ "metersPerUnit": 1.038285,
+ "metersPerUnitNote": "The scale of the app: 1.147 times the scale 0.905218 that gave the H of the badger of aa8af0dd8 (0.243662 m), so that the standing crown matches the crown of that badger (1.038 m).",
  "eyeSize": 0.269175,
  "jointsNote": "The joints of the source, measured on sections of the mesh: the arm axis at y 0.613, the shoulder where the arm leaves the trunk (x 0.17), the wrist at the closed loop of 17 vertices (x 0.356), the knuckles where the digits part (x 0.41), the elbow halfway, the legs on the sections of the feet and the shins, and the tail on its middle line.",
  "rings": {
