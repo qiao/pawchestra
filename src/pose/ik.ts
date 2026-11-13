@@ -26,6 +26,28 @@ function createJoints(): ArmJoints {
   return { elbow: new Vector3(), wrist: new Vector3() };
 }
 
+/**
+ * Gives a distance with a soft limit (design 4.7): the distance up to `limit - softness`, then a
+ * curve that comes near the limit and never passes it. The curve has no kink, so an arm near its
+ * full reach straightens slowly and its elbow does not stop in one frame. With no softness, it is
+ * the hard limit.
+ *
+ * @param distance The distance, in meters.
+ * @param limit The largest distance, in meters.
+ * @param softness The length of the curve below the limit, in meters, 0 or more.
+ * @returns The limited distance.
+ */
+export function softLimit(distance: number, limit: number, softness: number): number {
+  if (softness <= 0) {
+    return Math.min(distance, limit);
+  }
+  const start = limit - softness;
+  if (distance <= start) {
+    return distance;
+  }
+  return start + softness * (1 - Math.exp(-(distance - start) / softness));
+}
+
 const direction = new Vector3();
 const bend = new Vector3();
 
@@ -42,6 +64,8 @@ const bend = new Vector3();
  * @param pole The direction to which the elbow points. It must not be parallel to the direction
  *   from the shoulder to the target.
  * @param out The joints to write. They must not hold `shoulder`, `target`, or `pole`.
+ * @param softness The length below the full reach, in meters, in which the reach comes near the
+ *   full reach on a curve ({@link softLimit}). 0 by default: the hard limit.
  * @returns `out`, with the elbow and the wrist.
  */
 export function solveTwoBone(
@@ -51,11 +75,12 @@ export function solveTwoBone(
   lowerLength: number,
   pole: Vector3,
   out: ArmJoints = createJoints(),
+  softness = 0,
 ): ArmJoints {
   direction.subVectors(target, shoulder);
-  const reach = Math.min(
-    Math.max(direction.length(), Math.abs(upperLength - lowerLength) + 1e-6),
-    upperLength + lowerLength - 1e-6,
+  const reach = Math.max(
+    softLimit(direction.length(), upperLength + lowerLength - 1e-6, softness),
+    Math.abs(upperLength - lowerLength) + 1e-6,
   );
   direction.normalize();
   const along = (upperLength ** 2 - lowerLength ** 2 + reach ** 2) / (2 * reach);
@@ -333,16 +358,19 @@ export function writeCurl(arm: ArmRig, curl: number, rotations: Float32Array): v
  * @param arm The arm.
  * @param shoulder The posed shoulder joint, from {@link poseShoulder}.
  * @param wrist The wrist target. The function moves it in place.
+ * @param softness The length below the reach, in meters, in which the target comes near the reach
+ *   on a curve ({@link softLimit}), so that the elbow does not stop in one frame. 0 by default: a
+ *   target in reach does not move.
  * @returns `wrist`, in reach.
  */
-export function limitReach(arm: ArmRig, shoulder: Vector3, wrist: Vector3): Vector3 {
+export function limitReach(arm: ArmRig, shoulder: Vector3, wrist: Vector3, softness = 0): Vector3 {
   const distance = wrist.distanceTo(shoulder);
-  if (distance <= arm.reach) {
+  if (distance <= arm.reach - softness) {
     return wrist;
   }
   return wrist
     .sub(shoulder)
-    .multiplyScalar(arm.reach / distance)
+    .multiplyScalar(softLimit(distance, arm.reach, softness) / distance)
     .add(shoulder);
 }
 
