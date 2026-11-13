@@ -269,8 +269,12 @@ export const HARP_PEDALS = {
    * the travel of a pedal.
    */
   notch: { flat: 0.006, natural: -0.012, sharp: -0.03 },
-  /** The share of the length of a pedal from its root to the point where the hoof presses it. */
-  foot: 0.75,
+  /**
+   * The share of the length of a pedal from its root to the point where the hoof presses it: the
+   * end of the pedal. On the harp of 0.975, with the share 0.75, the right hoof went 3.0 cm into
+   * the side of the base in pedal moves (0.4 % of the samples), and with the end 2.6 cm.
+   */
+  foot: 1,
   /** The width and the thickness of a pedal. */
   bar: [0.014, 0.012],
 } as const;
