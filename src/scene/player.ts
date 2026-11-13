@@ -317,10 +317,16 @@ const IDENTITY: Matrix4Tuple = new Matrix4().elements;
  * the frame ({@link FrameSkeleton}). The world matrices of the bones must be ready.
  *
  * @param meshes The player meshes of {@link createPlayersSteps}.
+ * @param needed A flag for each mesh, or `null` for all. A mesh with the flag 0 keeps its old bone
+ *   matrices: the frame does not draw it (design 9.7).
  */
-export function holdSkeletons(meshes: readonly SkinnedMesh[]): void {
-  for (const mesh of meshes) {
-    if (mesh.skeleton instanceof FrameSkeleton) {
+export function holdSkeletons(
+  meshes: readonly SkinnedMesh[],
+  needed: Uint8Array | null = null,
+): void {
+  for (let i = 0; i < meshes.length; i++) {
+    const mesh = meshes[i];
+    if (mesh?.skeleton instanceof FrameSkeleton && needed?.[i] !== 0) {
       mesh.skeleton.hold();
     }
   }
@@ -970,11 +976,18 @@ function applyCopies(mesh: SkinnedMesh, held: Float32Array | null | undefined): 
  * @param meshes The meshes of {@link createPlayersSteps}: one for each player in the order of
  *   `ScenePose.players`, then the conductor.
  * @param pose The poses of the frame, from `poseAt()`.
+ * @param needed A flag for each mesh, or `null` for all. A mesh with the flag 0 keeps its old pose
+ *   (design 9.7).
  */
-export function applyScenePose(meshes: readonly SkinnedMesh[], pose: ScenePose): void {
-  for (const [i, mesh] of meshes.entries()) {
+export function applyScenePose(
+  meshes: readonly SkinnedMesh[],
+  pose: ScenePose,
+  needed: Uint8Array | null = null,
+): void {
+  for (let i = 0; i < meshes.length; i++) {
+    const mesh = meshes[i];
     const animal = i === pose.players.length ? pose.conductor : pose.players[i];
-    if (animal) {
+    if (mesh && animal && needed?.[i] !== 0) {
       applyPose(mesh, animal);
     }
   }
