@@ -1,9 +1,10 @@
-"""Frees the arms of a copy of the beaver mesh from the trunk (design 4.4, "Source meshes").
+"""Frees the arms of a copy of a mesh from the trunk (design 4.4, "Source meshes").
 
-The upper arm of `beaver.glb` joins the side of the trunk from the shoulder down to the elbow, so
-`arm_rebuild.py` finds no closed loop around the upper arm. This script frees each arm in a copy,
-`beaver-edit.glb`, so that `arm_rebuild.py` rebuilds it as the arm of any body. The side wall of
-the trunk under the arm follows `step_round_wall()` of `cat_arms.py`:
+When the upper arm of a mesh joins the side of the trunk down to the elbow, `arm_rebuild.py` finds
+no closed loop around the upper arm. These steps free each arm in a copy, so that
+`arm_rebuild.py` rebuilds it as the arm of any body. `badger_edit.py` runs them with the values of
+the badger (`use_badger()`). The side wall of the trunk under the arm follows `step_round_wall()`
+of `cat_arms.py`:
 
 1. Import the source and Merge by Distance (`violin_arms.import_mesh()`).
 2. Split the edges of the crease where the arm meets the trunk (`SEAMS`, `step_rip()`).
@@ -20,22 +21,12 @@ the trunk under the arm follows `step_round_wall()` of `cat_arms.py`:
    `step_round()`).
 8. Give the new faces the fur colors beside them (`step_color()`), and write the copy.
 
-The script prints the joints of the left arm of the rig config after the turn, for arms
-`--factor` times longer than the arms of the source (`turned_joints()`). The joints of the config
-before the edit are the joints of the source mesh.
-
-Run it in a terminal from the root of the tree:
-
-    blender -b --factory-startup -P tools/blender/beaver_edit.py -- <out.glb> [--factor <f>]
-
-Two runs give the same bytes: the script runs Blender again with `PYTHONHASHSEED=0`, as
-`arm_rebuild.py` does. In the live Blender of MCP, call the steps one at a time.
+`turned_joints()` gives the joints of the left arm of the rig config after the turn. In the live
+Blender of MCP, call the steps one at a time.
 """
 
-import json
 import math
 import os
-import subprocess
 import sys
 
 import bmesh
@@ -47,32 +38,27 @@ import arm_rebuild as ar  # noqa: E402
 
 va = ar.va
 
-#: The seam of each arm: the chain of concave edges where the arm meets the trunk, from the top
-#: of the back crease, down to the armpit under the elbow, and up the front crease. Each end lies
-#: above the shoulder joint, so that the arm of the turn ends at the seam (`arm_region()`). The
-#: chain is the shortest edge path through the concave edges from the back end over the lowest
-#: point to the front end. Vertex indices of the welded source (`violin_arms.import_mesh()`).
-SEAMS = {
-    1: [624, 628, 629, 630, 632, 597, 594, 488, 484, 485, 614, 159],
-    -1: [806, 807, 804, 805, 799, 790, 789, 788, 795, 794, 665, 666, 671, 667, 668, 674, 677, 274],
-}
-
-#: The turn of each arm out from the trunk, in degrees, about the forward axis through the
-#: shoulder joint.
-TURN = 10.0
-
-#: The shift of each arm out and up, at a right angle to the turned upper arm, in units.
-SHIFT = 0.018
-
-#: The shares of the upper arm over which the turn grows from 0 to its full angle.
-RAMP = (0.05, 0.45)
-
-#: The arm of the turn: the vertices from this share of the upper arm on, on the arm side of the
-#: seam (`arm_region()`).
+#: The values of the mesh, which the caller sets before the steps (`use_badger()` of
+#: `badger_edit.py`).
+#:
+#: - `SEAMS`: the seam of each side, a chain of vertex indices of the welded source
+#:   (`violin_arms.import_mesh()`) where the arm meets the trunk. Each end lies above the shoulder
+#:   joint, so that the arm of the turn ends at the seam (`arm_region()`).
+#: - `FLAPS`: the flap faces of the source on a seam, which the rip removes first (`step_rip()`).
+#: - `TURN`: the turn of each arm out from the trunk, in degrees, about the forward axis through
+#:   the shoulder joint.
+#: - `SHIFT`: the shift of each arm out and up, at a right angle to the turned upper arm, in units.
+#: - `RAMP`: the shares of the upper arm over which the turn grows from 0 to its full angle.
+#: - `FLOOD`: the arm of the turn starts at this share of the upper arm (`arm_region()`).
+#: - `JOIN`: the two copies of a seam vertex that part by less than this distance in units join
+#:   again.
+SEAMS = {}
+FLAPS = ()
+TURN = 0.0
+SHIFT = 0.0
+RAMP = (0.0, 0.0)
 FLOOD = 0.0
-
-#: The two copies of a seam vertex that part by less than this distance in units join again.
-JOIN = 0.005
+JOIN = 0.0
 
 #: The smooth of the old crease on the arm (`step_fair()`): the rounds and the factors of Smooth
 #: Vertices.
@@ -98,37 +84,12 @@ POCKET = {'angle': 40.0, 'reach': 0.08, 'ball': 0.05, 'rounds': 10}
 TRUNK, ARM, PIT, ARM_FILL, TRUNK_FILL, ARM_LIP, TRUNK_LIP, APEX = 0, 1, 2, 3, 4, 5, 6, 7
 
 
-#: The joints of the left arm of the source mesh, in the units of the studio: the joints of the
-#: rig config before the edit. The config now holds the joints of the turned and longer arms, so
-#: the edit keeps its own.
-SOURCE_ARM = {
-    'upper_arm_L': {'head': [0.175, 0.615, 0.105]},
-    'forearm_L': {'head': [0.228, 0.52, 0.163]},
-    'forearm_twist_L': {'head': [0.2505, 0.484, 0.191]},
-    'hand_L': {'head': [0.273, 0.448, 0.219]},
-    'fingers_L': {'head': [0.29, 0.4, 0.235], 'tail': [0.291, 0.3615, 0.245]},
-}
-
-
-def session():
-    """Gives a session of `arm_rebuild.py` on the source mesh of the beaver, with the arm joints
-    of the source (`SOURCE_ARM`)."""
-    s = ar.Session('beaver', source='assets/models/beaver/beaver.glb')
-    for name, joint in SOURCE_ARM.items():
-        s.joints[name] = dict(s.joints[name], **joint)
-    return s
-
-
 def share(s, side, co):
     """Gives the share of the upper arm of a point: its projection on the bone from the shoulder
     joint, over the length of the bone."""
     a, e, _, _ = va.arm_line(s, side)
     return (co - a).dot((e - a).normalized()) / (e - a).length
 
-
-#: The flap faces of the source on a seam: a face of an edge with three faces, with two open edges
-#: of its own (the small spot of the left armpit, `README.md`). The rip removes them first.
-FLAPS = ((484, 487, 488),)
 
 #: The open edges of the source in the whisker roots lie above this height in units. The holes of
 #: the seams lie below it (`open_edges()`).
@@ -786,35 +747,3 @@ def step_wall(s):
 STEPS = (step_rip, step_turn, step_fill, step_wall, step_pocket, step_fair, step_round,
          step_color)
 
-
-def main():
-    """Runs the steps on the source mesh, writes the copy, and prints the joints of the left arm
-    for the rig config, for arms `--factor` times longer (1 by default)."""
-    argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
-    factor = 1.0
-    if '--factor' in argv:
-        k = argv.index('--factor')
-        factor = float(argv[k + 1])
-        argv = argv[:k] + argv[k + 2:]
-    if len(argv) != 1:
-        raise SystemExit('Usage: blender -b --factory-startup -P tools/blender/beaver_edit.py -- '
-                         '<out.glb> [--factor <f>]')
-    if sys.flags.hash_randomization:
-        # A fixed string hash gives the same order of each set and dict on each run.
-        env = dict(os.environ, PYTHONHASHSEED='0')
-        code = subprocess.call([bpy.app.binary_path, '-b', '--factory-startup',
-                                '--python-use-system-env', '--python', os.path.abspath(__file__),
-                                '--', *sys.argv[sys.argv.index('--') + 1:]], env=env)
-        raise SystemExit(code)
-    va.clear_scene()
-    s = session()
-    va.import_mesh(s)
-    for step in STEPS:
-        print('beaver_edit: %s: %s' % (step.__name__, step(s)))
-    print('beaver_edit: wrote %s, %d bytes' % (argv[0], step_export(s, os.path.abspath(argv[0]))))
-    joints = turned_joints(s.joints, factor)
-    print('beaver_edit: joints %s' % json.dumps({'%s.%s' % k: v for k, v in joints.items()}))
-
-
-if __name__ == '__main__':
-    main()
