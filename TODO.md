@@ -111,6 +111,13 @@ passes.
       layout, by a median of 7 cm to 12 cm, and 17 players more than 0.2 m (the monkeys of
       beethoven-9 1.39 m and 1.28 m, a red fox of boulanger-matin 1.36 m). The seat height and the
       chair size move no player. Check the low chair and the moves with the user.
+- [ ] Panda trombonist (seated): with the belly key, a thin dark line stays at the lap, where the
+      belly meets the thigh tops (`assets/models/panda/README.md`, "Belly"). Check it in the stage
+      light. Gentler keys kept the old band across the belly.
+- [ ] Panda trombonist: the faces at the front of the right arm root fold in each sample (clavicle_R
+      117,313 fold samples in `pnpm fold-probe trombonist`). A move of half of the trunk share to
+      the clavicle made the folds worse (172 to 177 faces). Try the clavicle ramp of the polar bear
+      (`rows.control`).
 - [ ] Trumpeter monkey: the body of 1.2 times H with the trumpet of the app folds 47 arm faces in
       the rest sample of `hold-fit`. The arm gate did not run at this scale (folds p95 20 right
       and 26 left, skin twist 44 and 29 degrees at the scale before). Run it, and check the
@@ -247,6 +254,10 @@ passes.
 - [ ] Polar bear hand rig: a pocket stays at the front of each armpit in the chord and the far-left
       keys (0.0102 units, 2.1 cm, below its neighbors after the weight fixes, 4.9 cm before). Ask
       the user: a corrective key `arm_raise_*`, or a point edit of the armpit corner of the mesh.
+- [ ] Polar bear pianist: after the soft clavicle ramp, a thinner dark line still shows under the
+      right upper arm in the right views (chord, far-left, rest). Its color map is light there
+      (luma 0.83 to 0.89), so it is the crevice between the arm and the trunk. Try a point edit of
+      the armpit corner, or a corrective key.
 - [ ] Polar bear hand rig: a soft ledge stays at the top of the right seated thigh near the groin in
       the pedal pose. Check it in the stage light.
 - [ ] Polar bear hand rig: the right inner elbow folds up to 15 faces in the play (p95 11, limit 8)
@@ -805,6 +816,11 @@ passes.
 - [ ] Tripo pig: at rest and in the moves, the right upper arm goes 2.4 cm into the cap of the arm
       root (`pnpm pose-depth hornist`, limit 1.5 cm; 0.8 cm in the play). Check the right shoulder
       at rest in 2x crops, or accept the depth with its reason in the sweep of the hornist.
+- [ ] Pig hornist: a pale flat panel with a hard corner shows in front of the right upper arm in the
+      right views of the seated play and rest, and not in the stand moment. A move of the chest
+      toward the trunk form (thigh shares) and a softer clavicle ramp did not change it. The
+      clavicle_L faces 4453 and 4454 fold in each sample (`pnpm fold-probe hornist`). Find the
+      faces of the panel with a face id render first.
 - [ ] Pig hornist: the right grip moves 0.11 H out of the horn bell (`gripShiftR`), so the note
       target of the right palm is 4.5 cm from the grip of the horn (`pnpm hold-fit hornist`, within
       5 mm). Move the grip of the horn to the mouth of the bell (`HORN_PALM_DEPTH`), or let the
