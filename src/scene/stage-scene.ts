@@ -1396,8 +1396,8 @@ export class StageScene {
   }
 
   /**
-   * Calculates the focus of a frame (design 4.5). A shot focuses on its subject, after the focus
-   * pull of a cut (`CameraPose.focusPull`). Free mode focuses on the first player or the stage top
+   * Calculates the focus of a frame (design 4.5). A shot focuses on the nearer eye of its hero,
+   * or on the detail of an insert, after the focus pull of a cut (`CameraPose.focusPull`). Free mode focuses on the first player or the stage top
    * in the middle of the frame, and the focus moves to a new distance in about 0.3 s, at once
    * with reduced motion.
    *
