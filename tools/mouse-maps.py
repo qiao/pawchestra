@@ -32,7 +32,7 @@ NORMAL_LIMIT = 0.2
 NORMAL_GAIN = 4
 #: The texels of the eyeballs and this many texels around them take no strands.
 EYE_MARGIN = 4
-#: The fur strands that the maps add (`strands()`), with the values of tools/fox-maps.py. The
+#: The fur strands that the maps add (`strands()`), with the first values of tools/fox-maps.py. The
 #: source paints soft strokes in the fur, and the strands give the fur of the app the strands of
 #: the other Tripo bodies (a wavelength of 8 to 10 texels at 1024 pixels across the strands).
 STRANDS = {
