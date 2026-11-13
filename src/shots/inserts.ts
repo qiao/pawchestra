@@ -109,8 +109,12 @@ export const INSERT_LENS = {
    * tests of the stage at one point then serve the inserts of a detail at its other times.
    */
   snap: 0.04,
-  /** The factors of the frame size of each detail (`INSERT_SIZES`) that the search tries in turn. */
-  sizes: [1],
+  /**
+   * The factors of the frame size of each detail (`INSERT_SIZES`) that the search tries in turn.
+   * A frame of the paws of a flute at the first size cut the face of the player, and the second
+   * size holds its eyes.
+   */
+  sizes: [1, 1.5],
   /** The steps of the search around the seeded azimuth, in degrees, to both sides. */
   azimuthSteps: [0, 12, 24, 36, 48, 60, 72],
   /** The steps of the search above the seeded elevation, in degrees. */
