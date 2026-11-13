@@ -831,9 +831,11 @@ const SHOULDER_HOLD = {
  * around the normal, the grip in the paw changes by 27° in a move, and the paw goes 0.5 cm into the
  * violin. At 0.4 of the fingerboard with a turn of 35°, the forearm goes 0.2 cm into the violin at
  * rest. In the lift and the lowering, the violin hangs from the left paw, as on the rabbit, and the
- * wrist moves 0.1 H out and 0.15 H to the front in the middle (`liftReach`), so that the violin
- * near the jaw goes 1.9 cm into the body: with 0.1 H to the front, it goes 2.1 cm in, and with
- * 0.1 H up and 0.2 H to the front, 2.6 cm. In the middle of the move, the bow tip points to the
+ * wrist moves 0.1 H out, 0.22 H up, and 0.15 H to the front in the middle (`liftReach`), so that
+ * the lower bout passes in front of the belly and not of the lap: with no move up, the lower bout
+ * stood in front of the crotch in the middle of the lift. The violin then stays within the clip
+ * limit of the body (`pnpm body-clip fox-red:violin`). With 0.1 H up and 0.2 H to the front, it
+ * went 2.6 cm into the body near the jaw. In the middle of the move, the bow tip points to the
  * left, down, and to the front, (-1, -0.6, -0.5), with the hair in and a little down,
  * (-1, -0.3, 0), and the grip moves 0.3 H out, 0.2 H up, and 0.3 H to the front (`restBow.via`),
  * so that the tip passes below the snout, in front of the belly, and to the left of the violin.
@@ -922,7 +924,7 @@ const FOX_HOLD = {
   restPoleR: [0.5, -1, -0.2],
   restPlace: 0.37,
   rest: { ...LAP_VIOLIN, lap: { along: 0.6, offset: [0, -0.14, -0.2] } },
-  liftReach: [-0.1, 0, -0.15],
+  liftReach: [-0.1, 0.22, -0.15],
   restPawTurnL: 25 * MathUtils.DEG2RAD,
   restYawL: -45 * MathUtils.DEG2RAD,
   restGapL: -0.013158,
