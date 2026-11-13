@@ -265,6 +265,33 @@
     "sides": "LR",
     "note": "6 rounds of taubin() smooth the arm tubes of rhino-tpose-arms.glb after the weights (arm_smooth() of tools/blender/rig_mesh.py), at most 0.025 units, so that the tubes lose the ridges of the big faces of the T-pose mesh."
   },
+  "smooth": [
+    {
+      "box": [
+        [-0.17, 0.71, -0.25],
+        [0.17, 0.77, 0.0]
+      ],
+      "rounds": 4,
+      "share": 0.5
+    },
+    {
+      "box": [
+        [0.04, 0.26, -0.3],
+        [0.35, 0.36, 0.3]
+      ],
+      "rounds": 4,
+      "share": 0.5
+    },
+    {
+      "box": [
+        [-0.35, 0.26, -0.3],
+        [-0.04, 0.36, 0.3]
+      ],
+      "rounds": 4,
+      "share": 0.5
+    }
+  ],
+  "smoothNote": "The source mesh has two hard step rings: a ledge around the back and the sides of the neck under the head, and a ledge around the top of each thigh. The rhino stands in the app, and the shapes legs_straight give the source form back, so a relax of the seated bind does not reach the standing body. Each rule moves the vertices of its box 4 rounds half of the way to the middle of their neighbors (smooth_box() of tools/blender/rig_mesh.py), before the weights. The neck box starts at y 0.71 and ends at z 0, so that the chin and the throat keep their places and the head height H stays the same. The two thigh boxes leave out the middle plane (|x| below 0.04), so that the crotch and the tail root keep their form.",
   "raise": [
     {
       "side": "L",
