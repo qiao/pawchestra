@@ -3,6 +3,7 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { basename, join } from 'node:path';
 
 import { BOW_PART, bowSweep } from './bow-sweep.ts';
+import { bowWarnings } from './bow-warning.ts';
 import { findRole, findSweep, roleAnimal } from './fold-probe.ts';
 import type { PlayFilter } from './fold-probe.ts';
 import { runTool, takeGlb, withGlbBody } from './glb-swap.ts';
@@ -797,8 +798,16 @@ export async function sweepDemos(options: SweepOptions, role: RoleSweep): Promis
     return sweepScene(SOLOIST_FILE, soloistScene(role.role, options.soloist), options, role, true);
   }
   const results: DemoResult[] = [];
+  const warned = new Set<string>();
   for (const demo of await roleDemos(options.demos, options.midi ?? [], role)) {
     const scene = recastSceneOf(demo.bytes, role.recast);
+    // A bow arm that reaches nearly no hair gets one warning for each sweep.
+    for (const line of bowWarnings(scene, role)) {
+      if (!warned.has(line)) {
+        warned.add(line);
+        console.warn(line);
+      }
+    }
     results.push(...sweepScene(demoId(demo), scene, options, role, false));
   }
   return results;

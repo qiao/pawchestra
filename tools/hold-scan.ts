@@ -7,13 +7,15 @@
  * again (`preparePoses()` with a reuse), and sweeps `--samples` play samples, 12 by default, and
  * the rest of the first demo of the role, or of each `--demo`, with one part for each arm bone
  * (`perBoneRole()` of `tools/pose-depth.ts`). A row gives the deepest point of each pair, the
- * reached share of the fingerboard and of the hair of a bowed player, and the score
+ * reached share of the fingerboard and of the hair of a bowed player (with the mark `no reach` or
+ * `short` of `tools/bow-warning.ts` at a hair part that shows nearly no stroke), and the score
  * ({@link scoreOf}). The rows come sorted by the score, and `--top` rows show. A variant that
  * changes a model, such as a scale of a species, builds new scenes, and takes about 1 s. Check the
  * best rows with `pnpm pose-depth --per-bone` and `pnpm arm-check --variant`.
  */
 import { MathUtils, Quaternion, Vector3 } from 'three';
 
+import { bowMark } from './bow-warning.ts';
 import { gridChanges, gridVariants } from './hold-fit.ts';
 import { setHolds } from './hold-sets.ts';
 import { perBoneRole, roleDemos } from './pose-depth.ts';
@@ -88,8 +90,15 @@ interface ScanRow {
   readonly depths: ReadonlyMap<string, number>;
   /** The depth past the limit of each pair, summed over the pairs, in meters. */
   readonly over: number;
-  /** The reached part of the fingerboard and of the hair of a bowed player, or `null`. */
-  readonly reach: { readonly fingerboard: number; readonly hair: number } | null;
+  /**
+   * The reached part of the fingerboard and of the hair of a bowed player, with the mark of a
+   * hair part that shows nearly no stroke (`bowMark()`), or `null`.
+   */
+  readonly reach: {
+    readonly fingerboard: number;
+    readonly hair: number;
+    readonly mark: ReturnType<typeof bowMark>;
+  } | null;
   /** The score ({@link scoreOf}). */
   score: number;
 }
@@ -349,7 +358,11 @@ function scanVariant(
       if (note?.family === 'bowed' && !reach) {
         const [low, high] = note.rig.stopRange;
         const [from, to] = note.rig.bowRange;
-        reach = { fingerboard: high - low, hair: (to - from) / note.rig.hairLength };
+        reach = {
+          fingerboard: high - low,
+          hair: (to - from) / note.rig.hairLength,
+          mark: bowMark(note.rig),
+        };
       }
     }
   }
@@ -470,7 +483,9 @@ async function main(): Promise<void> {
     const reach = bowed
       ? [
           row.reach ? row.reach.fingerboard.toFixed(2) : '-',
-          row.reach ? row.reach.hair.toFixed(2) : '-',
+          row.reach
+            ? `${row.reach.hair.toFixed(2)}${row.reach.mark ? ` (${row.reach.mark})` : ''}`
+            : '-',
         ]
       : [];
     console.log(

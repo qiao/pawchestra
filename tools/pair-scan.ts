@@ -5,11 +5,14 @@
  * `--variant`, the tool builds the scene of each demo of the role, sweeps each n-th play sample
  * (`--every`) and all samples of the other sets, or only the samples of `--at`, and gives the
  * deepest point of each pair with its sample, and the share of the samples over the limit of the
- * pair (`depthLimit()`). A row of a bowed player also gives the reached fingerboard and bow hair.
+ * pair (`depthLimit()`). A row of a bowed player also gives the reached fingerboard and bow hair,
+ * with the mark `no reach` or `short` of `tools/bow-warning.ts` at a hair part that shows nearly
+ * no stroke.
  * `pnpm hold-scan` scores grids on 12 play samples and one rest, and this tool checks the chosen
  * pairs over the lift and the lowering too. Check the best rows with `pnpm pose-depth --set` and
  * `pnpm arm-check --variant`.
  */
+import { bowMark } from './bow-warning.ts';
 import { setHolds } from './hold-sets.ts';
 import { roleDemos } from './pose-depth.ts';
 import { sceneOf } from '../src/pose/test-scene.ts';
@@ -192,7 +195,8 @@ function scanVariant(
       if (note?.family === 'bowed' && !reach) {
         const [low, high] = note.rig.stopRange;
         const [from, to] = note.rig.bowRange;
-        reach = `${low.toFixed(2)} to ${high.toFixed(2)}, ${((to - from) / note.rig.hairLength).toFixed(3)}`;
+        const mark = bowMark(note.rig);
+        reach = `${low.toFixed(2)} to ${high.toFixed(2)}, ${((to - from) / note.rig.hairLength).toFixed(3)}${mark ? ` (${mark})` : ''}`;
       }
       for (const set of options.role.sampleSets(scene)) {
         if (!sets.has(set.name)) {
