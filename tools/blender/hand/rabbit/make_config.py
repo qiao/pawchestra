@@ -24,24 +24,24 @@ P = json.load(open(os.path.join(HERE, 'params.json')))
 #: soles at y 0, +z forward, +x the left side), measured on sections of the mesh and its loops.
 SOURCE = {
     'root': ([0, 0, 0], [0, 0, 0.1]),
-    'hips': ([0, 0.29, 0.0], 'spine'),
-    'spine': ([0, 0.36, 0.01], 'spine1'),
-    'spine1': ([0, 0.43, 0.02], 'chest'),
-    'chest': ([0, 0.495, 0.015], 'neck'),
-    'neck': ([0, 0.575, 0.0], 'head'),
-    'head': ([0, 0.605, 0.0], [0, 0.79, 0.0]),
-    'ear_L': ([0.045, 0.79, -0.02], [0.092, 1.0, -0.045]),
-    'clavicle_L': ([0.015, 0.54, 0.01], 'upper_arm_L'),
-    'upper_arm_L': ([0.07, 0.535, 0.02], 'forearm_L'),
-    'forearm_L': ([0.156, 0.524, 0.03], 'forearm_twist_L'),
-    'forearm_twist_L': ([0.20, 0.5255, 0.038], 'hand_L'),
-    'hand_L': ([0.245, 0.525, 0.048], 'fingers_L'),
-    'fingers_L': ([0.287, 0.521, 0.058], [0.336, 0.517, 0.045]),
-    'thigh_L': P.get('hipJoint', ([0.06, 0.265, 0.01], 'shin_L')),
-    'shin_L': ([0.065, 0.153, 0.006], 'foot_L'),
-    'foot_L': ([0.066, 0.058, -0.012], 'toes_L'),
-    'toes_L': ([0.075, 0.02, 0.06], [0.08, 0.01, 0.13]),
-    'tail': ([0, 0.28, -0.10], [0, 0.28, -0.145]),
+    'hips': ([0, 0.31, 0.0], 'spine'),
+    'spine': ([0, 0.38, 0.01], 'spine1'),
+    'spine1': ([0, 0.45, 0.02], 'chest'),
+    'chest': ([0, 0.52, 0.015], 'neck'),
+    'neck': ([0, 0.595, 0.0], 'head'),
+    'head': ([0, 0.625, 0.0], [0, 0.81, 0.0]),
+    'ear_L': ([0.045, 0.805, -0.015], [0.097, 1.0, -0.025]),
+    'clavicle_L': ([0.015, 0.567, 0.01], 'upper_arm_L'),
+    'upper_arm_L': ([0.07, 0.566, 0.023], 'forearm_L'),
+    'forearm_L': ([0.158, 0.563, 0.028], 'forearm_twist_L'),
+    'forearm_twist_L': ([0.2065, 0.563, 0.032], 'hand_L'),
+    'hand_L': ([0.255, 0.562, 0.041], 'fingers_L'),
+    'fingers_L': ([0.287, 0.559, 0.052], [0.322, 0.556, 0.05]),
+    'thigh_L': P.get('hipJoint', ([0.06, 0.275, 0.01], 'shin_L')),
+    'shin_L': ([0.062, 0.157, -0.01], 'foot_L'),
+    'foot_L': ([0.066, 0.058, -0.008], 'toes_L'),
+    'toes_L': ([0.075, 0.02, 0.06], [0.08, 0.01, 0.125]),
+    'tail': ([0, 0.305, -0.095], [0, 0.305, -0.145]),
 }
 ROLLS = {
     'root': [0, 1, 0],
@@ -104,7 +104,7 @@ def main():
         joints.pop('fingers_R')
     cfg['joints'] = joints
     cfg['sourceNote'] = (
-        'The new Tripo P2 rabbit mesh with its quads (assets/models/rabbit/README.md). The hand rig '
+        'The fourth Tripo P2 rabbit mesh with its quads (assets/models/rabbit/README.md). The hand rig '
         'assets/models/rabbit/tripo-hand/rabbit.blend starts from it in headless Blender with the calls '
         'of tools/blender/studio_armature.py (design 4.4, "Hand rig").'
     )
