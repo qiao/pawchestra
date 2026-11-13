@@ -245,12 +245,15 @@ Design 4.4 gives the rule and the reason of each config key.
   row folds it when the arm reaches forward: start `rows.control` near that share.
 - Bone heat thigh shares far up the belly pull a seated belly back into a ridge. Move it toward
   the trunk form with a key (`trunk_belly()` of the panda chain), faded out under the arms.
+- Limit Total 4 can drop the belly thigh shares under the arms, so the seated chest stands over
+  the belly as a ledge. Fade them out by exact rows (`belly_rows()`, pig).
 - Add a ring at a joint (`refine.rings`) only where `pnpm fold-probe` finds folds. A straight bind
   folds a thick inner elbow: put its rings one arm radius from the joint (`arm_rebuild.py --spec`).
 - Automatic weights give the clavicle most of a thick arm root, and the wrist helper half of a
   short paw. Check both. `weights.fingers` 1 closes a paw around a tube.
-- An elbow helper share below 1 at the elbow joint makes the bend share jump there. Let it reach
-  1 at the joint (badger).
+- A helper share below 1 at the elbow joint makes the bend share jump there. Let it rise from 0
+  to 1 at the joint (the source x for an arm stretch) and fall to 0, over about one arm radius
+  on each side: a rise of 0.018 units sharpened the fox elbow.
 - Uneven shares around one forearm ring dent a bent elbow and shear the twisted faces into dark
   spikes. Measure them with `sa.ring_spread()`.
 - Blender weights on the trunk, the head, or the neck fold faces. Keep the rule weights there
