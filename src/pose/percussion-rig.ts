@@ -811,7 +811,10 @@ export const PERCUSSION_HOLDS = {
  * strike direction, and the wrist holds the ball about 3.5 cm over its spot (`across.pitch`), as
  * the ready position of the snare drum. Before a strike, the wrist lifts the ball higher by the
  * loudness (`sizes.lift`, `across.peak`): about 6 cm for a soft note and 13 cm for a loud note.
- * With the rest direction across the forearm, the heads swing out past the rim. In a rest after a
+ * With the rest direction across the forearm, the heads swing out past the rim. At rest, the
+ * mallets lie across the body over the plate, as the snare sticks of the set position, with the
+ * left mallet 7° up and the right mallet 7° down (`set.rise`), so that the shafts lie side by
+ * side and do not cross: with 0° and 9° up, they crossed in an X. In a rest after a
  * note, the paw that did not strike takes its grip to the near rim, and the spine leans 9° more
  * (`damp`), so that the fingers touch the edge: with no lean, the arm stretched 0.12 of the upper
  * arm (main 0.04), and a grip at the rim point nearest to the shoulder joint twisted the arm in a
@@ -837,7 +840,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 5 },
   pitchR: 1,
   ready: false,
-  set: { raise: 0.246243, rise: [0, 0.15] },
+  set: { raise: 0.246243, rise: [0.12, -0.12] },
   pair: false,
   gap: 0,
   pass: 0,
