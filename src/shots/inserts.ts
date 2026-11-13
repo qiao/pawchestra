@@ -115,6 +115,12 @@ export const INSERT_LENS = {
    * size holds its eyes.
    */
   sizes: [1, 1.5],
+  /**
+   * The cameras that the tests of the play pose of one detail can refuse before the detail gives
+   * no more inserts, unless one of its inserts found a camera. The tests read the posed mesh, and
+   * a detail that its own body or a stand hides from most views wasted most of the plan time.
+   */
+  poseTries: 6,
   /** The steps of the search around the seeded azimuth, in degrees, to both sides. */
   azimuthSteps: [0, 12, 24, 36, 48, 60, 72],
   /** The steps of the search above the seeded elevation, in degrees. */
@@ -1046,6 +1052,7 @@ export function planInserts(inputs: InsertInputs, shots: readonly Shot[]): Shot[
   const poses = createScenePose(inputs.poses);
   const stageResults = new Map<string, StagePoint>();
   const poseRefusals = new Map<string, Map<number, InsertRefusal>>();
+  const framed = new Set<string>();
   const inserts: Shot[] = [];
   let nextFrom = -Infinity;
   let last: DetailSpot | null = null;
@@ -1107,6 +1114,10 @@ export function planInserts(inputs: InsertInputs, shots: readonly Shot[]): Shot[
           refusedBySpot = new Map();
           poseRefusals.set(spotKey, refusedBySpot);
         }
+        // A detail whose play pose refused many cameras, and none passed, has no clear view.
+        if (refusedBySpot.size >= INSERT_LENS.poseTries && !framed.has(spotKey)) {
+          continue;
+        }
         const view = detailView(inputs, spot, poses, (start + end) / 2, meanKey);
         const { target } = view.detail;
         const point = `${spotKey} ${target.map((v) => v.toFixed(2)).join(',')}`;
@@ -1128,6 +1139,7 @@ export function planInserts(inputs: InsertInputs, shots: readonly Shot[]): Shot[
         if (!camera) {
           continue;
         }
+        framed.add(spotKey);
         inserts.push({
           kind: 'insert',
           startSec: start,
