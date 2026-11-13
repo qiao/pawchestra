@@ -43,7 +43,8 @@ These rules hold for each route:
   into quads only guesses the loops. Edit the quads, and divide them only at the export.
 - **Subdivide, never cut.** Add a limb ring only by an edge ring split on a clean quad loop, with
   the new vertices at the edge middles (`rings.subdivide`). Never add a ring with a plane cut. An
-  edge ring with a triangle or a pole takes no split: report its place.
+  edge ring with a triangle or a pole takes no split: report its place. A limb ring of quads
+  through one triangle can take the split (`seed_rings()`, badger).
 - **A small clip over an over-cut.** A small clip of the arm root into the trunk is better than an
   over-cut. A notch, a gap, a fin, a flap, or a ledge at the armpit or the inner elbow is a fault.
   A fault that a prop or the piano hides still counts.
@@ -248,6 +249,8 @@ Design 4.4 gives the rule and the reason of each config key.
   folds a thick inner elbow: put its rings one arm radius from the joint (`arm_rebuild.py --spec`).
 - Automatic weights give the clavicle most of a thick arm root, and the wrist helper half of a
   short paw. Check both. `weights.fingers` 1 closes a paw around a tube.
+- An elbow helper share below 1 at the elbow joint makes the bend share jump there. Let it reach
+  1 at the joint (badger).
 - Uneven shares around one forearm ring dent a bent elbow and shear the twisted faces into dark
   spikes. Measure them with `sa.ring_spread()`.
 - Blender weights on the trunk, the head, or the neck fold faces. Keep the rule weights there
@@ -301,6 +304,7 @@ Design 4.4 gives the merges of each copy.
   root can set the seat top: fix it with `sit.top` and `sit.root`.
 - A girth move that ends at a joint leaves a ledge in the seated bind. Relax the posed bind there
   in a few plain Laplacian rounds, into the sit key by the inverse skin. Taubin keeps the ledge.
+  A standing body gets the source back from `legs_straight`: use `smooth` boxes (rhino).
 
 ### Head and colors
 
