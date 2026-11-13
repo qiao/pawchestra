@@ -1532,10 +1532,16 @@ flute, the oboe, the clarinet, the horn, the trumpet, or the trombone, as in a c
 | Stool           | For the harp, with no back (`STOOL`). It fits the legs, so the knees and the hooves stay out of it.       |
 | Piano bench     | A padded seat with four tapered legs (`PIANO_BENCH`), as in `polar-bear-views.png`. It fits the legs and holds the whole haunch. |
 | Music stand     | A tripod and a tilted desk with a sheet (`MUSIC_STAND`), below the eyes of its players.                   |
+| Sheet music     | Staff lines, bar lines, and notes on each stand sheet and each page of the conductor score (`SHEET_PRINT` of `scene/sheets.ts`). |
 | Podium          | A box with cut corners and framed panels (`PODIUM_SIZE`, `PODIUM_TRIM`), as in `bear-views.png`.          |
 | Conductor stand | A desk on a post in front of the podium (`CONDUCTOR_STAND`), with its top edge at the bear shoulders.     |
 | Stage           | A slab of side `S` with cut corners (`STAGE_CORNER_CUT`), a raised lip (`STAGE_LIP`), and lacquered planks. |
 | Choir risers    | Up to three arc levels behind the orchestra, and a curved stair at each side end (`RISER`).              |
+
+The props give the sheets as plain corners (`buildSheets()` of `models/stage.ts`). The scene draws
+the music into one canvas texture of 256 pixels at start, with no file, and lays it on the white
+sheets with a polygon offset. The lines fade to gray with the mip levels at a distance, so they
+make no moiré. Reason: the close shots showed the sheets as blank white quads.
 
 **Choir risers.** The risers follow real choral risers and stage stairs (`buildRisers()`):
 

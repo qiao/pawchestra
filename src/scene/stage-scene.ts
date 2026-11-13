@@ -34,7 +34,7 @@ import type { FrameCover, ScreenBox, ViewFrame } from '../shots/frame.ts';
 import type { CameraPose } from '../shots/types.ts';
 import type { ModelCache } from '../models/model-cache.ts';
 import { buildSceneProps } from '../models/props.ts';
-import { STAGE_THICKNESS } from '../models/stage.ts';
+import { STAGE_THICKNESS, buildSheets } from '../models/stage.ts';
 import type { Steps } from '../score/steps.ts';
 import { StageCamera } from './camera.ts';
 import { disposeTree } from './dispose.ts';
@@ -78,6 +78,7 @@ import {
 } from './player.ts';
 import type { PlayerSpot } from './player.ts';
 import { setBandViewHeight } from './harp-strings.ts';
+import { createSheetMesh } from './sheets.ts';
 import { PostPipeline, targetFormatOf } from './post.ts';
 import type { HazeFrame, PostView, TargetFormat } from './post.ts';
 import { FRAME_VIGNETTE, POST_LOOK } from './post.ts';
@@ -535,6 +536,10 @@ export class StageScene {
     setRimLights(this.#rim, lights);
     yield;
     const props = createStaticMesh(buildSceneProps(layout), materials);
+    const sheets = createSheetMesh(buildSheets(layout), materials[0]);
+    if (sheets) {
+      props.add(sheets);
+    }
     scene.add(props);
     const players = yield* createPlayersSteps(playerSpots(layout), materials, models);
     this.#variants.assign(players);

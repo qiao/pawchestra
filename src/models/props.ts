@@ -456,15 +456,49 @@ export function buildMusicStand(deskHeight: number = MUSIC_STAND.deskHeight): Me
     transform(toVec3(deskCenter), toQuat(tilt)),
   );
   // The sheet is one quad a little in front of the desk.
-  const w = s.deskWidth / 2 - 0.04;
-  const d = s.deskDepth / 2 - 0.04;
-  const front = 0.0075;
-  const corner = (cx: number, cy: number): Vec3 =>
-    toVec3(new Vector3(cx, cy, front).applyQuaternion(tilt).add(deskCenter));
-  builder.add(quad(corner(-w, -d), corner(w, -d), corner(w, d), corner(-w, d)), {
-    color: SCENE_COLORS.sheet,
-  });
+  const [a, b, c, d] = standSheetCorners(s.deskHeight);
+  builder.add(quad(a, b, c, d), { color: SCENE_COLORS.sheet });
   return builder.build();
+}
+
+/**
+ * Gives the corners of a sheet on a tilted desk (design 4.5): at the lower left, the lower right,
+ * the upper right, and the upper left, as the reader at +z sees the sheet. The scene draws the
+ * staff lines of a sheet in these axes.
+ *
+ * @param deskCenter The middle of the desk.
+ * @param tilt The tilt of the desk toward the reader.
+ * @param sheet The middle of the sheet in the axes of the desk, and its half width and half height.
+ * @returns The four corners.
+ */
+export function deskSheetCorners(
+  deskCenter: Vec3,
+  tilt: number,
+  sheet: { readonly middle: Vec3; readonly halfWidth: number; readonly halfHeight: number },
+): [Vec3, Vec3, Vec3, Vec3] {
+  const turn = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -tilt);
+  const [mx, my, mz] = sheet.middle;
+  const w = sheet.halfWidth;
+  const h = sheet.halfHeight;
+  const corner = (x: number, y: number): Vec3 =>
+    toVec3(new Vector3(mx + x, my + y, mz).applyQuaternion(turn).add(new Vector3(...deskCenter)));
+  return [corner(-w, -h), corner(w, -h), corner(w, h), corner(-w, h)];
+}
+
+/**
+ * Gives the corners of the sheet of a music stand in the axes of the stand: a quad 7.5 mm in
+ * front of the desk ({@link deskSheetCorners}).
+ *
+ * @param deskHeight The height of the middle of the desk above the floor, in meters.
+ * @returns The four corners.
+ */
+export function standSheetCorners(deskHeight: number): [Vec3, Vec3, Vec3, Vec3] {
+  const s = MUSIC_STAND;
+  return deskSheetCorners([0, deskHeight, 0], s.tilt, {
+    middle: [0, 0, 0.0075],
+    halfWidth: s.deskWidth / 2 - 0.04,
+    halfHeight: s.deskDepth / 2 - 0.04,
+  });
 }
 
 /**

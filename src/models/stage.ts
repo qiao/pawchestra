@@ -2,10 +2,11 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 import { SCENE_COLORS } from './colors.ts';
 import { toQuat, toVec3 } from './tuples.ts';
 import type { Vec3 } from './tuples.ts';
-import { MeshBuilder, transform } from './mesh.ts';
+import { MeshBuilder, applyTransform, transform } from './mesh.ts';
 import type { MeshData, Rgb } from './mesh.ts';
 import { box, cylinder, quad } from './primitives.ts';
-import { STAGE_COLORS, addDesk } from './props.ts';
+import type { SceneLayout } from './layout.ts';
+import { STAGE_COLORS, addDesk, deskSheetCorners, standSheetCorners } from './props.ts';
 
 /** The thickness of the stage slab (design 4.5, props). The floor is at y = -STAGE_THICKNESS. */
 export const STAGE_THICKNESS = 0.4;
@@ -573,15 +574,59 @@ function addPodium(builder: MeshBuilder, podium: Vec3, stand = true): void {
     transform(toVec3(deskCenter), toQuat(tilt)),
   );
   // The open score: two pages with a small gap, on the front face of the desk.
-  const lift = new Vector3(0, 0, 0.0095).applyQuaternion(tilt);
+  const lift = new Vector3(0, 0, SCORE_PAGE.lift).applyQuaternion(tilt);
   for (const sign of [-1, 1]) {
-    const page = box(desk.deskWidth / 2 - 0.03, desk.deskDepth - 0.06, 0.004);
+    const page = box(2 * SCORE_PAGE.halfWidth, 2 * SCORE_PAGE.halfHeight, SCORE_PAGE.thickness);
     const center = new Vector3((sign * desk.deskWidth) / 4, 0, 0).add(lift).add(deskCenter);
     builder.add(page, {
       color: SCENE_COLORS.sheet,
       at: transform(toVec3(center), toQuat(tilt)),
     });
   }
+}
+
+/** A page of the open score on the conductor stand, in meters (design 4.5). */
+const SCORE_PAGE = {
+  halfWidth: CONDUCTOR_STAND.deskWidth / 4 - 0.015,
+  halfHeight: CONDUCTOR_STAND.deskDepth / 2 - 0.03,
+  thickness: 0.004,
+  /** The distance of the middle of the page in front of the middle of the desk. */
+  lift: 0.0095,
+} as const;
+
+/**
+ * Gives the sheets of music of a layout (design 4.5): the sheet of each music stand, and the two
+ * pages of the score on the conductor stand. The scene draws staff lines and notes on them.
+ *
+ * @param layout The layout of a score.
+ * @returns 12 numbers for each sheet: x, y, z of its corners at the lower left, the lower right,
+ *   the upper right, and the upper left, as its reader sees it ({@link deskSheetCorners}).
+ */
+export function buildSheets(layout: SceneLayout): Float32Array {
+  const corners: number[] = [];
+  for (const at of layout.stands) {
+    const place = transform(
+      at.position,
+      toQuat(new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), at.facing)),
+    );
+    for (const corner of standSheetCorners(at.deskHeight)) {
+      corners.push(...applyTransform(place, corner));
+    }
+  }
+  if (layout.conductor) {
+    const desk = CONDUCTOR_STAND;
+    const [px, , pz] = layout.podium;
+    const deskCenter: Vec3 = [px, PODIUM_SIZE[1] + desk.deskHeight, pz - desk.forward];
+    for (const sign of [-1, 1]) {
+      const page = deskSheetCorners(deskCenter, desk.tilt, {
+        middle: [(sign * desk.deskWidth) / 4, 0, SCORE_PAGE.lift + SCORE_PAGE.thickness / 2],
+        halfWidth: SCORE_PAGE.halfWidth,
+        halfHeight: SCORE_PAGE.halfHeight,
+      });
+      corners.push(...page.flat());
+    }
+  }
+  return new Float32Array(corners);
 }
 
 /**
