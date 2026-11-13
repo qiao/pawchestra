@@ -124,8 +124,8 @@ always gives the correct pose.
 - `src/app/`, `src/ui/`: The load flow, the transport, the seat list, the URL hash, and the
   settings.
 - `src/gallery/`: The development pages `gallery.html` and `views.html`.
-- `src/test-page/`: The development page `test.html` at `/test`: one animal plays a test phrase
-  of its role on the stage of the app.
+- `src/test-page/`: The development page `test.html` at `/test`: one animal plays or conducts a
+  test phrase of its role on the stage of the app.
 - `tools/`: The build scripts, the probes, and the image tools
   ([`docs/agents/commands.md`](docs/agents/commands.md)).
 
