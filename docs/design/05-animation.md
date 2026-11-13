@@ -932,23 +932,25 @@ The rest of each family:
   `pedalLevelAt()`), and the synth reads the same events.
 
 **Harp** (harp 6): the palm faces the string of its note and pulls away to pluck. The left palm
-also faces a little down (`HANDS_HOLDS.harp.faceL`), so that the left wrist stays near straight,
+also faces down (`HANDS_HOLDS.harp.faceL`), so that the left wrist stays near straight,
 as the wrists of a harpist go only a little down (harp 4). Reason: the short upper arm of the deer
 cannot bring the left elbow near the plane of the strings, so the left forearm points into the
 strings. With the palm square to the strings, the left wrist bent back past the paw swing limit of
 the arm gate in the rest, in the lift, and in the play. The turned paw comes nearer to the
 strings at the knuckles, so the left palm stays further from the strings (`palmL`), and the
-knuckles stay out of the neck of the harp. The offsets of the palms are in `H`, so they grow with
-the deer (4.4).
+fingers stay out of the strings. Reason: the fingers of the deer curl toward the palm, and with
+the palm nearer, they went through the strings. The offsets of the palms are in `H`, so they grow
+with the deer (4.4).
 The highest strings of the left hand lie near the chest, so for them the left palm moves nearer to
 the strings, lower, and toward the column (`highL`), and the paw stays out of the chest.
-The highest strings of the right hand lie near the right shoulder, so for them the right palm
-moves down the strings and a little away from them (`highR`), as the right wrist of a harpist
-comes near the soundboard in the upper register (harp 4). Reason: at the neck of the harp, the
-right elbow folded and the right forearm twisted. The right elbow points out and a little down
-(`poleR`), as the elbows of a harpist rise, so the right upper arm only touches the top of the
-soundbox. Reason: with the elbow lower, the right upper arm went into the top of the soundbox in
-the play and the lift. The right palm faces a little down and a little back to the player
+The top of the soundbox stands below the right shoulder (4.6), so the right arm hangs outside it
+and reaches the strings from the right side, with no arm through the plane of the strings. The
+highest strings of the right hand lie near the right shoulder, so for them the right palm moves
+down the strings and a little away from them (`highR`), as the right wrist of a harpist comes near
+the soundboard in the upper register (harp 4). Reason: near the neck of the harp, the right elbow
+folded back. The right palm stands well above the pluck point (`palmR`), so the right paw reaches
+its lowest strings. The right elbow points out and down (`poleR`), so the right upper arm stands
+out only a little from the trunk. The right palm faces a little down and a little back to the player
 (`faceR`), so that the right forearm twists at most 45° in the chord and the pluck.
 
 Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
@@ -992,8 +994,11 @@ Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
   notch, and the changes of one foot keep `PEDAL_MOTION.footGapSec` apart when the music lets
   them, as a harpist moves 1 to 2 pedals each second (harp 7.7). The left foot moves D, C, and B,
   and the right foot E, F, G, and A (`PEDAL_FEET`). For each change, the foot goes from its rest
-  to the pedal, lifted, presses the pedal into the notch, and goes back (`poseHarpFeet()` of
-  `pose/harp-feet.ts`). Each foot starts from its rest place (`LEG_RESTS`): the left hoof rests
+  to the pedal, lifted by `PEDAL_LIFT` over the line of its move, presses the pedal into the notch,
+  and goes back to its rest (`poseHarpFeet()` of `pose/harp-feet.ts`). A move that starts on the
+  pedal of the change before goes from that pedal, and the return after the press goes to the
+  rest. Reason: a return to the pedal before kept the hoof at the height of a press, through the
+  corner of the base. Each foot starts from its rest place (`LEG_RESTS`): the left hoof rests
   to the left of the base, behind the foot of the soundbox, with the knee out and forward, so the
   harp stands between the knees, as a harpist sits (harp 2). Reason: the near diagonal harp puts
   the foot of its soundbox and its base over the bind place of the left hoof, so the left hoof
