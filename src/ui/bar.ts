@@ -62,6 +62,24 @@ const PLAY_ICONS = {
   'Play again': 'replay',
 } as const satisfies Readonly<Record<BarView['playLabel'], IconName>>;
 
+/** The width of the thumb of a slider, in CSS pixels, as in `ui.css`. */
+const THUMB_PX = 14;
+
+/**
+ * Gives the song time under the pointer on the seek bar (design 2.8). The thumb stops half its
+ * width inside each end of the track.
+ *
+ * @param input The seek bar.
+ * @param clientX The x of the pointer on the page, in CSS pixels.
+ * @returns The song time, in whole seconds.
+ */
+function pointerSeconds(input: HTMLInputElement, clientX: number): number {
+  const box = input.getBoundingClientRect();
+  const track = Math.max(1, box.width - THUMB_PX);
+  const share = Math.min(1, Math.max(0, (clientX - box.left - THUMB_PX / 2) / track));
+  return Math.round(share * Number(input.max));
+}
+
 /**
  * The time after the end of the tap that showed the hidden bar, after which its controls take the
  * pointer again if no click came, in milliseconds. A long press or a drag gives no click.
@@ -165,6 +183,8 @@ export class Bar {
   readonly #tooltips: Tooltips;
   /** True while the pointer drags the seek bar. Then a frame does not move its thumb. */
   #dragging = false;
+  /** The song time under the pointer on the seek bar, or `null` with no pointer over it. */
+  #pointerSec: number | null = null;
   #hovered = false;
   /**
    * True from a press on the hidden bar until the click of that tap. Until then, the controls
@@ -255,7 +275,7 @@ export class Bar {
     });
     this.#guardWakingTap();
     this.#addTooltip(this.#play, CONTROL_KEYS.play);
-    this.#addTooltip(this.#seek, CONTROL_KEYS.seek);
+    this.#addSeekTooltip();
     this.#addTooltip(this.#speed, null);
     this.#addTooltip(this.#mute, CONTROL_KEYS.mute);
     this.#addTooltip(this.#volume, CONTROL_KEYS.volume);
@@ -332,6 +352,32 @@ export class Bar {
     this.#tooltips.attach(control, () =>
       tooltipText(control.getAttribute('aria-label') ?? '', key),
     );
+  }
+
+  /**
+   * Gives the seek bar a tooltip with the time under the pointer before its name and its key
+   * (design 2.8), for example "1:23 · Seek (← →, Home)". The tooltip follows the pointer.
+   */
+  #addSeekTooltip(): void {
+    const seek = this.#seek;
+    const key = CONTROL_KEYS.seek;
+    seek.setAttribute('aria-keyshortcuts', key.shortcuts);
+    this.#tooltips.attach(seek, () => {
+      const text = tooltipText(seek.getAttribute('aria-label') ?? '', key);
+      return this.#pointerSec === null || seek.disabled
+        ? text
+        : `${clockText(this.#pointerSec)} · ${text}`;
+    });
+    seek.addEventListener('pointermove', (event) => {
+      if (event.pointerType === 'touch') {
+        return;
+      }
+      this.#pointerSec = pointerSeconds(seek, event.clientX);
+      this.#tooltips.follow(seek, event.clientX);
+    });
+    seek.addEventListener('pointerleave', () => {
+      this.#pointerSec = null;
+    });
   }
 
   /**

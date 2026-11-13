@@ -25,6 +25,8 @@ export class Tooltips {
   /** The control of the tooltip that shows or waits to show, or `null`. */
   #control: HTMLElement | null = null;
   #text: () => string = () => '';
+  /** The middle of the tooltip on the page, in CSS pixels, or `null` for the middle of its control. */
+  #anchorX: number | null = null;
   #showTimer: ReturnType<typeof setTimeout> | undefined;
   #hideTimer: ReturnType<typeof setTimeout> | undefined;
 
@@ -71,6 +73,7 @@ export class Tooltips {
       }
     });
     control.addEventListener('pointerleave', () => {
+      this.#anchorX = null;
       this.#hideSoon();
     });
     control.addEventListener('pointerdown', () => {
@@ -107,6 +110,21 @@ export class Tooltips {
     clearTimeout(this.#hideTimer);
     this.#control = null;
     this.element.hidden = true;
+  }
+
+  /**
+   * Moves the tooltip of a control to a point and reads its text again, while it shows. The seek
+   * bar uses it, so that the time at the pointer follows the pointer (design 2.8).
+   *
+   * @param control The control.
+   * @param x The middle of the tooltip on the page, in CSS pixels, or `null` for the middle of the
+   *   control.
+   */
+  follow(control: HTMLElement, x: number | null): void {
+    this.#anchorX = x;
+    if (this.#control === control && !this.element.hidden) {
+      this.#show(control);
+    }
   }
 
   /** Reads the text of the tooltip that shows again, for example after a change of the label. */
@@ -162,7 +180,8 @@ export class Tooltips {
     const width = this.element.offsetWidth;
     const height = this.element.offsetHeight;
     const maxLeft = window.innerWidth - width - EDGE_PX;
-    const left = Math.min(Math.max(EDGE_PX, box.left + box.width / 2 - width / 2), maxLeft);
+    const middle = this.#anchorX ?? box.left + box.width / 2;
+    const left = Math.min(Math.max(EDGE_PX, middle - width / 2), maxLeft);
     const above = box.top - GAP_PX - height;
     const top = above >= EDGE_PX ? above : box.bottom + GAP_PX;
     this.element.style.left = `${Math.round(left)}px`;
