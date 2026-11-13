@@ -126,6 +126,8 @@ passes.
 - [ ] Conductor bear: the quiet place of the left hand and the cue point stay at the height of the
       head, as `mockup.png` and design 5.4 give them. Check them against a real conductor, whose
       gestures stay below the chin (`conductor-technique.md`, section 1).
+- [ ] Conductor bear: in the steps of the end turn, the hips turn up to about 45° from the
+      planted foot (`TURN_STEPS`, 5.4). Check the skin of the hips and the thighs in 2x crops.
 - [ ] Conductor bear: at rest, the right arm folds 5 faces (p95, limit 8) against 1 before the
       relaxed arms and the turned rest baton. Check the right wrist in a 2x crop.
 - [ ] Conductor bear: in the held final chord and at a climax, the baton points up past the cheek
