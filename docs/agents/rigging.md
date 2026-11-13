@@ -30,7 +30,7 @@ model folder gives the files of each step.
 | badger | Hand rig at the crown of the older badger, arms 1.2 times longer, a left eyeball fused to its socket (`fused_ball()`), a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
 | monkey | Hand rig at 1.2 times H of the older monkey, no chair, with the trumpet of the app. | `trumpeter` |
 | rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), elbow `raise` shapes, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
-| deer | Hand rig of the fawn, arms 1.3 times longer. Sits on the harp stool, with a smaller harp (`harpScale`). | `harpist` |
+| deer | Hand rig of the fawn, arms 1.5 times longer. Sits on the harp stool, with the harp of 0.975 (`harpScale`) in front of the chest. | `harpist` |
 | penguin | Hand rig. Stands on its riser. | `singer` |
 | mannequin | The test body: the animal preset of `mannequin.py`, its own faces (`arm_rebuild.py --keep-faces`). | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
 

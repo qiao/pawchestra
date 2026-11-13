@@ -981,15 +981,16 @@ the palm nearer, they went through the strings. The offsets of the palms are in 
 with the deer (4.4).
 The highest strings of the left hand lie near the chest, so for them the left palm moves nearer to
 the strings, lower, and toward the column (`highL`), and the paw stays out of the chest.
-The top of the soundbox stands below the right shoulder (4.6), so the right arm hangs outside it
-and reaches the strings from the right side, with no arm through the plane of the strings. The
-highest strings of the right hand lie near the right shoulder, so for them the right palm moves
-down the strings and a little away from them (`highR`), as the right wrist of a harpist comes near
-the soundboard in the upper register (harp 4). Reason: near the neck of the harp, the right elbow
-folded back. The right palm stands well above the pluck point (`palmR`), so the right paw reaches
-its lowest strings. The right elbow points out and down (`poleR`), so the right upper arm stands
-out only a little from the trunk. The right palm faces a little down and a little back to the player
-(`faceR`), so that the right forearm twists at most 45° in the chord and the pluck.
+The top of the soundbox rests against the chest, below the right shoulder (4.6), so the right
+elbow points out and up (`poleR`), and the right arm passes outside the top of the soundbox to the strings,
+as the elbows of a harpist rise (harp 4). Reason: with the elbow down, the right upper arm went
+into the top of the soundbox. The highest strings of the right hand lie near the right shoulder,
+so for them the right palm moves down the strings and a little away from them (`highR`), as the
+right wrist of a harpist comes near the soundboard in the upper register (harp 4). Reason: near
+the neck of the harp, the right elbow folded back. The right palm stands above the pluck point
+(`palmR`), so the right paw reaches its lowest strings. The right palm faces a little down and a
+little back to the player (`faceR`), so that the right forearm twists at most 45° in the chord and
+the pluck.
 
 Each hand plays the fingering of a harpist (harp 7, `planHarpFingerings()` of
 `pose/harp-fingering.ts`), a pure function of the notes of the hands:
