@@ -81,7 +81,7 @@ the joints of the source, mapped by the point edits.
 
 | Item | Value |
 |---|---|
-| Size | 380,605 bytes. A new build gives the same export, but not the same `.blend` bytes |
+| Size | 382,254 bytes. A new build gives the same export, but not the same `.blend` bytes |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `fox`: 3,613 vertices and 3,805 faces (3,266 quads and 539 triangles, 7,071 triangles). Flat faces and the surface of `sa.add_surface()`. No face is gloss: the nose takes the slot `fur` and the color map. The 88 faces of the two eye domes have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`) |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The legs and the right ear have joints of their own. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -171,10 +171,38 @@ seated crown 1.535 m (1.609 m).
 **Seat.** The thighs slope 15 degrees down and 8 degrees out in the bind, the shins lean 12
 degrees forward, and the feet stay flat on the floor (`legTurns` of the config). The front of the
 seat lies 0.06 units behind the knee joint of the bind, and 54 % of the thigh lies on the seat.
-The half width 0.14 holds the haunch (x -0.127 to 0.134). The seat height of the app is 0.179 m
-(0.249 m before), and the chair is 0.386 m deep (0.318 m). Reason: the thighs and the trunk of the
-new mesh are thicker. At the waist (y 0.49) the trunk is 0.33 m wide and 0.196 units deep, against
-0.25 m and 0.120 units on the fox before.
+The half width 0.14 holds the haunch (x -0.127 to 0.134). The seat height of the app is 0.230 m
+(0.249 m on the fox before), and the chair is 0.386 m deep (0.318 m). Reason: the thighs and the
+trunk of the new mesh are thicker. At the waist (y 0.49) the trunk is 0.33 m wide and 0.196 units
+deep, against 0.25 m and 0.120 units on the fox before. The hip joints stand 10.7 cm (0.31 H) over
+the seat, as on the cat, the pig, the wolf, the dog, and the panda (0.30 to 0.31 H).
+
+**Sit key.** The key `bind_sit` (`sit_key()` of `build.py`, the block `sit` of `params.json`)
+comes after the keys `bind_belly` and `bind_tail`. It puts the underside of the haunch behind the
+hip joints onto the plane of the thigh underside in the bind, and it changes no weight. Reason: a
+knob of 3 vertices at the back of the haunch behind the tail root (`hips` 1.0) lay 0.039 units
+(6.5 cm) below the thighs. `seatHeightOf()` of `tools/studio-body.ts` puts the seat top at the
+lowest body point over the seat, so the seat was 0.179 m high, the thighs floated 6.6 cm over it,
+and the haunch up to 12.7 cm. The rule, in the Blender axes of the bind (the fox faces -y):
+
+- The body points: the vertices over the seat (|x| at most `halfWidth` 0.14) with a share of the
+  tail, the shins, the feet, the toes, and the arms below 0.5.
+- The plane: the lowest z of the body points with a thigh share above 0.5, from the seat front to
+  the hip joints (z 0.2373). The lowest body point over the seat was at z 0.1986.
+- Each body point p behind hip y - `ramp` and at most 2.5 `band` over the plane moves along z by
+  -min(gap, `most`) × ss(hip y - `ramp`, hip y, p.y) × (1 - ss(0, `band`, p.z - bottom)) ×
+  (1 - free share), and for gap > 0 also × (1 - ss(back - 2 `end`, back - `end`, p.y)). bottom
+  is the lowest z of the body points within `radius` of p in x and y and at most 3 `band` over the
+  plane, gap = bottom - plane, back the largest y of those low points, and ss a smoothstep.
+- The values: `band` 0.04, `most` 0.05, `ramp` 0.03, `end` 0.02, `radius` 0.012 (units).
+
+74 vertices move: up by at most 0.0387 units (the knob) and down by at most 0.05 units (the
+hollow under the haunch). Their ids: 371, 398, 400 to 402, 404 to 412, 416, 418 to 420, 1401,
+1403, 1404, 1457, 1466, 1467, 1469 to 1475, 1976, 1977, 1979, 1980, 1982 to 1988, 1991 to 1993,
+1995 to 2005, 2018, 2019, 2969 to 2972, 2974, 3022 to 3025, 3028 to 3032, 3044, 3046. In the bind,
+77 % of the seated length touches the seat (all thigh rows and 65 % of the haunch rows), against
+0 % before (`scratch/fox-seat/seat-probe.ts` of the round). The shape `legs_straight` gives the
+standing body its source form back.
 
 **Even arms.** The source is no mirror. The left arm matches the mirror of the right arm within
 1 to 2 mm (median nearest distance) up to x 0.26, and past it the left paw stands 0.023 to 0.031
@@ -220,11 +248,14 @@ In the app the paw is 0.148 m long and 0.142 m wide, on a wrist of 0.092 m.
 vertices at (0, 0.329, -0.048) on the back, and the loop itself (185 vertices). Its middle line goes
 from the middle of that loop to the tip (0, 0.073, -0.231). The tube vertices take {`hips` 1 - a,
 `tail` a (1 - b), `tail_tip` a b}, with a = smoothstep(-0.01, 0.03) of the place along the line and
-b = smoothstep(-0.04, 0.04) about the head of `tail_tip`. The tail bones point (0, -0.5, -1) and
-(0, -1, -0.1) in the bind (`studio.tailBind`): the tail goes back over the back edge of the seat and
-hangs down behind the chair. In the rest of the violinist (`node tools/tail-gap.ts fox-violinist`)
-the tail keeps 1.6 cm from the seat, 3.0 cm and 3.2 cm from the back posts, and 2.1 cm from the top
-rail, and its tip lies on the floor (0.0 cm). The tail sways in the idle motion.
+b = smoothstep(-0.04, 0.04) about the head of `tail_tip`. The tail bones point (0, -0.35, -1) and
+(0, -1, -0.1) in the bind (`studio.tailBind`): the tail goes back and 19 degrees down over the back
+edge of the seat and hangs down behind the chair. In the rest of the violinist and of the flutist
+(`node tools/tail-gap.ts <role>`) the tail root sits on the seat plane (0.0 cm), the tail keeps
+3.1 cm from each back post and 8.1 cm from the top rail, and its tip stands 1.5 cm over the floor.
+Reason: with the root at (0, -0.5, -1), the tail went 1.1 cm into the back edge of the seat of the
+key `bind_sit`, and the tip was the lowest point of the body, so the feet stood 1.45 cm over the
+floor. The tail sways in the idle motion.
 
 **Eyes.** Each eye of the source is a flat dome of 45 vertices with an open rim of 22 edges, in a
 closed socket: the rim is 0.024 units in radius, the top of the dome stands 0.0045 units over the
@@ -370,8 +401,8 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 1,051,856 bytes | `36e7bf690ef30eac3690bdca94267747741d986cb8f593e55cd4c245318f39a9` |
-| `tripo-hand/fox.rig.json` | 16,272 bytes | `9fc9f5db992fb369358361efc358cd711854c4a3cbdf142ec7d9595fbb08ed9a` |
+| `tripo-hand/fox.rig.glb` | 1,051,852 bytes | `35b9168f4e2424ac4c403a2ab6bfbca6ed4e96a15efbd30962e7ffb0a6aba7ec` |
+| `tripo-hand/fox.rig.json` | 16,270 bytes | `543e048a39758e83f96b6e524f3d9d11350e5d53b82232f935237b3a582f7e9a` |
 | `tripo-hand/fox-color.webp` | 172,080 bytes, 2048 × 2048 | `1e2a3fc91b1708228c25026edfcffc40a1f5fe8bba5a7390ee46836baf26dcfa` |
 | `tripo-hand/fox-tan-color.webp` | 178,228 bytes, 2048 × 2048 | `77340995571173589a2a609f0099daffb635e8a8638a5617b8458e94d45e81ae` |
 | `tripo-hand/fox-normal.webp` | 99,334 bytes, 1024 × 1024 | `377d69a822300e6f4265a5b8948d86481c9914e26b7d8a99a84e306fdf4f668f` |
