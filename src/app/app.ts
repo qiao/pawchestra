@@ -16,10 +16,8 @@ import type { CameraPose, ShotPlan } from '../shots/types.ts';
 import { CINEMA_ASPECT } from '../shots/view.ts';
 import type { Score, SectionSize } from '../score/types.ts';
 import { focusKindOf } from '../ui/dom.ts';
-import { nextShadeLevel } from '../ui/title-shade.ts';
 import { Ui } from '../ui/ui.ts';
 import { playWithSilentSwitch, warmAudioOutput } from './audio-session.ts';
-import { BackdropProbe } from './backdrop-probe.ts';
 import { DEFAULT_SPEED, DEFAULT_VOLUME, uiShown, volumeGain } from './bar-rules.ts';
 import { motionEvent, nextMode } from './camera-mode.ts';
 import type { CameraEvent, CameraMode } from './camera-mode.ts';
@@ -311,14 +309,6 @@ export class App {
   readonly #shotCamera = createCameraPose();
   /** The phone layout of design 2.8, which moves the frame above the sheet. */
   readonly #phone = window.matchMedia(PHONE_LAYOUT_QUERY);
-  /** The probe of the frame behind the title, for the shade (design 2.8). */
-  readonly #backdrop: BackdropProbe;
-  /** The level of the shade of each title line that the last read of the backdrop asked for. */
-  #shadeNeeded: readonly number[] = [];
-  /** The level of the shade of each title line in the last frame, from 0 to 1. */
-  #shadeLevels: readonly number[] = [];
-  /** The wall time of the last frame, in seconds, for the fall of the title shade. */
-  #shadeAt = 0;
   /** The Media Session and the screen Wake Lock (design 2.4). */
   readonly #media: SystemMedia;
 
@@ -332,8 +322,6 @@ export class App {
     this.#canvas = canvas;
     this.#scene = scene;
     this.#audioOutput = warmAudioOutput(navigator);
-    // The renderer made the context of the canvas first, so the canvas gives the same context.
-    this.#backdrop = new BackdropProbe(canvas, canvas.getContext('webgl2'));
     this.#tierWatch = watchTier(scene.tier);
     this.#ui = new Ui(
       document.body,
@@ -1210,8 +1198,6 @@ export class App {
    */
   frame(): void {
     const wallTime = performance.now() / 1000;
-    // The probe takes a finished read before the commands of the render (BackdropProbe).
-    const shade = this.#backdrop.collect(() => this.#ui.title.lines);
     const piece = this.#piece;
     let shot: CameraPose | null = null;
     if (piece) {
@@ -1245,7 +1231,6 @@ export class App {
     const ring = this.#phone.matches && drawer.open ? null : this.#ui.firstScreen.ringBox;
     this.#scene.render(shot, cover, ring);
     this.#ui.showLetterbox(this.#scene.letterboxBar, this.#scene.letterboxSide);
-    this.#followShade(wallTime, shade);
     this.#showFrame();
     if (piece && !this.#audioStarted) {
       this.#audioStarted = true;
@@ -1253,30 +1238,6 @@ export class App {
         this.#fail(piece, error, 'load');
       });
     }
-  }
-
-  /**
-   * Starts a read of the frame behind the title directly after the render, and shows the shade of
-   * each title line at the level that its text needs (design 2.8). A shade comes in at once and
-   * goes out slowly.
-   *
-   * @param wallTime The wall time of the frame, in seconds.
-   * @param needed The level of each line from a read that finished at the start of the frame, or
-   *   `null` when no read finished.
-   */
-  #followShade(wallTime: number, needed: readonly number[] | null): void {
-    const title = this.#ui.title;
-    this.#backdrop.request(wallTime, () => title.lines);
-    if (needed !== null) {
-      this.#shadeNeeded = needed;
-    }
-
-    const elapsed = wallTime - this.#shadeAt;
-    this.#shadeLevels = this.#shadeNeeded.map((level, i) =>
-      nextShadeLevel(this.#shadeLevels[i] ?? 0, level, elapsed),
-    );
-    this.#shadeAt = wallTime;
-    title.showShade(this.#shadeLevels);
   }
 
   /**

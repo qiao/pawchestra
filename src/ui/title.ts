@@ -1,8 +1,6 @@
 import { APP_NAME, REPOSITORY_LABEL, REPOSITORY_TEXT, REPOSITORY_URL } from '../app/page-title.ts';
 import { createElement, setText } from './dom.ts';
 import { createIcon, createWordmark } from './icons.ts';
-import { LINE_MARGIN, LOGO_BACKDROP_LIMIT, TEXT_BACKDROP_LIMIT } from './title-shade.ts';
-import type { TitleLine } from './title-shade.ts';
 
 /**
  * Creates the logo (design 2.8): the gold paw and the wordmark "Pawchestra". It is plain content, no
@@ -54,14 +52,8 @@ export class Title {
   readonly #title: HTMLElement;
   /** The composer line. */
   readonly #composer: HTMLElement;
-  /** The range that measures the text of a line. */
-  readonly #range = document.createRange();
   /** True while the pointer is over the link to the repository, the only control of the title. */
   #hovered = false;
-  /** Each line with the lightest backdrop at which its text keeps 4.5:1 with no shade. */
-  readonly #lines: readonly (readonly [HTMLElement, number])[];
-  /** The level of the shade of each line, from 0 to 1, or NaN before the first level. */
-  readonly #shadeLevels = [Number.NaN, Number.NaN, Number.NaN];
 
   /**
    * Creates the title. It keeps the static title of `index.html` and its text (design 2.8, 7.2):
@@ -87,11 +79,6 @@ export class Title {
     if (!this.#title.isConnected || !this.#composer.isConnected) {
       this.element.append(this.#title, this.#composer);
     }
-    this.#lines = [
-      [this.#logo, LOGO_BACKDROP_LIMIT],
-      [this.#title, TEXT_BACKDROP_LIMIT],
-      [this.#composer, TEXT_BACKDROP_LIMIT],
-    ];
     this.repositoryLink.addEventListener('pointerenter', () => {
       this.#hovered = true;
     });
@@ -111,33 +98,6 @@ export class Title {
   }
 
   /**
-   * The lines of the title, for their shades (design 2.8): the logo, the piece title, and the
-   * composer. Each has the box of its text with a margin of 4 px, and the lightest backdrop at
-   * which its color keeps 4.5:1 with no shade. Each read measures the layout.
-   */
-  get lines(): TitleLine[] {
-    return this.#lines.map(([element, limit]) => {
-      if (element.hidden) {
-        return { box: null, limit };
-      }
-
-      this.#range.selectNodeContents(element);
-      const text = this.#range.getBoundingClientRect();
-      if (text.width === 0 || text.height === 0) {
-        return { box: null, limit };
-      }
-
-      const box = {
-        left: text.left - LINE_MARGIN,
-        top: text.top - LINE_MARGIN,
-        right: text.right + LINE_MARGIN,
-        bottom: text.bottom + LINE_MARGIN,
-      };
-      return { box, limit };
-    });
-  }
-
-  /**
    * Shows the title of a piece.
    *
    * @param title The piece title.
@@ -147,24 +107,5 @@ export class Title {
     setText(this.#title, title);
     setText(this.#composer, composer);
     this.#composer.hidden = composer === '';
-  }
-
-  /**
-   * Shows the shade behind each line of the title at a level: the level multiplies the alpha of
-   * `--title-shade` (design 2.8). It writes the DOM only when a level changes by 0.01 or more.
-   *
-   * @param levels The level of each line in the order of {@link Title.lines}, from 0 (no shade)
-   *   to 1 (the full shade). A missing level is 0.
-   */
-  showShade(levels: readonly number[]): void {
-    for (const [i, [element]] of this.#lines.entries()) {
-      const level = Math.round((levels[i] ?? 0) * 100) / 100;
-      if (level === this.#shadeLevels[i]) {
-        continue;
-      }
-
-      this.#shadeLevels[i] = level;
-      element.style.setProperty('--title-shade-level', String(level));
-    }
   }
 }
