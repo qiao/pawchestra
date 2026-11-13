@@ -206,8 +206,11 @@ License of both files: CC BY-NC 4.0, as the FBX file. Two runs of the chain give
 ### Conductor
 
 `CONDUCTOR_HOLD` of `src/pose/conductor.ts` keeps its values, except the extra swing of the rest
-arms (`restArm.extraOut`, design 5.4). The measures of `pnpm hold-fit conductor` and `pnpm
-pose-depth conductor` (all 19 demos), the older bear against this body:
+arms (`restArm.extraOut`, design 5.4) and the curl of the baton paw (`batonCurl`). The baton
+grip fits this paw (`BATON_GRIP`, `STICK_TO_THUMB`, `STICK_TO_PALM` of
+`src/models/instruments/baton.ts`): the butt lies in the heel of the palm, and the stick leaves
+the paw through the palm under the curled claws. The measures of `pnpm hold-fit conductor` and
+`pnpm pose-depth conductor` (all 19 demos), the older bear against this body:
 
 | Measure | Older bear | This body |
 |---|---|---|
@@ -216,11 +219,12 @@ pose-depth conductor` (all 19 demos), the older bear against this body:
 | Forearms in the body, lift, lowering, and rest | 1.9 cm | 0.0 cm |
 | Upper arms in the body, lift and lowering | 3.8 cm | 4.0 cm (limit 4 cm) |
 | Upper arms in the body, rest | 3.2 cm | 3.7 cm (limit 4 cm) |
-| Samples of the play with a folded face | 56.2 % | 100 % (the knuckle crease of the baton paw) |
+| Samples of the play with a folded face | 56.2 % | 30.3 % |
 | Faces that fold at rest | 7 | 7 |
-| Paw twist on the forearm in the play, L / R | 20° / -3° | 0° / 4° |
+| Paw twist on the forearm in the play, L / R | 20° / -3° | 0° / 11° |
 | Body in the baton (`pnpm body-clip conductor`) | PASS, no point | PASS, no point |
 
-In the play, three thin faces of the knuckle crease of the right paw (104, 105, 1769) fold in 99 %
-of the samples at the curl of the fingers around the baton, and one wrist face (1833) in 77 %
-(`pnpm fold-probe conductor --faces 6`). The fist hides them in the hall view.
+Three thin faces of the knuckle crease of the right paw (104, 105, 1769) fold from a curl of
+about 57°, so the baton paw curls 50° (`batonCurl`). The paw near the line of the forearm also
+takes away the fold of the wrist face 1833. The paw stays closed around the baton at rest and in
+the bow.
