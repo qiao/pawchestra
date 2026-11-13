@@ -346,10 +346,15 @@ The rest of each family:
   back, the right forearm lay behind the soundbox and crossed it at rest, in the lift, and in the
   lowering.
 - **Percussion.** A ready player keeps its mallets over the instrument (`PercussionHold.ready`),
-  because a lift from hanging arms sweeps them through the body or the kettles. The snare sticks
-  rest level across the waist, as a snare drummer between entries (`PercussionHold.set`). The
-  mallets of the suspended cymbal and of the xylophone rest in the same way. Reason: no source
-  gives their rest, and the hanging paws of the badger held the xylophone mallets up. A hold
+  because a lift from hanging arms sweeps them through the body or the kettles. At rest, the
+  timpanist lays the felt balls on the heads (`PercussionHold.restPitch`). No source gives the
+  rest of a timpanist. The snare sticks rest level across the waist, as a
+  snare drummer between entries (`PercussionHold.set`). The mallets of the suspended cymbal and of
+  the xylophone rest in the same way, side by side: the two mallets turn up by two angles
+  (`MalletSet.rise`), so that the shafts do not cross in an X in the front view. Reason: no source
+  gives their rest, and the hanging paws of the badger held the xylophone mallets up. The
+  percussionist holds the triangle up at rest, because the trap table stands under it, and a paw
+  that hangs the triangle on its stand turns over between the hanging arm and the stand. A hold
   with a set position and no ready pose also takes it in a long rest of the music (`setRests()`,
   `SET_MOTION`): before the first note, in a rest of at least 6 beats, and after the last note.
   The sticks go down in the beat after the last strike, and lift from 2 beats to 1 beat before
@@ -710,9 +715,10 @@ The rest of each family:
   the left upper arm went into the body, and a drum moved or turned to the left put an upper arm
   into the body or the beater off its spot. The paw of the suspended cymbal that did not strike
   the note takes its grip to the near rim, so that the closed paw rests on the edge, and the spine
-  leans further over the cymbal (`EdgeDamp`). The wrist lifts the mallet, so that it points up
-  from the plate and its ball stays away from the bell (`EdgeDamp.share`), as a real player stops
-  the cymbal with the hand on the edge. The plate of the suspended cymbal is a piece on the `slide`
+  leans further over the cymbal (`EdgeDamp`). The wrist lifts the mallet, so that it points a
+  little up over the plate and its ball stays away from the bell (`EdgeDamp.share`), as a real
+  player stops the cymbal with the hand on the edge. Reason: a steeper mallet pointed up to the
+  chest, and a lower one put its ball near the bell. The plate of the suspended cymbal is a piece on the `slide`
   bone with its pivot at the bell, and it rocks after each strike: the sum of a damped sine of the
   time since each strike (`cymbalSwingAt()`, `CYMBAL_SWING`), with a limit for a roll. The damp
   stops it. The window ends before the next lift of each paw. Reason
@@ -720,7 +726,8 @@ The rest of each family:
   timpanist that struck the note moves toward the player with its mallet in the strike direction,
   as far toward the playing spot as the short arm reaches, and the lowest point of the paw goes to
   the head, while the spine leans (`FingersDamp`). The paw keeps the roll of the mallet of its
-  place before the muffle, and on the way, a paw under the head goes up to it at once. The move
+  place before the muffle, and on the way, a paw under the head goes up to it at once, and the
+  paw lifts in the middle of its move (`FingersDamp.arc`), so that it passes over the hoop. The move
   takes the time of `FingersDamp.speed` for its length (`DampWish.minInSec`), so a short rest has
   no muffle. Reason: a move in 0.06 s jumped the paw 25 cm, the turn of the upper body twisted the
   chest, and the roll of the posed forearm turned the paw over on the way. The muffle does not
@@ -747,7 +754,11 @@ The rest of each family:
   reach each one. At the xylophone, each mallet of the badger points from a place out from its
   shoulder (`PercussionHold.home`), and the spine leans further over the bars, so that the
   forearms stay out of the leaning belly. The elbows point down and back (`poleL`, `poleR`). A
-  home further in puts the forearms into the belly, and less lean misses the far bars.
+  home further in puts the forearms into the belly, and less lean misses the far bars. The grip
+  stays at most a few cm over its bar (`PercussionHold.gripRise`), so that the wrists stay low and
+  the forearms near level at the end bars, as a real player keeps them (percussion 9). Reason: a
+  bar far out from the home turned the mallet steeply down, and the wrists came up to the
+  shoulders. A home moved out to the end bars spread the arms out to the sides as wings.
 - **Fast rolls.** A roll is a run of single strikes on one target, faster than the visible stroke
   rate. It keeps its first strike and then each `k`-th strike (`thinRolls()`), so the kept strikes
   stay on the note grid and follow the tempo. Two hands in turn strike at most 12 times each
@@ -804,7 +815,8 @@ The rest of each family:
   its hang (`PercussionSide.piece`). Reason: the triangle followed the hand of the player, whose
   turn made the visible paw turn 70° in the plane of its palm, off the clip and up to the snout.
   The clip stays below the snout (`triangleClip`), because a higher clip puts the claws into the
-  snout.
+  snout. The left paw curls deeper than the right paw (`PercussionHold.curl`), so that its claw
+  tips close on the thin clip.
 - **Snare drum from the body.** The shared snare drum hold takes the place of the drum from the
   body (`PercussionHold.fit`, `fitDrumPlace()`). The drum goes forward until its near rim stands a
   room in front of the trunk on the middle line, from the head up to the shoulder joints. A deep

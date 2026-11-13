@@ -1855,7 +1855,9 @@ the body sets the hold, the instrument fits the body, as the table names.
 Each mallet, stick, and beater slants down toward the line of the forearm, as a real player holds
 the shaft along the thumb (`malletTilt`). Each shaft of the badger but the triangle beater takes
 one angle (`PAW_TILT`), so that it crosses the palm under the curled claws and leaves the fist at
-the thumb side. The paw holds each snare stick one third up from the
+the thumb side. The triangle beater slants a little less (`TRIANGLE.malletTilt`), and the claws
+also close on it. The left grip of the elephant lies nearer to the wrist than the right grip
+(`TIMPANI.malletSpotL`), so that the end of each stump closes on its shaft. The paw holds each snare stick one third up from the
 butt (`SNARE_DRUM.malletButt`), as a real player holds the fulcrum, and keeps the full length in
 front of the grip (`SNARE_DRUM.stick`), because the short arms reach the head only with it. No
 vertex of a player is below the floor.
