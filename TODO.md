@@ -451,10 +451,9 @@ passes.
       67 % to 87 % of the lift and the lowering. The chest goes 2.1 cm (lift) and the head 1.9 cm
       (lowering) into the violin, and the right paw 1.5 cm (6.5 % of the play). Similar values
       show in `pachelbel-p37`. Check in 2x crops if the neck of the violin goes through the paw.
-- [ ] Red fox violinist: `pnpm body-clip violinist` (limit 0.045 H, 1.7 cm) in bach-bwv1047: the
-      left forearm goes 2.3 cm into the violin in 99.8 % of the play, 87 % of the lift, and 60 %
-      of the lowering. The left paw goes 1.9 cm (1.5 % of the play), and the right paw 2.3 cm in
-      the lift (6.5 %).
+- [ ] Red fox violinist: with the violin of 0.83, the left paw goes 1.6 cm into the violin in
+      0.4% of the play (limit 1.6 cm, `pnpm body-clip fox-red:violin`, bach-bwv1047), and no
+      other row is over the limit. Check the smaller violin beside the rabbit in the hall view.
 - [ ] Dog cellist: `pnpm body-clip --demo pachelbel-p37` (limit 0.045 H, 1.9 cm): the left paw goes
       2.1 cm into the cello in the lowering (16.7 %) and the lift (9.7 %).
 - [ ] Layout: it knows only the bind footprints, so only a piano case keeps the reach of a player in
