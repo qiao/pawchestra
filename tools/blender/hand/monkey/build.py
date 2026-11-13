@@ -156,6 +156,73 @@ def subdivide(body):
     me.update()
 
 
+def fold_faces(S, tris, rule):
+    """The triangles of the body with a corner whose app normal (crease 180: the angle-weighted
+    mean of the normals of all triangles at its vertex) turns more than rule.angle degrees from
+    the normal of the triangle, in the region of the rule: no paw (|x| below rule.pawX) and no foot
+    (y above rule.footY)."""
+    Pt = S[tris]
+    n = np.cross(Pt[:, 1] - Pt[:, 0], Pt[:, 2] - Pt[:, 0])
+    n /= np.maximum(np.linalg.norm(n, axis=1), 1e-12)[:, None]
+    acc = np.zeros_like(S)
+    for k in range(3):
+        u = Pt[:, (k + 1) % 3] - Pt[:, k]
+        v = Pt[:, (k + 2) % 3] - Pt[:, k]
+        c = (u * v).sum(1) / np.maximum(
+            np.linalg.norm(u, axis=1) * np.linalg.norm(v, axis=1), 1e-12
+        )
+        np.add.at(acc, tris[:, k], n * np.arccos(np.clip(c, -1, 1))[:, None])
+    acc /= np.maximum(np.linalg.norm(acc, axis=1), 1e-12)[:, None]
+    dots = np.stack([(acc[tris[:, k]] * n).sum(1) for k in range(3)], 1)
+    mid = Pt.mean(1)
+    inside = (np.abs(mid[:, 0]) < rule['pawX']) & (mid[:, 1] > rule['footY'])
+    return np.nonzero((dots.min(1) < np.cos(np.radians(rule['angle']))) & inside)[0]
+
+
+def fold_relax(body):
+    """The folds of the source surface: the FBX viewer shades them with the custom normals of the
+    file, but the app makes its normals from the form, so the faces of a small fold shade dark. Each
+    round moves each vertex of the fold triangles (fold_faces()) by `lam` times the mean of its edge
+    neighbors less its place, until no fold triangle is left or after `rounds` rounds, with the
+    total move of each vertex clipped to `clip` units. The loose parts stay."""
+    rule = P.get('foldRelax')
+    if not rule:
+        return
+    me = body.data
+    me.calc_loop_triangles()
+    loose = set(loose_vertices(me))
+    tris = np.array([t.vertices[:] for t in me.loop_triangles if t.vertices[0] not in loose])
+    S0 = studio_points(me)
+    S = S0.copy()
+    nbr = [[] for _ in range(len(S))]
+    for e in me.edges:
+        a, b = e.vertices
+        nbr[a].append(b)
+        nbr[b].append(a)
+    first = len(fold_faces(S, tris, rule))
+    moved = set()
+    for k in range(rule['rounds']):
+        bad = fold_faces(S, tris, rule)
+        if not len(bad):
+            break
+        ids = sorted(set(tris[bad].ravel().tolist()) - loose)
+        moved |= set(ids)
+        mean = np.array([S[nbr[i]].mean(0) for i in ids])
+        S[ids] += rule['lam'] * (mean - S[ids])
+        d = S - S0
+        n = np.linalg.norm(d, axis=1)
+        over = n > rule['clip']
+        S[over] = S0[over] + d[over] * (rule['clip'] / n[over])[:, None]
+    left = fold_faces(S, tris, rule)
+    set_studio_points(me, S)
+    n = np.linalg.norm(S - S0, axis=1)
+    log(
+        f'fold relax: {first} fold triangles before, {len(left)} after {k + 1} rounds; {len(moved)} vertices move, '
+        f'largest {n.max():.4f}, mean {n[list(moved)].mean() if moved else 0:.4f}; left at '
+        f'{np.round(S[tris[left]].mean(1), 3).tolist()}'
+    )
+
+
 def turn_paws(body):
     """Turns each paw rigidly about the rest forearm axis by whole ring steps (pawTurn of the
     params, 45 degrees for the rings of 8 edges): each vertex past the wrist ring at x `turnRing`
@@ -1797,6 +1864,7 @@ def main():
     log('import', len(body.data.vertices), 'vertices', len(body.data.polygons), 'faces')
     drop_small(body)
     subdivide(body)
+    fold_relax(body)
     turn_paws(body)
     point_edits(body)
     trim_balls(body)
