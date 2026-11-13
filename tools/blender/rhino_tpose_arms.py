@@ -50,8 +50,8 @@ def load_bear_arms():
 
 
 def load_rhino_arms():
-    """Loads `rhino_arms.py`, the session of the A-pose rhino, from the folder of this script as
-    the module `rhino_arms`, for its paint fixes of the paws and the neck."""
+    """Loads `rhino_arms.py` from the folder of this script as the module `rhino_arms`, for its
+    paint fixes of the paws and the neck."""
     if 'rhino_arms' in sys.modules:
         return sys.modules['rhino_arms']
     path = os.path.join(HERE, 'rhino_arms.py')
@@ -71,13 +71,12 @@ va = ba.va
 #: in the units of the studio (1 unit from the soles to the ear tips). They are the settings of the
 #: bear (`bear_arms.py` at e34f47cba), moved to the arm root of the rhino: the arm is free of the
 #: trunk beyond |x| 0.19, from y 0.57 to 0.67. The upper arm is only 0.105 units long, so the
-#: shoulder cut stands at 0.4 of it (x 0.202), out of the joined root, as on the A-pose rhino
-#: (`rhino_arms.py`): at 0.2 (x 0.181), the cut loop runs over the trunk. The rings of the upper
-#: arm follow the cut. The forearm is 0.11 units long, so it has 4 inner rings. The paint boxes
-#: take the side of the trunk under the arm and the arm root, and the head bone leaves the
-#: shoulders below the head at y 0.7. `neck` and `paw` are the fixes of `rhino_arms.py`
-#: (`step_neck()` and `step_paw()`), with the neck box above the shoulders of the T-pose, and
-#: `chest` the box of `step_chest()`.
+#: shoulder cut stands at 0.4 of it (x 0.202), out of the joined root: at 0.2 (x 0.181), the cut
+#: loop runs over the trunk. The rings of the upper arm follow the cut. The forearm is 0.11 units
+#: long, so it has 4 inner rings. The paint boxes take the side of the trunk under the arm and the
+#: arm root, and the head bone leaves the shoulders below the head at y 0.7. `neck` and `paw` are
+#: the fixes of `rhino_arms.py` (`step_neck()` and `step_paw()`), with the neck box above the
+#: shoulders of the T-pose, and `chest` the box of `step_chest()`.
 RHINO = {
     'config': 'tools/mesh-rigs/rhino.json',
     'source': 'assets/models/rhino/rhino-tpose.glb',
@@ -100,7 +99,7 @@ RHINO = {
 }
 
 #: The name of the session. It gives the names of the files `rhino-tpose-arms.glb` and
-#: `rhino-tpose-weights.json`, apart from the files of `rhino_arms.py`.
+#: `rhino-tpose-weights.json`.
 ANIMAL = 'rhino-tpose'
 
 
