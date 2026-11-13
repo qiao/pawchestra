@@ -83,11 +83,17 @@ passes.
       (cat, fox, panda, beaver, rabbit) and the polar bear. After each species, `pnpm hand-chain
       <s>` must give the rig.glb, the rig.json, the studio module, and the config of `HEAD` byte
       for byte.
-- [ ] Beaver bassoonist and panda trombonist (4.4): with the continuous elbow ramp, the arm gate
-      gives folds p95 42 (37) on the right arm of the bassoonist and 86 (83) on the right arm of
-      the trombonist (FAIL), while the dihedral angles of the elbow band fall (p95 at rest 106 to
+- [ ] Beaver bassoonist and panda trombonist (4.4): with the continuous elbow ramp and the soft
+      clavicle ramp, the arm gate gives folds p95 37 on the right arm of the bassoonist and 86 (83)
+      on the right arm of the trombonist (FAIL), while the dihedral angles of the elbow band fall (p95 at rest 106 to
       76 degrees, and 83 to 71 edges over 30 degrees). Find the folded faces with
       `pnpm fold-probe --faces`, and check them in 2x crops.
+- [ ] Badger (4.4): with the back rows, the dark slit behind each upper arm is about half as large,
+      and a thin dark crease stays in the right view of the xylophonist lift and the cymbalist
+      strike (`reports/2026-11-13-c1b/`). The back wall on the clavicle folds in 71% of the lift
+      samples of the xylophonist (fold-probe, clavicle_L 192). In a trial, a bind key that moved
+      the crease vertices (1370, 1376, 1378, 1381 and their mirrors) 1.5 cm into the trunk cut the
+      slit by about a third alone, but added nothing on top of the back rows.
 - [ ] Badger (4.4): the elbow rings double the faces of the elbow, so the fold counts by face of
       `fold-probe` and the arm gate rise for some roles, while the bent elbow is round in the
       crops. Measure the folds by area, or by the dark pixels of the elbow, to compare.
