@@ -430,9 +430,20 @@ passes.
       scaled bass drum beater. Ask the user if the scale of the badger applies to them too.
 - [ ] Badger bass drummer: between strikes, the paw keeps its turn in the world while the body
       sways, so its twist on the forearm moves 20° in about 1 s.
-- [ ] Tripo badger xylophonist: the left claws go 3.5 cm into the left shoulder in the play and 3.3
-      cm in the lift (limit 1.5 cm, `pnpm hold-fit xylophonist`). Look at the left paw in a close
-      view at the lowest bars.
+- [ ] Badger cymbalist: the upper arms stand 35° out from the side of the body in the play (21° to
+      22° on the hanging arms). With the elbow poles of the snare drum ([±0.3, -1, 0.5]), the upper
+      arms went 3.5 cm into the body (limit 2.5 cm). Fit the homes, or the spots a little in from
+      opposite each other, as a real player rolls (percussion-technique 7, [31]).
+- [ ] Badger xylophonist: the wrists stay about 13 cm over the bars, and a real player keeps the
+      hands at most one inch over them (percussion-technique 9). Lower homes put the forearms 2.4 cm
+      to 3.1 cm into the leaning belly. A target misses by up to 2.1 mm, and the left paw grasps its
+      mallet in 35% of the lift (`pnpm wind-grip xylophonist`).
+- [ ] Badger bass drummer: the free left paw hangs open beside the body while the badger plays,
+      because a real player muffles only in the rests (percussion-technique 5). Ask the user if the
+      paw must wait at the far rim.
+- [ ] Badger percussionist: the claws of the right paw stand 2.1 cm off the beater, and the left
+      claws 3.0 cm off the clip (`pnpm wind-grip percussionist`). The beater runs 33° from the
+      fingers (`TRIANGLE.malletTilt`). With `PAW_TILT`, the paw turned 38° in 0.01 s.
 - [ ] Close views: `pnpm close-views play` renders with no fill light. Add a fill to the play mode
       for the checks (9.8).
 - [ ] Recast roles: with `--base`, `pnpm arm-check --views` and `pnpm close-views` render the
@@ -1051,8 +1062,8 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Badger: the front fur and the eye stripes are darker than the sheet, and the warm light shows
       the stripes on the head as a mid brown. Show the user the faces.
 - [ ] Badger triangle: the clip hangs from the tip of the thumb near the shoulder height, below the
-      long snout. A real player holds it near the eye level, but a higher clip puts the left claws
-      further into the snout.
+      long snout. A real player holds it near the eye level, but a clip 0.4 H higher put the left
+      claws 5.8 cm into the snout. Ask the user for a triangle at the chest or on its stand.
 - [ ] Xylophone: a scale stays in one paw (122 of 127 fast strikes of the test score), because a
       paw never passes the other (`pass` 0), and one paw does not reach the outer bars. A real
       player alternates the hands over the two rows of bars (percussion-technique 9).
@@ -1062,9 +1073,6 @@ scene of each demo has its seats and stage size with no overlap.
       band of reach and the bars nearer.
 - [ ] Xylophone: on a chord of two near bars, the shafts of the two mallets touch in 0.1% of the
       samples.
-- [ ] Xylophone grip: the shafts leave the fists past the knuckles, so the exit rule finds no grasp.
-- [ ] Xylophone rest: the paws hold the mallets up and forward at rest. No source gives the rest of
-      a xylophonist. The set position of the snare drum can fit it.
 - [ ] Elephant timpanist: the left paw grasps in 68% of the lift, and its largest twist step is 29°
       in 0.01 s.
 - [ ] Elephant timpanist: dark lines and areas show on the chest beside the raised arms, where the
