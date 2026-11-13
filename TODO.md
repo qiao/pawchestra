@@ -1314,9 +1314,6 @@ navigation menu at the top of the mockup is out of scope.
       the view. Now one map covers the whole stage (texel 11.8 mm, blur disc 11.8 cm on the high
       tier), so a paw or a bow casts no shadow, and the shadow pass draws 65% of the triangles of
       a close shot. Show the user a lineup (4.5, 9.7).
-- [ ] Read the full-size depth (`uSceneDepth`) for the depth of field mix in `FINAL_FRAGMENT`, and
-      take the mean of the mix weight at 4 points. Now the half-size depth gives steps of 2 pixels
-      at the outline of the subject, and 4 device pixels on a phone (4.5).
 - [ ] Test KTX2 body maps with the transcoder after the first frame. The high tier keeps the
       maps at full size: 386 MB of GPU memory in `boulanger-matin` (2.6).
 - [ ] Put two steps between the medium and the low tier: medium at the pixel ratio 1.25, then 1.0.
