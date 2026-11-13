@@ -132,8 +132,8 @@ The weights, in the rest pose:
 1. Automatic Weights, then Limit Total 4 and Normalize All, on a copy of the mesh with no tail.
 2. Arm rows: each vertex of a side with |x| from 0.13, within 0.075 units of the line of the rest
    arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.13 to 0 at x
-   0.17, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.2175, 0.2325, 0.2475, and
-   0.2625, and the rest on the 4 roll segments.
+   0.17, an elbow helper share that grows from 0 at x 0.205 to 1 at the elbow joint (x 0.24) and
+   falls to 0 at x 0.275, and the rest on the 4 roll segments.
 3. Wrist rows: the bend share of the hoof grows in 12 equal steps of 0.003 from 0.03 units before
    the head of `hand_<side>`. Knuckle rows: the toes share grows in 12 equal steps of 0.0025 from
    0.015 units before the head of `fingers_<side>`. The rig has no digit bones.
@@ -224,7 +224,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/pig.rig.glb` | 1,009,104 bytes | `57976132fef40d00fbebb06edb1151cd094c5a85121511682dd3935367ae60db` |
-| `tripo-hand/pig.rig.json` | 16,376 bytes | `0c86abd9e12c158be1c473f91cfd6c91bf6d67f444f157a89b36c80d8749af35` |
+| `tripo-hand/pig.rig.glb` | 1,009,104 bytes | `230ae5a81924fa4d2996d40f057f1e3cbbed4f47ef9cf72ddb10b00339f0a786` |
+| `tripo-hand/pig.rig.json` | 16,376 bytes | `edfbb4d7d84fd1e47ade66fb0bbe13a816c4388fd4a2921efa10d72cf41dbeb8` |
 | `tripo-hand/pig-color.webp` | 54,072 bytes, 2048 × 2048 | `7e93b90c62901e98e717ea958be65306951c6bc7f8ea7ec50fa9f91cc97af295` |
 | `tripo-hand/pig-normal.webp` | 16,518 bytes, 1024 × 1024 | `1f67a4b13f0fcdb7950acf73470ee5d796e7d0a8487acd0a78fa044198b7065b` |
