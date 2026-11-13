@@ -32,9 +32,6 @@ scratch/
 # report image (design 9.8).
 reports/
 
-# The copy of the badger mesh with the arms free of the trunk (tools/blender/badger_edit.py).
-# tools/blender/arm_rebuild.py reads it. Git keeps out its 15 MB (assets/models/badger/README.md).
-assets/models/badger/badger-edit.glb
 
 # The backup copies that Blender writes beside a .blend file at each save.
 *.blend1
