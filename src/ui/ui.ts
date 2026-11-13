@@ -5,6 +5,7 @@ import type { SectionSize } from '../score/types.ts';
 import { CLOSE_CREDITS_LABEL, CREDITS_TEXT, licensesUrl } from '../app/credits.ts';
 import { REPOSITORY_LABEL } from '../app/page-title.ts';
 import { PHONE_LAYOUT_QUERY } from '../app/phone-layout.ts';
+import { COPY_LINK_TEXT, shareLink, shareStatusText } from '../app/share-link.ts';
 import { isWideLayout } from '../app/wide-layout.ts';
 import { Bar } from './bar.ts';
 import type { BarActions } from './bar.ts';
@@ -25,6 +26,9 @@ import { Tooltips } from './tooltip.ts';
 
 /** The time of the fade of the stage before a build, in milliseconds, as in `ui.css`. */
 const STAGE_FADE_MS = 150;
+
+/** The time that the status of "Copy link" stays, in milliseconds (design 2.8). */
+const LINK_STATUS_MS = 4000;
 
 /** The actions of all controls of the UI. */
 interface UiActions extends BarActions {
@@ -160,7 +164,7 @@ export class Ui {
       this.creditsDialog.show(creditsLink);
     });
     const creditsLine = createElement('div', 'credits-line');
-    creditsLine.append(creditsLink);
+    creditsLine.append(this.#createCopyLink(target), creditsLink);
     this.drawer.addTab('settings', 'Settings', this.settings.element, creditsLine);
     // A wide window opens the drawer at start, at the tab "Music" (design 2.8).
     if (isWideLayout(target.innerWidth, target.innerHeight)) {
@@ -189,6 +193,37 @@ export class Ui {
       this.dropOverlay.element,
       this.tooltips.element,
     );
+  }
+
+  /**
+   * Creates the button "Copy link" and its status line (design 2.2, 2.8). A touch device opens the
+   * share sheet of the system, and another device copies the link into the clipboard. The status
+   * line is a polite live region, and it clears after {@link LINK_STATUS_MS}.
+   *
+   * @param target The window of the page.
+   * @returns The button and its status line.
+   */
+  #createCopyLink(target: Window): HTMLElement {
+    const button = createButton('text-link', '');
+    button.textContent = COPY_LINK_TEXT;
+    const status = createElement('span', 'link-status');
+    status.setAttribute('aria-live', 'polite');
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    button.addEventListener('click', () => {
+      const touch = target.matchMedia('(pointer: coarse)').matches;
+      shareLink(target.navigator, target.location.href, target.document.title, touch)
+        .then((result) => {
+          clearTimeout(timer);
+          status.textContent = shareStatusText(result);
+          timer = setTimeout(() => {
+            status.textContent = '';
+          }, LINK_STATUS_MS);
+        })
+        .catch(reportError);
+    });
+    const group = createElement('span', 'copy-link');
+    group.append(button, status);
+    return group;
   }
 
   /**
