@@ -578,9 +578,11 @@ export const WIND_HOLDS = {
  * Each palm faces the flute, and the fingers curl over it (`faceTube`, `gripCurl`), as a real
  * flutist curves the fingers over the keys (`docs/reference/wind-technique.md` 2.4). The left paw
  * holds the flute near the lip plate from its front and a little below, with the back of the paw to
- * the audience: its grip moves from the grip of the instrument, 2.5 cm below the axis, 0.12 H
- * across the tube to its front (`gripShiftL`): with 0.04 H, the middle of the paw lies below the
- * flute, 75° from its front, and the finger tips stand 1.3 cm off. The paw points half up across
+ * the audience: its grip moves from the grip of the instrument, 2.5 cm below the axis, 0.08 H
+ * across the tube to its front (`gripShiftL`), and its finger tips touch the flute in each play
+ * sample (`pnpm wind-grip flutist`). With 0.12 H, the paw lay 0.8 cm off the flute and its finger
+ * tips 1.5 cm off. With 0.04 H, the middle of the paw lies below the flute, 75° from its front,
+ * and the finger tips stand 1.3 cm off. The paw points half up across
  * the flute (`aimSide`), so that its fingers come over the top onto the keys. It also faces the
  * flute in the play, although it leaves its grip at rest. The right paw holds the body of the flute
  * as the right hand of a flutist: its middle lies behind the flute and a little below, its palm
@@ -665,7 +667,7 @@ const FOX_FLUTE = {
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
   aimSide: [0.5, -0.45],
-  gripShiftL: [-0.04, 0, 0.12],
+  gripShiftL: [-0.04, 0, 0.08],
   gripShiftR: [0, 0, -0.14],
   restGripShiftR: [-0.376, 0, -0.067],
   gripCurl: curls(90, 85),
