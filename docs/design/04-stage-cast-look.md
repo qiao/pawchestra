@@ -108,12 +108,12 @@ in a line at the back, as the Vienna Philharmonic seats them. The diagram shows 
 - The joint search of the seats reads the footprint, the eye height, and the mesh of each body
   (4.5, lanes). A new body with the same footprint can thus move the seats of other rows, because
   its eyes see other lanes and its head hides other sight lines. A body that replaces the body of
-  a species thus keeps the eye height of the old body, as the Tripo mouse and the Tripo fox do
-  (4.4, hand rig). The form of its footprint and its mesh can still move seats. For example, the
-  tail of the Tripo mouse lies straight back, and the tail of the old mouse curled to the side.
-  The whiskers of the fourth Tripo rabbit make its head box wider, and its ears hide other sight
-  lines. The trunk of the Tripo fox is deeper than that of the older fox, so its chair is deeper,
-  and its head and trunk hide other sight lines (`TODO.md`).
+  a species thus keeps the eye height of the old body, as the Tripo mouse, the Tripo fox, and the
+  Tripo bear do (4.4, hand rig). The form of its footprint and its mesh can still move seats. For
+  example, the tail of the Tripo mouse lies straight back, and the tail of the old mouse curled to
+  the side. The whiskers of the fourth Tripo rabbit make its head box wider, and its ears hide other
+  sight lines. The trunk of the Tripo fox is deeper than that of the older fox, so its chair is
+  deeper, and its head and trunk hide other sight lines (`TODO.md`).
 
 ## 4.3 Species
 
@@ -521,7 +521,7 @@ in Blender before the export. A pose in Blender skins from the T-pose and the ap
 export of the open `.blend`, with the bind as its rest.
 
 Seventeen species have the hand rig of a Tripo P2 mesh (`assets/models/<s>/tripo-hand/<s>.blend`).
-A chain of `tools/blender/hand/<s>/` makes each one, except the bear (`pnpm hand-chain <s>`). The
+A chain of `tools/blender/hand/<s>/` makes each one (`pnpm hand-chain <s>`). The
 rhino and the mannequin come from `rig-mesh`. Each paw of the polar bear
 has one digit bone for each claw (`DIGIT_BONES`,
 `digit1` at the thumb side to `digit5`), a child of the fingers with its head at the base of its
@@ -568,7 +568,7 @@ the role, the constant, and the GLB file. A tool reads each value from the expor
 `tools/mesh-rigs/<s>.json`, which keeps the values of the old chain. `pnpm rig-mesh <s>` stops
 for a body with a `.blend` beside its GLB file (`handRigOf()` of `tools/glb-swap.ts`).
 
-Each Tripo body of `tripo-hand/` except the bear comes from a script chain in
+Each Tripo body of `tripo-hand/` comes from a script chain in
 `tools/blender/hand/<s>/`: `params.json` and `base-config.json` hold its values, `make_config.py`
 writes its rig config `tools/mesh-rigs/simple/<s>-tripo.json`, and `build.py` writes its `.blend` in
 headless Blender. `pnpm hand-chain <s>` runs the chain, `rig-export`, and `studio-body`. For such a
@@ -760,12 +760,18 @@ show a white rabbit. Its arms are thicker than in the source, with the girth of 
 rabbit (the point edit `armGirth` of its chain). Reason: the arms of the source are 15% thinner,
 and thin arms read weak on the earlier Tripo bodies. Its seated eyes are at the height of the eyes
 of the third rabbit (`metersPerUnit` of its chain, 4.2). Its arms reach 0.299 m, so its violin is
-0.9 of the violin of the app (4.6, `violinScale`). A hand rig of the Tripo P2 bear
-(`assets/models/bear/tripo-hand/`) is the body of the conductor, in the same way. It stands
-with the bind of the bear of main, keeps the eyeballs of its mesh with lids, and keeps H of the bear
-of main. Its color map (`bear-color.webp` of `tools/bear-maps.py`) scales the fur, the muzzle, and
-the claws of the source to the colors of the bear of main in the hall light (the claws dark grey),
-and paints the eyes dark, as the bead eyes of main: the white ball of the source read startled. A
+0.9 of the violin of the app (4.6, `violinScale`). The Tripo bear
+(`assets/models/bear/tripo-hand/`) is the body of the conductor, by the rules of the badger. The
+source FBX is the target of its look: it keeps the eyeballs and the eye paint of the source with
+lids, the claws, the round belly, and the tail bump. It stands with the bind of the older bear,
+and its eyes stand at the height of the eyes of the older bear (`metersPerUnit` of its chain), so
+that the layout and the camera framing stay (4.2). Its front paws are smaller than in the source
+(the point edit `paw`). Reason: the paws of the source were 0.68 H long, against 0.35 to 0.5 H on
+the other bodies. Each paw turns by whole steps of a closed wrist ring, so that the forearms of
+the conductor do not twist. The skin of the upper lids turns down a little over the iris
+(`lidLower`). Reason: a full ring of white around the iris read startled. Its color map keeps the
+colors of the source at a lower lightness (`LIGHTNESS` of `tools/bear-maps.py`). Reason: the key
+light of the hall made the fur of the source colors lighter than the source. A
 hand rig of the fourth Tripo P2 cat (`assets/models/cat/tripo-hand/`) is the body of the cat
 violist, by the route of the Tripo wolf. The source FBX is the target of its look: no point edit
 changes its trunk, limbs, legs, or tail, its map keeps the colors of the source
@@ -1089,9 +1095,9 @@ interface SeatExtras {
   paw its own turn (`pawTurnL`, `pawTurnR`, `pawBendR`). Each shape takes its weight from the pose
   alone (`raiseWeight()`), so the rule of stateless poses holds.
 - **Render.** The fur gets smooth normals within the crease angle of the body (`crease` of
-  `ANIMALS`, `studioNormals()`). The bears take a larger angle and a color blend
-  (`colorBlend`), so they look round with soft facets, and the edges of the muzzle and the claws
-  stay sharp. The other bodies share one angle. The colors hold the baked occlusion of the rig.
+  `ANIMALS`, `studioNormals()`). A body can take its own angle, such as 180° for a Tripo body
+  that shows the smooth shading of its source. The other bodies share one angle. A body can also
+  blend its face colors (`colorBlend`), and no body of the app takes it. The colors hold the baked occlusion of the rig.
 - **Bind mesh.** `buildStudioBody()` gives the mesh in the bind pose of the player, with two
   bones for each corner, for the footprints, the budgets, and the tests.
 - **Recast role.** A role tool tests a body in a role that is not its own with a recast role
