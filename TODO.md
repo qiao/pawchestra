@@ -732,6 +732,10 @@ passes.
       violist` did not run on the fourth mesh.
 - [ ] Tripo cat: the smaller eyes and the lower upper lids have only ray checks of the lids (no
       lid point leaves the head in a blink step). Check a blink in the app.
+- [ ] Tripo cat violist folds (4.4): the left paw folds up to 44 faces at rest and in the lift
+      (`pnpm fold-probe violist`, L 42 of 44, in each of the 17 rest samples). The right arm root
+      folds faces 2461 and 2462 (`upper_arm_seg0_R`) in 89 % and 88 % of the play samples. Wait
+      for the next body of the cat before a fix.
 - [ ] Tripo red fox violinist: the rest frog of the bow is 16 cm over the right thigh, because the
       short arm does not reach it (best reach 7.7 cm, and there the forearm goes into the belly).
       At rest the left upper arm goes 3.4 cm into the belly (upperArmL 0.50), and in mozart-k525
@@ -828,6 +832,10 @@ passes.
       knuckles of the chain `tools/blender/hand/dog/` that bend without a fold allow that curl.
 - [ ] Tripo beagle cellist folds: in the arm gate, the left arm folds 20 faces and the right arm
       12 (limit 8) now that both arms reach the strings. The left paw swings 75° (limit 70).
+- [ ] Tripo beagle cellist folds (4.4): face 1410 (`hand_R`) folds in each of the 25,185 samples
+      of `pnpm fold-probe cellist` (rest, play, and lift). Faces 5426 and 6365 (`wrist_L`) fold
+      in each of the 18 rest samples, and in 52 % and 40 % of the play samples. Wait for the next
+      body of the dog before a fix.
 - [ ] Tripo beagle cellist: the front of each elbow has one long quad band between 2 poles, with
       no ring split. Check the inner elbow fold of the bow arm in the app.
 - [ ] Tripo beagle seats (4.5): the larger beagle and its 1/2 cello make the footprint of the
