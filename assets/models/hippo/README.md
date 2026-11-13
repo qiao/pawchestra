@@ -100,9 +100,15 @@ left side):
   poles. The legs have no closed loop, so they take no ring.
 - **Paws turned.** Each vertex past the arm ring at x 0.3307 turns rigidly about the rest forearm
   axis by whole ring steps of 360/18 degrees: 160 degrees on the left (8 steps) and -60 degrees on
-  the right (3 steps), 248 vertices on each side. New quads join the two rings with the step offset, and the
+  the right (3 steps), 241 vertices on each side. New quads join the two rings with the step offset, and the
   far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units). The new quads
   keep the UVs of the old band. The paws keep their form ("Arm twist").
+- **Wrist loop.** The ring at x 0.3307 does not turn. It is slanted, so 7 of its 18 vertices lie
+  past its mean along the forearm axis. When they turned with the paw, the quads before the ring
+  sheared into slits and notches at the wrist: 13 faces on the left and 15 on the right had UV scale
+  ratios of 2.6 to 22.5, against about 1.2 on the faces around them. One face on the left (2.5) and
+  8 faces in the new band and past ring B on the right (2.2 to 4.1) keep their stretch: the join of
+  the turned paw causes it, not the cut.
 - **Arm stretch.** The point edit `armStretch` (`tools/blender/hand/hippo/redits.py`, params `{"kind":
   "armStretch", "k": 1.2, "ramp": 0.01, "reach": [0.095, 0.115]}`), after the paw turns. Each
   vertex of a side with |x| over the shoulder joint moves along the line u of the rest arm, from
@@ -211,7 +217,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/hippo.rig.glb` | 1,130,772 bytes | `15049e4152aa4f12538a1dd8dafacdbbca917326c8bc45df2809261dceb43d71` |
-| `tripo-hand/hippo.rig.json` | 16,400 bytes | `d2b58e3d96d50b12d83b44d2fc2bfd43d09dd5a45b1a262f1fa083ae39ca780f` |
+| `tripo-hand/hippo.rig.glb` | 1,130,472 bytes | `fbd01d0b47e8504ec85b554d8ce2c91ecfee5a7a5117fd6667133237c4c99ac3` |
+| `tripo-hand/hippo.rig.json` | 16,400 bytes | `ec114d65f73fdf4793bc95233aba19a6b0ee03def4bd4a35327a911df42c759b` |
 | `tripo-hand/hippo-color.webp` | 66,764 bytes, 2048 × 2048 | `475803ad0c7ff15b5e375da9d97e4d350ac5f024cb7eb7380fa47c845d0473cb` |
 | `tripo-hand/hippo-normal.webp` | 37,300 bytes, 1024 × 1024 | `22136ba7d9c0141efc91d9e0c782ff23c17bd364221bdd73518552b033d0741f` |
