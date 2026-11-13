@@ -78,6 +78,10 @@ of 23 June 2021 add one rule: no training or test of a machine learning model.
   the first note, then the coda plays to the end. It has no vocal soloists, because the soloist
   passages start with a quiet solo and make the demo longer than 4 minutes. No Mutopia or
   Wikimedia Commons file with a permitted license has the full orchestra and the choir.
+- `cast` of `DEMOS` gives the cast line of each demo row (2.8), such as "Penguin choir, full
+  orchestra", from the column "What it shows" and the species of each section (4.3). It is a
+  static line, so the first download grows by a few hundred bytes and the list costs no build of
+  a score. A change of the species of a section updates the cast lines.
 - Eine kleine Nachtmusik and the Canon are no orchestral files (3.8), so "Auto" gives one player
   for each note.
 - The app keeps the choir and its risers, because a file of the user can have a choir.

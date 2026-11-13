@@ -50,6 +50,12 @@ export interface DemoInfo {
    */
   readonly title: string;
   readonly composer: string;
+  /**
+   * The players that the demo row names, so that a visitor sees a reason to select the piece
+   * (design 8.2): for example "Penguin choir, full orchestra". It names the species of
+   * `SECTION_SPECIES` of `models/cast.ts`.
+   */
+  readonly cast: string;
   /** The credit line of the credits dialog. */
   readonly credit: string;
   /**
@@ -66,24 +72,28 @@ export const DEMOS = {
   'mozart-k191': {
     title: 'Bassoon Concerto, K. 191: III',
     composer: 'Wolfgang Amadeus Mozart',
+    cast: 'Beaver bassoons, pig horns, strings',
     credit: 'Score: Mutopia Project, piece 686, public domain. Typeset by Maurizio Tomasi.',
     lengthSec: 224,
   },
   'mozart-k417': {
     title: 'Horn Concerto No. 2, K. 417: III',
     composer: 'Wolfgang Amadeus Mozart',
+    cast: 'Pig horns, mouse oboes, strings',
     credit: 'Score: Mutopia Project, piece 901, public domain. Typeset by Maurizio Tomasi.',
     lengthSec: 203,
   },
   'bach-bwv1050': {
     title: 'Brandenburg Concerto No. 5, BWV 1050: III',
     composer: 'Johann Sebastian Bach',
+    cast: 'Fox flute, polar bear harpsichord, strings',
     credit: 'Score: Mutopia Project, piece 548, public domain. Typeset by Eric van der Velden.',
     lengthSec: 310,
   },
   'beethoven-9': {
     title: 'Symphony No. 9, Op. 125: Ode to Joy',
     composer: 'Ludwig van Beethoven',
+    cast: 'Penguin choir, full orchestra',
     credit:
       'Score: OpenScore Orchestra, CC0. Bars 543 to 590 and 851 to 940 of the finale. MIDI file made with MuseScore 4.',
     lengthSec: 158,
@@ -91,6 +101,7 @@ export const DEMOS = {
   'pachelbel-p37': {
     title: 'Canon in D, P. 37',
     composer: 'Johann Pachelbel',
+    cast: 'Rabbit and fox violins, dog cello',
     credit: 'Score: Mutopia Project, piece 2047, CC BY 4.0. Typeset by Michael Fischer v. Mollard.',
     links: [
       { text: 'Source', href: 'https://www.mutopiaproject.org/cgibin/piece-info.cgi?id=2047' },
@@ -101,6 +112,7 @@ export const DEMOS = {
   'beethoven-5-4': {
     title: 'Symphony No. 5, Op. 67: IV',
     composer: 'Ludwig van Beethoven',
+    cast: 'Full orchestra, panda trombones',
     credit:
       'Score: OpenScore Orchestra, CC0. The exposition plays one time. MIDI file made with MuseScore 4.',
     lengthSec: 564,
@@ -108,6 +120,7 @@ export const DEMOS = {
   'beethoven-7-4': {
     title: 'Symphony No. 7, Op. 92: IV',
     composer: 'Ludwig van Beethoven',
+    cast: 'Full orchestra, elephant timpani',
     credit:
       'Score: OpenScore Orchestra, CC0. The exposition plays one time. MIDI file made with MuseScore 4.',
     lengthSec: 420,
@@ -115,6 +128,7 @@ export const DEMOS = {
   'beethoven-6-1': {
     title: 'Symphony No. 6, Op. 68: I',
     composer: 'Ludwig van Beethoven',
+    cast: 'Woodwinds, pig horns, strings',
     credit:
       'Score: OpenScore Orchestra, CC0. The exposition plays one time. MIDI file made with MuseScore 4.',
     lengthSec: 467,
@@ -122,60 +136,70 @@ export const DEMOS = {
   'boulanger-matin': {
     title: "D'un matin de printemps",
     composer: 'Lili Boulanger',
+    cast: 'Deer harp, badger percussion, full orchestra',
     credit: 'Score: OpenScore Orchestra, CC0. MIDI file made with MuseScore 4.',
     lengthSec: 280,
   },
   'mozart-k525': {
     title: 'Eine kleine Nachtmusik, K. 525: I',
     composer: 'Wolfgang Amadeus Mozart',
+    cast: 'Strings: rabbits, foxes, cats, a dog',
     credit: 'Score: Mutopia Project, piece 2230, public domain. Typeset by Mike Blackstock.',
     lengthSec: 248,
   },
   'bach-bwv1048': {
     title: 'Brandenburg Concerto No. 3, BWV 1048: I',
     composer: 'Johann Sebastian Bach',
+    cast: 'Three violin groups, polar bear harpsichord',
     credit: 'Score: OpenScore Orchestra, CC0. MIDI file made with MuseScore 4.',
     lengthSec: 327,
   },
   'beethoven-8': {
     title: 'Symphony No. 8, Op. 93: II',
     composer: 'Ludwig van Beethoven',
+    cast: 'Mouse oboes, wolf clarinets, strings',
     credit: 'Score: OpenScore Orchestra, CC0. MIDI file made with MuseScore 4.',
     lengthSec: 220,
   },
   'mozart-k315': {
     title: 'Andante in C, K. 315',
     composer: 'Wolfgang Amadeus Mozart',
+    cast: 'Fox flute soloist, strings',
     credit: 'Score: Mutopia Project, piece 344, public domain. Typeset by Maurizio Tomasi.',
     lengthSec: 255,
   },
   'beethoven-1': {
     title: 'Symphony No. 1, Op. 21: IV',
     composer: 'Ludwig van Beethoven',
+    cast: 'Monkey trumpets, elephant timpani, orchestra',
     credit: 'Score: OpenScore Orchestra, CC0. MIDI file made with MuseScore 4.',
     lengthSec: 294,
   },
   'brahms-2': {
     title: 'Symphony No. 2, Op. 73: IV',
     composer: 'Johannes Brahms',
+    cast: 'Full orchestra, panda trombones, rhino tuba',
     credit: 'Score: OpenScore Orchestra, CC0. MIDI file made with MuseScore 4.',
     lengthSec: 752,
   },
   'beethoven-8-4': {
     title: 'Symphony No. 8, Op. 93: IV',
     composer: 'Ludwig van Beethoven',
+    cast: 'Full orchestra',
     credit: 'Score: OpenScore Orchestra, CC0. MIDI file made with MuseScore 4.',
     lengthSec: 718,
   },
   'bach-bwv1047': {
     title: 'Brandenburg Concerto No. 2, BWV 1047: I',
     composer: 'Johann Sebastian Bach',
+    cast: 'Monkey trumpet, fox flute, mouse oboe',
     credit: 'Score: Mutopia Project, piece 1680, public domain. Typeset by Allen Garvin.',
     lengthSec: 277,
   },
   'mendelssohn-op61': {
     title: "A Midsummer Night's Dream, Op. 61: V",
     composer: 'Felix Mendelssohn',
+    cast: 'Wolf clarinet, woodwinds, strings',
     credit: 'Score: Mutopia Project, piece 80, public domain. Typeset by Aaron Gage.',
     lengthSec: 148,
   },
@@ -183,16 +207,16 @@ export const DEMOS = {
 
 /**
  * Gives the `aria-label` of the row of a demo in the demo list (design 2.8): the title, the
- * composer, and the spoken length. A screen reader reads the texts of the row with no pause
- * between them, for example "printemps4:40Lili".
+ * composer, the cast line, and the spoken length. A screen reader reads the texts of the row with
+ * no pause between them, for example "printemps4:40Lili".
  *
  * @param id The demo.
- * @returns The label, for example "Symphony No. 8, Op. 93: II, Ludwig van Beethoven, 3 minutes 40
- *   seconds".
+ * @returns The label, for example "Symphony No. 8, Op. 93: II, Ludwig van Beethoven, Mouse oboes,
+ *   wolf clarinets, strings, 3 minutes 40 seconds".
  */
 export function demoRowLabel(id: DemoId): string {
   const demo = DEMOS[id];
-  return `${demo.title}, ${demo.composer}, ${spokenTime(demo.lengthSec)}`;
+  return `${demo.title}, ${demo.composer}, ${demo.cast}, ${spokenTime(demo.lengthSec)}`;
 }
 
 /**

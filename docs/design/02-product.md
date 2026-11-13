@@ -319,7 +319,8 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   the window, so the opaque canvas shows no edge. A wide window opens the drawer at start
   (`isWideLayout()`), so that the stage does not move at the click on play. The change to
   Cinematic mode closes it (2.3).
-  - **Demos**: a row with the title, the composer, and the length, and no cover. A long title
+  - **Demos**: a row with the title, the composer, the cast line in `--accent` (8.2), and the
+    length, and no cover. A long title
     wraps, because an ellipsis would hide a part of it. The current row has a level meter from the
     notes of the score (`meterLevels()`), so the UI owns no audio code. The meter has a column of
     its own, so the text does not move.
