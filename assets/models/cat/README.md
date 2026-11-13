@@ -81,10 +81,10 @@ eye edit.
 
 | Item | Value |
 |---|---|
-| Size | 382,379 bytes |
-| SHA-256 | `8fb408f651418240fa15cf7b976dee666fa38ade9a7b91fcf421060a7c4d24da` |
+| Size | 382,564 bytes |
+| SHA-256 | `e6f7978c6f733b872a60134db5ac932412b40384ec7ebf0ff69b0b30def8d0ea` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `cat`: 3,693 vertices and 3,829 faces (3,274 quads and 555 triangles, 7,103 triangles), flat faces, and the surface of `sa.add_surface()`, with the shape keys `bind_belly` ("Belly") and `bind_tail` ("Tail behind the chair"). No face is gloss: the 45 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 187 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids `lid`, and the 36 faces of the whisker strips `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
+| Mesh | One object `cat`: 3,693 vertices and 3,829 faces (3,274 quads and 555 triangles, 7,103 triangles), flat faces, and the surface of `sa.add_surface()`, with the shape keys `bind_belly` ("Belly"), `bind_tail` ("Tail behind the chair"), and `bind_sit` ("Sit"). No face is gloss: the 45 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 187 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids `lid`, and the 36 faces of the whisker strips `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
 | Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.942613 (the shoulder joints at 1.48443 m for each unit, so that H is 0.339381 m, the H of the cat of `cat.rig.glb` at cbc8db5e4), `crease` 180, `seatWidth` 0.46 |
 | Eyes | The eyeballs of the mesh at 0.90 of their size ("Eye size"), with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -213,6 +213,24 @@ of the lap is the thigh.
 (Blender z) from 0.33 to 0.42, rest y below 0, and atan2(|x|, -y) at most 60 degrees, in 3 rounds
 of P += 0.5 ((mid - P) . n) n (the rule of the rabbit).
 
+**Sit.** The key `bind_sit` (`sit_key()` of the build, the last bind key, after `bind_tail`) puts
+the underside of the haunch onto the seat: `be.sit_move(cat, cat_rig, {band 0.05, most 0.07, ramp
+0.03, end 0.01, radius 0.012, across true})` of `tools/blender/bind_edit.py`, then
+`be.add_bind_move(cat, cat_rig, <move>, 'bind_sit')`. The plane is the thigh underside over the
+seat (Blender z 0.2229, the seat top of the app). Each body point behind 0.03 units in front of
+the hip joints moves down by the gap of the lowest point of its slice across the seat (0.012 units
+deep), less over 0.05 units of height and at the back of the haunch. The 17 points and their moves
+on z, in units: 407 -0.0279, 414 -0.0058, 447 -0.0273, 1541 -0.0195, 1594 -0.0063, 1595 -0.0099,
+1597 -0.0476, 1600 -0.0497, 1601 -0.0497, 1602 -0.0046, 1957 -0.0279, 2112 -0.0056, 3148 -0.0195,
+3189 -0.0497, 3204 -0.0099, 3206 -0.0063, 3208 -0.0474. The seat height does not change. In the
+seat probe (rows of 1 cm over the seat, a row touches within 1 cm), the rows behind the hip joints
+that touch the seat go from 0 % to 69 %, and their mean gap from 4.8 cm to 1.9 cm. Thus the
+haunch rests on the seat in the views from the side and from behind. A drop of each point to the
+lowest point within 0.012 units around it (no `across`) gave 77 %, but it made the haunch a box
+with steep sides, and its edge showed as teeth from behind. Thighs 15 degrees down gave 77 % with
+`across`, and they lowered the seat to 0.213 m, which moves players in the sight pass of the
+layout (design 4.5).
+
 **Tail behind the chair.** The tail has two bones, `tail` from the root at (0, 0.36, -0.065) and
 `tail_tip` from (0, 0.22, -0.12) to (0, 0.10, -0.20), with the `studio.tailBind` of the third cat.
 The tube vertices take exact rows along a middle line from (0, 0.335, -0.029) to (0, 0.119,
@@ -221,9 +239,10 @@ back from the root (0, 0.333, -0.031) of the bind, over the back edge of the sea
 the chair between the back posts, with the tip a little to the left. 140 tube vertices take tail
 rows, and 126 move in the key. The tube of the bind lies from y 0.095 to 0.384 and back to z
 -0.228. In the axes of the bind the soles are 0.073 units up and the seat top (the lowest point
-of the body over the seat) is at y 0.223, so the tube keeps 5.4 cm from the seat, 8.6 cm from
+of the body over the seat) is at y 0.223, so the tube keeps 8.6 cm from
 each back post, 6.7 cm from the top rail, and 3.3 cm from the floor in the app, in the rest and
-the play of the violist (`tools/tail-gap.ts` with samples of the play). The tail does not sway
+the play of the violist (`tools/tail-gap.ts` with samples of the play). The key `bind_sit`
+("Sit") puts the root of the tail on the seat (0.1 cm, 5.4 cm before), with no point in it. The tail does not sway
 (`seatedTail` of the species).
 
 The key of the first build laid the tube along the path of the third cat (the git history of this
@@ -342,8 +361,8 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/cat.rig.glb` | 1,191,172 bytes | `b6e8e249e93674b9723f7c49a864d7362ceafb9087783681ce1617690849d382` |
-| `tripo-hand/cat.rig.json` | 18,465 bytes | `d5539dce92cc348cb7725fe5c0b576faae75a7b78d9456a2a2aac1e3b6d3225e` |
+| `tripo-hand/cat.rig.glb` | 1,191,172 bytes | `94adf10fe6519189a5d90fb7012fc9ec2a2e07aa12fd8cc1780692321afb845c` |
+| `tripo-hand/cat.rig.json` | 18,465 bytes | `9891213795eb1aaaeb88f1935d9982fb80a2bfc04975b5c7a026a0a0f500256e` |
 | `tripo-hand/cat-color.webp` | 312,842 bytes, 2048 × 2048 | `cb365d40c472fdd23f5874fd8e5336b7f76fbf7ebfaf4ff0ab1ad76179a11b2a` |
 | `tripo-hand/cat-normal.webp` | 129,298 bytes, 1024 × 1024 | `039d58a13f55967f5152f30696548c0ed672d1186bf8c0d3f8f8279730ccf4f6` |
 
