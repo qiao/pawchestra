@@ -1,5 +1,5 @@
 {
- "sha256": "6531ce1bfc3873d6327a9f274d084a59abd5035e3c70ae2f275918f082e385a1",
+ "sha256": "b50a9f83b1111c370d4ad80efd8116555b63b6f155a5e7790d2cec57f1389c2e",
  "bindSupination": {
   "L": 0.0,
   "R": 52.0
@@ -93,7 +93,7 @@
     -0.016794
    ],
    "vertices": 255,
-   "weights": "8c15f5a11ed792ea"
+   "weights": "7b001a82bc97976d"
   },
   "upper_arm_L": {
    "head": [
@@ -147,7 +147,7 @@
     -0.016794
    ],
    "vertices": 258,
-   "weights": "e14ecc0345479ffd"
+   "weights": "dc6da0500eb04216"
   },
   "upper_arm_R": {
    "head": [
@@ -282,7 +282,7 @@
     -0.014868
    ],
    "vertices": 69,
-   "weights": "72517b32f374b62a"
+   "weights": "83e298f9540e2216"
   },
   "upper_arm_seg1_L": {
    "head": [
@@ -291,7 +291,7 @@
     0.002053
    ],
    "vertices": 54,
-   "weights": "ea433d75b8b426fa"
+   "weights": "30783a3ce603baf7"
   },
   "upper_arm_seg2_L": {
    "head": [
@@ -300,7 +300,7 @@
     0.018974
    ],
    "vertices": 41,
-   "weights": "2f33f7c1e0086f53"
+   "weights": "f4156d8808b43666"
   },
   "upper_arm_seg3_L": {
    "head": [
@@ -309,7 +309,7 @@
     0.035896
    ],
    "vertices": 38,
-   "weights": "45aea31901201ded"
+   "weights": "1ceadeae6a97d22f"
   },
   "forearm_seg0_L": {
    "head": [
@@ -372,7 +372,7 @@
     -0.014868
    ],
    "vertices": 68,
-   "weights": "ca6a70b7c8102262"
+   "weights": "83868976a9fd09ee"
   },
   "upper_arm_seg1_R": {
    "head": [
@@ -381,7 +381,7 @@
     0.002053
    ],
    "vertices": 56,
-   "weights": "24f2daad35c8eadd"
+   "weights": "1740ae19353255e2"
   },
   "upper_arm_seg2_R": {
    "head": [
@@ -390,7 +390,7 @@
     0.018974
    ],
    "vertices": 41,
-   "weights": "9de930fbc3de3f9a"
+   "weights": "a3fb762f23c25c70"
   },
   "upper_arm_seg3_R": {
    "head": [
@@ -399,7 +399,7 @@
     0.035896
    ],
    "vertices": 38,
-   "weights": "073d1ff4b30037de"
+   "weights": "389d0ae6a45a47ea"
   },
   "forearm_seg0_R": {
    "head": [
@@ -547,8 +547,8 @@
   }
  },
  "shapes": {
-  "arm_down_L": 0.005688,
-  "arm_down_R": 0.005718,
+  "arm_down_L": 0.005725,
+  "arm_down_R": 0.005727,
   "legs_straight_L": 0.060775,
   "legs_straight_R": 0.0611
  },
