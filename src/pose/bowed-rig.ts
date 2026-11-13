@@ -1238,14 +1238,16 @@ export const BOWED_HOLDS = {
  *
  * In the lift and the lowering, the viola leads, and the left paw follows it by its grip
  * (`carryVia`, `carryLift()` of `pose/bowed.ts`). In the middle of the move, the scroll points up
- * and to the left, (-0.79, 0.61, -0.06), and the top plate faces the front, (0.26, 0.25, -0.93).
+ * and a little to the left, (-0.6, 0.8, -0.05), and the top plate faces the front, (0.1, 0.1, -1).
  * Thus the strings stay toward the audience, and the viola turns 5° off the short arc
- * (`pnpm carry-check violist`). When the viola hung from the paw, the supination of the forearm
+ * (`pnpm carry-check violist`). With the middle of the short arc as the via, (-0.79, 0.61, -0.06)
+ * and (0.26, 0.25, -0.93), the left paw bent 58° on the wrist in the lift (p95, 39° when the
+ * viola hung from the paw, `pnpm arm-check violist`), and with this via 55°. When the viola hung from the paw, the supination of the forearm
  * took it 69° off the short arc in a lift of `bach-bwv1048`: the strings pointed down, and the
  * back of the viola faced the camera. The wrist moves 0.35 H up and 0.19 H to the front in the
- * middle (`liftReach`). With the move 0.14 H out of the hanging viola, the left forearm goes
- * 2.2 cm into the back of the viola at the start of a lift, and with this move 2.0 cm (1.6 cm when
- * the viola hung from the paw). In the middle of the moves, the left elbow points up, back, and a
+ * middle (`liftReach`). The left forearm then goes 2.3 cm into the back of the viola at the start
+ * of a lift and 2.1 cm at the end of a lowering (1.6 cm and 1.5 cm when the viola hung from the
+ * paw). With the move 0.14 H out of the hanging viola, it went 2.2 cm in. In the middle of the moves, the left elbow points up, back, and a
  * little in, (0.6, 1, 0.5) (`liftPoleL`). With the elbow out, (-1, -0.5, 0), the forearm keeps
  * out of the viola (1.2 cm), but the paw twists past 180° on its forearm in a lowering of
  * `mozart-k525`, and the skin turns over. In the middle, the bow points forward and a little out and up, (0.4, 0.3, -1),
@@ -1346,7 +1348,7 @@ const CAT_HOLD = {
   restYawL: 45 * MathUtils.DEG2RAD,
   restGapL: 0.02,
   liftPoleL: [0.6, 1, 0.5],
-  carryVia: { axis: [-0.79, 0.61, -0.06], top: [0.26, 0.25, -0.93] },
+  carryVia: { axis: [-0.6, 0.8, -0.05], top: [0.1, 0.1, -1] },
   restBow: {
     lap: { along: 0.6, offset: [0.3, 0.3, -0.2] },
     tip: [0.15, 1, -0.45],
