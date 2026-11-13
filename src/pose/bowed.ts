@@ -2,6 +2,7 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import { boneIndex } from '../models/rig.ts';
 import { palmTurnAngle, studioPawTwist } from '../models/studio-rig.ts';
+import type { Quat } from '../models/tuples.ts';
 import { X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { mixDirection, mixRotation, mixRotationNear } from './blend.ts';
 import type { BowedHold, BowedRig, RigPoints } from './bowed-rig.ts';
@@ -1150,6 +1151,10 @@ const seenMix = new Quaternion();
  * supination ({@link mixTwist}), as a real forearm turns. The bind of the left paw of these bodies
  * is supinated (design 4.4), so the twist of the studio paw stays on one side of 180° on the way.
  *
+ * With a via (`BowedHold.carryVia`), the instrument leads: it turns on a curve near the via
+ * ({@link viaTurn}), and the paw follows it by the mixed grip. The arm keeps its path, and the turn
+ * of the paw in the plane of its palm goes on a line from the rest turn to the playing turn.
+ *
  * @param rig The points of the player.
  * @param frames The posed frames of the torso.
  * @param state The bow state.
@@ -1238,16 +1243,24 @@ function carryLift(
   armFrame(rig, shoulder.position, carryArm.elbow, carryArm.wrist, out.rotation).multiply(
     handInMix,
   );
-  const angle = retargetTurn(out.rotation) + restOffset * (1 - weight) ** 2;
+  let angle = retargetTurn(out.rotation) + restOffset * (1 - weight) ** 2;
   turnedPaw(out.rotation, angle, seenMix);
 
   // The instrument hangs from the paw that the viewer sees, with the grip mixed from the rest grip
-  // to the playing grip of the note.
+  // to the playing grip of the note. With a via, the instrument leads, and the paw follows it.
   gripOf(liftRest, restHand.wrist, seenRest, gripRest);
   gripOf(liftPlay, playHand.wrist, seenPlay, gripPlay);
   mixRotation(gripRest.turn, gripPlay.turn, weight, gripTurn);
   gripWrist.lerpVectors(gripRest.wrist, gripPlay.wrist, weight);
-  place.rotation.copy(seenMix).multiply(gripTurn.invert());
+  if (rig.carryVia) {
+    viaTurn(rig, rig.carryVia, frames, weight, place.rotation);
+    seenMix.copy(place.rotation).multiply(gripTurn);
+    angle = restTurn + (playAngle - restTurn) * weight;
+    out.rotation.copy(seenMix).multiply(pawTurn.setFromAxisAngle(X_AXIS, -angle));
+    gripTurn.invert();
+  } else {
+    place.rotation.copy(seenMix).multiply(gripTurn.invert());
+  }
   place.pivot.copy(out.wrist).sub(gripWrist.applyQuaternion(place.rotation));
   const parent = rig.parent === BONES.chest ? frames.chest : frames.root;
   place.local.copy(parent.rotation).invert().multiply(place.rotation);
@@ -1256,6 +1269,50 @@ function carryLift(
     out.wrist.addScaledVector(carryShift.applyQuaternion(place.rotation), 1 - weight);
   }
   return angle;
+}
+
+const viaControl = new Quaternion();
+const viaFrom = new Quaternion();
+const viaTo = new Quaternion();
+
+/**
+ * Gives the turn of a carried violin or viola with a via (`BowedHold.carryVia`, design 5.2): a
+ * quadratic curve of turns from the rest turn to the playing turn ({@link liftRest},
+ * {@link liftPlay}), whose middle at the weight 0.5 is near the via. The control turn of the
+ * curve is `2 × via - (rest + play) / 2`, so the instrument turns on a smooth path with no stop at
+ * the via.
+ *
+ * @param rig The points of the player.
+ * @param carryVia The via of the rig (`RigPoints.carryVia`).
+ * @param frames The posed frames of the torso.
+ * @param weight The eased weight of the playing pose: 0 is the rest pose.
+ * @param out The world rotation of the instrument to write.
+ * @returns `out`.
+ */
+function viaTurn(
+  rig: RigPoints,
+  carryVia: Quat,
+  frames: TorsoFrames,
+  weight: number,
+  out: Quaternion,
+): Quaternion {
+  const parent = rig.parent === BONES.chest ? frames.chest : frames.root;
+  const via = viaControl.fromArray(carryVia).premultiply(parent.rotation);
+  const from = liftRest.rotation;
+  const to = liftPlay.rotation;
+  const fromSign = from.dot(via) < 0 ? -0.5 : 0.5;
+  const toSign = to.dot(via) < 0 ? -0.5 : 0.5;
+  via
+    .set(
+      2 * via.x - fromSign * from.x - toSign * to.x,
+      2 * via.y - fromSign * from.y - toSign * to.y,
+      2 * via.z - fromSign * from.z - toSign * to.z,
+      2 * via.w - fromSign * from.w - toSign * to.w,
+    )
+    .normalize();
+  mixRotation(from, via, weight, viaFrom);
+  mixRotation(via, to, weight, viaTo);
+  return mixRotation(viaFrom, viaTo, weight, out);
 }
 
 /**

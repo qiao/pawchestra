@@ -325,6 +325,14 @@ export interface BowedHold {
    * the playing pole. `null` mixes the rest pole and the playing pole directly.
    */
   readonly liftPoleL: Vec3 | null;
+  /**
+   * The violin or the viola in the middle of the lift and of the lowering, in the model axes: the
+   * direction from the tail end to the scroll, and the side of the top plate (design 5.2). The
+   * instrument then leads: it turns on a smooth path from its rest turn to its playing turn that
+   * passes near this turn in the middle of the move, and the left paw follows it by its grip
+   * (`carryLift()` of `pose/bowed.ts`). `null` lets the instrument hang from the paw.
+   */
+  readonly carryVia: { readonly axis: Vec3; readonly top: Vec3 } | null;
   /** The bow in the rest pose. */
   readonly restBow: {
     /** The place of the grip on the right thigh. */
@@ -501,6 +509,7 @@ const CHIN_HOLD = {
   girthFit: null,
   wristFit: null,
   liftPoleL: null,
+  carryVia: null,
   restBow: {
     lap: { along: 1, offset: [0.18, 0.08, 0] },
     tip: [-1, 0, -0.3],
@@ -577,6 +586,7 @@ const FLOOR_HOLD = {
   girthFit: null,
   wristFit: null,
   liftPoleL: null,
+  carryVia: null,
   restBow: {
     lap: { along: 1, offset: [0.2, 0.08, 0] },
     tip: [-0.1, -0.1, -1],
@@ -1756,6 +1766,11 @@ export interface BowedRig {
   readonly pawBindL: PawBind;
   /** The rotation of the `instrument` bone in the rest pose, relative to its parent. */
   readonly restRotation: Quat;
+  /**
+   * The rotation of the `instrument` bone in the middle of the lift and of the lowering, relative
+   * to its parent (`BowedHold.carryVia`), or `null` for no via and for a soloist who stands.
+   */
+  readonly carryVia: Quat | null;
   /** The move of the instrument while the player plays, in meters (`BowedHold.playShift`). */
   readonly playShift: Vec3;
   /** The move of the plucking palm toward the frog side, in meters (`BowedHold.pluckSide`). */
@@ -2131,6 +2146,7 @@ export function bowedRig(
     armR: armRig(model, 'R'),
     pawBindL: pawBindOf(model.studio.arms.L),
     restRotation: toQuat(restRotation),
+    carryVia: hold.carryVia && !atSide ? toQuat(turnTo(hold.carryVia, new Quaternion())) : null,
     playShift: toVec3(playShift),
     pluckSide: hold.pluckSide * h,
     restGapL: hold.restGapL * h,
