@@ -1228,12 +1228,6 @@ Done when: the pose tests pass, and the pose and frame targets pass.
 - [ ] Make `pnpm keyboard` pass again. At 1440 × 900 the check "Tooltips of the speed menu and the
       volume slider" fails, and `checkHiddenBarTap` stops at a timeout, because the UI has no
       `.collapse` element now. Thus the run never reaches its last checks.
-- [ ] Add a text button "Watch as a film" beside "Select music" on the first screen. It starts
-      the piece in Cinematic mode. Free stays the start mode. Now the film starts only from an
-      icon with no text or the key C, and a touch shows no tooltip (2.3, 2.8).
-- [ ] Put `film=1` in the hash, and remove the hash when a dropped file plays. Now a link copied
-      during an own file names the earlier demo. Then add "Copy link" to the drawer, with Web
-      Share on a phone (2.2).
 - [ ] Small control gaps: show the time at the pointer in the tooltip of the seek bar, give the
       canvas `cursor: grab` in Free mode with one line "Drag to look around" until the first drag,
       and give a dropped file a row "Your file: {title}" for the session, in memory only (2.3,
