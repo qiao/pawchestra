@@ -50,11 +50,6 @@ Do not edit a `.blend` of a chain in Blender, because the next run of the chain 
 A run writes the `.blend` with other bytes each time. The rig file, its summary, the studio module,
 and the rig config are the same byte for byte for the same chain.
 
-## Bodies with no chain
-
-The `.blend` of the Tripo bear is made by hand in Blender (`assets/models/bear/README.md`), so it
-has no chain. `pnpm rig-export bear` gives its rig file again from the committed `.blend`.
-
 ## One copy of build.py for each species
 
 Each `build.py` is a copy that grew from the build of another species. The copies share most

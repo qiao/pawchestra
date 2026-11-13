@@ -7,13 +7,13 @@ round.
 
 Each species has a studio body (`'studio-<a>'`) with the role-neutral bind (design 4.4). "Hand
 rig" means the hand rig of a Tripo P2 mesh in `assets/models/<s>/tripo-hand/`, with no arm cut and
-no stretch. A chain in `tools/blender/hand/<s>/` makes each one, except the bear. "Rebuilt arms"
+no stretch. A chain in `tools/blender/hand/<s>/` makes each one. "Rebuilt arms"
 means quad arm tubes, Blender weights, and arm segments of the mesh rig. The `README.md` of each
 model folder gives the files of each step.
 
 | Species | Body | Role |
 | --- | --- | --- |
-| bear | Hand rig, made by hand in Blender (no chain). Stands on the podium. | `conductor` |
+| bear | Hand rig at the eye height of the older bear, smaller paws, paws turned by whole ring steps. Stands on the podium. | `conductor` |
 | polar-bear | Hand rig, a digit bone for each claw. Sits on a bench that fits the legs, with the thighs sloped down (`benchFitOf()`). | `pianist` |
 | rabbit | Hand rig of the fourth Tripo rabbit at the seated eye height of the third rabbit, arms of the girth of the third rabbit (`armGirth`), a smaller violin. | `violinist` |
 | fox-red | Hand rig at the eye height of the older fox, arms 1.25 times longer, a smaller fore paw, own joints for the legs and the right ear of a source that is no mirror. | `fox-violinist` |
@@ -66,7 +66,7 @@ Three routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each 
 - **Simple route.** `simple_rig.py` writes the `.blend` of a hand rig from a clean quad mesh with
   the arms apart (design 4.4). The skill `pawchestra-body` runs it in a candidate tree.
 - **Hand rig.** A person or an agent makes the `.blend` in Blender, and `pnpm rig-export` exports
-  it. A script chain makes the `.blend` of each Tripo body except the bear.
+  it. A script chain makes the `.blend` of each Tripo body.
 
 A point edit of a rig file goes into `assets/models/<s>/<s>-edits.json`, and
 `pnpm glb-point-edits <file>` writes it into the rig file of its base commit. Test a
