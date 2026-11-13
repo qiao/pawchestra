@@ -15,6 +15,7 @@ import { groupChords } from './note-groups.ts';
 import type { NoteGroup } from './note-groups.ts';
 import {
   CRASH_MOTION,
+  SUSPENDED_CYMBAL_HOLD,
   TAMBOURINE_HOLD,
   TRIANGLE_ROLL,
   acrossAxes,
@@ -69,6 +70,8 @@ interface PercussionTracks {
   readonly ring: DampTrack | null;
   /** The switches and the rolls of the small percussion player, or `null`. */
   readonly small: SmallTracks | null;
+  /** The strikes that swing the plate of a suspended cymbal ({@link cymbalSwingAt}), or `null`. */
+  readonly swing: Float64Array | null;
 }
 
 /** The motion of the small percussion player with the held tambourine (design 5.3). */
@@ -147,6 +150,47 @@ function setRests(
   }
   rests.push(...lower(after[starts.length - 1] ?? last), Infinity, Infinity);
   return Float64Array.from(rests);
+}
+
+/**
+ * The swing of the plate of a suspended cymbal after a strike (design 5.3). The plate rocks on the
+ * felt of its stand: a damped sine of the time since each strike.
+ */
+export const CYMBAL_SWING = {
+  /** The largest tilt of one strike of the loudness 1, in radians. */
+  angle: 3 * MathUtils.DEG2RAD,
+  /** The rate of the swing, in swings for each second. */
+  hz: 1.4,
+  /** The time in which the swing falls to 1/e, in seconds. */
+  decaySec: 0.9,
+  /** The largest tilt of the sum of the strikes, in radians, for a roll. */
+  maxAngle: 4 * MathUtils.DEG2RAD,
+} as const;
+
+/**
+ * Gives the tilt of the plate of a suspended cymbal at a song time (design 5.3): the sum of a
+ * damped sine for each strike before the time. The sum of the swings of a linear rocker makes no
+ * jump at a strike, and the pose keeps no state.
+ *
+ * @param swings Two numbers for each strike, sorted: the start and the size of the strike.
+ * @param time The song time of the note layer.
+ * @returns The tilt around x, in radians: a positive tilt lowers the near edge.
+ */
+export function cymbalSwingAt(swings: Float64Array, time: number): number {
+  const s = CYMBAL_SWING;
+  const horizon = 5 * s.decaySec;
+  let tilt = 0;
+  for (let k = swings.length - 2; k >= 0; k -= 2) {
+    const dt = time - (swings[k] ?? 0);
+    if (dt < 0) {
+      continue;
+    }
+    if (dt > horizon) {
+      break;
+    }
+    tilt += (swings[k + 1] ?? 0) * Math.exp(-dt / s.decaySec) * Math.sin(2 * Math.PI * s.hz * dt);
+  }
+  return MathUtils.clamp(s.angle * tilt, -s.maxAngle, s.maxAngle);
 }
 
 /**
@@ -269,7 +313,12 @@ export function percussionTracks(
           ),
         }
       : null;
-  return { left, right, side, rests, damp, ring, small };
+  // Each strike of a suspended cymbal swings its plate (`CYMBAL_SWING`).
+  const plateSwings =
+    hold === SUSPENDED_CYMBAL_HOLD
+      ? Float64Array.from(groups.flatMap((g) => [g.start, g.loudness * amplitude]))
+      : null;
+  return { left, right, side, rests, damp, ring, small, swing: plateSwings };
 }
 
 /**

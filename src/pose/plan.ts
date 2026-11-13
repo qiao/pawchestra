@@ -233,6 +233,8 @@ export interface PercussionLayer {
   readonly ring: DampTrack | null;
   /** The switches and the rolls of the small percussion player, or `null`. */
   readonly small: SmallTracks | null;
+  /** The strikes that swing the plate of a suspended cymbal (`cymbalSwingAt()`), or `null`. */
+  readonly swing: Float64Array | null;
 }
 
 /**

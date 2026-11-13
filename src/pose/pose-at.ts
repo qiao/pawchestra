@@ -49,7 +49,13 @@ import { HARP_STRING_COUNT, stringSwingsAt } from './harp-strings.ts';
 import { poseHarpFeet } from './harp-feet.ts';
 import { pedalNotchesAt } from './harp-pedals.ts';
 import { HARP_PEDALS } from '../models/instruments/harp.ts';
-import { createSmallState, posePercussion, setWeightAt, smallStateAt } from './percussion.ts';
+import {
+  createSmallState,
+  cymbalSwingAt,
+  posePercussion,
+  setWeightAt,
+  smallStateAt,
+} from './percussion.ts';
 import { TAMBOURINE_HOLD } from './percussion-rig.ts';
 import { createSwitchState } from './percussion-switch.ts';
 import type { PercussionState } from './percussion.ts';
@@ -147,6 +153,7 @@ const BONES = {
   tail1: boneIndex('tail1'),
   tail2: boneIndex('tail2'),
   jaw: boneIndex('jaw'),
+  slide: boneIndex('slide'),
 } as const;
 
 /**
@@ -732,6 +739,11 @@ function poseAnimal(
       );
       if (note.side && legs) {
         plantFeet(legs, pose.rootOffset, pose.rotations);
+      }
+      // The plate of a suspended cymbal swings after each strike, and the paw of a damp stops it.
+      if (note.swing) {
+        const tilt = cymbalSwingAt(note.swing, noteTime) * (1 - strikes.damp.weight);
+        setBoneRotation(pose.rotations, BONES.slide, turn.setFromAxisAngle(X_AXIS, tilt));
       }
       break;
     }

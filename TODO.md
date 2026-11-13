@@ -1198,8 +1198,6 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Show the user a lineup of a seeded fur value step of ±5% for each player of a section, as one
       uniform of each player mesh. The posture of each player already varies (`PlayerPlan.posture`),
       and the four foxes of a section still have one face color (5.1).
-- [ ] Move the plate of the suspended cymbal to the `slide` bone, and tilt it with a decaying sine
-      of the time since the strike. Now a crash does not move it (5.3).
 - [ ] Add a softness to `solveTwoBone()` (`src/pose/ik.ts`), default 0, so that the elbow comes
       near the full reach on a curve. Try 5% of the arm length on the pianist and the harpist.
       The clamp at the full reach causes the snaps of the polar bear and the deer tasks above

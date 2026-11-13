@@ -689,7 +689,10 @@ The rest of each family:
   into the body or the beater off its spot. The paw of the suspended cymbal that did not strike
   the note takes its grip to the near rim, so that the closed paw rests on the edge, and the spine
   leans further over the cymbal (`EdgeDamp`). The wrist lifts the mallet, so that its ball stays
-  off the plate (`EdgeDamp.share`). The window ends before the next lift of each paw. Reason
+  off the plate (`EdgeDamp.share`). The plate of the suspended cymbal is a piece on the `slide`
+  bone with its pivot at the bell, and it rocks after each strike: the sum of a damped sine of the
+  time since each strike (`cymbalSwingAt()`, `CYMBAL_SWING`), with a limit for a roll. The damp
+  stops it. The window ends before the next lift of each paw. Reason
   of the lean: with no lean, the arm stretched past the margin of the arm gate. The paw of the
   timpanist that struck the note moves toward the player with its mallet in the strike direction,
   as far toward the playing spot as the short arm reaches, and the lowest point of the paw goes to
