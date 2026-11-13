@@ -81,8 +81,8 @@ of the source.
 
 | Item | Value |
 |---|---|
-| Size | 384,093 bytes |
-| SHA-256 | `1d752944202b92beedcdf3941e6d52d980063aadba474e3d4749f74e43082efc` |
+| Size | 386,111 bytes |
+| SHA-256 | `2e245e56c3cb2c6c901858204b15ac5d1d81f85b310ecbf69425413c469a48fe` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the pig faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `pig`: 3,642 vertices and 3,968 faces (3,203 quads and 765 triangles, 7,171 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the snout disc takes the slot `fur` and the color map. The 93 faces of the two painted eyes have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/pig/tripo-hand/pig-color.webp`) |
 | Armature | `pig_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -198,6 +198,39 @@ degrees. With 34 degrees, 9 players of `boulanger-matin` move in the sight pass 
 (design 4.5), and with 40 degrees, 3 players of two demos move. The curly tail stays behind the
 haunch, over the back edge of the seat.
 
+**Sit.** The key `bind_sit` (`sit_key()` of the build, after `bind_belly`) puts the underside of
+the haunch onto the seat: `be.sit_move(pig, pig_rig, {band 0.05, most 0.07, ramp 0.03, end 0.01,
+radius 0.012, across true})` of `tools/blender/bind_edit.py`, then `be.add_bind_move(pig,
+pig_rig, <move>, 'bind_sit')`. The plane is the thigh underside over the seat (Blender z 0.1509,
+the seat top of the app). Each body point behind 0.03 units in front of the hip joints moves down
+by the gap of the lowest point of its slice across the seat (0.012 units deep), less over 0.05
+units of height and at the back of the haunch. The 81 points and their moves on z, in units:
+909 -0.0025, 916 -0.0068, 917 -0.0080, 918 -0.0120, 919 -0.0072, 920 -0.0101, 1007 -0.0093,
+1008 -0.0089, 1009 -0.0094, 1010 -0.0094, 1011 -0.0091, 1023 -0.0102, 1024 -0.0060, 1029 -0.0086,
+1030 -0.0082, 1031 -0.0094, 1032 -0.0087, 1033 -0.0075, 1034 -0.0094, 1035 -0.0175, 1036 -0.0113,
+1037 -0.0189, 1038 -0.0281, 1039 -0.0176, 1040 -0.0245, 1041 -0.0131, 1042 -0.0176, 1049 -0.0105,
+1060 -0.0010, 1061 -0.0178, 1062 -0.0178, 1070 -0.0315, 1071 -0.0227, 1077 -0.0344, 1078 -0.0301,
+1080 -0.0296, 2623 -0.0060, 2624 -0.0103, 2634 -0.0064, 2639 -0.0064, 2640 -0.0076, 2641 -0.0074,
+2642 -0.0094, 2643 -0.0086, 2644 -0.0082, 2645 -0.0088, 2646 -0.0096, 2655 -0.0093, 2656 -0.0096,
+2657 -0.0095, 2658 -0.0091, 2659 -0.0097, 2660 -0.0134, 2661 -0.0090, 2662 -0.0188, 2663 -0.0182,
+2664 -0.0271, 2665 -0.0198, 2666 -0.0117, 2667 -0.0309, 2668 -0.0243, 2719 -0.0025, 2726 -0.0124,
+2727 -0.0083, 2728 -0.0076, 2729 -0.0065, 2731 -0.0105, 2732 -0.0108, 2733 -0.0141, 2734 -0.0358,
+2739 -0.0415, 2740 -0.0469, 2774 -0.0475, 2775 -0.0242, 2776 -0.0437, 2778 -0.0104, 2803 -0.0119,
+2819 -0.0206, 2820 -0.0207, 2821 -0.0029, 2822 -0.0001. The seat height does not change. In the
+seat probe (rows of 1 cm over the seat, a row touches within 1 cm), the rows behind the hip joints
+that touch the seat go from 0 % to 60 %, and their mean gap from 5.9 cm to 2.8 cm. Thus the two
+halves of the haunch rest on the seat in the views from the side and from behind. A drop of each
+point to the lowest point within 0.012 units around it (no `across`) gave the same contact, but
+it pulled the crotch down into dark teeth in the front view. Thighs 18 degrees down gave no more
+contact, and they lowered the seat to 0.141 m.
+
+The pig sits on the front half of its chair: the hip joints lie about 5 cm behind the front edge,
+and the back of the haunch about 11 cm in front of the back posts. The round back reaches about
+10 cm further back than the haunch, 21 cm over the seat, and it sets the depth of the chair
+(`chairDepthOf()` of `tools/studio-body.ts`, 1 cm from the back posts). The `back` of the property
+`seat` (-0.17) gives a shallower chair, so it sets nothing. Only a trunk that leans forward in the
+bind (`studio.trunk`) would put the haunch nearer to the chair back, and that moves each hold.
+
 **Lids.** A lid on each eye: 14 × 13 points from psi -50 to 40 degrees and lam from -75 to 80
 degrees on the left (the mirror on the right), with the lower strip as the first row. Each row lies
 at 1.2 ball radii, or 1.03 times the farthest eye point from the middle of the sphere fit of the
@@ -251,7 +284,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/pig.rig.glb` | 1,009,100 bytes | `88c5f7a269365ffa3d7e69255cfbe380db52e444ad062cdae81a08e1fe48b78d` |
-| `tripo-hand/pig.rig.json` | 16,377 bytes | `e5f0ec65fe6fe6ab1556ba839571141b9cd84b123e980e6e28b06574c5238ad6` |
+| `tripo-hand/pig.rig.glb` | 1,009,100 bytes | `3b9d2dd1c233e921797b67ed7d29bd277667dc0936abff2ba9f418907b477990` |
+| `tripo-hand/pig.rig.json` | 16,377 bytes | `3522263944ae7e94b159e7ca5a1d3ebeca45e3519404cb914663e001c03afe73` |
 | `tripo-hand/pig-color.webp` | 54,072 bytes, 2048 × 2048 | `7e93b90c62901e98e717ea958be65306951c6bc7f8ea7ec50fa9f91cc97af295` |
 | `tripo-hand/pig-normal.webp` | 16,518 bytes, 1024 × 1024 | `1f67a4b13f0fcdb7950acf73470ee5d796e7d0a8487acd0a78fa044198b7065b` |

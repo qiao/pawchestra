@@ -216,5 +216,13 @@
    0.36
   ],
   "rounds": 8
+ },
+ "sit": {
+  "band": 0.05,
+  "most": 0.07,
+  "ramp": 0.03,
+  "end": 0.01,
+  "radius": 0.012,
+  "across": true
  }
 }
