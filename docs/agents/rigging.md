@@ -130,8 +130,8 @@ with `pnpm bind-view`.
 5. **Export.** Run `pnpm rig-export <s>` and `pnpm studio-body <s>`. Diff `<s>.rig.json` to see
    what moved.
 
-For the simple route, run `simple_rig.py`, then step 5. Write a texture with `Image.save()`,
-because `Image.save_render()` changes the colors by the view transform.
+For the simple route, run `simple_rig.py`, then step 5. Write a texture with `Image.save()`:
+`Image.save_render()` applies the view transform.
 
 ## The arm gate
 
@@ -241,8 +241,9 @@ Design 4.4 gives the rule and the reason of each config key.
 - A hanging T-pose arm folds the faces under its root. Make them and the first tube ring rigid
   (`rigidPainted`), and join two rigid groups that touch. A rigid group at the front of a root or
   across the chest, or a Smooth of the root weights, moves the fold to its edge as a dark notch.
-- Bone heat gives the front of an armpit a clavicle share of about 0.55. A much lower first arm
-  row folds it when the arm reaches forward: start `rows.control` near that share.
+- Start `rows.control` near the bone heat clavicle share of the armpit (0.55 to 0.7), else the
+  front folds in a reach. Give the arm shares of the back wall to the clavicle (`back_rows()`,
+  badger), else a backward elbow folds it into a slit.
 - Bone heat thigh shares far up the belly pull a seated belly back into a ridge. Move it toward
   the trunk form with a key (`trunk_belly()` of the panda chain), faded out under the arms.
 - Limit Total 4 can drop the belly thigh shares under the arms, so the seated chest stands over
