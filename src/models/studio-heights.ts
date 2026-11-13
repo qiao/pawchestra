@@ -8,7 +8,7 @@ import type { StudioBody } from './studio-format.ts';
  */
 export const STUDIO_HEIGHTS = {
   'studio-badger': { headHeight: 0.27948, seatHeight: 0.123762 },
-  'studio-bear': { headHeight: 0.357761, seatHeight: null },
+  'studio-bear': { headHeight: 0.346565, seatHeight: null },
   'studio-beaver': { headHeight: 0.310441, seatHeight: 0.062187 },
   'studio-cat': { headHeight: 0.339381, seatHeight: 0.222242 },
   'studio-deer': { headHeight: 0.287073, seatHeight: 0.351835 },

@@ -80,8 +80,9 @@ const BODY_LOOPS = 2;
  * - The beaver: 23 open loops, the cuts to the two upper arms, the 19 open loops of the Tripo
  *   beaver (the 2 eye sockets, the top of the teeth, and the 16 whisker strips), and the edges of
  *   the 2 lids.
- * - The bear: the cuts to the two upper arms, the open bases of the 8 claws of the feet and of the
- *   tail ball, the 2 eye sockets, the open backs of the 2 eyeballs, and the edges of the 2 lids.
+ * - The bear: 10 open loops, the cuts to the two upper arms, the 6 open loops of the Tripo bear
+ *   (the 2 eye sockets, the open rims of the 2 eyeballs, a slit at the left corner of the mouth,
+ *   and a slit across the tail), and the edges of the 2 lids.
  * - The cat: 20 open loops, the cuts to the two upper arms and 18 open loops of the fourth Tripo
  *   cat and of its eyes and lids.
  * - The deer: 6 open loops, the cuts to the two upper arms, the open backs of the 2 eyeballs of
@@ -114,7 +115,7 @@ const BODY_LOOPS = 2;
 const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/badger/tripo-hand/badger.rig.glb', 7],
   ['assets/models/polar-bear/tripo-hand/polar-bear.rig.glb', 16],
-  ['assets/models/bear/tripo-hand/bear.rig.glb', 17],
+  ['assets/models/bear/tripo-hand/bear.rig.glb', 10],
   ['assets/models/beaver/tripo-hand/beaver.rig.glb', 23],
   ['assets/models/cat/tripo-hand/cat.rig.glb', 20],
   ['assets/models/deer/tripo-hand/deer.rig.glb', 6],

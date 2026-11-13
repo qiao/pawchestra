@@ -279,11 +279,11 @@ const FOX_TEXTURE_COLORS: SpeciesColors = {
 
 /** The animals that the app shows, by their ids. */
 export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalEntry>([
-  // The bear conductor: the candidate hand rig of the Tripo P2 mesh
-  // (`assets/models/bear/tripo-hand/bear.blend`), with no arm cut and no limb stretch. Its `.blend`
-  // holds the facts of the body: the scale that keeps H of the bear of `bear-tpose.rig.glb` at
-  // cbc8db5e4, and the crease angle 40° and the color blend 0.05 of that bear. It stands on the
-  // podium.
+  // The bear conductor: the hand rig of the Tripo P2 mesh
+  // (`assets/models/bear/tripo-hand/bear.blend`) of the chain `tools/blender/hand/bear/`, with no
+  // arm cut and no limb stretch. Its `.blend` holds the facts of the body: the scale that keeps the
+  // eye height of the older Tripo bear (1.481 m), the crease angle 180°, and the cue facts. It
+  // stands on the podium.
   [
     'bear',
     {

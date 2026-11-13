@@ -333,8 +333,9 @@ export const SPECIES = {
   },
   /**
    * Bear, the conductor (reference image). It has the studio body of the hand rig of the Tripo P2
-   * bear (`assets/models/bear/tripo-hand/bear.blend`, design 4.4). Its head height is the head of
-   * the studio body. It binds standing, so its seat has a fixed height.
+   * bear (`assets/models/bear/tripo-hand/bear.blend`, design 4.4), at the eye height of the older
+   * Tripo bear, with smaller paws and the colors of its source. Its head height is the head of the
+   * studio body. It binds standing, so its seat has a fixed height.
    */
   bear: {
     body: 'studio-bear',
