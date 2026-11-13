@@ -820,9 +820,13 @@ and the forearms are 1.25 times longer (`armStretch`). Reason: the source arm re
 the shoulder joint to the palm, and both flute grips lay out of reach. It now reaches 1.0 H, as
 the older fox. Its violin is 0.83 of the violin of the app (4.6, `violinScale`). Reason: with the
 full violin, the short arm stopped the strings only over the upper bout, and the thick left paw
-went into the violin. The fore paw past the wrist is smaller (the edit `paw`), about 1.3 wrist diameters
-wide, as the paw of the wolf, and its middle two digits stay the longest. Reason: the source paw
-was 1.9 wrist diameters wide. The legs and the right ear of the source are no mirrors of the left
+went into the violin. The fore paw past the wrist joint is a little smaller than the source paw
+(the edit `paw`): about 0.42 H long, as the paw of the wolf (0.43 H), and wider than the wrist. Its
+middle two digits stay the longest. Reason: the source paw was 0.47 H long and 1.8 wrist diameters
+wide, and a paw of 0.34 H, at the wrist ratio of the wolf, read too small on the forearm. The edit
+scales about the wrist joint after the arm stretch, so the forearm keeps its girth up to the joint,
+and the wrist and the knuckles of the mesh lie at their joints. Reason: about the source wrist, the
+edit made a narrow neck before the joint, and a wrist bend turned the paw heel. The legs and the right ear of the source are no mirrors of the left
 ones, so they take joints of their own. Its eyes are the flat eye domes of the mesh, because the
 map paints a full eye on each, with a light in each pupil. So the eyes take the finish `varnish`
 and no eye light. Each dome lies on its own sphere (`ballSphere`), and each blink lid turns 60°

@@ -116,8 +116,9 @@ instruments:
   as one piece. The share fades from 0.065 to 0.085 units from the arm line, so the trunk and the
   head stay ("Arm length").
 - **Paw size.** After the automatic weights, the edit `paw` scales each fore paw past the wrist
-  joint in the frame of the paw: 0.72 along the forearm axis, 0.66 in width, and 0.9 in height,
-  with a ramp of 0.02 units ("Paw size").
+  joint of the config (x 0.274, the source wrist moved by the arm stretch) in the frame of the paw:
+  0.9 along the forearm axis, 0.825 in width, and 0.9 in height, with a ramp of 0.02 units ("Paw
+  size").
 - **Eye domes.** Each dome vertex moves onto the sphere of its dome (`ballSphere` 1.0, radius
   0.0520 on the left and 0.0563 on the right). The source domes lie from 0.957 to 1.093 sphere
   radii from the middle ("Eyes").
@@ -186,18 +187,32 @@ flute grips have 1.8 to 2.8 cm to spare, and the violin hand reaches 0.63 to 1.0
 fingerboard. The upper arm is 6.6 cm in radius at its middle loop (5.8 cm before), and the forearm
 5.4 cm (4.3 to 5.2 cm).
 
-**Paw size.** The measures of the fore paw (`pawmeasure.py` of the session, in the units of the
-source, with the wrist girth of the narrowest arm section):
+**Paw size.** The measures of the fore paw in the rest pose of the rig file (the length from the
+head of `hand` to the tip along the forearm, the width across it, and the wrist diameter as the
+girth of the section at the head of `hand` / π), the mean of the two sides:
 
-| Measure | Source paw | Paw now | Fox before | Tripo wolf |
+| Measure | Source paw | Paw now | Paw of 0.72, 0.66, 0.9 about the source wrist | Tripo wolf |
 |---|---|---|---|---|
-| Digits | 4 and a short thumb, the middle two longest | The same | 4 | - |
-| Width / wrist diameter (girth / π) | 1.91 | 1.32 | 1.29 | 1.30 |
-| Length, wrist joint to tip / shoulder distance | 0.53 | 0.38 | 0.355 | 0.451 |
-| Width / shoulder distance | 0.57 | 0.39 | 0.366 | 0.462 |
+| Digits | 4 and a short thumb, the middle two longest | The same | The same | - |
+| Length / H | 0.47 | 0.42 | 0.29 | 0.43 |
+| Length / wrist diameter | 1.78 | 1.60 | 1.25 | 1.33 |
+| Width / wrist diameter | 1.86 | 1.54 | 1.40 | 1.36 |
 
-In the app the paw is 0.117 m long and 0.119 m wide (0.34 H), on a wrist of 0.091 m (0.086 m on
-the fox before).
+The length and the width are 1.25 times the values before (0.72 and 0.66), and the height stays
+0.9. A lineup of the factors 1.15, 1.25, and 1.35 against the wolf paw at the same scale of H (with
+the height 1.0) gave a length of 0.39, 0.42, and 0.46 H. The factor 1.25 is nearest to the wolf.
+With the height 1.0, the closed paws of the flutist folded more faces (arm gate, folds p95, L 40
+and R 58 against 34 and 50). The wrist ratio of the wolf
+(1.33) does not set the size: the forearm of the fox is thin for its body (0.26 H at the wrist,
+0.33 H on the wolf), so at that ratio the paw was 0.34 H.
+
+The edit scales about the wrist joint of the config. Before, the build gave it only the edits with
+`after`, so it found no `armStretch` and scaled about the source wrist, 0.036 units back along the
+forearm. Then the last 0.036 units of each forearm narrowed to a neck (0.042 units across, 0.055 on
+the source), and the wrist and the knuckles of the mesh lay 0.010 units before the joints `hand`
+and `fingers`: a wrist bend turned the paw heel, and the fingers bone bent the digits.
+
+In the app the paw is 0.148 m long and 0.142 m wide, on a wrist of 0.092 m.
 
 **Tail.** The tail is a part of the body. Its tube is each vertex past the closed root loop of 18
 vertices at (0, 0.329, -0.048) on the back, and the loop itself (185 vertices). Its middle line goes
