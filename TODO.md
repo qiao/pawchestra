@@ -140,13 +140,14 @@ passes.
       layout, by a median of 7 cm to 12 cm, and 17 players more than 0.2 m (the monkeys of
       beethoven-9 1.39 m and 1.28 m, a red fox of boulanger-matin 1.36 m). The seat height and the
       chair size move no player. Check the low chair and the moves with the user.
-- [ ] Panda trombonist (seated): with the belly key, a thin dark line stays at the lap, where the
-      belly meets the thigh tops (`assets/models/panda/README.md`, "Belly"). Check it in the stage
-      light. Gentler keys kept the old band across the belly.
-- [ ] Panda trombonist: the faces at the front of the right arm root fold in each sample (clavicle_R
-      117,313 fold samples in `pnpm fold-probe trombonist`). A move of half of the trunk share to
-      the clavicle made the folds worse (172 to 177 faces). Try the clavicle ramp of the polar bear
-      (`rows.control`).
+- [ ] Panda trombonist (5.3): the faces at the front of the right arm root and of the chest under
+      the chin fold in each sample (clavicle_R 117,334 fold samples in `pnpm fold-probe
+      trombonist`). Cause: the right shoulder bone turns 70° forward (`reach` of `PANDA_TROMBONE`),
+      so the front of the right shoulder moves about 0.18 units toward the middle line, which is
+      only 0.13 units away. No weight row removes it: the soft clavicle ramp and a chest ramp to
+      the middle line only moved the folds. With `--set 'trombone@panda.reach=25deg'`, clavicle_R
+      folds 4 samples, but the right upper arm goes 3.3 cm into the belly (45°: 16,490 samples and
+      1.7 cm, limit 1.5 cm). Try a lower reach with the right elbow further out.
 - [ ] Trumpeter monkey: the body of 1.2 times H with the trumpet of the app folds 47 arm faces in
       the rest sample of `hold-fit`. The arm gate did not run at this scale (folds p95 20 right
       and 26 left, skin twist 44 and 29 degrees at the scale before). Run it, and check the
@@ -288,9 +289,11 @@ passes.
       keys (0.0102 units, 2.1 cm, below its neighbors after the weight fixes, 4.9 cm before). Ask
       the user: a corrective key `arm_raise_*`, or a point edit of the armpit corner of the mesh.
 - [ ] Polar bear pianist: after the soft clavicle ramp, a thinner dark line still shows under the
-      right upper arm in the right views (chord, far-left, rest). Its color map is light there
-      (luma 0.83 to 0.89), so it is the crevice between the arm and the trunk. Try a point edit of
-      the armpit corner, or a corrective key.
+      right upper arm in the right views (chord, far-left, rest). It is a V groove between the
+      bottom of the upper arm and the trunk wall in the reach poses: the line stays with no cast
+      shadow (`--probe noshadow`) and with the crease angle 180. The arm rows with a reach of 0.115
+      or a softer clavicle ramp change its dark pixels by at most 11%, up or down. Try a corrective
+      key `arm_raise_R` that moves the trunk wall under the arm out to the arm in the reach poses.
 - [ ] Polar bear hand rig: a soft ledge stays at the top of the right seated thigh near the groin in
       the pedal pose. Check it in the stage light.
 - [ ] Polar bear hand rig: the right inner elbow folds up to 15 faces in the play (p95 11, limit 8)
@@ -864,13 +867,12 @@ passes.
 - [ ] Fourth Tripo rabbit fur: in the hall the lit fur has Oklab L 0.78 and C 0.07, and the
       rabbits of `orchestra-latest.png` L 0.94 to 0.98 and C 0.01 to 0.02. The map fur has the
       chroma of the sheet (`FUR_CHROMA`), and the warm hall light gives most of the rest.
-- [ ] Tripo pig: at rest and in the moves, the right upper arm goes 2.4 cm into the cap of the arm
-      root (`pnpm pose-depth hornist`, limit 1.5 cm; 0.8 cm in the play). Check the right shoulder
-      at rest in 2x crops, or accept the depth with its reason in the sweep of the hornist.
-- [ ] Pig hornist (4.4): the clavicle_L faces 4453 and 4454 fold in each sample of
-      `pnpm fold-probe hornist`. Check the left shoulder in 2x crops.
-- [ ] Pig hornist (4.4): the lap key `bind_belly` shows the darker fur of the lower belly in the
-      crotch of the front view, where the shadow hid it. Check the lap in the stage light.
+- [ ] Tripo pig: at rest and in the moves, the right upper arm went 2.4 cm into the cap of the arm
+      root (`pnpm pose-depth hornist`, limit 1.5 cm). With the arm rows of reach 0.085,
+      `pnpm hold-fit hornist` gives 1.3 cm. Run `pnpm pose-depth hornist` to confirm.
+- [ ] Pig hornist (4.4): the left armpit face 4454 still folds in 73% of the play and 48% of the
+      lift (`pnpm fold-probe hornist`), at the front of the arm root. Check it in 2x crops from
+      below.
 - [ ] Pig hornist: the right grip moves 0.11 H out of the horn bell (`gripShiftR`), so the note
       target of the right palm is 4.5 cm from the grip of the horn (`pnpm hold-fit hornist`, within
       5 mm). Move the grip of the horn to the mouth of the bell (`HORN_PALM_DEPTH`), or let the
