@@ -161,6 +161,18 @@ const ABOUT: SitePage = {
       text: `The demo list has ${DEMO_IDS.length} pieces by ${COMPOSERS}. The scores come from OpenScore and the Mutopia Project, and each one is in the public domain or has a free license. The credits in the app give the source of each score.`,
     },
     DEMO_LIST,
+    { kind: 'heading', text: 'Free MIDI files' },
+    {
+      kind: 'paragraph',
+      text: 'To play a different piece, drop a MIDI file on the page. These two libraries give MIDI files of classical music for free. Each file has its license on its page.',
+    },
+    {
+      kind: 'list',
+      items: [
+        '[The Mutopia Project](https://www.mutopiaproject.org/): scores in the public domain or with a Creative Commons license, each with a MIDI file.',
+        '[Wikimedia Commons](https://commons.wikimedia.org/wiki/Category:MIDI_files_of_classical_music): MIDI files of classical music with free licenses.',
+      ],
+    },
     { kind: 'heading', text: 'Open source' },
     {
       kind: 'paragraph',
