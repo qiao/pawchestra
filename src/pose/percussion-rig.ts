@@ -530,9 +530,11 @@ export const PERCUSSION_HOLDS = {
     curl: GRIP_CURL,
     strikeRoll: true,
   },
-  // The sticks leave the front of the fists (SNARE_DRUM.malletTilt) and point from homes out from
-  // the shoulders, so that they make a V of about 66° at a strike and slant down 9°, as the matched
-  // grip of a real player. Between strikes, each stick keeps its strike direction, and the wrist
+  // The sticks leave the front of the fists (SNARE_DRUM.malletTilt) and point from homes 0.4 H out
+  // from the shoulders, so that they make a V at a strike and slant down, as the matched grip of a
+  // real player. The spine leans 3° over the drum (lean), so that the short arms of the Tripo
+  // badger reach the strike spots: with the homes 0.5 H out and no lean, the sticks missed the
+  // spots by up to 4.5 cm, and with the homes 0.6 H out, the paws bent 72° on the forearms. Between strikes, each stick keeps its strike direction, and the wrist
   // lifts the tip over the head (across.pitch), as a real player's stroke from the wrist. With the
   // rest direction across the forearm, the tips swing out over the rim. The pitch of 0.15 rad holds
   // each tip about 4 cm above the head between strikes, with the stick almost level, as the ready
@@ -540,8 +542,7 @@ export const PERCUSSION_HOLDS = {
   // tip higher by the loudness (sizes.lift, across.peak): about 11 cm above the head at a velocity
   // of 40, 14 cm at 100, and 15 cm at 127, below the 8 inches of a full stroke, and about 10 cm in
   // a roll. The ball at the tip touches the head at a strike (offsetL, offsetR). The elbows point
-  // out, so that the rebuilt round upper arms stay out of the belly (design 5.3): with the elbows
-  // nearer to the body, they went 2.4 cm into it. The drum takes its place from the body (fit): at
+  // out, so that the upper arms stay out of the belly (design 5.3). The drum takes its place from the body (fit): at
   // the bind place, the forearms or the paws of the recast elephant, bear, hippo, and panda went
   // 6.4 cm to 7.8 cm into the belly. With a room of 0.3 H, the paws of the recast hippo and panda
   // missed their targets by 4.7 cm to 5.8 cm more, and with the full raise for each body, the
@@ -556,7 +557,7 @@ export const PERCUSSION_HOLDS = {
     poleL: POLE_L,
     poleR: POLE_R,
     rim: 0,
-    home: [0.5, -0.3, -0.5],
+    home: [0.4, -0.3, -0.5],
     top: 'up',
     across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 5 },
     pitchR: 1,
@@ -566,7 +567,7 @@ export const PERCUSSION_HOLDS = {
     gap: 0,
     pass: 0,
     reach: Infinity,
-    lean: 0,
+    lean: 0.05,
     side: null,
     fit: { drop: 0.07, gap: 0.15 },
     damp: null,
@@ -700,9 +701,11 @@ export const PERCUSSION_HOLDS = {
  * (`SUSPENDED_CYMBAL.malletTilt`), as the sticks of the snare drum, and the two hands strike in
  * turn near the edge, opposite each other: the left hand at the left and the right hand at the
  * right (`docs/reference/percussion-technique.md` 7). The offsets move the target, the middle of a
- * cymbal of the scale 1, to these spots, 1.3 cm in from the rim. The homes stand further out than
- * for the snare drum, so that the mallets point in to the spots, and the upper arms of the badger
- * mesh fold less and stay within their accepted depth. Between strikes, each mallet keeps its
+ * cymbal of the scale 1, to these spots, 1.3 cm in from the rim. The homes stand 0.45 H out from
+ * the shoulders, a little further out than for the snare drum, so that the mallets point in to the
+ * spots. The spine leans 3° over the cymbal (`lean`), so that the short arms of the Tripo badger
+ * reach the spots: with the homes 0.6 H out and no lean, the mallets missed them by up to 3.1 cm.
+ * Between strikes, each mallet keeps its
  * strike direction, and the wrist holds the ball about 3.5 cm over its spot (`across.pitch`), as
  * the ready position of the snare drum. Before a strike, the wrist lifts the ball higher by the
  * loudness (`sizes.lift`, `across.peak`): about 6 cm for a soft note and 13 cm for a loud note.
@@ -723,7 +726,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   poleL: [-0.6, -1, 0.3],
   poleR: [0.6, -1, 0.3],
   rim: 0,
-  home: [0.6, -0.3, -0.5],
+  home: [0.45, -0.3, -0.5],
   top: 'up',
   across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 5 },
   pitchR: 1,
@@ -733,7 +736,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   gap: 0,
   pass: 0,
   reach: Infinity,
-  lean: 0,
+  lean: 0.05,
   side: null,
   fit: null,
   damp: {
