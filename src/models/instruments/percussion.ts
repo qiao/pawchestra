@@ -233,16 +233,16 @@ const BEATER_BUTT = 0.095;
  */
 export const BASS_DRUM = {
   /**
-   * The middle of the drum, from the floor under the player. The right head stands 0.26 m to the
+   * The middle of the drum, from the floor under the player. The right head stands 0.21 m to the
    * right of the middle of the player, so that the right paw holds the beater at its near rim, out
-   * from the trunk, and the shell stands in front of the belly, about 4 cm from it in the lean of
-   * the play. With the head 0.21 m to the right, the elbow pointed in to keep the shaft out of the
-   * fingers, and the upper arm went 4.7 cm into the body. The middle stands 0.45 m high, so that
-   * the top hoop stays below the snout of the leaning badger: at 0.48 m with the larger drum of 36
-   * inches, the snout touched the top hoop. A drum 4 cm further forward or 5 cm lower put the
-   * beater 3.0 cm or 2.0 cm from its strike targets, because the short arm reaches no further.
+   * from the trunk, and the shell stands in front of the belly. With the head 0.23 m to the right,
+   * the left forearm of the Tripo badger went 1.6 cm into the belly, and with 0.26 m, 2.7 cm. The
+   * middle stands 0.45 m high, so that the top hoop stays below the snout of the leaning badger:
+   * at 0.48 m with the larger drum of 36 inches, the snout touched the top hoop. A drum 4 cm
+   * further forward put the beater 4.5 cm from its strike targets, because the arm reaches no
+   * further (`pnpm hold-fit bass-drummer`).
    */
-  center: [0.1347, 0.45, -0.49],
+  center: [0.0847, 0.45, -0.49],
   /**
    * The radius of the heads: a concert bass drum of 32 by 16 inches at the {@link BADGER_SCALE},
    * the smallest of the real concert bass drums (32 to 40 inches wide).

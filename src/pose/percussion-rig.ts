@@ -484,17 +484,18 @@ export const PERCUSSION_HOLDS = {
   // so that the shaft leaves the fist at the side of the thumb (strikeRoll). The upper arm hangs
   // near the side, with the elbow down and back: with the elbow out, the forearm comes within 26°
   // of the shaft, and the shaft leaves the fist along the claws. The rebuilt round arm is free of
-  // the trunk, and with the elbow a little in, it went 3.4 cm into the belly. The spine leans 7°
-  // over the drum, so that the elbow can bend: with no lean, the wrist reaches 0.97 of the arm, and
-  // the paw grasps the shaft in 10% of the play. With 9°, the elbow skin stretches 0.13 of the
-  // upper arm from the rest. The paw holds the beater at the drum and the spine keeps its lean also
-  // at rest (ready). The left arm hangs while the badger plays, because a single note often needs
-  // no muffling. In a rest after a note, the left palm lies on the near part of the far head
-  // (damp), and the upper body turns 20° so that the left shoulder comes forward: with no turn,
-  // the left upper arm went 4.8 cm into the body, and the drum moved or turned to the left put an
-  // upper arm 3.3 cm to 4.3 cm into the body or the beater off its spot. The paw turns 37° from
-  // flat toward the forearm, so that it bends 2° on the forearm at p95 (47° flat), and stands
-  // 7 cm out so that the claws stay at the head.
+  // the trunk, and with the elbow a little in, it went 3.4 cm into the belly. The spine leans 13°
+  // over the drum, and the home stands 0.5 H out, so that the beater of the Tripo badger reaches
+  // each strike spot: with 7° and 0.56 H, it missed by up to 2.7 cm, and with 13° and 0.62 H, by up
+  // to 2.2 cm. The paw holds the beater at the drum and the spine keeps its lean also at rest
+  // (ready). The left arm hangs while the badger plays, because a single note often needs no
+  // muffling. In a rest after a note, the left palm lies on the near part of the far head (damp),
+  // and the upper body turns 26° so that the left shoulder comes forward: with 20°, the left
+  // forearm of the Tripo badger went 2.2 cm into the belly at the drum place of now plus 2 cm to
+  // the right. With no turn, the left upper arm of the old badger went 4.8 cm into the body, and
+  // the drum moved or turned to the left put an upper arm 3.3 cm to 4.3 cm into the body or the
+  // beater off its spot. The paw turns 37° from flat toward the forearm, so that it bends 2° on the
+  // forearm at p95 (47° flat), and stands 7 cm out so that the claws stay at the head.
   'bass-drum': {
     hands: 'right',
     sizes: { lift: 0.13, rest: 0.05 },
@@ -505,7 +506,7 @@ export const PERCUSSION_HOLDS = {
     poleL: POLE_L,
     poleR: [0, -0.5, 0.4],
     rim: 0,
-    home: [0.56, -0.389, -0.146],
+    home: [0.5, -0.389, -0.146],
     top: 'up',
     across: null,
     pitchR: 1,
@@ -515,7 +516,7 @@ export const PERCUSSION_HOLDS = {
     gap: 0,
     pass: 0,
     reach: Infinity,
-    lean: 0.12,
+    lean: 0.22,
     side: null,
     fit: null,
     damp: {
@@ -525,7 +526,7 @@ export const PERCUSSION_HOLDS = {
       wrist: [0.287283, 0, 1.026011],
       fingers: 0.5,
       yaw: 0.65,
-      turn: 0.35,
+      turn: 0.45,
     },
     curl: GRIP_CURL,
     strikeRoll: true,
