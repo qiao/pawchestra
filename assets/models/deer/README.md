@@ -29,7 +29,7 @@ these files and the sections of this file about them.
 made by one build script in a headless Blender 5.2, by the route of the Tripo wolf
 (`../wolf/README.md`, "Tripo hand rig"). The body keeps the form, the colors, and the eye paint of
 the source. Two point edits change the form: the eyeballs and their sockets are smaller ("Eyes"),
-and the upper arms and the forearms are 1.3 times longer ("Arm stretch"). No point edit changes the
+and the upper arms and the forearms are 1.5 times longer ("Arm stretch"). No point edit changes the
 head, the ears, the trunk, the hooves, the legs, or the tail. The arms have no cut and no split from
 the trunk. The `ANIMALS` entry of the deer points to `tripo-hand/deer.rig.glb`. The files of the old
 deer above do not change.
@@ -82,8 +82,8 @@ joints of the source.
 
 | Item | Value |
 |---|---|
-| Size | 393,380 bytes |
-| SHA-256 | `87b70b41c63deac26cce08dcda59165508d652e4c0b39014199f3322b015926f` |
+| Size | 394,165 bytes |
+| SHA-256 | `a90befb9f3fa9247e55881f099fedb3b26afec84ab573bf4320cb17f288c4504` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fawn faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `deer`: 3,746 vertices and 3,923 faces (3,425 quads and 498 triangles, 7,348 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 48 faces of the nose take the slot `fur` and the color map ("Nose"). The 225 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/deer/tripo-hand/deer-color.webp`) |
 | Armature | `deer_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -115,8 +115,8 @@ left side):
   config=<deer-tripo.json>)`. The 48 gloss faces are the dark nose in the nose box of the config.
 - **Eyes.** The faces of the two eyeballs (the loose parts of 30 to 199 vertices in the eye box)
   take the face attribute `eye`, and keep the color map.
-- **Armature.** The joints of the config: the shoulder at x 0.095, the elbow at x 0.1984, the
-  wrist at x 0.2954, where the pastern widens, the knuckles at x 0.3617, where the two toes part
+- **Armature.** The joints of the config: the shoulder at x 0.095, the elbow at x 0.214, the
+  wrist at x 0.3256, where the pastern widens, the knuckles at x 0.3924, where the two toes part
   (x 0.175, 0.25, and 0.315 in the source, moved by the arm stretch), the hip
   at (0.055, 0.33, -0.03), the knee at (0.054, 0.245, -0.052), and the ankle at (0.064, 0.055,
   -0.045). The palm is the true palm of the source, the mean normal of the hoof faces that face
@@ -151,12 +151,12 @@ The weights, in the rest pose:
    smoothstep(0, 0.02) of the length of the shortest edge path from the root of the tail.
 
 **Arm stretch.** The point edit `armStretch` (`redits.py` of the session, from the Tripo hippo,
-`../hippo/README.md`; params `{"kind": "armStretch", "k": 1.3, "ramp": 0.01, "reach": [0.05,
+`../hippo/README.md`; params `{"kind": "armStretch", "k": 1.5, "ramp": 0.01, "reach": [0.05,
 0.07]}`), after the hoof turn. Each vertex of a side with |x| over the shoulder joint moves along
 the line u of the rest arm, from the shoulder joint to the wrist joint (0.155 units), from its
-place t on the line to t + 0.3 G(t). G is the integral of a band from 0 to t: a smoothstep from 0
+place t on the line to t + 0.5 G(t). G is the integral of a band from 0 to t: a smoothstep from 0
 at t -0.01 to 1 at 0.01, 1 to the wrist, and a smoothstep to 0 from 0.01 before the wrist to 0.01
-after it. Thus the upper arm and the forearm grow by 1.3, and the hoof moves out by 0.047 units
+after it. Thus the upper arm and the forearm grow by 1.5, and the hoof moves out by 0.078 units
 as one piece, with its size. The move fades from 1 at 0.05 units from the line to 0 at 0.07
 units, so that the chest stays. With the harp scale 0.8 and vertical shins, 87 % of the palm
 targets of the harp lay within 5 mm with 1.1, 92 % with 1.15, and 96 % with 1.2. The longer arms
@@ -165,7 +165,12 @@ chest. At that place, with the hold of 2026-11-13 (`scratch/deerclip/depth.ts`, 
 in each closed harp part, every 0.1 s of `boulanger-matin`): with 1.2, 98.2 % of the targets lay
 within 5 mm (worst 8.9 mm), and the right upper arm went more than 1.0 cm into the neck of the
 harp in 2.1 % of the play. With 1.3, 100 % lay within 5 mm, and the upper arm went into the neck
-in 0.2 %.
+in 0.2 %. The harp of 0.975 stands in front of the chest ("Harp fit"), further from the left
+shoulder: with the hold of that harp, the paws missed their targets by up to 2.3 cm (94 % within
+5 mm) with 1.4, by up to 4.8 cm (76 %) with 1.3, and with 1.5 each target lies within 5 mm. The
+arms of 1.5 are 0.69 of the trunk from the hips to the neck (upper arm 21.5 cm, forearm 20.2 cm),
+against 0.54 for the Tripo wolf, 0.60 for the cat, and 0.52 to 0.65 for the other hand bodies
+(`scratch/da/armlen.ts` of the round 2026-11-13).
 
 **Smooth surface.** No relax and no region colors. The crease angle 180 gives each corner the mean
 normal of the faces at its vertex, as the smooth shading of an FBX viewer.
@@ -229,7 +234,10 @@ the demos against main (`boulanger-matin`, the only demo with the harp, 42 playe
 | 30 degrees | 0.283 m | 0 |
 | 35 degrees | 0.271 m | 0 |
 
-The place of the harp moves no player. At the scale 1.3, the larger body and harp move one
+The harp of 0.975 in front of the chest has a larger footprint, and it moves players of
+`boulanger-matin` (`scratch/da/layout.ts` of the round 2026-11-13): the deer 0.46 m, the fox
+violinist of seat 7 0.54 m, the contrabass 0.72 m, the small percussion 0.72 m, and the flutes,
+the oboes, the clarinet, the horns, and the cymbals 0.1 to 0.2 m. At the scale 1.3, the larger body and harp move one
 player of `boulanger-matin`: the pig hornist, 0.43 m (`scratch/deersize/layout.ts`). The
 short tail hangs behind the back edge of the seat: no tail corner lies in the stool in the play
 (`pnpm pose-depth harpist --where tail1`).
@@ -254,12 +262,14 @@ forward right rest elbow (`restR.pole`) rolls the right upper arm 58 to 59 degre
 the arms of 1.2 and of 1.3 times the source. The left forearm spreads 59 degrees from the chord
 to the rest, so no hoof step of 32.7 degrees centers it better.
 
-**Harp fit.** The harp is 0.85 of the concert harp of the app (`harpScale`, 1.11 m high). Its
-base stands 0.19 m in front of the floor point at the scale 1 and 0.22 H to the right of it,
-turned 48 degrees (`HARP_PLACE`), and the top of its soundbox and the end of its neck are slim
-(`SOUNDBOX`, `NECK` of `src/models/instruments/harp.ts`). The top of the soundbox stands at the
-right side of the chest, below the right shoulder, and the right arm hangs outside it. The last
-table of this section gives the fit of 2026-11-13. The other measures come from the harp 0.75 of
+**Harp fit.** The harp is 0.975 of the concert harp of the app (`harpScale`, 1.27 m high). Its
+base stands 0.23 m in front of the floor point at the scale 1 and 0.25 H to the left of it,
+turned 46 degrees (`HARP_PLACE`), and the top of its soundbox and the end of its neck are slim
+(`SOUNDBOX`, `NECK` of `src/models/instruments/harp.ts`). The top of the soundbox rests against
+the chest, in front of and below the right shoulder, and the right arm passes outside it with the
+elbow up. The last table of this section gives the fit of the harp of 0.975 (round
+2026-11-13, `reports/2026-11-13-deer-arms/`). The table before it gives the fit of the harp of
+0.85 at the right of the chest. The other measures come from the harp 0.75 of
 the fit at 1/1.3 of the size ("Size") and from the harp 0.975. The left hand plays up to D4
 (`reach.leftHighest` 62 of the harp hold), and the spine stays erect (`lean` 0). Against the old
 deer and the first fawn (H of the old deer, no arm stretch, harp scale 1.3), from
@@ -314,6 +324,27 @@ when the arm is straight.
 | Paw swing p95, left and right (limit 70) | 66, 27 | 67, 27 |
 | Right grip turn p50 (limit 45) | 11 | 40 |
 
+The fit of the harp of 0.975 in front of the chest, with the arms of 1.5 (`scratch/dh/evalc.ts`
+of the round 2026-11-13, every 0.5 s of `boulanger-matin` with the lift, the rest, and the
+lowering; `pnpm body-clip harpist`; `pnpm arm-check harpist --base 19f45196b`). At the place of
+the harp of 0.85, from the scale 0.875, the right upper arm went through the plane of the
+strings, inside their frame, in 90 % of the samples.
+
+| Measure | Harp 0.85, arms 1.3 | Harp 0.975, arms 1.5 |
+| --- | --- | --- |
+| Right elbow angle, p5 of the play | 99 degrees | 96 degrees |
+| Left elbow angle, p5 of the play | 76 degrees | 79 degrees |
+| Right upper arm out from the trunk, p50 | 33 degrees | 18 degrees |
+| Fingers through the strings, left and right | 1.9, 1.7 cm | 0, 0 cm |
+| Arm surface through the frame of the strings | 1.5 cm | 0 cm |
+| Palm targets within 5 mm | 100 % (2.4 mm) | 100 % (4.1 mm) |
+| Clips of `pnpm body-clip harpist` (limit 1.3 cm) | 0 | 4: right hoof in the base 2.6 cm (0.5 %), chest in the neck 1.5 cm (2.1 %), chest in the soundbox 1.3 cm (0.7 %), right upper arm in the neck 1.3 cm (0.0 %) |
+| Folds p95, left and right (limit 8) | 4, 0 | 4, 1 |
+| Twist p95, left and right (limit 55) | 7, 26 | 20, 36 |
+| Paw swing p95, left and right (limit 70) | 67, 27 | 54, 36 |
+| Right paw twist p95 at rest (limit 170) | 26 | 82 |
+| Right grip turn p50 (limit 45) | 40 | 20 |
+
 **Color map** (`tools/deer-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and writes
 WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color.
 
@@ -322,7 +353,7 @@ wolf: each x, y tilt limited to 0.2 (3.59 % of the texels), a box scale to 1024 
 times 4 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
 
 **Differences from the source.** The eyeballs and their sockets are at 0.8 of the source, and the
-upper arms and the forearms are 1.3 times longer. The app
+upper arms and the forearms are 1.5 times longer. The app
 light is warm and comes from above, so the brown coat reads lighter and more orange than in the
 even gray light of an FBX viewer, and the long neck shades darker under the chin. The seated bind
 and the hold bend the arms and the legs.
@@ -331,7 +362,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/deer.rig.glb` | 1,245,312 bytes | `383a07faaa39a382da9d7ae21b374258d5c00837a3a7e0a1fe0cdd4804b93614` |
-| `tripo-hand/deer.rig.json` | 19,351 bytes | `e650b8a9e13588b3bc581239299484c0e03964d0a9567bfbb35ee309e1c863d1` |
+| `tripo-hand/deer.rig.glb` | 1,245,332 bytes | `490abdd58d6ccf3281f107870b3b294ac211c1bede1a5102a25e3dd4140dbd3d` |
+| `tripo-hand/deer.rig.json` | 19,344 bytes | `4b3de397707a41e60550bb40ccb7cd37ad9463249fc48cea1e67587f8efd3594` |
 | `tripo-hand/deer-color.webp` | 133,838 bytes, 2048 × 2048 | `9f40f146e7a1f5ea11a8139d90682db82a8ace321451b96b30200236b9cb6876` |
 | `tripo-hand/deer-normal.webp` | 75,080 bytes, 1024 × 1024 | `3607beb00dcf3ec1e5d061d975efd4a221ef12dc63c378ab6e7058439928e538` |
