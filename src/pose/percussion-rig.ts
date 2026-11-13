@@ -627,7 +627,9 @@ export const PERCUSSION_HOLDS = {
     gap: 0,
     pass: 0,
     reach: Infinity,
-    lean: 0,
+    // The spine leans 6°, so that the beater reaches the lower triangle: with no lean, it missed
+    // the strike spots by up to 2.1 cm.
+    lean: 0.1,
     side: null,
     fit: null,
     damp: null,
@@ -816,12 +818,13 @@ export const PERCUSSION_PLACES = {
    */
   crash: [0, -0.09, -1.1],
   /**
-   * The clip of the triangle at the tip of the left thumb, from the left shoulder joint: below the
-   * mouth of the badger, as near to the eye level of a real player as its short arm reaches. The
-   * wrist keeps its place of a clip in the palm, so that the arm gate keeps its values: a clip
-   * 2 cm higher twisted the arm 5° more in a lift (main 22°, margin 3°).
+   * The clip of the triangle at the tip of the left thumb, from the left shoulder joint: a little
+   * above the shoulder and out to the left, below the long snout of the Tripo badger. The claws of
+   * the left paw then go 3.9 cm into the head in the play, and 5.3 cm with the clip at
+   * [0.36, 0.46, -0.87]. A real player holds the triangle near the eye level, but a higher clip
+   * puts the claws further into the snout.
    */
-  triangleClip: [0.36, 0.46, -0.87],
+  triangleClip: [0.4, 0.1, -0.8],
   /**
    * The world rotation of the left hand that holds the triangle, from the bind pose: the thumb
    * points down, so that the clip hangs from its tip, between the thumb and the curled fingers
