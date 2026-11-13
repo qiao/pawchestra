@@ -1027,6 +1027,14 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   (`sit.carryTail`). The ring drops by different amounts, so the haunch near the ball also moves
   with the ball, with a share that falls to 0 over a band (`sit.tailSpread`). The change of the
   drop then spreads over several faces, and the ball keeps its round form.
+- A hand chain has no sit step of the rig config. The seat top is the lowest body point over the
+  seat, often the thigh underside, so a round haunch hangs over the seat with a gap. The key
+  `bind_sit` of the cat and the pig chains (`sit_move()` of `tools/blender/bind_edit.py`, `sit` of
+  `params.json`) moves the haunch underside behind the hip joints down onto the plane of the thigh
+  underside. The seat height does not change. Each slice across the seat moves as one (`across`),
+  so the cross section of the haunch keeps its round form. Reason: a drop of each point to its
+  own lowest neighbor made the haunch a box with steep sides, and on a coarse mesh its edge showed
+  as teeth.
 - The polar bear is the largest player, as a real polar bear is larger than the other animals of
   the cast. The piano grows only a little with it (`PIANO_SCALE`), because a larger piano hides
   the players behind it. It stands on longer legs (`PIANO_LIFT`) with its lid on the short prop
@@ -1059,7 +1067,8 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   its seat is higher than with flat feet, and the front edge of the seat is nearer to the knees,
   so that more of each thigh lies on the seat. Reason: with flat feet, the seat was low, and only
   the haunch sat on it. A higher seat moved players in the sight pass of the layout (4.5), so the
-  seat takes the largest height with no move.
+  seat takes the largest height with no move. Its round back reaches further back than the
+  haunch and sets the chair depth, so the haunch sits on the front half of the seat.
 - The Tripo panda keeps the short, thick legs of its mesh, and its bind keeps the leg turns of the
   panda of the old mesh: the thighs slope down and the shins stand vertical, with flat feet. So
   its chair is low, and the front edge of the seat lies about one shin radius behind the knees,
