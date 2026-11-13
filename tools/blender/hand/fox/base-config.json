@@ -1,5 +1,5 @@
 {
-  "source": "assets/models/fox/tripo-p2/fox-paws.fbx",
+  "source": "assets/models/fox/tripo-p2/fox.fbx",
   "sourceNote": "The Tripo P2 fox mesh with its quads (assets/models/fox/README.md). The hand rig assets/models/fox/tripo-hand/fox.blend starts from it in a live Blender with the calls of tools/blender/studio_armature.py (design 4.4, \"Hand rig\").",
   "name": "Fox",
   "weld": 1e-05,

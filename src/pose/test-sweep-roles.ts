@@ -89,8 +89,8 @@ const BODY_LOOPS = 2;
  * - The dog: 7 open loops, the cuts to the two upper arms and 5 open loops of the Tripo beagle.
  * - The elephant: 4 open loops, the cuts to the two upper arms and the edges of the 2 lids. The
  *   Tripo elephant has no open edge.
- * - The fox: 8 open loops, the cuts to the two upper arms, the 2 small slits of the feet of the
- *   Tripo fox, the open backs of the 2 eyeballs, and the edges of the 2 lids.
+ * - The fox: 7 open loops, the cuts to the two upper arms, the open rims of the 2 eye domes of the
+ *   Tripo fox, a slit of 3 edges at its crotch, and the edges of the 2 lids.
  * - The hippo: 10 open loops, the cuts to the two upper arms, the rims of the 2 eyeballs, the 2
  *   holes of the head under them, the 2 teeth, and the edges of the 2 lids.
  * - The monkey: 6 open loops, the cuts to the two upper arms and 4 open loops of the Tripo monkey.
@@ -120,7 +120,7 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/deer/tripo-hand/deer.rig.glb', 6],
   ['assets/models/dog/tripo-hand/dog.rig.glb', 7],
   ['assets/models/elephant/tripo-hand/elephant.rig.glb', 4],
-  ['assets/models/fox/tripo-hand/fox.rig.glb', 8],
+  ['assets/models/fox/tripo-hand/fox.rig.glb', 7],
   ['assets/models/hippo/tripo-hand/hippo.rig.glb', 10],
   ['assets/models/monkey/tripo-hand/monkey.rig.glb', 6],
   ['assets/models/mouse/tripo-hand/mouse.rig.glb', 22],

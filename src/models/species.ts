@@ -263,9 +263,9 @@ export const SPECIES = {
   },
   /**
    * Red-orange fox with a white face, the second violins (reference image). It has the studio body
-   * of the hand rig of the Tripo P2 fox (`assets/models/fox/tripo-hand/fox.blend`, design 4.4),
-   * seated with its long thighs on the seat and its tail back through the chair, and standing as a
-   * soloist. Its color map keeps the hue of the source (`assets/models/fox/README.md`, "Color
+   * of the hand rig of the Tripo P2 fox (`assets/models/fox/tripo-hand/fox.blend`, design 4.4), at
+   * the eye height of the fox before, seated with its thighs on the seat and its tail back through
+   * the chair, and standing as a soloist. Its color map keeps the hue of the source (`assets/models/fox/README.md`, "Color
    * map"). Its head height is the head of the studio body, and its chair fits its legs: the seat
    * height is the seat of the studio body, in H. Its violin is almost the violin of the app.
    *

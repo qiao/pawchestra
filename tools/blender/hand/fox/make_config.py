@@ -1,7 +1,7 @@
-"""Writes tools/mesh-rigs/simple/fox-tripo.json from the measured joints of the new Tripo fox
-and the parameters of tools/blender/hand/fox/params.json. The joints are measured on the source mesh, then
-mapped through the paw turns and the point edits of the params (redits.py), so that the config
-holds the joints of the edited mesh.
+"""Writes tools/mesh-rigs/simple/fox-tripo.json from the measured joints of the Tripo fox and
+the parameters of tools/blender/hand/fox/params.json. The joints are measured on the source mesh,
+then mapped through the paw turns and the point edits of the params (redits.py), so that the
+config holds the joints of the edited mesh.
 
     uv run --no-project --with numpy python -I tools/blender/hand/fox/make_config.py
 """
@@ -24,25 +24,34 @@ P = json.load(open(os.path.join(HERE, 'params.json')))
 #: soles at y 0, +z forward, +x the left side), measured on sections of the mesh and its loops.
 SOURCE = {
     'root': ([0, 0, 0], [0, 0, 0.1]),
-    'hips': ([0, 0.31, 0.06], 'spine'),
-    'spine': ([0, 0.39, 0.07], 'spine1'),
-    'spine1': ([0, 0.47, 0.08], 'chest'),
-    'chest': ([0, 0.55, 0.08], 'neck'),
-    'neck': ([0, 0.655, 0.065], 'head'),
-    'head': ([0, 0.69, 0.07], [0, 0.90, 0.07]),
-    'ear_L': ([0.075, 0.88, 0.045], [0.105, 1.0, 0.045]),
-    'clavicle_L': ([0.015, 0.603, 0.07], 'upper_arm_L'),
-    'upper_arm_L': ([0.085, 0.600, 0.069], 'forearm_L'),
-    'forearm_L': ([0.185, 0.597, 0.067], 'forearm_twist_L'),
-    'forearm_twist_L': ([0.233, 0.596, 0.067], 'hand_L'),
-    'hand_L': ([0.281, 0.5906, 0.068], 'fingers_L'),
-    'fingers_L': ([0.316, 0.5855, 0.068], [0.341, 0.580, 0.068]),
-    'thigh_L': P.get('hipJoint', ([0.06, 0.29, 0.06], 'shin_L')),
-    'shin_L': ([0.055, 0.165, 0.042], 'foot_L'),
-    'foot_L': ([0.056, 0.065, 0.040], 'toes_L'),
-    'toes_L': ([0.068, 0.022, 0.115], [0.07, 0.01, 0.16]),
-    'tail': ([0, 0.36, -0.03], 'tail_tip'),
-    'tail_tip': ([0, 0.27, -0.13], [0, 0.124, -0.177]),
+    'hips': ([0, 0.32, 0.055], 'spine'),
+    'spine': ([0, 0.40, 0.065], 'spine1'),
+    'spine1': ([0, 0.48, 0.08], 'chest'),
+    'chest': ([0, 0.56, 0.085], 'neck'),
+    'neck': ([0, 0.675, 0.06], 'head'),
+    'head': ([0, 0.715, 0.06], [0, 0.92, 0.05]),
+    'ear_L': ([0.075, 0.895, 0.05], [0.104, 1.0, 0.055]),
+    'clavicle_L': ([0.015, 0.628, 0.072], 'upper_arm_L'),
+    'upper_arm_L': ([0.09, 0.626, 0.075], 'forearm_L'),
+    'forearm_L': ([0.168, 0.6234, 0.071], 'forearm_twist_L'),
+    'forearm_twist_L': ([0.203, 0.622, 0.068], 'hand_L'),
+    'hand_L': ([0.238, 0.620, 0.066], 'fingers_L'),
+    'fingers_L': ([0.295, 0.608, 0.068], [0.333, 0.600, 0.065]),
+    'thigh_L': ([0.07, 0.30, 0.066], 'shin_L'),
+    'shin_L': ([0.078, 0.165, 0.05], 'foot_L'),
+    'foot_L': ([0.0915, 0.067, 0.054], 'toes_L'),
+    'toes_L': ([0.115, 0.02, 0.12], [0.12, 0.01, 0.165]),
+    'tail': ([0, 0.329, -0.048], 'tail_tip'),
+    'tail_tip': ([0, 0.22, -0.15], [0, 0.071, -0.228]),
+}
+#: The joints of the right side that do not mirror the left side: the legs and the right ear of
+#: the source stand apart from the mirrors of the left ones by up to 0.026 units.
+SOURCE_R = {
+    'ear_R': ([-0.095, 0.895, 0.05], [-0.13, 0.997, 0.055]),
+    'thigh_R': ([-0.06, 0.30, 0.066], 'shin_R'),
+    'shin_R': ([-0.0612, 0.165, 0.05], 'foot_R'),
+    'foot_R': ([-0.067, 0.067, 0.054], 'toes_R'),
+    'toes_R': ([-0.089, 0.02, 0.12], [-0.093, 0.01, 0.165]),
 }
 ROLLS = {
     'root': [0, 1, 0],
@@ -55,13 +64,15 @@ ROLLS = {
     'toes_L': [0, 1, 0],
     'tail': [0, 1, 0],
     'tail_tip': [0, 1, 0],
+    'foot_R': [0, 1, 0],
+    'toes_R': [0, 1, 0],
 }
 TAIL_JOINTS = {'tail', 'tail_tip'}
 
 
 def source_joints():
     out = {}
-    for name, (head, tail) in SOURCE.items():
+    for name, (head, tail) in {**SOURCE, **SOURCE_R}.items():
         out[name] = {'head': list(head), 'tail': tail}
     return out
 
@@ -78,19 +89,19 @@ def turned(head, side):
 
 def mapped_joints():
     out = {}
-    for name in list(SOURCE) + ['fingers_R']:
+    for name in list(SOURCE) + list(SOURCE_R) + ['fingers_R']:
         if name in ('fingers_L', 'fingers_R'):
             side = name[-1]
             head, tail = SOURCE['fingers_L']
             head, tail = turned(head, side), turned(tail, side)
         else:
-            head, tail = SOURCE[name]
+            head, tail = {**SOURCE, **SOURCE_R}[name]
         pts = [np.array(head, float)] + (
             [np.array(tail, float)] if not isinstance(tail, str) else []
         )
         pts = np.array(pts)
         tail_mask = np.full(len(pts), name in TAIL_JOINTS)
-        pts = ce.map_points(pts, P, tail_mask)
+        pts = ce.map_points(pts, dict(P, _joints=True), tail_mask)
         joint = {'head': [round(float(x), 6) for x in pts[0]]}
         joint['tail'] = [round(float(x), 6) for x in pts[1]] if len(pts) > 1 else tail
         if name in ROLLS or name == 'fingers_R':
@@ -106,7 +117,7 @@ def main():
         joints.pop('fingers_R')
     cfg['joints'] = joints
     cfg['sourceNote'] = (
-        'The Tripo P2 fox mesh with four-digit front paws (tripo-p2/fox-paws.fbx, '
+        'The Tripo P2 fox mesh with its quads (tripo-p2/fox.fbx, '
         'assets/models/fox/README.md). The hand rig assets/models/fox/tripo-hand/fox.blend starts from it in headless Blender with the calls '
         'of tools/blender/studio_armature.py (design 4.4, "Hand rig").'
     )
