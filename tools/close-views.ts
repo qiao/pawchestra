@@ -3162,7 +3162,10 @@ type PlayTime =
       readonly sec: number;
     }
   | {
-      /** The frame of the first solo or section shot of a subject (`--shot`). */
+      /**
+       * A frame of the first solo or section shot of a subject that a detail insert does not
+       * cover (`--shot`).
+       */
       readonly kind: 'shot';
       /** The subject. */
       readonly subject: ShotSubject;
@@ -3607,8 +3610,8 @@ function playParts(args: PlayArgs): PlayArgs[] {
  * ({@link stripTimes}, {@link stripViews}). A frame of `--time` or `--shot` also shows the exact
  * song time, except with `--pause` or `--url` ({@link freezesTime}). `--size` sets the size of the frames
  * ({@link playSize}). `--cinematic` renders the camera of the shot plan
- * of the app ({@link CINEMATIC_CAMERA}). `--shot` also gives the time: the frame of the first solo
- * or section shot of its subject ({@link chooseShot}). `--at` aims the stage camera at one player
+ * of the app ({@link CINEMATIC_CAMERA}). `--shot` also gives the time: a frame of the first solo
+ * or section shot of its subject, out of each detail insert ({@link chooseShot}). `--at` aims the stage camera at one player
  * ({@link aimCamerasOf}, {@link aimPose}). `--set` renders a variant of the holds of the working
  * tree from a build of its own ({@link startVariantSite}). More than one `--set` renders each
  * variant into its own folder ({@link playSetDir}) from that one build. More than one `--time` renders each
@@ -3919,6 +3922,13 @@ function aimCamerasOf(text: string, options: ReadonlyMap<string, readonly string
 /** The share of a shot at the frame of `--shot`: the middle, after the blend from the shot before. */
 const SHOT_FRAME_SHARE = 0.5;
 
+/**
+ * The smallest time from the frame of `--shot` to a cut, to the end of a blend, or to a detail
+ * insert, in seconds. In the time of an insert, the insert takes the frame (design 5.6), and it
+ * can show the detail of another seat.
+ */
+const SHOT_FRAME_MARGIN_SEC = 0.5;
+
 /** The shot of `--shot` in the shot plan of a demo. */
 interface ChosenShot {
   /** The shot, from `prepareShots()` with the seed of the app. */
@@ -3926,26 +3936,26 @@ interface ChosenShot {
   /** The species of the players of each seat of the shot, in the order of the seats. */
   readonly species: readonly SpeciesId[];
   /**
-   * The song time of the frame, in seconds, at {@link SHOT_FRAME_SHARE} of the shot, to 0.1 s.
-   * The first shot starts at the song start, and the last shot ends at the end of the demo.
+   * The song time of the frame, in seconds, to 0.1 s ({@link shotFrameSec}). The first shot
+   * starts at the song start, and the last shot ends at the end of the demo.
    */
   readonly frameSec: number;
 }
 
 /**
- * Finds the first solo or section shot of a subject in a shot plan: the first shot in time whose
- * seats hold the seat of the subject, or a seat of its species.
+ * Finds the solo and section shots of a subject in a shot plan: the shots whose seats hold the
+ * seat of the subject, or a seat of its species.
  *
  * @param shots The shots of the plan, sorted by their start.
  * @param players The players of the layout of the score.
  * @param subject The subject.
- * @returns The shot, or `undefined` when no solo or section shot has the subject.
+ * @returns The shots, in the order of time. Empty when no solo or section shot has the subject.
  */
-function firstShotOf(
+function shotsOf(
   shots: readonly Shot[],
   players: readonly PlayerPlace[],
   subject: ShotSubject,
-): Shot | undefined {
+): Shot[] {
   const seats = new Set(
     subject.kind === 'seat'
       ? [subject.seat]
@@ -3953,10 +3963,60 @@ function firstShotOf(
           .filter((player) => isSubjectPlayer(subject, player.cast))
           .map((player) => player.cast.seatIndex),
   );
-  return shots.find(
+  return shots.filter(
     (shot) =>
       (shot.kind === 'solo' || shot.kind === 'section') && shot.seats.some((s) => seats.has(s)),
   );
+}
+
+/**
+ * Gives the song time of the frame of a shot: the time nearest to {@link SHOT_FRAME_SHARE} of
+ * the shot at which the shot fills the frame. The time is {@link SHOT_FRAME_MARGIN_SEC} or more
+ * from each end of the shot, from the end of the blend into it, and from each detail insert.
+ *
+ * @param shot The shot.
+ * @param inserts The detail inserts of the plan.
+ * @param start The start of the shot, in seconds, at the song start or later.
+ * @param end The end of the shot, in seconds, at the end of the piece or earlier.
+ * @returns The time, to 0.1 s, or `null` when the shot has no such time.
+ */
+function shotFrameSec(
+  shot: Shot,
+  inserts: readonly Shot[],
+  start: number,
+  end: number,
+): number | null {
+  const margin = SHOT_FRAME_MARGIN_SEC;
+  let free: (readonly [number, number])[] = [
+    [Math.max(start, shot.startSec + shot.blendSec) + margin, end - margin],
+  ];
+  for (const insert of inserts) {
+    const from = insert.startSec - margin;
+    const to = insert.endSec + margin;
+    free = free.flatMap(([a, b]): (readonly [number, number])[] =>
+      to <= a || from >= b
+        ? [[a, b]]
+        : [
+            [a, Math.min(b, from)],
+            [Math.max(a, to), b],
+          ],
+    );
+  }
+  const goal = start + (end - start) * SHOT_FRAME_SHARE;
+  let best: number | null = null;
+  for (const [a, b] of free) {
+    // The first and the last time of the span in steps of 0.1 s.
+    const first = Math.ceil(a * 10) / 10;
+    const last = Math.floor(b * 10) / 10;
+    if (first > last) {
+      continue;
+    }
+    const sec = Math.min(last, Math.max(first, Math.round(goal * 10) / 10));
+    if (best === null || Math.abs(sec - goal) < Math.abs(best - goal)) {
+      best = sec;
+    }
+  }
+  return best;
 }
 
 /**
@@ -4034,15 +4094,18 @@ async function demoLayout(
 
 /**
  * Chooses the shot of `--shot` as the app plans it: the layout of the demo ({@link demoLayout}),
- * the shots of `planScene()` of `src/app/app.ts`, and the seed of the app.
+ * the shots of `planScene()` of `src/app/app.ts`, and the seed of the app. It is the first solo or
+ * section shot of the subject with a frame time ({@link shotFrameSec}), because a detail insert
+ * can fill the whole middle of a short shot.
  *
  * @param demo The demo.
  * @param subject The subject.
  * @param midi The path of the file of `--midi`, which replaces the demo, or `null`.
  * @param recast The recast of `--recast`, or `null`.
  * @returns The shot, its species, and the time of its frame.
- * @throws Error when the demo is not valid, when no solo or section shot has the subject, or when
- *   the time of the frame is not a time of a play frame ({@link frameTime}).
+ * @throws Error when the demo is not valid, when no solo or section shot has the subject, when no
+ *   such shot has a frame time, or when the time of the frame is not a time of a play frame
+ *   ({@link frameTime}).
  */
 async function chooseShot(
   demo: DemoId,
@@ -4051,20 +4114,28 @@ async function chooseShot(
   recast: Recast | null = null,
 ): Promise<ChosenShot> {
   const { score, layout, models } = await demoLayout(demo, midi, recast);
-  const { shots } = prepareShots(score, layout, SHOT_SEED, models);
+  const { shots, inserts } = prepareShots(score, layout, SHOT_SEED, models);
 
-  const shot = firstShotOf(shots, layout.players, subject);
-  if (!shot) {
-    const name = subject.kind === 'seat' ? `the seat ${subject.seat}` : subjectName(subject);
+  const candidates = shotsOf(shots, layout.players, subject);
+  const name = subject.kind === 'seat' ? `the seat ${subject.seat}` : subjectName(subject);
+  if (candidates.length === 0) {
     throw new Error(
       `The ${pieceText(demo, midi)} has no solo or section shot of ${name}. Its solo and section shots show: ${shotSubjectsText(shots, layout.players)}.`,
     );
   }
-  const start = Math.max(0, shot.startSec);
-  const end = Math.min(pieceLength(demo, midi), shot.endSec);
-  const frameSec = Math.round((start + (end - start) * SHOT_FRAME_SHARE) * 10) / 10;
-  const species = shot.seats.map((seat) => speciesOfSeat(layout.players, seat));
-  return { shot, species, frameSec: frameTime(frameSec, demo, midi) };
+  // The first shot with a time that no detail insert covers.
+  for (const shot of candidates) {
+    const start = Math.max(0, shot.startSec);
+    const end = Math.min(pieceLength(demo, midi), shot.endSec);
+    const frameSec = shotFrameSec(shot, inserts, start, end);
+    if (frameSec !== null) {
+      const species = shot.seats.map((seat) => speciesOfSeat(layout.players, seat));
+      return { shot, species, frameSec: frameTime(frameSec, demo, midi) };
+    }
+  }
+  throw new Error(
+    `The ${pieceText(demo, midi)} has no time in a solo or section shot of ${name} that is ${SHOT_FRAME_MARGIN_SEC} s or more from each cut and each detail insert.`,
+  );
 }
 
 /**
