@@ -217,6 +217,11 @@ export interface FingersDamp {
    * (`DampHand.moveSec`).
    */
   readonly speed: number;
+  /**
+   * The lift of the paw in the middle of its move to the muffle and back, in head heights `H`, so
+   * that the paw passes over the hoop at the near rim of the kettle.
+   */
+  readonly arc: number;
 }
 
 /** The damp of the free paw on the far head of the bass drum ({@link DampRule}). */
@@ -496,6 +501,7 @@ export const PERCUSSION_HOLDS = {
       lean: 0.05,
       turn: 0,
       speed: 1.2,
+      arc: 0,
     },
     // The end of the stump paw of the Tripo elephant closes a little on the shaft
     // (TIMPANI.malletSpotL and malletSpotR). The stump has no fingers: with a curl of 100° (the
@@ -1255,6 +1261,8 @@ export type DampHand =
        * (`DampWish.minInSec`), or 0 for the times of `DAMP_MOTION`.
        */
       readonly moveSec: number;
+      /** The lift of the paw in the middle of its move, in meters (`FingersDamp.arc`). */
+      readonly arc: number;
     };
 
 /**
@@ -1780,6 +1788,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
         touch: target.point[1] - damp.press * h,
         paw: pawCorners(model, arm),
         moveSec: (1.5 * grip.distanceTo(struck)) / damp.speed,
+        arc: damp.arc * h,
       };
     };
     dampHands = [spot(restL, hold.offsetL, sides[0]), spot(restR, hold.offsetR, sides[1])];
@@ -1983,6 +1992,7 @@ function pawsOnRim(
       touch: null,
       paw: new Float32Array(),
       moveSec: 0,
+      arc: 0,
     };
   };
   return [paw(arms[0]), paw(arms[1])];

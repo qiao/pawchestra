@@ -1428,6 +1428,8 @@ function poseHand(
     if (damped?.kind === 'grip' && damped.touch !== null && muffle > 0) {
       const rise = damped.touch - lowestPoint(damped.paw, wrist, turn);
       wrist.y += rise > 0 ? rise : rise * muffle;
+      // On the way to the muffle and back, the paw passes over the hoop (`FingersDamp.arc`).
+      wrist.y += damped.arc * Math.sin(Math.PI * muffle);
     }
   } else if (side.kind === 'mallet' && fingers) {
     fingerHand(rig, hand, state.small);
