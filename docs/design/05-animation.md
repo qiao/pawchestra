@@ -1222,7 +1222,8 @@ the same piece gives the same film. `pnpm shot-trace` prints the choice at each 
 ```
 
 ```typescript
-type ShotKind = 'wide' | 'high' | 'conductor' | 'side' | 'section' | 'solo';
+type ShotKind = 'wide' | 'high' | 'conductor' | 'side' | 'section' | 'solo' | 'insert';
+type InsertDetail = 'keys' | 'bow' | 'fingers' | 'harp' | 'slide' | 'bell' | 'sticks' | 'bars' | 'baton';
 
 interface ShotKey {
   azimuth: number;   // radians around y, from +z (the audience) to +x
@@ -1244,6 +1245,16 @@ interface Shot {
   from: ShotKey;
   to: ShotKey;
   blendSec: number;    // 0 is a hard cut
+  hero: number | null; // the player whose nearer eye takes the focus, or CONDUCTOR_OWNER
+  detail?: InsertDetail; // only an insert
+}
+
+interface ShotPlan {
+  stageSide: number;
+  shots: readonly Shot[];   // the main shots, which touch
+  starts: Float64Array;
+  inserts: readonly Shot[]; // the detail inserts, each inside one main shot
+  insertStarts: Float64Array;
 }
 ```
 
@@ -1280,10 +1291,27 @@ it stays out of the beam fade of Free mode (4.5) and keeps the full beam.
   the same camera, a pause holds it, and a blend has no jump. The position does not move, so the
   distance floor to each animal holds. A wide or a high shot stands on a crane and drifts less.
   With reduced motion, the view does not drift (2.5).
-- **Focus pull** (`FOCUS_PULL`, `CameraPose.focusPull`). After a hard cut into a close shot, the
-  focus starts a little behind the subject and pulls onto it in under a second, as a focus puller
-  finds the subject after a cut. The blur in front of the focus has a limit (4.5), so the subject
-  is only a little soft. With reduced motion, the focus stays on the subject.
+- **Focus on the eye** (`subjectHero()`, `heroFocusDepth()`, `EYE_FOCUS`). A focus puller keeps
+  the eyes of a close face sharp, the eye nearer to the camera in a shallow focus
+  (`camera-technique.md`). Each shot names its hero, and the scene focuses on the nearer eye of
+  the posed head of the hero (4.5). The hero of a solo is its player. The hero of a section or a
+  side view is the principal player of the seat with the lead in the frame, else of the most active
+  seat. The view over the shoulder of the conductor faces the players, so its hero is the lead
+  player in its sphere. The close view of the conductor from behind names the conductor, and
+  its eyes face away, so the focus takes the middle of its head. A wide shot names the lead
+  player, and its closed aperture keeps the stage sharp. A blend moves the focus from the eye of
+  the old hero to the eye of the new hero.
+- **The eye of a body.** The scene reads the posed eye bones `eye_L` and `eye_R` of the body: the
+  middle of a bead eye, or of the sphere of an eye of the mesh (4.4). Thus each body, also a new
+  one, gives its own eye places, with no constant of a species. An eye counts when it is in the
+  frame and the front of the head, from the middle of the head to the middle of the eyes, turns
+  toward the camera. Else the focus takes the middle of the head, and a hero out of the frame
+  keeps the focus on the point that the camera looks at. The pose cull (9.7) poses each hero of
+  a frame. The focus is the view depth of the eye, because the blur of 4.5 reads the view depth.
+- **Focus pull** (`FOCUS_PULL`, `CameraPose.focusPull`). After a hard cut into a close shot or an
+  insert, the focus starts a little behind the eye and pulls onto it in under a second, as a
+  focus puller finds the subject after a cut. The blur in front of the focus has a limit (4.5), so
+  the subject is only a little soft. With reduced motion, the focus stays on the eye.
 
 **The frame of a close shot.** A 21:9 frame that fits the height of one player shows about 2.3
 times its width. Thus a close shot fits the width of its subject with the shot size of its kind
@@ -1422,6 +1450,46 @@ const SHOT_BEAM_OPACITY = {
   solo: CLOSE_BEAM_OPACITY,
 } as const satisfies Record<ShotKind, number>;
 ```
+
+**Detail inserts** (`planInserts()` of `shots/inserts.ts`, `INSERT_RULES`, `INSERT_LENS`,
+`INSERT_SIZES`). A concert film cuts away from its main shot to a short insert of a detail of the
+playing and back (`camera-technique.md`, section 6). The plan makes the inserts after the main
+shots, so they do not change the main shots. The main shot moves on under an insert, as the
+camera of a live film keeps its shot while the director cuts to another camera. Thus the cut back
+shows the main shot at its time, with no focus pull.
+
+- **Details.** The paws on the keys, the bow on the strings, the left paw of a violin or a viola,
+  the paws of a woodwind, the harp strings, the slide of a trombone, the bell of the other brass,
+  the heads of the drums under the sticks, the bars, and the baton. The point comes from the play
+  targets and the grips of the instrument (4.6) in the bind pose. The keys and the bars take the
+  place of the mean key of the notes of the insert. A cello or a double bass shows only its bow,
+  because its left paw travels along the long neck, away from its grip.
+- **Where.** An insert starts on a downbeat or a middle beat inside one main shot, after its cut,
+  its blend, and its focus pull, and it ends on a beat before the end of the main shot. The first
+  and the last shot get none, because the film first sets the place. No seat enters from
+  `entryGuardSec` before the insert to its end, because the film shows each player who enters.
+  The window of the insert keeps the lead of the window before it, or both windows are a tutti:
+  a phrase of the current lead, a held chord, or a long tutti goes on.
+- **Length and rate.** An insert lasts `lengthSec`, as a quick cutaway. At most one comes in each
+  seeded `gapSec` and one in each main shot, so the film does not change its angles too fast.
+- **A detail that moves.** A held detail, such as the bow, has notes over `coverage` of the
+  insert. A struck detail, such as the sticks, has `strokes` notes. The baton shows in a tutti.
+  A detail of the lead wins, then the most activity, with a seeded jitter. An insert does not
+  show the detail or the player of the insert before it, and a detail of the two inserts before
+  it loses `repeatLoss`.
+- **Camera.** A long lens (`INSERT_LENS.fov`), as a remote camera on a railing, with a slow
+  push-in. The camera stands at a seeded offset from the front of the player, low over the
+  detail. The keys take the side view of a piano shot. Its tests are those of a close shot: the
+  line, one side of the beam, a clear line of sight, no head or large object in the foreground.
+- **Floor.** An insert keeps `INSERT_FLOOR` from each point of a body in its frame, lower than
+  `ANIMAL_FLOOR`, because its frame holds the paws and the instrument. Each head in its frame
+  still keeps `ANIMAL_FLOOR`, because the faces show the facets and the seams from near.
+- **Focus.** The focus stays on the detail. When the nearer eye of the player is in the frame,
+  the eye rule applies.
+- **Grammar.** Each cut into and out of an insert changes the size of the frame by
+  `FILM_GRAMMAR.jumpSize`, or it turns the view by `jumpAngle`. An insert only pushes in, which
+  is neutral on the axis of the arc, so the arc of the main shot does not reverse at its cuts.
+  `pnpm shot-trace --rules` reads only the main shots.
 
 During play, `cameraAt()` uses `t = max(songTime, transport.startSec)`, so the count-in holds the
 camera of the start point.

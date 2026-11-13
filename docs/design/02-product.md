@@ -150,8 +150,9 @@ page starts in Free mode (`app/camera-mode.ts`).
   stops outside the box of the stage and the players.
 - "Watch as a film" on the first screen (2.8) and `film=1` in the hash (2.2) change to Cinematic
   mode at the next play. A change of the mode by the user before the play cancels it.
-- **Cinematic** takes each frame from `cameraAt()`: the shots of 5.6. The first shot starts from
-  the default view, so a click on play makes no cut. A drag, a pinch, or a wheel changes to Free
+- **Cinematic** takes each frame from `cameraAt()`: the shots of 5.6, with short cutaways to
+  details of the playing, and the focus on the eye of the hero of each shot. The first shot
+  starts from the default view, so a click on play makes no cut. A drag, a pinch, or a wheel changes to Free
   at once. The change to Cinematic mode closes the drawer (2.3).
 - **Letterbox.** Cinematic mode shows the scene in the largest box of the aspect 21:9
   (`CINEMA_ASPECT`) at the middle of the viewport, as a film. Pure black bars fill the rest: at

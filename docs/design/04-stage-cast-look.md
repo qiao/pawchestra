@@ -1439,8 +1439,10 @@ beam depth ──> surface 1/2 ──> surface blur 1/2 ────────
 
 - With no float target, the scene renders with no post effects. The bloom levels follow the tier
   (2.6).
-- The depth of field is a thin lens focused on the subject of the shot (5.6). The aperture
-  closes for a far focus, so the wide views stay sharp and skip the blur. Free mode has none.
+- The depth of field is a thin lens focused on the nearer eye of the hero of the shot (5.6), at
+  the view depth of the eye, or on the detail of an insert. The aperture follows the distance to
+  the point that the camera looks at, and it closes for a far point, so the wide views stay sharp
+  and skip the blur. Free mode has none.
 - **Depth of the blur.** The blur reads a depth at half size with the hall, and the depth pass of
   the beam has no hall. A pass copies the depth of the beam pass to half size
   (`DEPTH_COPY_FRAGMENT`), and a draw of only the hall adds the hall. Thus each player and each
