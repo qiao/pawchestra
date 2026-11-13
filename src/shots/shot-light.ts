@@ -17,6 +17,8 @@ export const SHOT_LIGHT = {
   side: 0.5,
   section: 1,
   solo: 1,
+  // A detail insert is a close setup of its own.
+  insert: 1,
 } as const satisfies Record<ShotKind, number>;
 
 /**
@@ -30,6 +32,7 @@ export const SHOT_SPOT = {
   side: 0,
   section: 0,
   solo: 1,
+  insert: 0,
 } as const satisfies Record<ShotKind, number>;
 
 /**

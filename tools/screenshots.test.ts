@@ -180,7 +180,13 @@ function planOf(list: readonly [ShotKind, number][]): ShotPlan {
       hero: null,
     };
   });
-  return { stageSide: 10, shots, starts: Float64Array.from(shots, (s) => s.startSec) };
+  return {
+    stageSide: 10,
+    shots,
+    starts: Float64Array.from(shots, (s) => s.startSec),
+    inserts: [],
+    insertStarts: new Float64Array(0),
+  };
 }
 
 describe('shotSeeks and cameraShots (design 5.6, 9.8)', () => {

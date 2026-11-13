@@ -27,6 +27,7 @@ export const SHADOW_FIT = {
     side: false,
     section: true,
     solo: true,
+    insert: true,
   },
 } as const satisfies { frames: number; kinds: Record<ShotKind, boolean> };
 

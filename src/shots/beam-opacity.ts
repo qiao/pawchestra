@@ -18,6 +18,7 @@ export const SHOT_BEAM_OPACITY = {
   side: CLOSE_BEAM_OPACITY,
   section: CLOSE_BEAM_OPACITY,
   solo: CLOSE_BEAM_OPACITY,
+  insert: CLOSE_BEAM_OPACITY,
 } as const satisfies Record<ShotKind, number>;
 
 /**

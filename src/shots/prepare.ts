@@ -47,6 +47,7 @@ import type { ShotSize } from './shot-size.ts';
 import { barLengthAt, beatLengthAt, entriesIn, musicIn, prepareMusic, restingIn } from './music.ts';
 import type { ScoreMusic, WindowMusic } from './music.ts';
 import { leadHero, subjectHero } from './hero.ts';
+import { planInserts } from './inserts.ts';
 import {
   SUBJECT_SIZES,
   activeMiddle,
@@ -1948,6 +1949,9 @@ function framingOf(planner: Planner, candidate: Candidate, window: WindowMusic):
         candidate.id,
       );
     }
+    case 'insert':
+      // The inserts come after the main shots (`planInserts()`), so no candidate is an insert.
+      return null;
   }
 }
 
@@ -2885,10 +2889,26 @@ function* planShotsSteps(
     trace.attempt = null;
   }
   const shots = planner.planned.map((p) => p.shot);
+  yield;
+  const inserts = planInserts(
+    {
+      music,
+      layout,
+      models,
+      clearance: planner.clearance,
+      bodies,
+      heads: subjects.heads,
+      stageSide: layout.stageSide,
+      seed,
+    },
+    shots,
+  );
   return {
     stageSide: layout.stageSide,
     shots,
     starts: Float64Array.from(shots, (s) => s.startSec),
+    inserts,
+    insertStarts: Float64Array.from(inserts, (s) => s.startSec),
   };
 }
 

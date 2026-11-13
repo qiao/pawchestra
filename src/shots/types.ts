@@ -1,13 +1,28 @@
 import type { Vec3 } from '../models/tuples.ts';
 
-/** The kinds of shot (design 5.6). */
-export type ShotKind = 'wide' | 'high' | 'conductor' | 'side' | 'section' | 'solo';
+/**
+ * The kinds of shot (design 5.6). An `insert` is a short cutaway to a detail of the playing, which
+ * the plan keeps apart from the main shots (`ShotPlan.inserts`).
+ */
+export type ShotKind = 'wide' | 'high' | 'conductor' | 'side' | 'section' | 'solo' | 'insert';
+
+/** The details that an insert shows (design 5.6). */
+export type InsertDetail =
+  | 'keys'
+  | 'bow'
+  | 'fingers'
+  | 'harp'
+  | 'slide'
+  | 'bell'
+  | 'sticks'
+  | 'bars'
+  | 'baton';
 
 /**
  * Tells if a kind of shot is a close shot, which fits the frame to its subject.
  *
  * @param kind The kind.
- * @returns True for a conductor, side, section, or solo shot.
+ * @returns True for a conductor, side, section, solo, or insert shot.
  */
 export function isCloseShot(kind: ShotKind): boolean {
   return kind !== 'wide' && kind !== 'high';
@@ -83,6 +98,8 @@ export interface Shot {
    * the point that the camera looks at.
    */
   readonly hero: number | null;
+  /** The detail of an insert. The other kinds have none. */
+  readonly detail?: InsertDetail;
 }
 
 /** The shots of one score. `prepareShots()` makes it. */
@@ -93,6 +110,14 @@ export interface ShotPlan {
   readonly shots: readonly Shot[];
   /** The `startSec` of each shot, for the search by time. */
   readonly starts: Float64Array;
+  /**
+   * The detail inserts, sorted by `startSec` (design 5.6). Each one cuts away from the main shot
+   * of its time and back to it. The main shot moves on under the insert, as the camera of a live
+   * concert film keeps its shot while the director cuts to another camera.
+   */
+  readonly inserts: readonly Shot[];
+  /** The `startSec` of each insert, for the search by time. */
+  readonly insertStarts: Float64Array;
 }
 
 /** The camera of one frame. */
@@ -137,6 +162,11 @@ export interface CameraPose {
   /** The weight of the eye of {@link CameraPose.hero} against the eye of `heroFrom`, from 0 to 1. */
   readonly heroShare?: number;
   /**
+   * True in a detail insert (design 5.6): with no eye of the hero in the frame, the focus stays
+   * on the detail, the point that the camera looks at, and not on the head of the hero.
+   */
+  readonly detail?: boolean;
+  /**
    * The sphere that the shadow map of the key light holds (design 4.5): the center and the radius,
    * in meters. It is constant in a shot (`writeShadowFit()`). A radius of 0, or a pose with no
    * value, holds the whole stage.
@@ -157,6 +187,7 @@ export interface CameraPoseBuffer {
   hero: number | null;
   heroFrom: number | null;
   heroShare: number;
+  detail: boolean;
   shadowFit: [number, number, number, number];
 }
 

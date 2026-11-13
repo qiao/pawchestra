@@ -20,6 +20,8 @@ export const CAMERA_DRIFT = {
     side: 1,
     section: 1,
     solo: 1,
+    // An insert has a narrow field of view, so the same turn moves its image more.
+    insert: 0.7,
   },
   /**
    * The periods of the two sines of the side turn and of the two sines of the up turn, in

@@ -32,6 +32,7 @@ export function createCameraPose(): CameraPoseBuffer {
     hero: null,
     heroFrom: null,
     heroShare: 1,
+    detail: false,
     shadowFit: [0, 0, 0, 0],
   };
 }
@@ -157,6 +158,63 @@ function copyPoint(from: Vec3, out: [number, number, number]): void {
 }
 
 /**
+ * Gives the factor of the focus distance of the focus pull after a hard cut into a close shot
+ * ({@link FOCUS_PULL}).
+ *
+ * @param sinceCut The song time since the cut, in seconds.
+ * @returns The factor: {@link FOCUS_PULL}.start at the cut, 1 at the end of the pull.
+ */
+function pullAt(sinceCut: number): number {
+  if (sinceCut >= FOCUS_PULL.seconds) {
+    return 1;
+  }
+  const pulled = smoothstep(Math.max(0, sinceCut) / FOCUS_PULL.seconds);
+  return FOCUS_PULL.start + (1 - FOCUS_PULL.start) * pulled;
+}
+
+/**
+ * Writes the camera of a detail insert (design 5.6): a hard cut into the insert, its slow
+ * push-in, and the focus pull onto the detail. The main shot moves on under the insert, so the
+ * cut back shows the main shot at its time, with no focus pull, as the camera of the main shot
+ * kept its focus. With `still`, the insert holds its `from` key and its focus.
+ *
+ * @param plan The plan.
+ * @param insert The insert of the time.
+ * @param time The time of the frame, in song seconds.
+ * @param view The aspect and the motion preference.
+ * @param out The camera to write.
+ * @returns `out`.
+ */
+function writeInsert(
+  plan: ShotPlan,
+  insert: Shot,
+  time: number,
+  view: CameraView,
+  out: CameraPoseBuffer,
+): CameraPose {
+  const { aspect, still } = view;
+  const span = insert.moveEndSec - insert.startSec;
+  const sinceCut = time - insert.startSec;
+  const u = still || span <= 0 ? 0 : smoothstep(sinceCut / span);
+  out.fov = writeShotCamera(plan, insert, u, aspect, out.position, out.target);
+  out.beam = SHOT_BEAM_OPACITY.insert;
+  out.light = SHOT_LIGHT.insert;
+  out.spot = SHOT_SPOT.insert;
+  out.close = true;
+  out.focusPull = still ? 1 : pullAt(sinceCut);
+  out.hero = insert.hero;
+  out.heroFrom = insert.hero;
+  out.heroShare = 1;
+  out.detail = true;
+  writeShadowFit(insert, null, out.shadowFit);
+  if (!still) {
+    writeDrift(time, CAMERA_DRIFT.shares.insert, driftTurn);
+    turnTarget(out.position, out.target, driftTurn);
+  }
+  return out;
+}
+
+/**
  * Calculates the camera of one frame from the song time (design 5.6). Pure: the same plan, song
  * time, transport, and view give the same camera, so a seek, a pause, and a speed change are
  * always correct.
@@ -185,6 +243,8 @@ function copyPoint(from: Vec3, out: [number, number, number]): void {
  *    on the eye.
  * 10. A shot from the front of players fits the shadow map of the key light to a sphere around
  *    its target (`writeShadowFit()`). A blend holds the spheres of both shots.
+ * 11. In the time of a detail insert, the insert takes the frame, with a hard cut in and out
+ *    (`writeInsert()`). The main shot of the time moves on under it.
  *
  * @param plan The plan from `prepareShots()`.
  * @param songTime The song time, in seconds.
@@ -217,8 +277,13 @@ export function cameraAt(
     out.hero = null;
     out.heroFrom = null;
     out.heroShare = 1;
+    out.detail = false;
     out.shadowFit[3] = 0;
     return out;
+  }
+  const insert = plan.inserts[lastAtOrBefore(plan.insertStarts, time)];
+  if (insert && time < insert.endSec) {
+    return writeInsert(plan, insert, time, view, out);
   }
   // The move of the first shot starts at the downbeat: its count-in holds the first camera.
   const moveStart = Math.max(current.startSec, 0);
@@ -236,14 +301,14 @@ export function cameraAt(
   out.hero = current.hero;
   out.heroFrom = current.hero;
   out.heroShare = 1;
+  out.detail = false;
   const previous = plan.shots[i - 1];
   const sinceCut = time - current.startSec;
   const share = CAMERA_DRIFT.shares[current.kind];
   if (still || !previous || current.blendSec <= 0 || sinceCut >= current.blendSec) {
     writeShadowFit(current, null, out.shadowFit);
-    if (!still && previous && current.blendSec <= 0 && out.close && sinceCut < FOCUS_PULL.seconds) {
-      const pulled = smoothstep(Math.max(0, sinceCut) / FOCUS_PULL.seconds);
-      out.focusPull = FOCUS_PULL.start + (1 - FOCUS_PULL.start) * pulled;
+    if (!still && previous && current.blendSec <= 0 && out.close) {
+      out.focusPull = pullAt(sinceCut);
     }
     if (!still) {
       writeDrift(time, share, driftTurn);
