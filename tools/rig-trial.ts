@@ -3,8 +3,9 @@
  * result in the app. The stages:
  *
  * 1. Copy the base into `scratch/trials/<animal>/<tag>.blend`. The base is the `.blend` of the
- *    animal, an earlier trial (`--base <tag>`), the `.blend` of a commit (`--base <ref>`), or a
- *    file (`--base <file.blend>`). The tool never writes the `.blend` of the animal in a trial.
+ *    animal (`assets/models/<animal>/tripo-hand/<animal>.blend`), an earlier trial
+ *    (`--base <tag>`), the `.blend` of a commit (`--base <ref>`), or a file
+ *    (`--base <file.blend>`). The tool never writes the `.blend` of the animal in a trial.
  * 2. Run the step on the copy in headless Blender (`tools/blender/rig_trial.py`, which gives the
  *    contract of a step). `-` runs no step.
  * 3. Export `<tag>.rig.glb` and `<tag>.rig.json` beside the copy (`tools/blender/export_rig.py`).
@@ -170,13 +171,23 @@ function trialDir(animal: string): string {
 }
 
 /**
+ * Gives the folder of the hand rig of an animal: `assets/models/<animal>/tripo-hand/`.
+ *
+ * @param animal The animal.
+ * @returns The path from the root.
+ */
+function rigDir(animal: string): string {
+  return join('assets', 'models', animal, 'tripo-hand');
+}
+
+/**
  * Gives the `.blend` of the hand rig of an animal.
  *
  * @param animal The animal.
  * @returns The absolute path.
  */
 function rigBlend(animal: string): string {
-  return join(ROOT, 'assets', 'models', animal, `${animal}.blend`);
+  return join(ROOT, rigDir(animal), `${animal}.blend`);
 }
 
 /**
@@ -380,7 +391,7 @@ function baseOf(args: TrialArgs): BaseFile {
       cwd: ROOT,
       encoding: 'utf8',
     }).trim();
-    const path = `assets/models/${args.animal}/${args.animal}.blend`;
+    const path = `${rigDir(args.animal)}/${args.animal}.blend`;
     const bytes = execFileSync('git', ['show', `${commit}:${path}`], {
       cwd: ROOT,
       maxBuffer: 1 << 30,
@@ -817,17 +828,17 @@ async function applyTrial(animal: string, tag: string): Promise<void> {
       stop(`The step ${record.step} changed after the trial ${record.tag}. Run the trials again.`);
     }
   }
-  const glb = join(ROOT, 'assets', 'models', animal, `${animal}.rig.glb`);
+  const glb = join(ROOT, rigDir(animal), `${animal}.rig.glb`);
   const summary = glb.replace(/\.glb$/, '.json');
   const keep = join(trialDir(animal), 'apply-backup');
   mkdirSync(keep, { recursive: true });
   const files = [blend, glb, summary].filter((file) => existsSync(file));
   for (const file of files) {
-    copyFileSync(file, join(keep, relative(join(ROOT, 'assets', 'models', animal), file)));
+    copyFileSync(file, join(keep, relative(join(ROOT, rigDir(animal)), file)));
   }
   const putBack = (why: string): never => {
     for (const file of files) {
-      copyFileSync(join(keep, relative(join(ROOT, 'assets', 'models', animal), file)), file);
+      copyFileSync(join(keep, relative(join(ROOT, rigDir(animal)), file)), file);
     }
     return stop(`${why} The .blend, the GLB file, and the summary of before are back.`);
   };
@@ -849,7 +860,7 @@ async function applyTrial(animal: string, tag: string): Promise<void> {
   }
   const exported = await blender(
     'export_rig.py',
-    [animal],
+    [animal, '--blend', blend, '--out', glb],
     join(trialDir(animal), `${tag}.apply.log`),
   );
   if (exported.code !== 0) {
