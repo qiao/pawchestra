@@ -7,8 +7,8 @@ import { clamp01, smoothstep } from './rest.ts';
  * cut-off of the last chord, the bear holds the release in the silence, lowers the arms, stands
  * still, turns on the podium to the audience, bows from the waist, and turns back to the
  * orchestra. The times are wall seconds after the stop at the song end, so the pose stays a
- * function of the transport. The end card shows from 2 s (`END_CARD` of `app/end-card.ts`), so the
- * turn and the bow show with the card and end before its countdown ends.
+ * function of the transport. The end card shows after the turn back (`END_CARD` of
+ * `app/end-card.ts`), because the card stands over the podium.
  *
  * ```text
  * wall s  0    0.4        1.4     2.0          3.4               5.3     6.0         7.4
