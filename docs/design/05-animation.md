@@ -592,9 +592,8 @@ The rest of each family:
   goes up for each lower string (`elbowPerString`), as a cellist raises the elbow for the lower
   strings (strings 1.8), and further in the high positions (`highElbow`). Reason: with the
   nearly level elbow of the shared hold, the upper arm stood out level from the shoulder, and the
-  elbow made a sharp point behind the forearm. A lower elbow bends the skin of the inner elbow of
-  the dog over into a dark wedge, and an elbow further back folds the back of the left armpit.
-  The elbow turn of the high positions keeps the forearm out of the upper bout. The shared hold
+  elbow made a sharp point behind the forearm. The left upper arm of the Tripo beagle is about
+  level in the play, and a cellist holds it lower (`TODO.md`). The elbow turn of the high positions keeps the forearm out of the upper bout. The shared hold
   keeps its nearly level elbow until a cast matrix run checks the new elbow on the recast bodies
   (`TODO.md`).
 
