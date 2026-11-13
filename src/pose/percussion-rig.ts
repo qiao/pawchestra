@@ -739,10 +739,11 @@ export const PERCUSSION_HOLDS = {
     // The elbows point down, a little out, and back. With the homes out from the shoulders, the
     // median upper arm stands 28° (left) and 32° (right) out from the side of the body in the
     // play, and at most 63° and 58°. With the right elbow at [2, -1, 0.3], the right upper arm
-    // stood up to 70° out. With the right elbow at [0.6, -1, 0.6], the right mallet missed a bar
-    // by 4.5 mm.
+    // stood up to 70° out. With the low grip (gripRise), the right elbow points a little further
+    // in and forward, so that the right paw bends less on the forearm: paw swing p95 54° (59° at
+    // [1, -1, 0.3], limit 70°). With [0.7, -1, 0.5], the right mallet missed a bar by 5.4 mm.
     poleL: [-0.5, -1, 0.6],
-    poleR: [1, -1, 0.3],
+    poleR: [0.75, -1, 0.5],
     rim: 0,
     // Each mallet points from a place 0.35 H out from its shoulder, so that the forearms stay out
     // of the leaning belly: 1.2 cm and 1.3 cm in the play and the lift (limit 1.5 cm). With the
