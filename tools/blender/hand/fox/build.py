@@ -236,12 +236,24 @@ def turn_paws(body):
             uvs = {l.vert.index: tuple(l[uv].uv) for l in face.loops}
             old.append((forward, [uvs[q.index] for q in quad]))
             bm.faces.remove(face)
-        # The paw: each arm vertex past ring A along the axis, on the side of the paw.
+        # The paw: each vertex that the edges join to ring B with no step through ring A. The band
+        # quads are gone, so this is the part past the band. A cut by the place along the axis
+        # also turned 4 of the 14 vertices of the slanted ring A (up to 0.006 units past its
+        # mean place), and these vertices made fins and slits at the wrist.
         S = np.array([rings.studio(v.co) for v in bm.verts])
         Borig = S[B].copy()
-        t_a = float(np.mean((S[A] - f) @ axis))
-        r = np.linalg.norm((S - f) - np.outer((S - f) @ axis, axis), axis=1)
-        move = (((S - f) @ axis) > t_a + 0.002) & (r < 0.08) & (sign * S[:, 0] > 0.15)
+        move = np.zeros(len(S), bool)
+        stop = set(A)
+        todo = list(B)
+        move[B] = True
+        while todo:
+            v = bm.verts[todo.pop()]
+            for e in v.link_edges:
+                o = e.other_vert(v).index
+                if not move[o] and o not in stop:
+                    move[o] = True
+                    todo.append(o)
+        assert not move[A].any() and move.sum() < 1000, int(move.sum())
         S[move] = (S[move] - f) @ R.T + f
         for i in np.nonzero(move)[0]:
             bm.verts[i].co = Vector((S[i] @ sa.TO_STUDIO).tolist())
