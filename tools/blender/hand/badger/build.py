@@ -761,6 +761,39 @@ def exact_rows(body, rig, head_ids):
     log('exact rows:', count, 'head rows', len(head_ids))
 
 
+def back_rows(body):
+    """Exact rows of the back of each armpit (params backRows): each vertex of a side with |x| from
+    x0 to x1, y from y0 to y1, and z at most zMax (studio units) moves the share of its upper arm
+    and elbow bones onto the clavicle of its side, and keeps its other shares. When the elbow goes
+    back, the bone heat arm shares of these trunk vertices pulled the back of the armpit into a
+    fold, and the fold showed as a dark slit behind the upper arm."""
+    rule = P.get('backRows')
+    if not rule:
+        return
+    me = body.data
+    S = studio_points(me)
+    x0, x1 = rule['x']
+    y0, y1 = rule['y']
+    names = {g.index: g.name for g in body.vertex_groups}
+    count = 0
+    for i, p in enumerate(S):
+        if not (x0 <= abs(p[0]) <= x1 and y0 <= p[1] <= y1 and p[2] <= rule['zMax']):
+            continue
+        side = 'L' if p[0] > 0 else 'R'
+        row = {}
+        moved = 0.0
+        for g in me.vertices[i].groups:
+            name = names[g.group]
+            if name.startswith(('upper_arm', 'elbow')):
+                moved += g.weight
+            elif g.weight > 0:
+                row[name] = row.get(name, 0.0) + g.weight
+        row[f'clavicle_{side}'] = row.get(f'clavicle_{side}', 0.0) + moved
+        sa.set_weight_row(body, i, row)
+        count += 1
+    log(f'back rows: {count} vertices')
+
+
 def tail_rows(body, rig):
     """Exact rows of the tail (a loose part of the source) along the line of its bones: with u the
     place of the vertex along the bone tail (0 at its head, 1 at its tail) and on to tail_tip,
@@ -2071,6 +2104,7 @@ def main():
     auto_weights(body, rig, set(head_ids))
     paw_size(body)
     exact_rows(body, rig, set(head_ids))
+    back_rows(body)
     if P.get('tailRows'):
         tail_rows(body, rig)
     if 'tailRule' in P:
