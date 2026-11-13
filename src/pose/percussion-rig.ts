@@ -532,9 +532,9 @@ export const PERCUSSION_HOLDS = {
   },
   // The sticks leave the front of the fists (SNARE_DRUM.malletTilt) and point from homes 0.4 H out
   // from the shoulders, so that they make a V at a strike and slant down, as the matched grip of a
-  // real player. The spine leans 3° over the drum (lean), so that the short arms of the Tripo
-  // badger reach the strike spots: with the homes 0.5 H out and no lean, the sticks missed the
-  // spots by up to 4.5 cm, and with the homes 0.6 H out, the paws bent 72° on the forearms. Between strikes, each stick keeps its strike direction, and the wrist
+  // real player. The spine leans 3° over the drum (lean), so that the arms of the Tripo badger
+  // reach the strike spots: with the homes 0.5 H out and no lean, the sticks missed the spots by
+  // up to 1.4 cm. Between strikes, each stick keeps its strike direction, and the wrist
   // lifts the tip over the head (across.pitch), as a real player's stroke from the wrist. With the
   // rest direction across the forearm, the tips swing out over the rim. The pitch of 0.15 rad holds
   // each tip about 4 cm above the head between strikes, with the stick almost level, as the ready
@@ -703,8 +703,7 @@ export const PERCUSSION_HOLDS = {
  * right (`docs/reference/percussion-technique.md` 7). The offsets move the target, the middle of a
  * cymbal of the scale 1, to these spots, 1.3 cm in from the rim. The homes stand 0.45 H out from
  * the shoulders, a little further out than for the snare drum, so that the mallets point in to the
- * spots. The spine leans 3° over the cymbal (`lean`), so that the short arms of the Tripo badger
- * reach the spots: with the homes 0.6 H out and no lean, the mallets missed them by up to 3.1 cm.
+ * spots. The spine leans 3° over the cymbal (`lean`), as over the snare drum.
  * Between strikes, each mallet keeps its
  * strike direction, and the wrist holds the ball about 3.5 cm over its spot (`across.pitch`), as
  * the ready position of the snare drum. Before a strike, the wrist lifts the ball higher by the

@@ -172,17 +172,16 @@ export const SNARE_DRUM = {
   radius: 0.15,
   depth: 0.13,
   /**
-   * The height of the top head: about the height of the wrists of the Tripo badger in the play, so
-   * that the sticks are almost level, as a real player holds them
+   * The height of the top head: about the height of the wrists of the badger in the play, so that
+   * the sticks are almost level, as a real player holds them
    * (`docs/reference/percussion-technique.md` 6).
    */
-  top: 0.43,
+  top: 0.46,
   /**
-   * The distance of the middle of the drum in front of the player. The short arms of the Tripo
-   * badger reach the strike spots from 0.39 m: at 0.45 m and the top at 0.46 m, they missed each
-   * strike by up to 4.5 cm (`pnpm hold-fit snare-drummer`).
+   * The distance of the middle of the drum in front of the player. The stretched arms of the
+   * Tripo badger reach each strike spot from here (`pnpm hold-fit snare-drummer`).
    */
-  forward: 0.39,
+  forward: 0.45,
   /**
    * The angle of each mallet below the level in the bind pose, toward the fingers of the hanging
    * paw, in radians ({@link PAW_TILT}).
@@ -1744,13 +1743,12 @@ export function buildCymbals(scale = 1): InstrumentModel {
  */
 export const SUSPENDED_CYMBAL = {
   /** The height of the rim above the floor. */
-  height: 0.47,
+  height: 0.5,
   /**
-   * The distance of the middle of the cymbal in front of the player. The short arms of the Tripo
-   * badger reach the strike spots from 0.38 m: at 0.42 m and the rim at 0.5 m, they missed the
-   * spots by up to 3.1 cm (`pnpm hold-fit cymbalist`).
+   * The distance of the middle of the cymbal in front of the player. The stretched arms of the
+   * Tripo badger reach each strike spot from here (`pnpm hold-fit cymbalist`).
    */
-  forward: 0.38,
+  forward: 0.42,
   /** The radius of the yarn ball of each mallet. */
   ball: 0.02,
   /**
