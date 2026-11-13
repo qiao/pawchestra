@@ -728,27 +728,30 @@ function poseRefusal(
   far: Vec3,
 ): InsertRefusal | null {
   const { spot, detail, posed } = view;
-  for (const camera of [near, far]) {
-    const frame: InsertView = {
-      camera,
-      target: detail.target,
-      fov: INSERT_LENS.fov,
-      aspect: CINEMA_ASPECT,
-      lens: lensScale(camera, detail.target, INSERT_LENS.fov, inputs.stageSide),
-    };
-    const cover = insertCover(frame, posed, spot.owner, detail.part, inputs.clearance);
-    if (cover.share > INSERT_FRAME.coverShare) {
-      return 'cover';
-    }
-    if (cover.soft > INSERT_FRAME.softShare) {
-      return 'soft';
-    }
-    if (cover.detail) {
-      return 'detail';
-    }
-    if (cutsFace(frame, posed, view.headRadius)) {
-      return 'face';
-    }
+  const frameOf = (camera: Vec3): InsertView => ({
+    camera,
+    target: detail.target,
+    fov: INSERT_LENS.fov,
+    aspect: CINEMA_ASPECT,
+    lens: lensScale(camera, detail.target, INSERT_LENS.fov, inputs.stageSide),
+  });
+  if (cutsFace(frameOf(near), posed, view.headRadius)) {
+    return 'face';
+  }
+  if (cutsFace(frameOf(far), posed, view.headRadius)) {
+    return 'face';
+  }
+  // The push-in changes the frame by a few percent, so the cover test reads only its end, where
+  // the objects in front look largest.
+  const cover = insertCover(frameOf(near), posed, spot.owner, detail.part, inputs.clearance);
+  if (cover.share > INSERT_FRAME.coverShare) {
+    return 'cover';
+  }
+  if (cover.soft > INSERT_FRAME.softShare) {
+    return 'soft';
+  }
+  if (cover.detail) {
+    return 'detail';
   }
   return null;
 }
