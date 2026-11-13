@@ -454,7 +454,9 @@ The app follows these facts:
   So the seated fox rests the free left paw on the top of the left haunch near the hip. The paw
   hangs in line with the forearm, with no bend at the wrist, as a relaxed hand hangs from a loose
   arm [69], and it turns about its long axis to the turn at which the skin of the paw of the fox
-  chain is nearest to its bind (`restFreeL`). A standing fox lets the free left arm hang down along the
+  chain is nearest to its bind (`restFreeL`). In the lift and the lowering, the free left elbow
+  stays bent (`restFreeL.moveReach`, `keepMoveBend()`), because the path from the haunch to the
+  lip plate leaves the reach of the short arm. No source gives this path. A standing fox lets the free left arm hang down along the
   side with a small bend of the elbow (`FOX_HANG`), with the palm toward the leg (`hangRoll`). The embouchure hole
   sits at the lower lip, under the long muzzle, and the lip plate presses the lips and the chin
   about 0.5 cm, as a flutist rests the plate against the chin (`lipShift`).

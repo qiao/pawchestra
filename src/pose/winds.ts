@@ -644,7 +644,9 @@ export const WIND_HOLDS = {
  * reach of the arm. At a rest place out of reach, the arm stays straight in the lift until the paw
  * comes into reach. The elbow then folds in a few frames, and the forearm turned 2219° each second.
  * Now each bone of the left arm turns at most 465° each second in the lift. The wrist passes in
- * front of the belly (`arc`). The rest elbow points out and back, (-0.5, -1, 0.6): with (-0.3, -1,
+ * front of the belly (`arc`). The path from the rest place to the lip plate still leaves the
+ * reach in the middle of the move, so the elbow keeps a bend there (`moveReach`): with no limit,
+ * the arm was straight over most of the lift, and the elbow folded 11° in one step of 0.01 s. The rest elbow points out and back, (-0.5, -1, 0.6): with (-0.3, -1,
  * 0.7), the left upper arm went 1.8 cm into the body at rest and 2.5 cm in the lift. With
  * (-0.6, -1, 0.4), the upper arm rolled 34° at rest, against 28°.
  *
@@ -693,6 +695,7 @@ const FOX_FLUTE = {
       bend: FOX_HANG[1] * MathUtils.DEG2RAD,
     },
     hangRoll: 150 * MathUtils.DEG2RAD,
+    moveReach: 0.9,
   },
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
