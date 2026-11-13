@@ -68,6 +68,8 @@ export const INSERT_FRAME = {
    * value.
    */
   backView: -0.3,
+  /** The factor of the radius of a group of triangles in the bind pose, for the stretch of the skin. */
+  reachMargin: 1.5,
 } as const;
 
 /** The depth of the near plane of the cover test, in meters. */
@@ -108,7 +110,7 @@ function moveByBone(matrices: Float32Array, bone: number, point: Vec3): Vec3 {
 
 /**
  * Poses the bones of a player as the scene does (design 4.4, 5.1), and gives the middles of its
- * head and its eyes. {@link posedCorners} poses its mesh on the first read.
+ * head and its eyes. The cover test poses its mesh on the first read (`posedMesh()`).
  *
  * @param model The player model.
  * @param pose The pose of the player at the song time.
@@ -193,46 +195,50 @@ function skinBody(mesh: StudioMesh, pose: StudioPose): Float32Array {
   return out;
 }
 
-/** The posed corners of each posed player, made on the first read. */
-const cornerCache = new WeakMap<PosedPlayer, Float32Array>();
+/** The mesh of a posed player in the stage axes. */
+interface PosedMesh {
+  /** x, y, z of each vertex of the studio body. */
+  readonly body: Float32Array;
+  /**
+   * x, y, z of each corner of the mesh of the model after the corners of the body: the
+   * instrument and the seat, three corners for each triangle.
+   */
+  readonly extra: Float32Array;
+}
+
+/** The posed mesh of each posed player, made on the first read. */
+const meshCache = new WeakMap<PosedPlayer, PosedMesh>();
 
 /**
  * Poses the mesh of a player as the scene draws it (design 4.4): the body with the skin of the
  * studio, and the instrument and the seat on the bones of the player.
  *
  * @param posed The posed player.
- * @returns x, y, z of each corner of the mesh of the model in the stage axes, three corners for
- *   each triangle.
+ * @returns The posed mesh in the stage axes.
  */
-export function posedCorners(posed: PosedPlayer): Float32Array {
-  const known = cornerCache.get(posed);
+function posedMesh(posed: PosedPlayer): PosedMesh {
+  const known = meshCache.get(posed);
   if (known) {
     return known;
   }
 
   const { mesh, studio } = posed.model;
   const m = posed.pose.matrices;
-  const vertices = skinBody(studio.mesh, posed.pose);
+  const body = skinBody(studio.mesh, posed.pose);
   const cos = Math.cos(posed.place.facing);
   const sin = Math.sin(posed.place.facing);
   const [px, py, pz] = posed.place.position;
-  for (let v = 0; v < vertices.length; v += 3) {
-    const x = vertices[v] ?? 0;
-    const z = vertices[v + 2] ?? 0;
-    vertices[v] = px + x * cos + z * sin;
-    vertices[v + 1] = py + (vertices[v + 1] ?? 0);
-    vertices[v + 2] = pz - x * sin + z * cos;
+  for (let v = 0; v < body.length; v += 3) {
+    const x = body[v] ?? 0;
+    const z = body[v + 2] ?? 0;
+    body[v] = px + x * cos + z * sin;
+    body[v + 1] = py + (body[v + 1] ?? 0);
+    body[v + 2] = pz - x * sin + z * cos;
   }
 
-  const corners = new Float32Array(mesh.positions.length);
-  const bodyCorners = studio.mesh.corners.length;
-  for (let c = 0; c < bodyCorners; c++) {
-    const v = (studio.mesh.corners[c] ?? 0) * 3;
-    corners[c * 3] = vertices[v] ?? 0;
-    corners[c * 3 + 1] = vertices[v + 1] ?? 0;
-    corners[c * 3 + 2] = vertices[v + 2] ?? 0;
-  }
   // The other corners follow one or two bones of the player, as the GPU skin does.
+  const bodyCorners = studio.mesh.corners.length;
+  const extra = new Float32Array(mesh.positions.length - bodyCorners * 3);
   const studioCount = STUDIO_BONES.length;
   const { positions, bones, blendBones, blendWeights } = mesh;
   for (let c = bodyCorners; c < bones.length; c++) {
@@ -257,12 +263,14 @@ export function posedCorners(posed: PosedPlayer): Float32Array {
       y += (by - y) * w;
       z += (bz - z) * w;
     }
-    corners[c * 3] = px + x * cos + z * sin;
-    corners[c * 3 + 1] = py + y;
-    corners[c * 3 + 2] = pz - x * sin + z * cos;
+    const e = (c - bodyCorners) * 3;
+    extra[e] = px + x * cos + z * sin;
+    extra[e + 1] = py + y;
+    extra[e + 2] = pz - x * sin + z * cos;
   }
-  cornerCache.set(posed, corners);
-  return corners;
+  const posedMeshValue = { body, extra };
+  meshCache.set(posed, posedMeshValue);
+  return posedMeshValue;
 }
 
 /**
@@ -324,16 +332,6 @@ export interface InsertCover {
   readonly soft: number;
 }
 
-/**
- * The triangles of a posed player outside the reach of its detail, which can cover the detail: x,
- * y, z of the middle of each one, then the index of its first corner.
- */
-interface CoverTriangles {
-  readonly part: InsertDetailPart;
-  /** x, y, z of the middle, and the index of the first corner in the posed corners. */
-  readonly data: Float32Array;
-}
-
 /** The studio bones of the paws: a part on them near the detail is the detail. */
 const PAW_BONES: ReadonlySet<number> = new Set(
   STUDIO_BONES.flatMap((name, i) => (/^(hand|fingers|digit|thumb)/.test(name) ? [i] : [])),
@@ -370,47 +368,86 @@ function pawVerticesOf(mesh: StudioMesh): Uint8Array {
   return out;
 }
 
-/** The cover triangles of each posed player, made on the first test. */
-const coverCache = new WeakMap<PosedPlayer, CoverTriangles>();
+/** A group of near triangles of a mesh, which the cover test skips together. */
+interface TriangleGroup {
+  /**
+   * The corner whose posed place is the middle of the sphere of the group: a vertex of the
+   * studio body, or a corner after the body corners as `-1 - index` of the extra corners.
+   */
+  readonly anchor: number;
+  /** The radius of the sphere around the anchor, in meters, with `INSERT_FRAME.reachMargin`. */
+  readonly radius: number;
+  /** The triangles of the group, by their index in the mesh of the model. */
+  readonly triangles: Uint32Array;
+}
+
+/** The size of the cells of the grid that groups the triangles, in meters. */
+const GROUP_CELL = 0.2;
+
+/** The triangle groups of each model, made on the first read. */
+const groupCache = new WeakMap<PlayerModel, readonly TriangleGroup[]>();
 
 /**
- * Lists the triangles of a posed player outside the reach of its detail.
+ * Groups the triangles of the mesh of a model by the cell of a grid of their middles in the bind
+ * pose: the body and the other parts apart. The cover test skips a group whose sphere is outside
+ * the narrow frame of an insert, and most groups are outside it.
  *
- * @param posed The posed player.
- * @param part The detail.
- * @returns The triangles.
+ * @param model The player model.
+ * @returns The groups.
  */
-function coverTriangles(posed: PosedPlayer, part: InsertDetailPart): CoverTriangles {
-  const known = coverCache.get(posed);
-  if (known?.part === part) {
+function triangleGroups(model: PlayerModel): readonly TriangleGroup[] {
+  const known = groupCache.get(model);
+  if (known) {
     return known;
   }
 
-  const p = posedCorners(posed);
-  const { studio } = posed.model;
-  const paws = pawVerticesOf(studio.mesh);
+  const { mesh, studio } = model;
   const bodyCorners = studio.mesh.corners.length;
-  const out: number[] = [];
-  for (let t = 0; t + 8 < p.length; t += 9) {
-    const mx = ((p[t] ?? 0) + (p[t + 3] ?? 0) + (p[t + 6] ?? 0)) / 3;
-    const my = ((p[t + 1] ?? 0) + (p[t + 4] ?? 0) + (p[t + 7] ?? 0)) / 3;
-    const mz = ((p[t + 2] ?? 0) + (p[t + 5] ?? 0) + (p[t + 8] ?? 0)) / 3;
-    // A part of the instrument or a paw near the detail is the detail. Each other part of the
-    // body counts, such as the belly behind the bell of a horn.
-    const corner = t / 3;
-    const detailPart =
-      corner >= bodyCorners ||
-      (paws[studio.mesh.corners[corner] ?? 0] === 1 &&
-        paws[studio.mesh.corners[corner + 1] ?? 0] === 1 &&
-        paws[studio.mesh.corners[corner + 2] ?? 0] === 1);
-    if (!detailPart || segmentDistance(mx, my, mz, part.from, part.to) >= part.reach) {
-      out.push(mx, my, mz, t);
+  const cornerOf = (c: number): [source: Float32Array, index: number] =>
+    c < bodyCorners ? [studio.mesh.positions, studio.mesh.corners[c] ?? 0] : [mesh.positions, c];
+  const cells = new Map<string, number[]>();
+  for (let tri = 0; tri < mesh.bones.length / 3; tri++) {
+    const middle = [0, 0, 0];
+    for (let k = 0; k < 3; k++) {
+      const [source, index] = cornerOf(tri * 3 + k);
+      for (let a = 0; a < 3; a++) {
+        middle[a] = (middle[a] ?? 0) + (source[index * 3 + a] ?? 0) / 3;
+      }
     }
+    const key = `${tri * 3 < bodyCorners ? 'b' : 'e'} ${middle.map((v) => Math.floor(v / GROUP_CELL)).join(' ')}`;
+    const list = cells.get(key) ?? [];
+    list.push(tri);
+    cells.set(key, list);
   }
-  const triangles = { part, data: Float32Array.from(out) };
-  coverCache.set(posed, triangles);
-  return triangles;
+  const groups = [...cells.values()].map((triangles): TriangleGroup => {
+    const first = (triangles[0] ?? 0) * 3;
+    const [source, index] = cornerOf(first);
+    let radius = 0;
+    for (const tri of triangles) {
+      for (let k = 0; k < 3; k++) {
+        const [s, i] = cornerOf(tri * 3 + k);
+        radius = Math.max(
+          radius,
+          Math.hypot(
+            (s[i * 3] ?? 0) - (source[index * 3] ?? 0),
+            (s[i * 3 + 1] ?? 0) - (source[index * 3 + 1] ?? 0),
+            (s[i * 3 + 2] ?? 0) - (source[index * 3 + 2] ?? 0),
+          ),
+        );
+      }
+    }
+    return {
+      anchor: first < bodyCorners ? index : -1 - (first - bodyCorners),
+      radius: radius * INSERT_FRAME.reachMargin,
+      triangles: Uint32Array.from(triangles),
+    };
+  });
+  groupCache.set(model, groups);
+  return groups;
 }
+
+/** The x, y, z of the three corners of the triangle of the cover test. */
+const triangle = new Float64Array(9);
 
 /** The cells of the grid of the frame: 1 for a cell that an object covers. */
 const cellCover = new Uint8Array(INSERT_FRAME.cells * INSERT_FRAME.cells);
@@ -532,6 +569,21 @@ export function insertCover(
     if (obstacle.kind === 'risers' || obstacle.owner === owner) {
       continue;
     }
+    // The sphere around the obstacle: a part of it must be in front of the depth limit and in the
+    // frame.
+    const ox = obstacle.x - cx;
+    const oy = (obstacle.minY + obstacle.maxY) / 2 - cy;
+    const oz = obstacle.z - cz;
+    const reach = Math.hypot(obstacle.radius, (obstacle.maxY - obstacle.minY) / 2);
+    const depth = ox * fx + oy * fy + oz * fz;
+    if (
+      depth - reach > limit ||
+      depth + reach <= 0 ||
+      Math.abs(ox * rx + oz * rz) - reach > Math.max(depth + reach, 0) * tanH ||
+      Math.abs(ox * ux + oy * uy + oz * uz) - reach > Math.max(depth + reach, 0) * tanV
+    ) {
+      continue;
+    }
     for (const box of obstacle.boxes) {
       const bx = box.x - cx;
       const by = (box.minY + box.maxY) / 2 - cy;
@@ -565,8 +617,12 @@ export function insertCover(
     }
   }
 
-  const p = posedCorners(posed);
-  const { data } = coverTriangles(posed, detail);
+  const { body, extra } = posedMesh(posed);
+  const { studio } = posed.model;
+  const corners = studio.mesh.corners;
+  const bodyCorners = corners.length;
+  const paws = pawVerticesOf(studio.mesh);
+  const groups = triangleGroups(posed.model);
   // The focus of the scene: the nearer eye in the frame, else the detail (design 4.5, 5.6).
   const focus =
     heroFocusDepth(
@@ -576,31 +632,83 @@ export function insertCover(
     ) ?? Math.hypot(target[0] - cx, target[1] - cy, target[2] - cz);
   softCover.fill(0);
   let soft = 0;
-  for (let i = 0; i + 3 < data.length; i += 4) {
-    const depth =
-      ((data[i] ?? 0) - cx) * fx + ((data[i + 1] ?? 0) - cy) * fy + ((data[i + 2] ?? 0) - cz) * fz;
-    const front = depth < limit;
-    const blurred = depth > 0 && Math.abs(blurAt(depth, focus, view.lens)) >= INSERT_FRAME.softBlur;
-    if (depth <= 0 || (!front && !blurred)) {
+  for (const group of groups) {
+    const g = group.anchor >= 0 ? body : extra;
+    const gi = (group.anchor >= 0 ? group.anchor : -1 - group.anchor) * 3;
+    const gx = (g[gi] ?? 0) - cx;
+    const gy = (g[gi + 1] ?? 0) - cy;
+    const gz = (g[gi + 2] ?? 0) - cz;
+    const gr = group.radius;
+    const groupDepth = gx * fx + gy * fy + gz * fz;
+    if (
+      groupDepth <= -gr ||
+      Math.abs(gx * rx + gz * rz) - gr > Math.max(groupDepth + gr, 0) * tanH ||
+      Math.abs(gx * ux + gy * uy + gz * uz) - gr > Math.max(groupDepth + gr, 0) * tanV
+    ) {
       continue;
     }
-    const t = data[i + 3] ?? 0;
-    for (let k = 0; k < 3; k++) {
-      const dx = (p[t + 3 * k] ?? 0) - cx;
-      const dy = (p[t + 3 * k + 1] ?? 0) - cy;
-      const dz = (p[t + 3 * k + 2] ?? 0) - cz;
-      const d = Math.max(dx * fx + dy * fy + dz * fz, NEAR_DEPTH);
-      boxCorners[2 * k] = (dx * rx + dz * rz) / (d * tanH);
-      boxCorners[2 * k + 1] = (dx * ux + dy * uy + dz * uz) / (d * tanV);
-    }
-    const [ax = 0, ay = 0, bx = 0, by = 0, qx = 0, qy = 0] = boxCorners;
-    if (blurred) {
-      soft += markTriangle(ax, ay, bx, by, qx, qy, softCover);
-    }
-    if (front) {
-      covered += markTriangle(ax, ay, bx, by, qx, qy);
-      if (covered > most) {
-        return { share: covered / (n * n), detail: false, soft: soft / (n * n) };
+    for (const tri of group.triangles) {
+      const c = tri * 3;
+      let paw = c < bodyCorners;
+      for (let k = 0; k < 3; k++) {
+        if (c < bodyCorners) {
+          const v = corners[c + k] ?? 0;
+          paw &&= paws[v] === 1;
+          triangle[k * 3] = body[v * 3] ?? 0;
+          triangle[k * 3 + 1] = body[v * 3 + 1] ?? 0;
+          triangle[k * 3 + 2] = body[v * 3 + 2] ?? 0;
+        } else {
+          const e = (c + k - bodyCorners) * 3;
+          triangle[k * 3] = extra[e] ?? 0;
+          triangle[k * 3 + 1] = extra[e + 1] ?? 0;
+          triangle[k * 3 + 2] = extra[e + 2] ?? 0;
+        }
+      }
+      const wx = ((triangle[0] ?? 0) + (triangle[3] ?? 0) + (triangle[6] ?? 0)) / 3;
+      const wy = ((triangle[1] ?? 0) + (triangle[4] ?? 0) + (triangle[7] ?? 0)) / 3;
+      const wz = ((triangle[2] ?? 0) + (triangle[5] ?? 0) + (triangle[8] ?? 0)) / 3;
+      const mx = wx - cx;
+      const my = wy - cy;
+      const mz = wz - cz;
+      const depth = mx * fx + my * fy + mz * fz;
+      if (depth <= 0) {
+        continue;
+      }
+      // A part of the instrument or a paw near the detail is the detail. Each other part of the
+      // body counts, such as the belly behind the bell of a horn.
+      if (
+        (paw || c >= bodyCorners) &&
+        segmentDistance(wx, wy, wz, detail.from, detail.to) < detail.reach
+      ) {
+        continue;
+      }
+      const front = depth < limit;
+      const blurred = Math.abs(blurAt(depth, focus, view.lens)) >= INSERT_FRAME.softBlur;
+      if (!front && !blurred) {
+        continue;
+      }
+      for (let k = 0; k < 3; k++) {
+        const dx = (triangle[3 * k] ?? 0) - cx;
+        const dy = (triangle[3 * k + 1] ?? 0) - cy;
+        const dz = (triangle[3 * k + 2] ?? 0) - cz;
+        const d = Math.max(dx * fx + dy * fy + dz * fz, NEAR_DEPTH);
+        boxCorners[2 * k] = (dx * rx + dz * rz) / (d * tanH);
+        boxCorners[2 * k + 1] = (dx * ux + dy * uy + dz * uz) / (d * tanV);
+      }
+      const ax = boxCorners[0] ?? 0;
+      const ay = boxCorners[1] ?? 0;
+      const bx = boxCorners[2] ?? 0;
+      const by = boxCorners[3] ?? 0;
+      const qx = boxCorners[4] ?? 0;
+      const qy = boxCorners[5] ?? 0;
+      if (blurred) {
+        soft += markTriangle(ax, ay, bx, by, qx, qy, softCover);
+      }
+      if (front) {
+        covered += markTriangle(ax, ay, bx, by, qx, qy);
+        if (covered > most) {
+          return { share: covered / (n * n), detail: false, soft: soft / (n * n) };
+        }
       }
     }
   }
