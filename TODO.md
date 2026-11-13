@@ -98,10 +98,10 @@ passes.
       the source that faces down, away from the key light.
 - [ ] Monkey trumpeter: two thin faces across the wrists (329 and 1090) fold in each play sample.
       Cut the thin faces, or count their pixels in a probe build.
-- [ ] Monkey trumpeter: the trumpet now points about 30° below the level, so that the right paw
-      lies below the mouth. A real player holds it "slightly down" (wind-technique 2.1). A higher
-      bell needs longer arms or a right grip nearer to the bell, which the right arm (1.4 cm of
-      spare reach) does not reach.
+- [ ] Monkey trumpeter: the trumpet points about 23° below the level with the spine 12° back in
+      the play (`MONKEY_TRUMPET.lean`), against "slightly down" of a real player (wind-technique
+      2.1). Confirm the backward spine in the app. With the trumpet 20° down on the face, the top
+      of the right paw comes to the height of the mouthpiece.
 - [ ] Rhino tubist: the main branch is about 15 cm wide at the left grip, so the left paw lies
       against it and does not close around it. A real tubist grips thinner tubing at the side.
       Option: a thin tube at the left side of the tuba model for the left paw.
@@ -110,11 +110,11 @@ passes.
       rest. Read the play pose with `--lines`.
 - [ ] Pig hornist: the right hoof still lies across the mouth of the bell (`PIG_HORN`). Grips
       nearer to the rim or further out of the bell kept the grasp share at 0% and the palm 90° to
-      134° from the bell axis (`pnpm wind-grip hornist`). A cupped paw in the bell needs a paw
-      that fits the throat of the horn, or a larger horn.
-- [ ] Penguin singer: the flipper tips curl around the outer edges of the folder, and the digits
-      stay about 2.7 cm off the front of the cover. A flex of 45° brought them to 2.0 cm, but the
-      palms then missed their grips by up to 10.7 mm (`pnpm hold-fit singer`).
+      134° from the bell axis (`pnpm wind-grip hornist`). A hoof at the far rim along the bell
+      wall needs a forearm near the bell axis, but the forearm meets the axis at 72° to 89° with
+      each turn of the right side of the horn from 35° back to 15° forward, each grip, and each
+      elbow, and a hoof off the axis goes through the wall. A cupped paw in the bell needs a paw that fits the throat of
+      the horn, a larger horn, or a bell that opens toward the right shoulder.
 - [ ] Beaver bassoonist: from the front, the long joint passes in front of the left cheek and the
       whiskers, 4.8 cm from the skin, as the bell of a real bassoonist rises at the left of the
       line of sight (`BEAVER_PLAY_TURN`). Confirm the look in the app.
@@ -816,10 +816,6 @@ passes.
       (`bandPatch`), so a straight light line shows where the band meets the forearm in the play
       view (`reports/2026-11-13-fox-wrist/play-red-fox/pair-az0-wrists-2x.png`). Try UVs that
       continue the forearm fur on the near ring.
-- [ ] Tripo tan fox flutist: the left paw twists 138° on its forearm (p95 of `pnpm arm-check
-      flutist`) and the forearm 70°, in the rest, the lift, and the lowering, because the left paw
-      turn of 7 steps fits the violin. Try a rest of the free left paw (`restFreeL` of
-      `FOX_FLUTE`) that needs less twist from the turned paw.
 - [ ] Tripo red fox violinist: with the right paw turn of 4 steps, the bow paw twists 47° (p95,
       22° with 3 steps) and the move twist is 122° (97°). Check the bow paw in the lift and the
       lowering in the app.
