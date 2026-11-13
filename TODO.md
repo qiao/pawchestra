@@ -1325,8 +1325,6 @@ navigation menu at the top of the mockup is out of scope.
 - [ ] After the shadow fit, make a proxy of about 1,500 triangles for one species in its chain,
       and draw it in the shadow and depth passes. Measure with `pnpm frame`. Now each pass draws
       about 360,000 triangles for 42 players (7.2, 9.7).
-- [ ] Fade the piano strings to their mean color beyond a distance (`fwidth()`). They make a moiré
-      at the pixel ratio 1 (4.6).
 - [ ] Give the cello and the contrabass the deeper ribs of the real instruments (about 0.16 of the
       body length), and check the holds of the dog and the hippo.
 - [ ] Slope the strings of the bowed strings down about 5° from the bridge to the nut, as on a real
