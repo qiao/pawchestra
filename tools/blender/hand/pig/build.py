@@ -797,6 +797,43 @@ def tail_rows(body, rig):
     )
 
 
+def belly_rows(body):
+    """Belly rows (bellyRows of the params): the thigh shares that bone heat gives the trunk. Each
+    trunk vertex (a thigh share below 0.5) with rest z (Blender) above bellyRows.z[0] keeps its
+    thigh shares times f, with f linear from 1 at bellyRows.z[0] to 0 at bellyRows.z[1]. The rest
+    of its thigh share goes to `spine`. Bone heat gave the belly up to z 0.48 thigh shares of 0.13
+    to 0.19, and Limit Total 4 dropped them under the arms. The seated bind turns the thighs, so
+    it pulled the belly 0.05 units back up to z 0.48 and 0.006 units from z 0.505. The chest then
+    stood over the belly as a ledge: a pale flat panel with a hard corner in front of each upper
+    arm in the seated play and rest. With the rows, the pull falls evenly from 0.10 units at z
+    0.32 to 0.008 units at z 0.47."""
+    rule = P.get('bellyRows')
+    if not rule:
+        return
+    z0, z1 = rule['z']
+    me = body.data
+    names = {g.index: g.name for g in body.vertex_groups}
+    count = 0
+    for v in me.vertices:
+        z = v.co.z
+        if z <= z0:
+            continue
+        row = {names[g.group]: g.weight for g in v.groups if g.weight > 0}
+        thigh = [k for k in row if k.startswith('thigh_')]
+        t = sum(row[k] for k in thigh)
+        if not thigh or t >= 0.5:
+            continue
+        f = max(0.0, 1 - (z - z0) / (z1 - z0))
+        new = {k: w for k, w in row.items() if k not in thigh}
+        for k in thigh:
+            if row[k] * f > 0:
+                new[k] = row[k] * f
+        new['spine'] = new.get('spine', 0.0) + t * (1 - f)
+        sa.set_weight_row(body, v.index, new)
+        count += 1
+    log(f'belly rows: {count} trunk vertices from z {z0} to {z1}')
+
+
 def leg_rows(body, rig):
     """Knee rows: each leg vertex within kneeRows.reach of the knee joint along the rest leg (and
     within kneeRows.radius of the line from the hip joint to the ankle joint) keeps the sum t of
@@ -1960,6 +1997,7 @@ def main():
     auto_weights(body, rig, set(head_ids))
     exact_rows(body, rig, set(head_ids))
     leg_rows(body, rig)
+    belly_rows(body)
     if P.get('tailRows'):
         tail_rows(body, rig)
     thicken_trunk(body)
