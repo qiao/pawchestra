@@ -4287,12 +4287,16 @@ const FREEZE_WALL = 1000;
 
 /**
  * The code of `frame()` of `src/app/app.ts` that {@link freezePlugin} changes: the read of the
- * song time from the `Player`, and the call of `poseAt()`. A tree with no such code stops the
- * build.
+ * song time from the `Player`, and the call of `poseAt()`. The call has two forms: the call of
+ * each frame before the cull of the poses (design 9.7), and the call in the `FramePoser` of the
+ * frame. A tree with no such code stops the build.
  */
 const FREEZE_ANCHORS = {
   song: "this.#songTime = audio && piece.samples !== 'loading' ? audio.player.now() : 0;",
-  pose: 'poseAt(plan, this.#songTime, wallTime, transport, audibility, poses)',
+  pose: [
+    'poseAt(plan, songTime, wallTime, transport, audibility, poses, needed)',
+    'poseAt(plan, this.#songTime, wallTime, transport, audibility, poses)',
+  ],
 } as const;
 
 /**
@@ -4317,19 +4321,23 @@ function freezePlugin(root: string): Plugin {
       if (id !== app) {
         return null;
       }
-      const missing = Object.values(FREEZE_ANCHORS).filter((anchor) => !code.includes(anchor));
-      if (missing.length > 0) {
+      const anchor = FREEZE_ANCHORS.pose.find((call) => code.includes(call));
+      const missing = [
+        ...(code.includes(FREEZE_ANCHORS.song) ? [] : [FREEZE_ANCHORS.song]),
+        ...(anchor ? [] : [FREEZE_ANCHORS.pose.join('" or "')]),
+      ];
+      if (!anchor || missing.length > 0) {
         throw new Error(
           `The app ${app} has no code "${missing.join('" and no "')}", so the frames of the mode play cannot freeze its song time.`,
         );
       }
-      const pose = FREEZE_ANCHORS.pose.replace('wallTime', `(${freeze}?.wall ?? wallTime)`);
+      const pose = anchor.replace('wallTime', `(${freeze}?.wall ?? wallTime)`);
       return code
         .replace(
           FREEZE_ANCHORS.song,
           `${FREEZE_ANCHORS.song}\n      this.#songTime = ${freeze}?.song ?? this.#songTime;`,
         )
-        .replace(FREEZE_ANCHORS.pose, pose);
+        .replace(anchor, pose);
     },
   };
 }
