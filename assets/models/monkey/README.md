@@ -79,8 +79,8 @@ those of the Tripo wolf with the changes below. `make_config.py` writes
 
 | Item | Value |
 |---|---|
-| Size | 398,642 bytes |
-| SHA-256 | `22c4676a02c17138f5dbac43950c69c832a835131f18ef8611f75cd2098ad268` |
+| Size | 398,656 bytes (each run writes other bytes) |
+| SHA-256 | `1d0484d325e91a8620df7c2aad0a19fcf61d1a16231a3908db359dd1bb864470` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the tuft, the soles at z = 0, the monkey faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `monkey`: 3,721 vertices and 3,983 faces (3,323 quads and 660 triangles, 7,306 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 20 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 96 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/monkey/tripo-hand/monkey-color.webp`) |
 | Armature | `monkey_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -98,6 +98,15 @@ left side):
   use_grid_fill=True)`) of the clean quad bands of 8 edges between the closed arm loops at x 0.165,
   0.185, 0.199, 0.213, 0.234, 0.261, 0.285, and 0.305: 1 cut on each band. The elbow and the
   forearm then have a ring about each 0.3 arm radii.
+- **Folds.** `fold_relax()` of the badger chain (`foldRelax` of the params): each round moves each
+  vertex of the triangles with a corner normal 45 degrees or more off the face normal half of the
+  way to the middle of its neighbors, between the feet (y 0.06) and the neck (y 0.66) and inside
+  the paws (|x| below 0.29), with each move clipped to 0.015 units. 130 fold triangles become 3
+  in 40 rounds, and 145 vertices move, by 0.006 units in the mean and 0.015 units (2.0 cm) at
+  most. The folds are fur tufts along the back and creases at the backs of the knees. The FBX
+  viewer shades them with the custom normals of the file, but the app makes its normals from the
+  form, so they showed as dark spikes on the outline of the back and dark creases at the knees.
+  The head keeps its form.
 - **No knee rings.** The leg loops stop at poles, so no leg band is a clean quad ring. Exact knee
   rows ("Weights" below) take their place.
 - **Hands turned.** Each vertex past the arm ring at x 0.295 turns rigidly about the rest forearm
@@ -230,7 +239,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/monkey.rig.glb` | 1,239,404 bytes | `cccff22e4b12bc8c7c1e4667a7dcebaea0f9df3273f31e63f3a4c43548d95375` |
-| `tripo-hand/monkey.rig.json` | 16,672 bytes | `c24dbd8ec6789d1e95fb9a2a7d23c67aa783afa4e1ca57925ac8743c5803d0cb` |
+| `tripo-hand/monkey.rig.glb` | 1,239,404 bytes | `a42590fe194c25894fff5c965c07c5c9a782be8fc4890c19bd23f57b32ab4420` |
+| `tripo-hand/monkey.rig.json` | 16,671 bytes | `2086a1ed58d160c470edccf826dd14f0c75b5bb44766e26f8fa97d1aa338abf1` |
 | `tripo-hand/monkey-color.webp` | 178,300 bytes, 2048 × 2048 | `5b9920243e479862e07e602f19b82b5eebdfe1f1ddd6d019c524f619cb34d117` |
 | `tripo-hand/monkey-normal.webp` | 111,326 bytes, 1024 × 1024 | `e81b285a48619d696b4ae23557ee2d203934d8a2be29739b2a7cfd2c88f83dca` |
