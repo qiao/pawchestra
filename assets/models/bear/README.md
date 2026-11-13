@@ -109,11 +109,15 @@ left side):
   vertices move, at most 0.0094 units.
 - **Paw turn.** Each paw past the closed loop at x 0.336 turns rigidly about the rest forearm axis
   by whole steps of the loop of 14 edges (25.7°): -77.1° on the left (3 steps) and 51.4° on the
-  right (2 steps), 311 vertices on each side. The band to the loop at x 0.368 goes, new quads
+  right (2 steps), 305 vertices on each side. The band to the loop at x 0.368 goes, new quads
   join the two loops with the step offset, and the turned loop takes the form of the loop before
   the turn, with a fade over 0.03 units (`turnFit`). The palm hint turns with the paw. Reason:
   with no turn, the paws of the conductor twisted -78° (left) and 55° (right) on their forearms in
-  the play (`pnpm hold-fit conductor`), and now 0° and 4°.
+  the play (`pnpm hold-fit conductor`), and now 0° and 4°. The loop at x 0.336 does not turn. It
+  is slanted, so 6 of its 14 vertices lie past its mean along the forearm axis. When they turned
+  with the paw, the quads before the loop sheared into a pinched, kinked wrist with a fan of
+  stretched fur: 5 faces on the left and 6 on the right had UV scale ratios of 2.6 to 4.2, against
+  about 1.15 on the faces around them.
 - **Surface.** `sa.add_surface(bear, 'bear', <base color>, eye_fans=False,
   config=<bear-tripo.json>)`. The 51 gloss faces of the nose box go back to the slot `fur`
   (`nose_trim()`), so that the nose takes the color map with its painted nostrils.
@@ -200,8 +204,8 @@ License of both files: CC BY-NC 4.0, as the FBX file. Two runs of the chain give
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/bear.rig.glb` | 1,093,528 bytes | `95cb3fae3b61776b2f0ab70ac93528729a809506414359ea3c512a82800c8936` |
-| `tripo-hand/bear.rig.json` | 15,939 bytes | `4b63d21d89ab7ceef681168a0e80530466a6c65e1ab01acce3a1851d422eaa81` |
+| `tripo-hand/bear.rig.glb` | 1,092,328 bytes | `79a4dfd5cfc90eda6ea6e9c2e4822063b9dbf6eef8688da1bffcfbc57e407c4c` |
+| `tripo-hand/bear.rig.json` | 15,939 bytes | `a9db167a6de148d90d0ef3d31a45cc92f4c4552f7210c5fc21fb4561b0844856` |
 
 ### Conductor
 
