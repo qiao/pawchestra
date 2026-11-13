@@ -46,15 +46,16 @@ export const CONDUCTOR_HOLD = {
   beatPoint: [0.35, 0.685, -2.43],
   /**
    * The baton points from this place to its tip, from the right shoulder joint: forward, up 18°,
-   * and 3.5° inward at beat 1, as a conductor points it at the players. The forearm points a
+   * and 12° inward at beat 1, as a conductor points it at the players. The forearm points a
    * little out of the baton, so that the baton is a longer line of the forearm, a little in
-   * (`conductor-technique.md` 7a): 19° off the forearm (p50 of the play). With 20° inward, the
-   * baton stood 53° off the forearm. With 25° up, the baton rises past the face in the views from
-   * the front. The pivot is about 0.9 m from the tip, about twice as far as the wrist, so that the
-   * wrist follows about half of the motion of the tip in the beat plane, and the arm beats with
-   * the baton.
+   * (`conductor-technique.md` 7a): 32° off the forearm (p50 of the play). With 20° inward, the
+   * baton stood 53° off the forearm. With 3.5° inward (19° off the forearm), the baton touched
+   * the desk of the stand when the arms came down after the final chord of `beethoven-8-4`. With
+   * 25° up, the baton rises past the face in the views from the front. The pivot is about 1 m
+   * from the tip, about twice as far as the wrist, so that the wrist follows about half of the
+   * motion of the tip in the beat plane, and the arm beats with the baton.
    */
-  batonPivot: [0.53, -0.22, 0.35],
+  batonPivot: [0.95, -0.22, 0.35],
   /**
    * The beat plane turns this part of the turn of the upper body to a cued section on the left.
    * Thus the arm opens to the right in a turn to the left, and the hand stays beside the head from
@@ -75,8 +76,8 @@ export const CONDUCTOR_HOLD = {
   /**
    * The right elbow points down and out to the side, as the elbow of a conductor is a little away
    * from the body. Thus the forearm points forward and in to the paw, and the baton continues its
-   * line (`conductor-technique.md` 7a). With the elbow of the left arm mirrored, the baton stood
-   * 53° off the forearm (p50 of the play).
+   * line (`conductor-technique.md` 7a). With the elbow down and a little out (0.4, -1, -0.4),
+   * the forearm pointed about 7° further out of the baton.
    */
   poleR: [1, -1, -0.2],
   /**
