@@ -1,6 +1,7 @@
 import { ShaderChunk, SpotLight, Vector2, Vector3 } from 'three';
 import type { Group, WebGLProgramParametersWithUniforms } from 'three';
 
+import { STUDIO_BONES } from '../models/studio-format.ts';
 import { LIGHT_NAMES, RIM_LIGHT } from './lights.ts';
 
 /** The most rim lights that the shaders take (`RIM_PLACE.count` of `models/beam.ts`). */
@@ -101,14 +102,49 @@ varying vec3 vRimLight;
 `;
 
 /**
+ * The light of the rim lights through the thin ears of the players (design 4.5). A thin ear in a
+ * back light glows warm on its side away from the lamp, because the light passes through the skin.
+ * The vertex shader finds the ear by the skin weights of the bones `ear_L` and `ear_R` of the
+ * studio bodies (`STUDIO_BONES`), so each body with ear bones gets the glow.
+ */
+const EAR_GLOW = {
+  /**
+   * The part of the light of a rim light that reaches the side of an ear away from the lamp, on a
+   * vertex with the full weight of an ear bone. A first moderate step: the rabbit has white fur near
+   * the shoulder of the tone curve.
+   */
+  strength: 0.45,
+  /** The linear factor of the color of the light through an ear: warm, as the blood in the skin. */
+  tint: [1, 0.62, 0.45],
+} as const;
+
+/**
+ * The GLSL of the skin weight of the ear bones of a vertex ({@link EAR_GLOW}), as `rimEar`. Each
+ * player is a studio body, so the index of each ear bone is the same for each skeleton.
+ */
+const EAR_WEIGHT = /* glsl */ `
+#ifdef USE_SKINNING
+float rimEar = dot(
+  skinWeight,
+  vec4(equal(skinIndex, vec4(${STUDIO_BONES.indexOf('ear_L')}.0))) +
+    vec4(equal(skinIndex, vec4(${STUDIO_BONES.indexOf('ear_R')}.0)))
+);
+#else
+float rimEar = 0.0;
+#endif
+`;
+
+/**
  * The GLSL of the rim lights in the vertex shader, after the skin and the normal of the vertex:
  * the light of each rim light on a face that looks at it, with the smooth step of the cone of
- * three.js r186, the decay 2, and the cosine of the face. The light falls off slowly over a face,
- * so the vertices give it.
+ * three.js r186, the decay 2, and the cosine of the face. On the ears of a player, the light also
+ * passes to the faces that turn away from the lamp (`RIM_EAR`, {@link EAR_GLOW}). The light falls
+ * off slowly over a face, so the vertices give it.
  */
 const RIM_VERTEX = /* glsl */ `
 vec3 rimPosition = (modelMatrix * vec4(transformed, 1.0)).xyz;
 vec3 rimNormal = inverseTransformDirection(transformedNormal, viewMatrix);
+RIM_EAR_WEIGHT
 vRimLight = vec3(0.0);
 for (int i = 0; i < ${MAX_RIM_LIGHTS}; i++) {
   if (i >= uRimCount) {
@@ -119,7 +155,8 @@ for (int i = 0; i < ${MAX_RIM_LIGHTS}; i++) {
   vec3 direction = toLamp * inversesqrt(distanceSquared);
   float cone = smoothstep(uRimCone[i].x, uRimCone[i].y, dot(-direction, uRimAxis[i]));
   float facing = saturate((dot(rimNormal, direction) + RIM_WRAP) / (1.0 + RIM_WRAP));
-  vRimLight += uRimColor[i] * (facing * cone / distanceSquared);
+  vec3 through = RIM_EAR * saturate(-dot(rimNormal, direction));
+  vRimLight += uRimColor[i] * ((vec3(facing) + through) * cone / distanceSquared);
 }
 `;
 
@@ -163,7 +200,11 @@ export function addRimLight(
   const fragment = RIM_FRAGMENT.replace('RIM_SKY', surface === 'stage' ? 'stageBake.g' : '1.0');
   // The floor gets no wrap: it is no fur, and the wrap would light the stage behind each lamp.
   const wrap = surface === 'players' ? RIM_LIGHT.wrap : 0;
-  const vertex = RIM_VERTEX.replaceAll('RIM_WRAP', wrap.toFixed(3));
+  const tint = EAR_GLOW.tint.map((part) => (part * EAR_GLOW.strength).toFixed(3)).join(', ');
+  const ear = surface === 'players' ? `rimEar * vec3(${tint})` : 'vec3(0.0)';
+  const vertex = RIM_VERTEX.replaceAll('RIM_WRAP', wrap.toFixed(3))
+    .replace('RIM_EAR_WEIGHT', surface === 'players' ? EAR_WEIGHT : '')
+    .replace('RIM_EAR', ear);
   shader.vertexShader = shader.vertexShader
     .replace('#include <common>', `#include <common>\n${RIM_UNIFORMS}`)
     .replace('#include <worldpos_vertex>', `#include <worldpos_vertex>\n${vertex}`);

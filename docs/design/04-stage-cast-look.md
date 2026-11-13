@@ -1362,7 +1362,11 @@ edges of the triangles, so such a line breaks into dashes that move with the cam
   shadows keep one direction. The vertex shaders calculate them (`scene/rim-light.ts`), because a
   spotlight costs GPU time on each lit pixel (9.7). On the players, the rim light wraps a little
   past the edge of each body (`RIM_LIGHT.wrap`), because fur scatters the light under its tips,
-  so a rim in a back light is a soft band. The stage gets no wrap.
+  so a rim in a back light is a soft band. The stage gets no wrap. A thin ear passes a part of the
+  rim light to its side away from the lamp, with a warm tint (`EAR_GLOW`), as the skin of a real
+  ear glows in a back light. The vertex shader finds the ears by the skin weights of the bones
+  `ear_L` and `ear_R`, so each studio body with ear bones gets the glow. The default camera
+  stands in front, so each ear stands between a rim light and the camera.
 - **Side and back-row lights** (`SIDE_LIGHT`, `BACK_ROW_LIGHT`). Weak cross lights from the
   front corners. They cast no shadow (2.6), so the key light alone casts the shadows. The
   back-row lights keep the back rows almost as bright as the front rows. These lights are a warm
