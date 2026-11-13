@@ -149,6 +149,13 @@ check the real motion and the sound of one role with no MIDI file.
   Until the samples of the `Player` are ready, a song clock with no sound runs the loop
   (`SilentClock`). The button "Start the sound" makes the `Player` in its click, and the
   `Player` then plays on from the song time of the clock.
+- **Mode.** In play mode, the animal plays the phrase. In rest mode, the page makes no sound, and
+  the animal holds the rest pose of its role with its idle motion. Each seat of the score is
+  silent, as a mute of the app makes it (`changeAudibility()`, 5.5), so `poseAt()` lowers each
+  instrument to the rest pose of a long rest. The conductor has no seat. Its rest pose comes from
+  the transport, so rest mode pauses the transport of the pose, as a pause of the app does (5.2):
+  the arms stay up for the hold of a pause, then hang beside the body. The song time runs on in
+  both modes, so a change back to play mode lifts the instruments in the phrase.
 - **Camera.** The orbit controls of Free mode turn the camera (2.5). The presets Front, Side,
   Back, and Close show for one frame as the camera of a shot, and Free mode keeps them. So each
   preset target stays less than 1 m from the default target, and each camera stays outside the
@@ -159,8 +166,8 @@ check the real motion and the sound of one role with no MIDI file.
   button at its top folds and unfolds the controls. On a screen of 600 px or less, the panel goes
   to the bottom, over the floor, and starts folded, so that it does not cover the animal. The role
   panel becomes a drawer there: a button at the top left opens it, and a pick closes it.
-- **Link.** The URL hash names the role, such as `/test#rabbit-violin`, so a reload or a shared
-  link shows the same role.
+- **Link.** The URL hash names the role and rest mode, such as `/test#rabbit-violin` or
+  `/test#rabbit-violin&rest`, so a reload or a shared link shows the same role in the same mode.
 
 `pnpm build` builds the test page in a second pass (`TEST_PAGE_MODE` of `vite.config.ts`). As a
 fourth entry of one build, it put the modules that it shares with the start page into common
