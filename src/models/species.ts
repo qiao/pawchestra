@@ -408,17 +408,18 @@ export const SPECIES = {
    * P2 fawn `assets/models/deer/tripo-hand/deer.blend` (design 4.4). It sits fully on the stool of
    * the harp, which fits its legs, with no chair back, and the harp soloist keeps the stool. Its
    * head height is the head of the studio body, and the seat height is the seat of the studio
-   * body, in H. It plays a harp of 1.11 m with its base on the floor, and the top of the soundbox
-   * stands at the right side of its chest, below the right shoulder
-   * (`docs/reference/harp-technique.md`, section 6). At the scale 0.975, the treble strings lay
-   * 14 cm to 38 cm from the right shoulder, so the arm of 36 cm folded its elbow around the top of
-   * the soundbox. With the hold of that scale, the right elbow bent to 57° (p5) at 0.975, 81° at
-   * 0.875, and 89° at 0.85. With the hold of 0.85, it bends to 99°, and the right upper arm stands
-   * out 33° (p50) in place of 46° (`scratch/dh/evalc.ts` of the round 2026-11-13).
+   * body, in H. It plays a harp of 0.975 of the concert harp of the app, 1.27 m high, with its
+   * base on the floor in front of the chest, as a harpist holds it. The top of the soundbox rests
+   * against the chest, in front of and below the right shoulder
+   * (`docs/reference/harp-technique.md`, section 6). On the harp of 0.85 (1.11 m) at the right of
+   * the chest, the harp read as a harp of a child. A larger harp at that place put its treble
+   * strings through the right shoulder: from the scale 0.875, the right upper arm went 6.5 cm
+   * through the plane of the strings in 90 % of the samples (`scratch/dh/evalc.ts` of the round
+   * 2026-11-13).
    */
   deer: {
     body: 'studio-deer',
-    harpScale: 0.85,
+    harpScale: 0.975,
     colors: SPECIES_COLORS.deer,
     headHeight: STUDIO_HEIGHTS['studio-deer'].headHeight,
     seatHeight: STUDIO_HEIGHTS['studio-deer'].seatHeight / STUDIO_HEIGHTS['studio-deer'].headHeight,
