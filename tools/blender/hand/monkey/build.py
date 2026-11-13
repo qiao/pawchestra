@@ -159,8 +159,8 @@ def subdivide(body):
 def fold_faces(S, tris, rule):
     """The triangles of the body with a corner whose app normal (crease 180: the angle-weighted
     mean of the normals of all triangles at its vertex) turns more than rule.angle degrees from
-    the normal of the triangle, in the region of the rule: no paw (|x| below rule.pawX) and no foot
-    (y above rule.footY)."""
+    the normal of the triangle, in the region of the rule: no paw (|x| below rule.pawX), no foot
+    (y above rule.footY), and no head or neck (y below rule.headY, when the rule gives it)."""
     Pt = S[tris]
     n = np.cross(Pt[:, 1] - Pt[:, 0], Pt[:, 2] - Pt[:, 0])
     n /= np.maximum(np.linalg.norm(n, axis=1), 1e-12)[:, None]
@@ -176,6 +176,7 @@ def fold_faces(S, tris, rule):
     dots = np.stack([(acc[tris[:, k]] * n).sum(1) for k in range(3)], 1)
     mid = Pt.mean(1)
     inside = (np.abs(mid[:, 0]) < rule['pawX']) & (mid[:, 1] > rule['footY'])
+    inside &= mid[:, 1] < rule.get('headY', np.inf)
     return np.nonzero((dots.min(1) < np.cos(np.radians(rule['angle']))) & inside)[0]
 
 
