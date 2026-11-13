@@ -1232,10 +1232,6 @@ Done when: the pose tests pass, and the pose and frame targets pass.
 - [ ] Make `pnpm keyboard` pass again. At 1440 × 900 the check "Tooltips of the speed menu and the
       volume slider" fails, and `checkHiddenBarTap` stops at a timeout, because the UI has no
       `.collapse` element now. Thus the run never reaches its last checks.
-- [ ] After the key C closes the drawer, give the focus to the drawer button only if the focus in
-      the drawer was a keyboard focus. Else remove the focus. Now the focus ring and the tooltip
-      "Open the drawer" stay on the film, the bar does not hide, and Space opens the drawer in
-      place of a pause (`src/ui/ui.ts:308`, `src/app/keys.ts:73`) (2.4, 2.8).
 - [ ] Make the seat rows read: keep the color dot at full size and color, and show the level only
       by the glow ring. At rest the dot is 3.9 px wide at the opacity 0.3 (`src/ui/ui.css`). Add a
       visible word to M and S in the wide drawer ("Mute", "Only this"), and a row "All seats"
