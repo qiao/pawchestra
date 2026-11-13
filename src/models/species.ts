@@ -442,11 +442,14 @@ export const SPECIES = {
    * Mouse, the oboes: a gray-taupe mouse with a cream belly, large round pink ears, whiskers, pink
    * paws, and a long thin pink tail. It has the studio body of the hand rig of the Tripo P2 mouse
    * (`assets/models/mouse/tripo-hand/`, design 4.4), with the form, the colors, and the eyes of
-   * its source, and the head height of the mouse of the old mesh. Its arms keep the length of the
-   * source: each arm reaches 0.22 m from the shoulder joint to the wrist, less than the 0.27 m of
-   * the old mouse. So it keeps the smaller oboe, 0.45 of the oboe of the app. It has no chair: it
-   * stands upright on its legs in the pose of the source, at the seat height of its legs (the
-   * crotch). Its long tail goes back and down and lies on the floor behind it, and it stands as a
+   * its source, and the eye height of the mouse of the old mesh (`metersPerUnit` of its chain).
+   * Reason: at the head height of the old mouse, its eyes stood 0.84 m high (old 0.69 m) and its
+   * ears 1.03 m, and the seat search moved players of 14 of 18 demos. Its arms keep the length of
+   * the source: each arm reaches 0.18 m from the shoulder joint to the wrist, less than the 0.27 m
+   * of the old mouse. So it keeps the smaller oboe, 0.45 of the oboe of the app. The scale of an
+   * instrument is a factor of the instrument of the app, so the oboe keeps its size in meters when
+   * the body changes its size. It has no chair: it stands upright on its legs in the pose of the
+   * source, at the seat height of its legs (the crotch). Its long tail goes back and down and lies on the floor behind it, and it stands as a
    * soloist. Its head height is the head of the studio body, and the seat height is the seat of
    * the studio body, in H.
    */

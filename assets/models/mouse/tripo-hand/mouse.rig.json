@@ -1,5 +1,5 @@
 {
- "sha256": "53340713916b39ed53212dc55b561404d535fb2c3d9b6cdc3044c15d9adc4741",
+ "sha256": "05fe01765647a9669efda3f91eb08478f5230bb1dbb25a6f746a490a6638cfa5",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -1401,7 +1401,7 @@
    }
   },
   "body": {
-   "height": 0.622076,
+   "height": 0.507275,
    "crease": 180
   },
   "texture": "assets/models/mouse/tripo-hand/mouse-color.webp"
