@@ -131,7 +131,10 @@ The weights, in the rest pose:
 2. Arm rows: each vertex of a side with |x| from 0.15, within 0.1 units of the line of the rest arm,
    takes one exact row (`sa.set_weight_row()`): a clavicle share of 0.50, 0.38, 0.33, 0.22, 0.10,
    and 0.04 at x 0.15, 0.17, 0.175, 0.19, 0.21, and 0.225, and 0 from x 0.24,
-   an elbow helper share of 0.75 (1 - |x - 0.245| / 0.07), and the rest on the 4 roll segments.
+   an elbow helper share of 1 - |x - 0.245| / 0.07, and the rest on the 4 roll segments.
+   The helper share reaches 1 at the elbow joint, so that the bend share grows linearly over
+   the elbow. A peak of 0.75 put 0.25 on the upper arm before the joint and on the forearm
+   after it, and the bend share jumped from 0.375 to 0.625 at the joint.
    The bone heat rows inside x 0.15 give the front of each armpit a clavicle share of about 0.57.
    A first row of 0.35 folded the front of each armpit when the arm reached for the keys, and a
    dark slit showed under the right upper arm. With the soft ramp, the fold samples on the
@@ -231,7 +234,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/polar-bear.rig.glb` | 883,040 bytes | `6531ce1bfc3873d6327a9f274d084a59abd5035e3c70ae2f275918f082e385a1` |
-| `tripo-hand/polar-bear.rig.json` | 18,509 bytes | `6b204497b2b4589bf88b0c5f0bb3d6c737bb4bfa8aad484750efdbbc6bf7ca08` |
+| `tripo-hand/polar-bear.rig.glb` | 883,036 bytes | `4881e0432286911d67a8f72318bd0f6d16e6532783d523ab268a5d7cfe866dc0` |
+| `tripo-hand/polar-bear.rig.json` | 18,509 bytes | `f5d83381065de71814de2a3bbe72a41b35a4e0fa3e94bce17061dc2e2639eb13` |
 | `tripo-hand/polar-bear-color.webp` | 177,576 bytes, 2048 × 2048 | `3445636300eb5ca1b2d3213048b8de71ae63f2cb7edc34989184015e11396757` |
 | `tripo-hand/polar-bear-normal.webp` | 119,866 bytes, 1024 × 1024 | `a7c97420957c9ba890474f5e429ed9e3740e87616b82b98f1fcbf444711b4e68` |
