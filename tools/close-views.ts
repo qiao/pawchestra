@@ -4156,7 +4156,8 @@ function chosenShotText(demo: string, chosen: ChosenShot): string {
 /**
  * Writes the shot of the working tree at a song time of a Cinematic frame, as the app plans it,
  * for the output of the tool: its kind, its seats, its times, and the blend into it when the time
- * falls in the blend.
+ * falls in the blend. When a detail insert covers the time, the text also gives the insert,
+ * because the insert then takes the frame.
  *
  * @param args The command line.
  * @param time The song time, in seconds.
@@ -4165,20 +4166,28 @@ function chosenShotText(demo: string, chosen: ChosenShot): string {
  */
 async function shotAtText(args: PlayArgs, time: number): Promise<string> {
   const { score, layout, models } = await demoLayout(args.demo, args.midi, args.recast?.recast);
-  const { shots } = prepareShots(score, layout, SHOT_SEED, models);
+  const { shots, inserts } = prepareShots(score, layout, SHOT_SEED, models);
   const shot = shots.findLast((s) => s.startSec <= time) ?? shots[0];
   if (!shot) {
     return `The ${pieceText(args.demo, args.midi)} has no shot.`;
   }
-  const seats = shot.seats.map((seat) => `${seat} (${speciesOfSeat(layout.players, seat)})`);
-  const subject =
-    seats.length === 0 ? '' : ` of the seat${seats.length > 1 ? 's' : ''} ${seats.join(', ')}`;
+  const subjectText = (seatsOf: readonly number[]): string => {
+    const seats = seatsOf.map((seat) => `${seat} (${speciesOfSeat(layout.players, seat)})`);
+    return seats.length === 0
+      ? ''
+      : ` of the seat${seats.length > 1 ? 's' : ''} ${seats.join(', ')}`;
+  };
   const end = Number.isFinite(shot.endSec) ? `${shot.endSec.toFixed(2)} s` : 'the end';
   const blend =
     time < shot.startSec + shot.blendSec
       ? `, in the blend of ${shot.blendSec.toFixed(2)} s from the previous shot`
       : '';
-  return `The shot of ${pieceName(args)} at ${time.toFixed(2)} s: ${shot.kind}${subject}, ${Math.max(0, shot.startSec).toFixed(2)} s to ${end}${blend}.`;
+  // In the time of a detail insert, the insert takes the frame (design 5.6).
+  const insert = inserts.find((s) => s.startSec <= time && time < s.endSec);
+  const insertText = insert
+    ? ` The frame shows the ${insert.detail ?? 'detail'} insert${subjectText(insert.seats)}, ${insert.startSec.toFixed(2)} s to ${insert.endSec.toFixed(2)} s.`
+    : '';
+  return `The shot of ${pieceName(args)} at ${time.toFixed(2)} s: ${shot.kind}${subjectText(shot.seats)}, ${Math.max(0, shot.startSec).toFixed(2)} s to ${end}${blend}.${insertText}`;
 }
 
 /** The player of `--at` on the stage of a demo. */
