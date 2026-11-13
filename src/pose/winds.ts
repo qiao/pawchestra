@@ -813,13 +813,15 @@ const MOUSE_OBOE_FORWARD = 10;
  * as a real oboist holds it about 40° from the body. The small mouse plays a smaller oboe
  * (`SpeciesParams.oboeScale`), so that the grips stay near the chest and the elbows bend near the
  * body: 0.45 of the oboe of the app. As on a real oboe, the left paw holds the upper joint near
- * the reed, and the right paw holds the lower joint above the bell, with a clear gap of 0.1 H
- * between the paws: the left grip stays at the grip of {@link WIND_HOLDS}, and the right grip moves
- * 0.1 H down the tube (`gripShiftL`, `gripShiftR`). With the left grip 0.3 H down, both paws lie
- * together on the lower half. Each grip also moves 0.06 H toward the axis and 0.05 H across it
+ * the reed, and the right paw holds the lower joint above the bell, with a clear gap between the
+ * paws: the left grip moves 0.03 H up the tube from the grip of {@link WIND_HOLDS}, and the right
+ * grip moves 0.05 H down the tube (`gripShiftL`, `gripShiftR`). The oboe keeps its size in meters
+ * and the body of 0.82 of the source scale is smaller, so with the right grip 0.1 H down, the right
+ * paw missed its grip by 1.7 cm. With the left grip 0.3 H down, both paws lie together on the lower
+ * half. Each grip also moves 0.06 H toward the axis and 0.05 H across it
  * toward the shoulder of its paw, so that each paw holds the tube from its own side. The arms of
- * the Tripo mouse reach 0.22 m from the shoulder joint to the wrist, so each shoulder bone turns
- * forward (`reach` 60° on the right, `reachL` 45° on the left), as the shoulder blades of a real
+ * the Tripo mouse reach 0.18 m from the shoulder joint to the wrist, so each shoulder bone turns
+ * forward (`reach` 70° on the right, `reachL` 45° on the left), as the shoulder blades of a real
  * player slide forward. With the 20° and 0° of {@link WIND_HOLDS} and the right grip 0.15 H down,
  * the left paw missed its grip by 2.7 cm and the right paw by 5.2 cm in the play
  * (`pnpm hold-fit oboist`), and the left upper arm went 2.3 cm into the shoulder. Each paw aims
@@ -832,11 +834,12 @@ const MOUSE_OBOE_FORWARD = 10;
  * tube at rest, and the left paw grasped it in no rest sample. With the grips behind the tube and a side aim
  * of half, each paw lies behind the tube with its palm to the audience and its thumb down the oboe.
  * With the left grip on the axis (0.04 H toward it), the roll to the tube has no direction, and the
- * paw turns over. With 60° on the right, the right arm folds 9 faces at rest (limit 8).
+ * paw turns over. With 70° on the right, the right arm folds 18 faces at p95 of the play, and the
+ * left arm 20 (`pnpm arm-check oboist`, limit 8).
  *
  * In the rest, the oboe stands upright in front of the belly, 0.25 H below the mouth, as a real
  * oboist holds it vertical in a short rest. Both paws stay on their grips of the play, the left paw
- * on the upper joint and the right paw on the lower joint, with a gap of 5.7 cm between them, so
+ * on the upper joint and the right paw on the lower joint, with a clear gap between them, so
  * that the lift and the lowering move the oboe with the paws, and no paw slides along the tube.
  * With the grips of the play, the oboe 0.45 H below the mouth puts an arm 1.3 cm to 1.9 cm into
  * the body. Both paws keep the aim and the roll of the play (`restAim`): with the roll of the
@@ -847,7 +850,7 @@ const MOUSE_OBOE_FORWARD = 10;
  * the tube, and the paw does not grasp it (`pnpm wind-grip oboist`). With the right elbow further
  * down, the right upper arm goes 0.8 cm into the body (0.6 cm with this elbow).
  *
- * The big head puts the mouth about 0.13 m above the shoulder joints, so the grips are near the
+ * The big head puts the mouth about 0.11 m above the shoulder joints, so the grips are near the
  * height of the shoulders. While the mouse plays, the right elbow points down, out, and forward,
  * as an oboist drops the wrists and keeps the arms a little away from the sides. With the elbow of
  * the right arm of {@link WIND_HOLDS} out and level, the right upper arm turns 83° from its bind
@@ -861,7 +864,7 @@ const MOUSE_OBOE_FORWARD = 10;
  */
 const MOUSE_OBOE = {
   ...WIND_HOLDS.oboe,
-  reach: 60 * MathUtils.DEG2RAD,
+  reach: 70 * MathUtils.DEG2RAD,
   reachL: 45 * MathUtils.DEG2RAD,
   lipShift: [0, -0.04, 0.23],
   rest: holdTurn(-30, 0),
@@ -873,8 +876,8 @@ const MOUSE_OBOE = {
   poleR: [0.5, -1, -0.5],
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
-  gripShiftL: [0, 0.06, -0.05],
-  gripShiftR: [0.1, 0.06, -0.05],
+  gripShiftL: [-0.03, 0.06, -0.05],
+  gripShiftR: [0.05, 0.06, -0.05],
   restAim: 1,
   gripCurl: curls(130, 110),
 } as const satisfies WindHold;
