@@ -15,6 +15,7 @@ import { SPECIES, instrumentScale } from '../models/species.ts';
 import type { SpeciesId, SpeciesParams } from '../models/species.ts';
 import { scoreOf } from '../score/test-score.ts';
 import { countInAt } from './count-in.ts';
+import { END_BOW_SEC } from './end-bow.ts';
 import { preparePoses } from './plan.ts';
 import type { PosePlan } from './plan.ts';
 import { createScenePose, poseAt } from './pose-at.ts';
@@ -744,6 +745,9 @@ export const CONDUCTOR_SWEEP: RoleSweep = {
     const arms: SweepSample[] = [];
     for (let wall = 10; wall < 14; wall += 0.05) {
       arms.push([Math.min(0, start + wall - 10), wall, play]);
+    }
+    // The whole bow, and 1 s of the rest pose after it.
+    for (let wall = 10; wall < 10 + END_BOW_SEC + 1; wall += 0.05) {
       arms.push([scene.score.durationSec, wall, ended]);
     }
     return [
