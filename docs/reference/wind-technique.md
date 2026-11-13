@@ -484,8 +484,8 @@ The app follows these facts:
   holds them (`faceTube`, `aimSide`, design 5.3). With the roll of the shoulder, the right paw of
   a recast body stood up behind the valves, with its finger tips up.
 - **The oboe (2.3, `MOUSE_OBOE`).** The oboe stands at about 40° from the body (`hanging()` of
-  `src/models/instruments/woodwinds.ts`, `play`). The reed is in the mouth under the long muzzle
-  (`lipShift`), and the head stays up. The left paw holds the upper joint, and the right paw the
+  `src/models/instruments/woodwinds.ts`, `play`). The reed goes between the lips at the front of the
+  long muzzle, on the middle line (`lipShift`), and the head stays up. The left paw holds the upper joint, and the right paw the
   lower joint (`gripShiftL`, `gripShiftR`). The upper arms hang below the shoulders, with the
   elbows a little out (`poleL`, `poleR`). The shoulders slide forward, so that the short arms of
   the mouse reach the grips (`reach`, `reachL`).

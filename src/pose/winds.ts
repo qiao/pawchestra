@@ -806,9 +806,12 @@ const MOUSE_OBOE_FORWARD = 10;
 
 /**
  * The oboe hold of the mouse (design 5.3), the hold of a real oboist
- * (`docs/reference/wind-technique.md` 2.3). The long muzzle puts the tip of the nose far in front
- * of the mouth, so the reed sits 0.23 H further back and 0.04 H lower than the mouth of the bind
- * pose, in the mouth under the nose, with about half of the reed in the mouth. The oboe hangs 40°
+ * (`docs/reference/wind-technique.md` 2.3). The mouth point of the body lies under the tip of the
+ * nose, about 1.8 cm in front of the lips, so the reed tip sits 0.13 H further back and 0.005 H
+ * lower than that point (`lipShift`): the reed goes about 1 cm between the lips at the front of the
+ * muzzle, on the middle line, as a real oboist puts the reed at the middle of the lips. With the
+ * reed tip 0.23 H back, the reed went into the underside of the muzzle 5.1 cm behind the mouth
+ * point, and from the front left it stood at the corner of the mouth. The oboe hangs 40°
  * from the vertical, 10° further forward than in {@link WIND_HOLDS} ({@link MOUSE_OBOE_FORWARD}),
  * as a real oboist holds it about 40° from the body. The small mouse plays a smaller oboe
  * (`SpeciesParams.oboeScale`), so that the grips stay near the chest and the elbows bend near the
@@ -837,8 +840,9 @@ const MOUSE_OBOE_FORWARD = 10;
  * paw turns over. With 70° on the right, the right arm folds 18 faces at p95 of the play, and the
  * left arm 20 (`pnpm arm-check oboist`, limit 8).
  *
- * In the rest, the oboe stands upright in front of the belly, 0.25 H below the mouth, as a real
- * oboist holds it vertical in a short rest. Both paws stay on their grips of the play, the left paw
+ * In the rest, the oboe stands upright in front of the belly, 0.29 H below the mouth point, as a
+ * real oboist holds it vertical in a short rest. The rest place moves by the opposite step of the
+ * reed (`restShift`), so the rest pose stays when the reed moves. Both paws stay on their grips of the play, the left paw
  * on the upper joint and the right paw on the lower joint, with a clear gap between them, so
  * that the lift and the lowering move the oboe with the paws, and no paw slides along the tube.
  * With the grips of the play, the oboe 0.45 H below the mouth puts an arm 1.3 cm to 1.9 cm into
@@ -866,9 +870,9 @@ const MOUSE_OBOE = {
   ...WIND_HOLDS.oboe,
   reach: 70 * MathUtils.DEG2RAD,
   reachL: 45 * MathUtils.DEG2RAD,
-  lipShift: [0, -0.04, 0.23],
+  lipShift: [0, -0.005, 0.13],
   rest: holdTurn(-30, 0),
-  restShift: [0.1, -0.25, -0.05],
+  restShift: [0.1, -0.285, 0.05],
   restPoleL: [-1, -0.75, -1],
   restPoleR: [1.5, -0.75, 0.25],
   play: holdTurn(MOUSE_OBOE_FORWARD, 0),

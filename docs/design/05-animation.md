@@ -623,7 +623,10 @@ The rest of each family:
   but the long muzzle of the wolf puts the mouthpiece far in front of the chest, and at 45° the
   arms do not reach the grips.
 - **Oboe of the mouse.** The left paw holds the upper joint and the right paw the lower joint,
-  with the fingers curled over the front of the tube (`MOUSE_OBOE`). Both shoulder bones turn
+  with the fingers curled over the front of the tube (`MOUSE_OBOE`). The reed goes between the
+  lips at the front of the muzzle, on the middle line (`lipShift`). Reason: a real oboist puts
+  the reed at the middle of the lips (winds 2.3), and the reed under the muzzle further back
+  read as the corner of the mouth. Both shoulder bones turn
   forward, the right more than the left (`reach`, `reachL`), as the shoulder blades of a real
   player slide forward. Reason: the arms of the Tripo mouse keep the length of its source, and
   with square shoulders the paws missed their grips by 2.7 cm and 5.2 cm. The scale of an
