@@ -143,8 +143,8 @@ The weights, in the rest pose:
 2. Arm rows: each vertex of a side with |x| from 0.09, within 0.055 units of the line of the rest
    arm, takes one exact row (`sa.set_weight_row()`): a clavicle share of 0.6, 0.48, 0.36, 0.25,
    0.15, and 0.07 at the source x 0.09, 0.10, 0.11, 0.12, 0.13, and 0.14, linear between them and
-   0 from x 0.15, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at the rings x 0.153, 0.163,
-   0.1735, and 0.185, and the rest on the 4 roll segments ("Arm roots"). The rows take x of the
+   0 from x 0.15, an elbow helper share that grows from 0 at x 0.13 to 1 at the elbow joint (x 0.168) and falls
+   to 0 at x 0.1965, and the rest on the 4 roll segments ("Arm roots"). The rows take x of the
    source, mapped back through the arm stretch (`arm_source_x()`).
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.003 from 0.03 units before
    the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.003 from
@@ -353,8 +353,8 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 1,051,856 bytes | `826365e783e48e948b76138b37182565ed9f3c995c2bc0cd482b7046a4df1f79` |
-| `tripo-hand/fox.rig.json` | 16,272 bytes | `b0c3103af258c5f25d346d3a0528e5e8d6b3afe4d129df615f4b9879c916f140` |
+| `tripo-hand/fox.rig.glb` | 1,051,856 bytes | `36e7bf690ef30eac3690bdca94267747741d986cb8f593e55cd4c245318f39a9` |
+| `tripo-hand/fox.rig.json` | 16,272 bytes | `9fc9f5db992fb369358361efc358cd711854c4a3cbdf142ec7d9595fbb08ed9a` |
 | `tripo-hand/fox-color.webp` | 172,080 bytes, 2048 × 2048 | `1e2a3fc91b1708228c25026edfcffc40a1f5fe8bba5a7390ee46836baf26dcfa` |
 | `tripo-hand/fox-tan-color.webp` | 178,228 bytes, 2048 × 2048 | `77340995571173589a2a609f0099daffb635e8a8638a5617b8458e94d45e81ae` |
 | `tripo-hand/fox-normal.webp` | 99,334 bytes, 1024 × 1024 | `377d69a822300e6f4265a5b8948d86481c9914e26b7d8a99a84e306fdf4f668f` |
