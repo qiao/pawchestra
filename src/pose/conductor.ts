@@ -729,9 +729,10 @@ function poseLeftHand(
   shrugTurn.setFromAxisAngle(Z_AXIS, -state.shrug);
   poseShoulder(rig.left, chest, rig.chestBind, shrugTurn, left);
   setBoneRotation(rotations, rig.left.bones.shoulder, shrugTurn);
-  // The places turn with the upper body to the left. In a turn to the right, they stay, so that
-  // the hand does not come over the desk of the stand.
-  const turn = Math.max(0, cue.torsoYaw);
+  // The places turn with the upper body to each side. When the places stayed in a turn to the
+  // right, the left arm reached back across the turned chest: the left forearm stretched 0.58 of
+  // the upper arm, and the left upper arm went 2.4 cm into the shoulder at a climax.
+  const turn = cue.torsoYaw;
   placeOf(rig, places.quiet, state, turn, null);
   wrist.copy(place);
   direction.copy(fingers);
