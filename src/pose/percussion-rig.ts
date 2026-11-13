@@ -736,8 +736,17 @@ export const PERCUSSION_HOLDS = {
     // shoulder, and with the new tilt the forearms went 2.6 cm into the belly. With 0.3 H, the
     // forearms went 1.7 cm in.
     home: [0.35, -0.2, -0.75],
-    gripRise: null,
-    homeOut: null,
+    // At the lowest and the highest bars, the target lies out past the home, so the mallet pointed
+    // straight forward and 30° down, and the wrists came up to the height of the shoulders, with
+    // the forearms 22° to 34° up. A real player keeps the forearms a little below level and the
+    // hands low over the bars (percussion 9). The grip stays at most 0.25 H (7 cm) over its target
+    // (gripRise), and the home stays at least 0.45 H out from the target (homeOut), so that the
+    // mallet points a little in and the paw bends less on the forearm. At the end bars, the
+    // forearms then slope 5° to 13° down, and the targets miss by at most 3.5 mm. With the grip
+    // limit alone, the paws bent more and the folds grew from 22 and 15 to 35 and 24 (arm gate),
+    // and with 0.2 H a target missed by 6.8 mm. With the homeOut 0.25 H, the right folds were 19.
+    gripRise: 0.25,
+    homeOut: 0.45,
     top: 'up',
     across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 6 },
     // Both heads keep one height between strikes, because the paws do not pass each other.
