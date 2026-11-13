@@ -154,8 +154,8 @@ export async function githubMarkEntry(root: string): Promise<LicenseEntry> {
 }
 
 /**
- * Makes the license entry of the font of the wordmark in the logo (design 2.8, 7.3). The logo
- * holds the outlines of the word in Fraunces as an SVG path, so the text is the license of
+ * Makes the license entry of the font Fraunces (design 2.8, 7.3): the outlines of the wordmark in
+ * the logo, and the static subset of the title font. The text is the license of
  * `assets/fraunces/LICENSE.txt`.
  *
  * @param root The folder of the root package.json.
@@ -168,7 +168,7 @@ async function frauncesEntry(root: string): Promise<LicenseEntry> {
     license: 'OFL-1.1',
     source: 'https://github.com/undercasetype/Fraunces',
     text: [
-      'The logo shows the name of the app as the outlines of this font. The app holds no font file.',
+      'The logo shows the name of the app as the outlines of this font. The piece title uses fonts/fraunces-title.woff2: a static instance of this font with a subset of its glyphs.',
       '',
       license,
     ].join('\n'),
