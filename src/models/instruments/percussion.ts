@@ -350,12 +350,14 @@ export interface TablePlace {
  * (`PERCUSSION_PLACES.triangleHand` of `pose/percussion-rig.ts`), so that the paw does not turn to
  * hang it there. The tambourine lies flat with the turn of the paw that holds it in the play
  * (`TAMBOURINE_HOLD` of `pose/percussion-rig.ts`), with its head turned up: a turn of -54° around
- * the vertical from the bind pose. The right paw lays the beater down with
- * the palm down and the fingers forward, so that the beater lies flat and points forward and in.
+ * the vertical from the bind pose. It lies in the middle of the table and toward its far edge, so
+ * that the triangle in the raised left paw hangs beside it: at the left and near edge, the lower
+ * corner of the triangle went into its head. The right paw lays the beater down with the palm down
+ * and the fingers forward, so that the beater lies flat and points forward and in.
  */
 export const TABLE_PLACES = {
   tambourine: {
-    at: [-0.15, TRAP_TABLE.top + 0.0225, -0.215],
+    at: [0, TRAP_TABLE.top + 0.0225, -0.29],
     hand: toQuat(new Quaternion().setFromAxisAngle(new Vector3(0, 1, 0), -54 * MathUtils.DEG2RAD)),
   },
   triangle: {
