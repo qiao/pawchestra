@@ -81,8 +81,8 @@ scripts are those of the Tripo beaver with the changes below. `make_config.py` w
 
 | Item | Value |
 |---|---|
-| Size | 392,270 bytes (each run writes other bytes) |
-| SHA-256 | `91199926c7f064243997edb40178f9290c37a9081428ac3a1214fe3f495fcb98` |
+| Size | 392,523 bytes (each run writes other bytes) |
+| SHA-256 | `3efe93bc56ff4360a955af7b4e86c27480125ba17572ead0752b904715ffcc2c` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the badger faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `badger`: 3,765 vertices and 4,132 faces (3,259 quads and 873 triangles, 7,391 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the nose takes the slot `fur` and the color map. The 114 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/badger/tripo-hand/badger-color.webp`) |
 | Armature | `badger_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -133,19 +133,28 @@ The weights, in the rest pose:
 1. Automatic Weights, then Limit Total 4 and Normalize All, on a copy of the mesh with no loose
    part.
 2. Arm rows: each vertex of a side with |x| from 0.17, within 0.08 units of the line of the rest
-   arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.17 to 0 at x
-   0.21, an elbow helper share that grows from 0 at x 0.228 to 1 at the elbow joint (x 0.2625)
-   and falls to 0 at x 0.299, and the rest on the 4 roll segments. The helper turns half of the
-   bend, so the bend share of a row grows linearly from 0 to 1 over the span. The old helper share
-   (0.25, 0.75, 0.75, 0.25) put 0.25 on the upper arm before the joint and on the forearm after
-   it, so the bend share jumped from 0.375 to 0.625 at the joint and creased the bent elbow. Each
-   vertex of the elbow rings takes the row of its own x.
+   arm, takes one exact row (`sa.set_weight_row()`): a clavicle share of 0.55, 0.47, 0.40, 0.32,
+   0.22, and 0.08 at x 0.17, 0.18, 0.19, 0.2, 0.21, and 0.228, and 0 at x 0.2625, an elbow
+   helper share that grows from 0 at x 0.228 to 1 at the elbow joint (x 0.2625) and falls to 0 at
+   x 0.299, and the rest on the 4 roll segments. The helper turns half of the bend, so the bend
+   share of a row grows linearly from 0 to 1 over the span. The old helper share (0.25, 0.75,
+   0.75, 0.25) put 0.25 on the upper arm before the joint and on the forearm after it, so the bend
+   share jumped from 0.375 to 0.625 at the joint and creased the bent elbow. Each vertex of the
+   elbow rings takes the row of its own x. The bone heat rows inside x 0.17 give the armpit a
+   clavicle share of about 0.6 to 0.7, so the soft clavicle ramp of the polar bear starts near
+   that share. The old first row of 0.4 dropped to 0 in 0.04 units.
 3. Wrist rows and knuckle rows as on the beaver: the bend share of the paw grows in 12 equal steps
    of 0.004 from 0.03 units before the head of `hand_<side>`, and the fingers share in 12 equal
    steps of 0.0035 from 0.02 units before the head of `fingers_<side>`.
-4. Ear rows: a plane through the ear base splits the head and each ear (`earPlane` of the
+4. Back rows (`back_rows()`, `backRows` of the params): each vertex of a side with |x| from 0.12
+   to 0.2, y from 0.53 to 0.7, and z at most -0.06 (the back wall of the armpit, 25 vertices on
+   each side) moves its upper arm and elbow shares onto `clavicle_<side>`. These trunk vertices
+   kept bone heat arm shares of 0.1 to 0.4. When the elbow goes back, as in the strike of the
+   cymbalist and the lift of the xylophonist, they pulled the back of the armpit into a fold, and
+   the fold showed as a dark slit behind the upper arm.
+5. Ear rows: a plane through the ear base splits the head and each ear (`earPlane` of the
    params): 257 ear vertices, 25 base vertices.
-5. The eyeballs take {`head` 1}. The tail (each vertex with rest z below -0.2 and y below 0.3, 113
+6. The eyeballs take {`head` 1}. The tail (each vertex with rest z below -0.2 and y below 0.3, 113
    vertices) takes {`hips` 1 - a, `tail` a (1 - c), `tail_tip` a c}, with a = smoothstep(0, 0.04)
    along `tail` and c = smoothstep(-0.03, 0.03) along `tail_tip`. Each other vertex gives its tail
    weights to the hips.
@@ -210,7 +219,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/badger.rig.glb` | 1,257,288 bytes | `1684c0b25070644de60a58a1672bcce217e7fca310fb3f396e10612ceeb0156c` |
-| `tripo-hand/badger.rig.json` | 16,699 bytes | `5fdc71a28f02914191bafed9478ccc939e7dd7ebb1dd317839054233b15d3d7c` |
+| `tripo-hand/badger.rig.glb` | 1,257,292 bytes | `743c059eb0ce8a261fec9988cfdcfb5b7b931b581fad6996be9c38536da873c9` |
+| `tripo-hand/badger.rig.json` | 16,699 bytes | `7aed3a6e695f48938021a0230b258894b72c92c232f7af6fd9bccb69bfa25c3a` |
 | `tripo-hand/badger-color.webp` | 153,548 bytes, 2048 × 2048 | `11aac51d538ed6221ab83617e707062a40d1f895ec1e19de1710d821b02af718` |
 | `tripo-hand/badger-normal.webp` | 117,358 bytes, 1024 × 1024 | `88d50cb835488a10fc3dbff89e2bac000f8217715d117f2022de2efc1ce0dca0` |
