@@ -5,455 +5,222 @@ This folder holds the Tripo P2 source mesh of the bear (`tripo-p2/`) and its han
 `src/models/studio/bear.ts`, which this chain writes:
 
 ```text
-tripo-p2/bear.fbx           source mesh with quad faces
-   │  edits by hand in Blender
+tripo-p2/bear.fbx             source mesh with quad faces
+   │  pnpm hand-chain bear    chain tools/blender/hand/bear/
    v
-tripo-hand/bear.blend       hand rig (design 4.4, "Hand rig")
-   │  pnpm rig-export bear --blend <file>
+tripo-hand/bear.blend         hand rig (design 4.4, "Hand rig")
+   │  pnpm rig-export bear    the same run
    v
-tripo-hand/bear.rig.glb     rigged mesh, with its summary bear.rig.json
-   │  pnpm studio-body bear
+tripo-hand/bear.rig.glb       rigged mesh, with its summary bear.rig.json
+   │  pnpm studio-body bear   the same run
    v
-src/models/studio/bear.ts   studio body of the app
+src/models/studio/bear.ts     studio body of the app
 ```
 
-The bear has no chain in `tools/blender/hand/`, because its `.blend` is made by hand
-(`tools/blender/hand/README.md`, "Bodies with no chain"). The section "Tripo hand rig" below
+`tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
 gives the files, their sources, their licenses, and their checksums.
 
-The files of the older body of the route of `pnpm rig-mesh` are removed. Commit `cbc8db5e4` has
-these files and the sections of this file about them.
+The older Tripo bear, made by hand in a live Blender, is at commit `d5d8ab2c3`, with the sections
+of this file about it. The files of the route of `pnpm rig-mesh` are at commit `cbc8db5e4`.
 
 ## Tripo hand rig
 
-`tripo-hand/` holds the body of the app ("tripo-hand/bear.blend" below): a hand rig of the Tripo P2
-mesh `tripo-p2/bear.fbx`, made in a live Blender with no arm cut and no limb stretch. The `ANIMALS`
-entry of the bear points to `tripo-hand/bear.rig.glb`.
+`tripo-hand/` holds the body of the app: a hand rig of the Tripo P2 mesh `tripo-p2/bear.fbx`,
+made by one build script in a headless Blender 5.2, by the route of the Tripo badger
+(`../badger/README.md`). The source FBX is the target of the look: the body keeps the form, the
+eye paint, the eyes, the claws, the round belly, and the tail bump of the source, with a crease
+angle of 180°. The edits are a scale to the eye height of the older bear, smaller front paws, a
+paw turn, a small move of the upper lids, and a lower lightness of the color map. The arms and
+the legs keep the length of the source, with no cut and no split from the trunk. The `ANIMALS`
+entry of the bear in `tools/studio-body.ts` points to `tripo-hand/bear.rig.glb`.
 
 | File | Origin | Rebuild |
 |---|---|---|
 | `tripo-p2/bear.fbx`, `tripo-p2/bear.fbm/` | Source mesh with quad faces, and its color map and normal map (below) | None |
-| `tripo-hand/bear.blend` | Made by hand in Blender 5.2 from `tripo-p2/bear.fbx` (below). License as the FBX file | None: edit it in Blender |
+| `tripo-hand/bear.blend` | Made from `tripo-p2/bear.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain bear` |
 | `tripo-hand/bear.rig.glb` | Export of `tripo-hand/bear.blend`. License as the FBX file | `pnpm rig-export bear --blend assets/models/bear/tripo-hand/bear.blend --out assets/models/bear/tripo-hand/bear.rig.glb` |
 | `tripo-hand/bear.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/bear-color.webp` | The color map of the FBX in the brown of the bear of main ("Color map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/bear-maps.py` |
-| `tripo-hand/bear-normal.webp` | The normal map of the FBX for the fur shading ("Normal map" below). License as the FBX file | The steps of "Normal map" |
+| `tripo-hand/bear-color.webp`, `tripo-hand/bear-normal.webp` | Web copies of the color map and the normal map of the FBX, with fur strands ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/bear-maps.py`, after the chain (the tool reads the eyes of the rig file) |
 
 ### tripo-p2/bear.fbx
 
-A brown bear in a T-pose, made with Tripo P2: quad faces, and arm and leg tubes of 18 vertices
-around. The FBX file keeps the quads. The folder `bear.fbm/` holds its color map and its normal
-map.
+A round, furry brown bear in a T-pose with quad faces, made with Tripo P2 from the turnaround
+sheet of the bear. It stands upright on short legs, with a round belly, round ears, a light tan
+muzzle, a dark brown nose, dark claws on the paws and the feet, and a small tail bump.
 
 | Item | Value |
 |---|---|
-| Origin | Made with Tripo by the project author on a paid plan. The author holds the rights |
+| Origin | Made with Tripo by the project author on a paid plan, and given on 2026-11-13. The author holds the rights |
 | License | CC BY-NC 4.0 (`../LICENSE`). It is no third-party file, so the third-party license file (design 7.3) has no entry for it |
-| Writer | Tripo, FBX 7.4 binary |
-| Contents | One mesh object, with no armature and no animation. 2,717 vertices and 2,900 faces: 2,336 quads and 564 triangles (5,236 triangles), no n-gon. One UV layer |
-| Parts | 22 parts: the body (2,088 vertices), two eyeballs (41 vertices each), the tail ball (51 vertices), five claws on each paw (28 vertices each), and four claws on each foot (27 vertices each). No vertices merge at 1e-5. The 156 open edges are the open root loops of the claws, the tail ball, and the eyeballs. No edge has more than two faces |
-| Box | In the studio units (1 unit from the soles to the ear tips): x ±0.4966 (the claw tips of the paws), and z -0.2303 (the tail ball) to 0.2303 (the belly). The bear faces -y in Blender |
+| Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
+| Contents | One mesh object, with no armature and no animation. 3,113 vertices and 3,397 faces: 2,729 quads and 668 triangles (6,126 triangles), no n-gon. One UV layer |
+| Parts | 3 parts: the body with the head, the claws, and the tail (3,031 vertices), and the two eyeballs (41 vertices each). Each eyeball is a cap of a sphere of radius 0.0413 units, open at the back. 116 open edges in 13 loops: the rims of the 2 eyeballs (17 edges), the 2 eye sockets (18 edges), a slit at the left corner of the mouth (10 edges), a slit across the tail (7 edges), and 7 holes of 4 edges (on the paws, beside the mouth, and on the left upper arm). No edge has more than two faces |
+| Box | In the studio units (1 unit from the soles to the top of the ears): x ±0.477 (the claw tips of the paws), z -0.2255 (the tail) to 0.2259 (the nose). The bear faces -y in Blender, with its left side at +x, so the import needs no turn |
 
-The Tripo download names the maps by their job. The copy gives them the names of the species,
-and leaves out the roughness map (`bear_roughness.JPEG`) and the metallic map
-(`bear_metallic.JPEG`). The FBX file still names the maps of the download. No step reads the
-material of the FBX file: `sa.import_source()` keeps only the mesh and its UVs.
+The folder `bear.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness and
+the metallic maps are not kept.
 
-| File | Name in the download | Size | Pixels | SHA-256 |
+| File | Name in the zip file | Size | Pixels | SHA-256 |
 |---|---|---|---|---|
-| `bear.fbx` | `tripo_convert_8ef16b57-d21b-4b3f-9cbf-02d63e935668.fbx` | 187,036 bytes | | `0eaaf5e5a4afcfdc3daf43031433c96558482c9e5f1f7f40c37e8856688a1dbc` |
-| `bear.fbm/bear_basecolor.jpg` | `tripo_rgb_78a1f9d0-753e-4381-90e8-663ab5ba5049.jpg` | 3,396,472 bytes | 4096 × 4096 | `84f0807f254aaa366d32796545a35b7a1c5eb5ba79316d94f13494131ab57be7` |
-| `bear.fbm/bear_normal.jpg` | `tripo_normal_b737a6d9-0904-4602-a807-ec24bf9e02f9.jpg` | 1,772,996 bytes | 4096 × 4096 | `fdae5918b0d09a6c76110d5a6e4da4955fad2794e283a3ab80ff8c792937cf1f` |
+| `bear.fbx` | `tripo_convert_a5dac401-27b1-4d25-870f-82d6f3a31524.fbx` | 211,148 bytes | | `b9cd9a0a50f38faf1f53fbd8b51437296e70f6858de74f0a3b5c70c3ae077da6` |
+| `bear.fbm/bear_basecolor.jpg` | `tripo_rgb_b023e225-56ba-4cda-ad47-4d0d3174b833.jpg` | 3,676,950 bytes | 4096 × 4096 | `59d4a219ff02ad972f7b3b0dff545a1d6b619f99400204edcb387f2e6a19391c` |
+| `bear.fbm/bear_normal.jpg` | `tripo_normal_17744727-2bb2-4bc9-963a-dfa0b4559192.jpg` | 1,706,614 bytes | 4096 × 4096 | `a57fcfa9f6bf0dde2ec1ade13e07722b69cc21ff5e6099ffabde499d5a7eb9d2` |
 
-The color map paints a full eye on each eyeball: a black pupil, a dark iris, a white light, and
-a light rim. The fur is orange brown, the muzzle is light tan, and the nose and the claws are
-dark brown. The map paints no pads on the paws.
+The color map paints orange brown fur (median sRGB 159, 86, 32 on the back), a lighter belly, a
+tan muzzle (206, 139, 82), a dark brown nose (80, 54, 36), dark claws, and on each eyeball a white
+ball with a brown iris and a black pupil. The chain reads the base color by its path in this folder
+(`sourceTexture` of the params), so the FBX needs no new paths.
 
 ### tripo-hand/bear.blend
 
-The hand rig of the Tripo P2 mesh (design 4.4, "Hand rig"), made in a live Blender 5.2 through the
-Blender MCP tools, in a scene `bear` of its own. The arms and the legs keep the form and the length
-of the source: no cut, no split from the trunk, and no stretch.
+The hand rig (design 4.4, "Hand rig"). The chain of the body is in `tools/blender/hand/bear/`
+(`build.py`, `make_config.py`, `params.json`, `base-config.json`, `redits.py`, `rimport.py`,
+`rings.py`, `tail.py`), and `pnpm hand-chain bear` runs it. Its scripts are those of the Tripo
+badger with the changes below. `make_config.py` writes `tools/mesh-rigs/simple/bear-tripo.json`:
+the joints of the source, mapped by the point edits.
 
 | Item | Value |
 |---|---|
-| Size | 367,371 bytes |
-| SHA-256 | `5a57ad9d8f70f9fa699de6eb6a4939d1d64de2a85fd167c830060460ede6863b` |
-| Origin | Made by hand in Blender 5.2 from `tripo-p2/bear.fbx` |
-| License | CC BY-NC 4.0, as the FBX file |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `bear`: 3,261 vertices and 3,392 faces (2,828 quads and 564 triangles, 6,220 triangles), flat faces, and the surface of `sa.add_surface()` with one color for each region ("Smooth surface" below). 47 faces are gloss (the nose). The two eyeballs of the source sit in their sockets, and their 80 faces have the face attribute `eye` ("Eyes" below). A lid on each eye: 312 quads with the face attribute `lid` ("Lids" below). The UV map of the FBX, and the custom property `texture` (`assets/models/bear/tripo-hand/bear-color.webp`) |
-| Armature | `bear_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/bear-tripo.json` (shoulder x 0.15, elbow 0.27, wrist 0.365, knuckles 0.43). The Action `bind` holds the standing bind of that config: no leg turn, no trunk recline, straight arms, and no bind supination. The property `palm` holds a palm for each side ("Arm twist" below), and the property `lids` the turn and the hinge axes of the lids. The properties `seat` and `hinges` come from `sa.build_armature()` |
-| Facts | `height` 1.108447 (the shoulder joints at 0.669 u, 1.656871 m for each unit, so that H stays 0.357761 m, the H of the bear of `bear-tpose.rig.glb` at cbc8db5e4), `crease` 40 and `colorBlend` 0.05 (the values of that bear), and the cue facts `cueHeadLeft` 35, `cueHeadRight` 30, and `cueLift` 12 ("Cue facts" below) |
-| Eyes | The eyeballs of the mesh, with the `eye` finish and the eye light of the app. No eye objects, so the app adds no bead eyes. A lid on each eye blinks |
+| Size | 372,325 bytes (each run writes other bytes) |
+| SHA-256 | `a1b3ae46bbe840f3105de08ff8eb8aa1c59ba719feeede92a8d9f7b033744d9a` |
+| Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
+| Mesh | One object `bear`: 3,477 vertices and 3,716 faces (3,048 quads and 668 triangles, 6,764 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the nose takes the slot `fur` and the color map. The 92 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/bear/tripo-hand/bear-color.webp`) |
+| Armature | `bear_rig`: the 30 body bones and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the standing bind of the older bear: no leg turn, no trunk recline, straight arms, and no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
+| Facts | `height` 1.121989 (the shoulder joints at y 0.669, 1.677114 m for each unit), `crease` 180, and the cue facts `cueHeadLeft` 35, `cueHeadRight` 30, and `cueLift` 12 of the older bear (design 5.4, `rigFacts` of the params) |
+| Eyes | The eyeballs of the source, with the finish `eye` and the eye light, and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The export of the file. License of both files: CC BY-NC 4.0, as the FBX file.
+**Scale.** The eyes of the standing bear (the middles of the eyeballs) stand 1.481005 m high, as
+on the older bear (1.481006 m), so that the seats and the camera framing do not move (design 4.2).
+H goes from 0.357761 m to 0.346565 m, the crown from 1.659 m to 1.677 m. The baton, the
+conductor stand, and the podium keep their sizes in meters. The feet stand on the podium (1.05 m
+wide), at most 0.35 m from its middle.
 
-| File | Size | SHA-256 |
-|---|---|---|
-| `tripo-hand/bear.rig.glb` | 712,416 bytes | `b2da3ca16e6612503173981d09aaaa1869bdf0cfcf2803348be71b22ea79b0a0` |
-| `tripo-hand/bear.rig.json` | 16,157 bytes | `7a2eedb869d6fd23a7954139dbb4878a528efc4bd685209f293c975cdeddaecf` |
+The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+left side):
 
-The edits, in the order of the work:
+- **Import.** `sa.import_source('assets/models/bear/tripo-p2/bear.fbx', 1e-5)`. No vertex merges,
+  and each face is flat.
+- **Holes.** `fill_holes()` of the polar bear chain closes each open loop of 4 edges or fewer with
+  one quad (`holes` of the params): 7 holes. Each new corner takes the UV of a face of its vertex.
+- **No rings.** Only a few arm loops of the source are closed (14 vertices at x 0.201, 0.244,
+  0.336, and 0.368), the elbow region has poles, and the legs have no closed loop. No band is
+  split.
+- **Folds.** `fold_relax()` with the rule of the beaver: 3 fold triangles become 0 in 2 rounds. 9
+  vertices move, at most 0.0094 units.
+- **Paw turn.** Each paw past the closed loop at x 0.336 turns rigidly about the rest forearm axis
+  by whole steps of the loop of 14 edges (25.7°): -77.1° on the left (3 steps) and 51.4° on the
+  right (2 steps), 311 vertices on each side. The band to the loop at x 0.368 goes, new quads
+  join the two loops with the step offset, and the turned loop takes the form of the loop before
+  the turn, with a fade over 0.03 units (`turnFit`). The palm hint turns with the paw. Reason:
+  with no turn, the paws of the conductor twisted -78° (left) and 55° (right) on their forearms in
+  the play (`pnpm hold-fit conductor`), and now 0° and 4°.
+- **Surface.** `sa.add_surface(bear, 'bear', <base color>, eye_fans=False,
+  config=<bear-tripo.json>)`. The 51 gloss faces of the nose box go back to the slot `fur`
+  (`nose_trim()`), so that the nose takes the color map with its painted nostrils.
+- **Eyes.** The eyeballs are the two loose parts of 41 vertices in the eye box. Their 92 faces take
+  the face attribute `eye`.
+- **Armature.** The joints of the source, on sections of the mesh: the arm axis at y 0.669 to
+  0.663, from z 0.01 at the shoulder to z 0.106 at the wrist (the arm points 27° forward). The
+  shoulder at x 0.165 (the arm leaves the trunk at x 0.205), the elbow at x 0.265, the wrist at x
+  0.355 where the paw widens, the knuckles at x 0.42, and the tip at x 0.475. The hip at (0.112,
+  0.23, -0.005), the knee at (0.118, 0.13, -0.014), the ankle at (0.12, 0.06, -0.03), and the toes
+  from (0.125, 0.025, 0.07) to (0.13, 0.012, 0.135): the thigh leans 6°, so that its frame in the
+  frame of the hips stays exact. The tail bone from (0, 0.29, -0.17) to (0, 0.28, -0.235). The palm
+  is the true palm of the source, the mean normal of the paw faces that face down (x from 0.37),
+  (0.129, -0.99, -0.058), turned with the paw.
+- **Paw size.** After the automatic weights, the point edit `paw` makes each front paw past the
+  wrist joint 0.75 times as long, 0.8 times as wide, and 0.9 times as thick, with a ramp of 0.025
+  units: 305 vertices on each side, at most 0.034 units. The tip goes from x 0.467 to x 0.439.
+  Reason: the paws of the source were 0.68 H long from the wrist joint, against 0.35 to 0.50 H on
+  the polar bear, the wolf, the panda, the badger, and the rabbit. They are now 0.47 H long.
+- **Upper lids.** `lower_lids()` turns the skin of each upper lid down by 5° about the middle of the
+  ball (`lidLower`: psi 12° to 60°, reach 1.15 to 1.6 ball radii, lam 20° to 35°): 54 vertices on
+  each side, at most 0.004 units. Reason: a full ring of white around the iris read startled, and
+  the sheet shows the upper lid over the top of the iris.
+- **Seat.** The bear stands on the podium, so the app does not read the seat. The seat is the
+  crotch between the legs (half width 0.02, front 0.03, back -0.06), inside the inner sides of the
+  legs.
 
-- **Import.** `sa.import_source('assets/models/bear/tripo-p2/bear.fbx', 1e-5)` in the new scene
-  `bear`: no vertex merges, 1 unit from the soles to the ear tips.
-- **Joints.** The FBX has no armature, so each joint comes from cuts of the mesh and from its
-  edge loops (`jointsNote` of the config).
-- **Arm rings.** Edge ring Subdivide (`bmesh.ops.subdivide_edges(bm, edges=<ring>, cuts=1,
-  use_grid_fill=True)`) of the clean quad edge ring of 18 edges between two arm rings. The bands,
-  by the x of their rings on the left arm: 0.2504 to 0.2773, 0.2773 to 0.3029, and 0.3029 to
-  0.3403 (the right arm at 0.2518 to 0.2776, 0.2776 to 0.303, and 0.303 to 0.3405). The new rings
-  lie at x 0.264, 0.290, and 0.322. Each arm now has rings at x 0.1756, 0.2053, 0.2504, 0.264,
-  0.2773, 0.2902, 0.3029, 0.3217, and 0.3403: from x 0.25 to the wrist, a ring each 0.19 to 0.31
-  arm radii (radius 0.073 to 0.063).
-- **Knee rings.** The same call with 2 cuts on the clean leg band of 18 edges at y 0.1037 to
-  0.1611 of each leg. The knee joint is at y 0.13, and the knee has rings at y 0.104, 0.123,
-  0.142, and 0.161.
-- **Rings with no split.** These edge rings stop at a triangle or a pole, so they take no split:
-  the arm root bands at x 0.1756 to 0.2053 (3 triangles, poles 1741, 1744, 1746 on the left) and
-  0.2053 to 0.2504 (1 triangle, poles 1741, 1746, 2158), the wrist band at x 0.3403 to 0.3779
-  (poles 2181, 2661), the paw bands from x 0.3779 (triangles and poles at the claw roots), the
-  leg band at y 0.1611 to 0.1963 (one triangle), and the foot bands below y 0.04 (triangles and
-  poles at the toes). The upper arm thus has 0.41 and 0.62 arm radii between its root rings. The
-  clean ankle band at y 0.069 to 0.104 lies at no knee, so it takes no split.
-- **Surface.** `sa.add_surface(bear, 'bear', 'assets/models/bear/tripo-p2/bear.fbm/bear_basecolor.jpg',
-  eye_fans=False, config=<bear-tripo.json>)` on the flat mesh. 60 faces of the dark brown nose
-  are gloss. The faces of the eyeballs took the fur color.
-- **Eyes.** The 80 faces of the two eyeballs get the face attribute `eye` (BOOLEAN, FACE) and the
-  colors `color` and `color_base` `#15110e` (the eye color of the app). The export then gives
-  `ownEyes`, and the app adds no bead eyes. The eyeballs keep the slot `fur`. The color map
-  paints a full eye on each eyeball ("tripo-p2/bear.fbx"), so the body keeps its own eyes.
+The weights, in the rest pose:
 
-The weights, in the order of the work, in the rest pose:
+1. Automatic Weights, then Limit Total 4 and Normalize All, on a copy of the mesh with no loose
+   part.
+2. Arm rows: each vertex of a side with |x| from 0.165, within 0.085 units of the line of the rest
+   arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.165 to 0 at x
+   0.22, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.245, 0.26, 0.275, and 0.29, and
+   the rest on the 4 roll segments.
+3. Wrist rows and knuckle rows as on the badger: the bend share of the paw grows in 12 equal steps
+   of 0.004 from 0.03 units before the head of `hand_<side>`, and the fingers share in 12 equal
+   steps of 0.0035 from 0.02 units before the head of `fingers_<side>`.
+4. Ear rows: a plane through the ear base, from (0.05, 0.958) at the inner side to (0.137, 0.925)
+   at the outer side, splits the head and each ear (`earPlane`): 166 ear vertices, 22 base
+   vertices.
+5. Throat rows (`throat_rows()`): each vertex at y 0.77 to 0.86 and z above 0 with a head and neck
+   share of at least 0.6 gives its clavicle and ear shares to the head and the neck, in the ratio of
+   its head and neck shares: 250 vertices, at most 0.32 moves. Reason: the skin under the muzzle
+   stayed behind in a large head turn, and its thin faces folded. The box starts at y 0.77, so that
+   the chin and H stay.
+6. The eyeballs and the lids take {`head` 1}. The tail bump keeps the automatic weights.
 
-1. Parent with Automatic Weights, then Limit Total 4 and Normalize All (`sa.skin_mesh(bear,
-   bear_rig, auto=True)`). No vertex took no weight.
-2. Arm rings: each vertex ring of each arm from x 0.1756 to x 0.3403 takes one exact row with
-   `sa.set_weight_row()`. A row holds a clavicle share, an elbow helper share, and a wrist helper
-   share, linear between the control rings below (x of the left arm). The rest of the row goes to
-   the 4 roll segments of the upper arm (x below 0.27) or of the forearm, by the x of the ring
-   along the bone: segment k takes the share at (k + 0.5) / 4 of the part, with a linear ramp
-   between two segments (the roll split of the simple route).
+**Lids.** A lid on each eye, as on the badger (`lids` of the params). Each eyeball is a cap: a ray
+from outside the head reaches its points within 16° of its axis. Each closed lid spans psi from
+-36° to 34° and lam from -24° to 36° in 12 steps each, at 1.07 times the ball radius, with a lower
+strip at 1.03 times the radius. The open lid lies 110° up. 2 points of each open lid move onto the
+plane x = ±0.003 (`lidClear`), so that each lid stays on its own side of the middle plane. In 21
+steps of the blink, no point of the side edges or of the back edge leaves the head.
 
-   | x | 0.1756 | 0.2053 | 0.2504 | 0.264 | 0.2773 | 0.2902 | 0.3029 | 0.3403 |
-   |---|---|---|---|---|---|---|---|---|
-   | Clavicle | 0.40 | 0.20 | 0.05 | 0 | 0 | 0 | 0 | 0 |
-   | Elbow helper | 0 | 0 | 0.25 | 0.75 | 0.75 | 0.25 | 0 | 0 |
-   | Wrist helper | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0.25 |
+### Maps
 
-   The ring at x 0.3217 takes the linear values between its neighbors: the wrist helper 0.126.
-   The trunk loop
-   around each arm root keeps the automatic weights.
-3. Paws, by rows across the paw, by the place along the rest forearm axis (from the forearm head
-   to the paw head, as the x of the axis point of the left paw): 0.352 to 0.372 {`wrist` 0.75,
-   `forearm_seg3` 0.25}, 0.372 to 0.392 {`wrist` 0.5, `hand` 0.5}, 0.392 to 0.42 {`hand` 1}, the
-   knuckle row 0.42 to 0.44 {`hand` 0.5, `fingers` 0.5}, and from 0.44 {`fingers` 1}.
-4. The loose parts follow one bone each: the 82 vertices of the eyeballs {`head` 1}, the 51
-   vertices of the tail ball {`tail` 1}, the 10 paw claws (280 vertices) {`fingers` 1} of their
-   side, and the 8 foot claws (216 vertices) {`toes` 1} of their side. A claw on the head bone
-   would stay behind when the paw moves.
-5. Round 12 replaces the rows of steps 2 and 3 from the ring at x 0.2504, and the paw claw rows
-   of step 4, on both arms (`scratch/bear/r12_rows.py`: `elbow_rows()`, `wrist_rows()`, then
-   `knuckle_rows()`). The old rows turned the bend of a joint in steps that were too short for
-   the arm radius, so the skin on the inner side of the bend turned over: 25 faces of the left
-   inner elbow in the lift (elbow 87°), and 20 faces of each knuckle crease (curl 60° to 80°). A
-   bend of angle a stays clean when its blend is longer than a times the distance of the inner
-   skin from the bone (0.07 at the elbow, 0.036 at the palm).
-   - Elbow. The bend share (half the elbow helper, plus the forearm) of each ring: 0.2504 0.25,
-     0.264 0.375, 0.2773 0.5, 0.2902 0.625, 0.3029 0.75, and 0.3217 0.875. A ring before the
-     joint takes {`elbow` 2b, upper arm segments the rest}, a ring after it {`elbow` 2(1 - b),
-     forearm segments the rest}. The clavicle and the wrist shares stay.
-   - Wrist. The bend share of the paw (half the wrist helper, plus the paw bones): the ring at x
-     0.3403 0.25, then by the place t along the rest forearm axis: below 0.365 0.45, 0.365 to
-     0.378 0.65, 0.378 to 0.39 0.85, and from 0.39 1.
-   - Knuckles. The paw skin from t 0.380 splits its paw share into `hand` and `fingers`: the
-     `fingers` share is 0.05 in the first band of 0.007, then 0.1 more in each band, and 1 from
-     t 0.450.
-   - Claws. Each paw claw takes one rigid row: the row of the skin vertex nearest to its root.
-6. Round 13 gives the throat under the muzzle exact rows {`head`, `neck`}
-   (`scratch/bear/r13_throat_rows.py`). The automatic rows of these thin faces had about 0.08
-   each of `ear_L`, `ear_R`, and `clavicle_*`, so they stayed behind the head in a large head
-   turn, and up to 14 faces folded in the lift. Each vertex with an ear or a clavicle share and
-   a head and neck share of 0.6 or more takes the row (1 - f) old + f {`head` 1 - n, `neck` n}
-   (267 vertices, the largest change 0.30):
-   - n is the neck share of the old head and neck ratio, times ss(0, 0.03, d), with d the
-     distance to the nearest of the 46 mouth vertices under the muzzle that follow only `head`
-     (|x| below 0.1, y below -0.12, z 0.79 to 0.87). With no fade, the faces between the mouth
-     and the throat took a step from {`head` 0.84, `neck` 0.16} to {`head` 1}, and 3 of them
-     folded in 1.4 % of the play.
-   - f = ss(0.745, 0.785, z) (1 - ss(0.85, 0.89, z)) (1 - ss(0.07, 0.10, |x|))
-     (1 - ss(-0.09, -0.06, y)), in the rest (Blender axes), so the chest, the cheeks, the sides
-     of the neck, and the back of the throat keep their rows.
+`tools/bear-maps.py` writes both maps, as `tools/badger-maps.py` does: the color map of the
+source at 2048 pixels, with the fur strands of `strands()` (a luma step along the strands), and
+the normal map of the source with the limit 0.2, at 1024 pixels, with the slope of the same
+strands. The source normal map is smooth: its median tilt at 1024 pixels is 0.020, against 0.026 on
+the cat and 0.024 on the wolf.
 
-   With the cue facts of "Cue facts", `pnpm fold-probe conductor` gives no folded head face
-   over all samples (4,473 before): face 3774 folded in 5.5 % of the play and 15.1 % of the
-   lift before. `sp.fold_faces(60)` on the lift of `bach-bwv1047` (wall 1.0 s to 2.5 s) gives 0
-   throat faces, against 9 with the old rows and the same pose.
-
-The trunk, the neck, the head, the ears, the hips, and the legs keep the automatic weights,
-except the throat rows of step 6. The lids take the row `head` 1 ("Lids" below). The file has no
-shape key, no key `bind*`, and no key `arm_raise_*`.
-
-**Arm twist.** In the moments of the conductor, the roll of each upper arm skin (from the
-clavicle) and the twist of each forearm skin (from the upper arm) reached 108.7° (the right
-forearm), and the left forearm turned 94° from the ready gesture to the quiet place. These
-changes make each part take 36.3° or less:
-
-- **Paws turned.** Each vertex past the arm loop at |x| 0.3215 (the loop stays), with the loose
-  claws of its side, turns rigidly about the rest forearm axis (from the head of `forearm_<side>`
-  to the head of `hand_<side>`) by whole loop steps of 20°: -80° on the left (4 steps) and 40° on
-  the right (2 steps), 290 vertices on each side. The 18 quads from that loop to the next loop go,
-  and new quads join the loop to the turned loop with the same step offset, with the colors, the
-  face attributes, and the UVs of the old quads. The bones `hand_<side>` and `fingers_<side>` turn
-  with the paw.
-- **Palms.** The property `palm` holds the source palm of each side, (0, -0.0995, -0.995) with x
-  mirrored on the right, turned by the same angle about the same axis: left (-0.103033, -0.991788,
-  -0.075769), right (0.074176, -0.711415, -0.698846). Then `sa.fix_rolls()`, and each key of the
-  Action `bind` again with the same world turn of its bone from the rest (supination 0).
-- **Wrist relax.** The wrist loops are ovals (0.054 by 0.071 units), so the joined band was
-  sheared and showed a dark slit on the left forearm in the play. Ten Taubin rounds (0.5, then
-  -0.53) on the 113 vertices at |x| 0.295 to 0.365 above z 0.55, with the claws held, move each
-  vertex at most 0.008 units.
-- **Hold.** `CONDUCTOR_HOLD` of `src/pose/conductor.ts` takes the baton roll of a true palm, a
-  ready roll of the left paw, and a rest pose with the arms beside the belly (its comments give
-  the values).
-
-The roll of the upper arm and the twist of the forearm, in degrees, before (the r3 rig with the
-hold of main) and after (`pose-preview` and `twists()` of the session):
-
-| Moment | Left upper arm | Left forearm | Right upper arm | Right forearm |
-|---|---|---|---|---|
-| beat-1 (ready) | -16.7 / -16.7 | -7.5 / 13.9 | 25.1 / 24.9 | 84.8 / 2.8 |
-| between | -13.5 / -13.5 | -48.5 / -5.8 | 27.9 / 27.8 | 95.6 / 14.6 |
-| beat-2 | -14.7 / -14.7 | -92.6 / -19.7 | 26.5 / 26.3 | 96.6 / 14.4 |
-| beat-3 | -13.9 / -13.9 | -96.2 / -20.4 | 25.2 / 25.0 | 73.8 / -4.2 |
-| rest | 53.4 / 30.2 | -84.5 / 34.3 | -50.6 / -34.8 | 80.0 / -0.8 |
-| cue (25 s) | -16.7 / -16.7 | -41.5 / 32.8 | 31.1 / 30.9 | 87.1 / 3.9 |
-| largest of all samples | 53.4 / 32.4 | 99.5 / 36.3 | 50.6 / 34.8 | 108.7 / 28.2 |
-
-The samples are the moments of the role and 21 times of `mozart-k525.mid` (0 s to 90 s and the
-song end), and 10 times each of `beethoven-9`, `brahms-2`, `bach-bwv1048`, and
-`mendelssohn-op61`. The values after are those of the final file, after "Form".
-
-**Smooth surface.**
-
-- **One color for each region.** The face colors of `add_surface()` took the shade that the
-  Tripo texture bakes, so the belly and the chest showed a mosaic of 16 fur tones. Each face takes
-  the color of its region, by the HLS lightness of its old color and its part: the fur (L 0.3 to
-  0.55, and the tail ball), the muzzle (L above 0.55), the mouth (the pink faces under the nose),
-  the claws (the loose claws), and the gloss nose. The fur and the muzzle take the color of their
-  face at 0.6 of their luma range, and the claws and the nose their median face. "Color map" gives
-  the colors.
-- **Crease 40.** The limb loops have 18 vertices, 20° apart, so the crease 40 of the bear of main
-  is enough. The share of the faces with a facet corner (`studioNormals()`), at the crease 40:
-  head 20.4 %, ears 41.1 %, trunk 13.2 %, arms 19.0 %, paws 62.4 %, legs 4.2 %, feet 72.3 %,
-  against 64.3, 50.1, 22.6, 25.4, 86.1, 58.9, and 94.9 % on the bear of main.
-- **Relax.** Ten Taubin rounds (0.5, then -0.53) on the body, with each move clipped to 0.01
-  units, move the vertices by 0.0027 units on average. The gloss nose, the four top vertices of
-  the head, and the six lowest vertices of the chin stay, so H stays 0.357761 m. The mean fold
-  between neighbor faces goes from 21.9° to 16.1° on the paws, from 20.2° to 18.2° on the head,
-  and from 18.9° to 16.5° on the legs. The bones and the weights stay.
-
-**Form.** The bear stands on the podium with its feet flat: 97 sole vertices lie below z 0.012.
-Its center of mass (the volume of the body part) lies at y -0.010, inside the soles (y -0.129 to
-0.096). Sections of both rig files in their rest (`form.py` of the session), as a share of H:
-
-| Part | Before | After | Bear of main |
-|---|---|---|---|
-| Upper arm girth, t 0.6 to 0.9 | 2.23 to 2.12 | 2.12 to 1.91 | 2.01 to 1.93 |
-| Forearm girth, t 0.3 to 0.8 | 2.03 to 1.79 | 1.77 to 1.63 | 1.77 to 1.61 |
-| Shin girth, t 0.3 to 0.6 | 2.43 to 2.38 | 2.16 to 2.07 | 2.07 to 1.96 |
-| Paw length, width, depth | 0.610, 0.797, 0.455 | 0.439, 0.599, 0.392 | 0.440, 0.566, 0.388 |
-| Height to the ear tips | 4.637 | 4.637 | 4.254 |
-
-A point edit in the live Blender (`arm_paw_moves()` and `shin_moves()` of the session) moves
-1,100 vertices, at most 0.041 units:
-
-- Each arm vertex (|x| above 0.17, z above 0.45, up to the wrist joint) moves toward the middle of
-  its section (the mean of the arm vertices within 0.006 units of its x), in the plane square to
-  x, by the scale 1, 0.86, 0.87, 0.86, 0.86 at |x| 0.19, 0.23, 0.27, 0.30, 0.365 (smoothstep
-  between them), times its share of the arm bones.
-- Each paw vertex past the wrist joint (the head of `hand_<side>`), with the claws, maps in the
-  frame of its paw: a the rest forearm axis, w the width axis (the first principal axis of the paw
-  across a), n = a × w, about the middle line of the wrist section. The point takes 0.72 d along
-  a, and across a the scale goes from 0.86 at the wrist to 0.66 (w) and 0.86 (n) over d 0 to
-  0.025 by a smoothstep. The tails of `hand_<side>` and both ends of `fingers_<side>` take the
-  map. The wrist joints stay.
-- Each leg vertex from z 0.035 to 0.17 moves toward the middle of its leg section (the mean of
-  the leg vertices within 0.005 units of its z) by the scale 1, 0.86, 0.86, 1 at z 0.035, 0.06,
-  0.13, 0.17 (smoothstep).
-
-The legs show no flare at the knee. The rest pose hangs the thinner arms beside the belly, and
-each arm part still takes 36.3° or less.
-
-**Color map.** The app shows the color map of the FBX on the body, in place of the face colors
-(design 4.5). `tools/bear-maps.py` writes it: a Lanczos scale of `bear_basecolor.jpg` to 2048
-pixels, then a move in Oklab of each texel of the fur, the muzzle, and the claw triangles of the rig
-file (the region of a triangle is its face color). The lightness and the chroma scale by the ratios
-of the median source color of the region to its target, and the hue turns by their hue step, so each
-strand keeps its contrast. The gutters of the atlas take the fur step. The fur goes from sRGB (160,
-87, 36) to the fur face color of the bear of main, (95, 60, 32), and the muzzle from (232, 152, 89)
-to the light muzzle of main, (234, 192, 148), and the claws from (87, 58, 32) to the dark grey claw
-face color of main, (48, 46, 44), as the claws of the bear of main. The mouth line keeps its colors.
-The eyes take the eye color of the app ("Eyes" below).
-
-An offset step (the anchors of `tools/fox-maps.py`) did not work for the bear: the source belly
-and back are lighter than its sides, those texels took a part of the muzzle step, and the back
-stayed light in the hall view for each fur target.
-
-In the hall view from the back (`close-views play --demo mozart-k525 --time 12 --no-fill` with
-the camera `back` of `scratch/bear/cams.json`, the box x 0.40 to 0.56, y 0.42 to 0.62 on the
-back), the median Oklab L, C, and h:
+Each texel of the color map, except the eyeballs, takes 0.87 times its Oklab lightness
+(`LIGHTNESS`). The chroma and the hue stay. In the hall view with no fill light (`close-views play
+--demo mozart-k525 --time 12`, the camera `back` behind the conductor, the box x 0.40 to 0.56 and
+y 0.42 to 0.62 of the frame), the median Oklab L, C, and h of the back fur:
 
 | Fur | L | C | h |
 |---|---|---|---|
-| Face colors of round 5 (no map) | 0.624 | 0.121 | 47 |
-| Map with the offset step to L 0.40 | 0.587 | 0.105 | 50 |
-| Map with the offset step to L 0.24 | 0.520 | 0.099 | 49 |
-| `bear-color.webp` (the scale step) | 0.484 | 0.091 | 50 |
-| Bear of main | 0.477 | 0.090 | 49 |
+| The source fur in the map (sRGB 159, 86, 32) | 0.531 | 0.117 | 53 |
+| The colors of the source in the hall | 0.637 | 0.122 | 47 |
+| `bear-color.webp` (`LIGHTNESS` 0.87) in the hall | 0.561 | 0.120 | 45 |
+| The older bear in the hall | 0.470 | 0.090 | 50 |
 
-The face colors before the map loads take the median of the map in each region: fur (123, 72,
-31), muzzle (230, 184, 139), mouth (161, 83, 67), claws (49, 46, 44). The gloss nose takes the
-near black of the nose of main, (24, 20, 18). 13 faces at the edge of the gloss nose (source luma
-100 or more, most on its right side) take the slot fur ("Nose sides" gives the 14th) and the muzzle color, so the map paints
-them light and no dark wedge shows under the nose. The scale step needs the fur sheen of the
-luma (`fullLuma` of `FUR_LOOK`, design 4.5). The texture points of the studio module add 18.0 KB
-to the first download (655,887 to 673,885 bytes after gzip, `pnpm size`), and the lids 1.9 KB
-more. The images load after the first frame.
+| File | Size | SHA-256 |
+|---|---|---|
+| `bear-color.webp` | 215,298 bytes, 2048 × 2048, WebP quality 60 | `f0ad4a83ea40d8f6a86768977c17321883c4a2adfcea2494c82c419d1c091bb7` |
+| `bear-normal.webp` | 217,400 bytes, 1024 × 1024 | `93fd2202c47b3ef13c9e9aef7ef77dcaa9d8dfb28d62f994118f8cbc673d8b6e` |
 
-| Item | Value |
-|---|---|
-| Source | `tripo-p2/bear.fbm/bear_basecolor.jpg` (above) |
-| `bear-color.webp` | 2048 × 2048, WebP quality 60 (Pillow 13.0.0, method 6): 105,576 bytes, SHA-256 `b4fc7bddaae7fb10cdea19cdbae97941f9afd7880ae2c084425edf870e5f2ea9` |
-| Origin, license | As the FBX file |
+### Export
 
-**Eyes.** The source paints a white ball with a black pupil and a white light on each eyeball.
-The ball sits in its socket, so a white crescent of the ball showed beside the pupil, and in the
-hall light the eyes read startled. The eye was also small: about 0.8 of the width and 0.6 of the
-height of the pea eye of main. Two changes give a calm, happy face:
+License of both files: CC BY-NC 4.0, as the FBX file. Two runs of the chain give the same bytes.
 
-- **Dark eyes.** `tools/bear-maps.py` gives each eye texel lighter than Oklab L 0.3 the eye color
-  of the app (#15110e), and the black pupil keeps its color. The eye light of the app gives each
-  ball its soft light, as on the bead eyes of main.
-- **Size.** A point edit in the live Blender (`eye_moves(1.35, 0)` of the session) scales each
-  eyeball by 1.35 about the middle of its sphere (left (0.0379, -0.1123, 0.8939)), and moves each
-  other vertex of its side, except the gloss nose, from that middle by 1.35 up to 0.028 units,
-  with a smoothstep back to 1 at 0.052 units: 242 vertices, at most 0.0104 units. The ball radius
-  is now 0.0246. A lineup of 1.0, 1.2, and 1.35 against main (`reports/2026-11-10-bear-hand-r8/`,
-  which git ignores) put 1.35 nearest to the eye of main. A turn of the ball 10° down showed the
-  white crescent above the pupil.
+| File | Size | SHA-256 |
+|---|---|---|
+| `tripo-hand/bear.rig.glb` | 1,093,528 bytes | `ba06d1dfee96b08a54702de0fadbe9fa42fc58ae52e54259e8c1766305ac4a6b` |
+| `tripo-hand/bear.rig.json` | 15,939 bytes | `02541d39618ae6519994bc91f1b6dd9373666c5e862fb0319cc092d652e46001` |
 
-Each eyeball is open at the back, so its axis of the vector area lies 6.9° from its visible axis
-g, and the eye light needs no further edit.
+### Conductor
 
-**Lids.** A scripted edit in the live Blender adds a lid to each eye, as a separate part, as the
-Tripo rabbit and fox have them. In the hinge frame of each eye, g is the mean direction from the
-middle of the ball to the ball points that a ray from the middle reaches with no hit on the head
-(left (0.492, -0.851, 0.183)), u is +Z made square to g, and h = u × g is the hinge axis (left
-(0.865972, 0.500092, 0), right (0.865973, -0.500092, 0)).
+`CONDUCTOR_HOLD` of `src/pose/conductor.ts` keeps its values, except the extra swing of the rest
+arms (`restArm.extraOut`, design 5.4). The measures of `pnpm hold-fit conductor` and `pnpm
+pose-depth conductor` (all 19 demos), the older bear against this body:
 
-1. Each closed lid spans psi from -60° to 60° and lam from -64° to 64° in 12 steps each, at the
-   radius 0.031 from the middle of the ball (radius 0.0246). An extra row at psi -60° and the
-   radius 0.027 makes a strip at the lower edge that turns in toward the ball. Thus 14 × 13
-   vertices and 156 quads on each side, with outward normals.
-2. The file holds the open lid: each point turned up by 126° about h. The property `lids` of the
-   armature holds `angle` 2.199115 (126°) and the axis h of each side.
-3. Each lid face takes the slot `fur`, flat shading, the fur face color, and the face attribute
-   `lid`. Each corner takes the UV of the planar projection of its closed point on the plane of h
-   and u, at 0.74 UV for each unit (the median density of the fur faces 0.036 to 0.05 units from
-   the middle), about the fur patch at UV (0.1612, 0.3661) of Blender (96 px with a deviation of
-   2.2 in `bear-color.webp`).
-4. Each lid vertex takes the row `head` 1. `pnpm studio-body` moves it onto the eye bone of its
-   side.
+| Measure | Older bear | This body |
+|---|---|---|
+| Paws in the body or the head, play | 0.1 cm | 0.0 cm |
+| Upper arms in the body, play | 0.0 cm | 2.4 cm (the left arm root, limit 1.5 cm) |
+| Forearms in the body, lift, lowering, and rest | 1.9 cm | 0.0 cm |
+| Upper arms in the body, lift and lowering | 3.8 cm | 4.0 cm (limit 4 cm) |
+| Upper arms in the body, rest | 3.2 cm | 3.7 cm (limit 4 cm) |
+| Samples of the play with a folded face | 56.2 % | 100 % (the knuckle crease of the baton paw) |
+| Faces that fold at rest | 7 | 7 |
+| Paw twist on the forearm in the play, L / R | 20° / -3° | 0° / 4° |
+| Body in the baton (`pnpm body-clip conductor`) | PASS, no point | PASS, no point |
 
-The head surface lies 0.019 units from the middle at 40° from g, 0.031 at 50°, and 0.039 at 60°.
-In 21 steps of the blink, no point of the side edges or of the back edge leaves the head, the
-open lid lies at least 0.0174 units under the head, and the lower strip of the closed lid lies
-under the head. The renders at the blink peaks of `mozart-k525` (9.44 s and 12.38 s) show both
-eyes closed.
-
-**Normal map.** The app tilts the normals of the fur faces with the normal map of the FBX (design
-4.5, fur shading). Checks of the source: the mean normal is (0.00, 0.00, 0.99), and 5 texels have
-z < 0. On 524 UV seams of the mesh with a tilt of 0.03 or more, the two faces decode normals with
-a median gap of 22.1° with the green of OpenGL and 23.2° with the other sign, so the map is
-OpenGL, as the maps of the Tripo rabbit and fox. The fur luma of the map is low (about 0.07
-linear), so the sheen is weak and the strands show.
-
-| Item | Value |
-|---|---|
-| Source | `tripo-p2/bear.fbm/bear_normal.jpg` (above) |
-| Steps | Limit each x, y tilt to the length 0.2 (0.93 % of the texels). Box scale to 1024 × 1024. Store x and y times 4 (`NORMAL_MAP_GAIN`) in red and green, and 255 in blue. No value clips |
-| `bear-normal.webp` | `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0): 99,184 bytes, SHA-256 `2a76fa1e0046f5473c25e7e596c0b0ee464d5dbb9a253d64d1ec2da2de6b6abe` |
-| Origin, license | As the FBX file |
-
-The tilts of the source are larger than on the rabbit and the fox (median 0.023, 99th percentile
-0.18).
-
-**Nose facets.** The gloss faces keep a flat normal each (`studioNormals()`), with the sharp
-highlight of `lacquer`. The 46 gloss faces of the source nose turn a median 19° (at most 46°)
-from their neighbors. Thus in the 2x face crops each small face caught the light or not, and the
-top of the nose showed a mosaic of light squares. The map is not the
-cause: the gloss corners have no texture points. A point edit in the live Blender makes two
-flat facets on the top of the nose, as the large facets of the nose of main:
-
-- Facet A, the faces 1304, 1306, 1307, 2245, 1210, 1211, 1213, 2159 (the top rows), and facet B,
-  the faces 1202, 1209, 1212, 2158 (the row below, which faces the camera and the light).
-- Each facet plane has x = 0 in its normal (a mirror plane), and fits its vertices by least
-  squares. Each of the 20 vertices goes to the least-squares point of the planes of its facets,
-  with the weight 0.05 to its old place, in 10 rounds: A normal (0, -0.2938, 0.9559), B normal
-  (0, -0.8004, 0.5994). The largest move is 0.0042 units, and no vertex is more than 0.0003 units
-  from its planes.
-
-Now the top of the nose shows one even band of light in place of the squares. A fit of all 46
-faces to 7 facets moved the edge of the nose by up to 0.0064 units and made it angular, and the
-same fit with the edge held turned some triangles over.
-
-**Nose sides.** In the face crop at 60°, each side of the nose showed a fan of small triangles
-that each caught the light or not, and a brown wedge of fur faces at its root. A point edit in
-the live Blender (`run(obj, apply=True)` and `root_faces(obj)` of `scratch/bear/nose_sides.py`,
-which git ignores) makes four flat facets on each side, with the facets A and B of the top in
-the same fit:
-
-- Left side (x < 0): upper side 199, 1196; middle side 196, 197; lower side 198, 203, 1234,
-  1220, 1219; lower front 201, 202, 204, 1201. The right side takes the mirror face of each
-  (x to -x): 399, 2160; 396, 398; 395, 397, 2163, 2167, 2172; 205, 2156, 2157.
-- Each facet plane fits its vertices by least squares. Each vertex goes to the least-squares point
-  of the planes of its facets, with the weight 0.05 to its old place, in 10 rounds: 46 vertices,
-  the largest move 0.0027 units, and no vertex more than 0.0002 units from its planes. The
-  largest turn of a face next to the moved vertices is 23° (1201, a facet face).
-- The face 2172 takes the slot gloss and the face colors of 1234, its mirror face.
-- The fur faces 1197, 1198, 1235 and 2173, 2174, 2175 at the upper root of each side take a small
-  UV patch (0.25 of their own spread) at the middle of the UVs of a light muzzle face: 1194, 200,
-  2169, and 400. Their map color goes from about (157, 129, 97) to (245, 202, 154). The lower root
-  faces 1218, 1221, 2164, and 2168 keep their UVs.
-
-Now each side shows a few even facets and no brown wedge, and from the front the nose reads as
-the rounded triangle of the nose of main.
-
-**Cue facts.** The head of this body sits 11 cm higher and its muzzle 4 cm further forward than
-on the bear of main. In a cue, the head turned up to 50° on the upper body, and the left hand
-pointed 30° up. Thus the raised right forearm went 3.3 cm into the right cheek in a turn to the
-right (`brahms-2` 285.38 s), and the left paw went 5.6 cm into the left side of the head in a cue
-to the left (`brahms-2` 127.88 s). A change of the beat point or of the right elbow had no
-effect. `scratch/bear/r13_cue_facts.py` gives the armature three facts of the body (design 5.4):
-`cueHeadLeft` 35 and `cueHeadRight` 30 (the largest head turn in degrees) and `cueLift` 12 (the
-angle up of the left hand at the cue point). A sweep of the play samples of the 17 demos
-(`scratch/r13/headsweep.ts`, every fourth sample with the old throat rows, every second sample
-with the throat rows of step 6 of the weights) gave the depth in the head:
-
-| Facts (left, right, lift) | Throat rows | Paws | Forearms |
-|---|---|---|---|
-| 50, 50, 30 (none) | old | 4.8 cm | 3.3 cm |
-| 50, 30, 15 | old | 1.9 cm | 0.6 cm |
-| 40, 30, 20 | old | 2.1 cm | 0.0 cm |
-| 45, 30, 15 | old | 1.1 cm | 0.0 cm |
-| 45, 30, 15 | step 6 | 2.1 cm | 1.1 cm |
-| 40, 30, 12 | step 6 | 1.3 cm | 1.1 cm |
-| 30, 30, 15 | step 6 | 1.1 cm | 0.0 cm |
-| 35, 30, 12 (the file) | step 6 | 0.9 cm | 0.0 cm |
-
-The throat rows make the chin follow the head fully, so it sweeps further toward the left paw in
-a turn to the left. `pnpm pose-depth conductor --base main` now gives in the play 1.0 cm (paws)
-and 0.0 cm (forearms), against 0.3 cm and 0.0 cm on main and 5.6 cm and 3.3 cm before.
+In the play, three thin faces of the knuckle crease of the right paw (104, 105, 1769) fold in 99 %
+of the samples at the curl of the fingers around the baton, and one wrist face (1833) in 77 %
+(`pnpm fold-probe conductor --faces 6`). The fist hides them in the hall view.
