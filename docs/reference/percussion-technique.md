@@ -238,7 +238,12 @@ The app follows these facts:
   as in the German grip, and the shaft crosses the lower side of the closed stump, as through a
   fist (`TIMPANI.malletSpotL`, `malletSpotR`, `malletTilt`). The end of the stump closes 20° onto
   the shaft (`PercussionHold.curl`), the head leaves the front of the fist, and the butt end
-  sticks out 2 cm to 3 cm behind the paw (`TIMPANI.malletButt`).
+  sticks out 2 cm to 3 cm behind the paw (`TIMPANI.malletButt`). The left grip lies nearer to the
+  wrist than the right grip (`TIMPANI.malletSpotL`), so that the end of each stump closes on its
+  shaft (`pnpm wind-grip timpanist`).
+- **The rest.** No source of this file gives the rest of a timpanist. At rest, the felt balls lie
+  on the heads, and the paws stay over the kettles (`PercussionHold.restPitch`), because the
+  hanging paws reach into the large kettles.
 - **The V (section 2).** Each mallet points forward and 27° to 34° in, a V of about 60°
   (`PercussionHold.home`).
 - **The elbows (section 3).** Each upper arm hangs near the side, and the elbow points down and a
@@ -259,7 +264,8 @@ The app follows these facts:
   back before the next note, as a real player muffles at a rest [56] (`FingersDamp`). The spine
   leans only 3°, so that the trunk stays out of the kettles and the body stays over its feet.
   The mallet keeps its strike direction, and the wrist lifts its head off the drum, so the mallet
-  stays in the paw [55] [56]. A pause in a muffle keeps the paw on the head. The upper body does
+  stays in the paw [55] [56]. A pause in a muffle keeps the paw on the head. On the way, the paw
+  lifts over the hoop (`FingersDamp.arc`). The upper body does
   not turn. The paw moves to the muffle and back at most at 1.2 m/s (`FingersDamp.speed`), so a
   short rest after a note has no muffle, as a rest does not always need one [58 (secondary)].
 
@@ -352,7 +358,8 @@ The app follows these facts:
   beater lie on a padded trap table [65] [66], and the triangle hangs from the hook of a stand.
   In the rest, the paws put down one instrument and take the other (`SWITCH_MOTION`).
 - **The triangle (section 8).** The left paw holds the upper end of the clip between the tip of
-  the thumb and the curled fingers, with the thumb down, and the clip and the triangle hang below
+  the thumb and the fingers, curled deep on the thin clip (`PercussionHold.curl`), with the thumb
+  down, and the clip and the triangle hang below
   the paw in a loop of cord [15] [25] (`TRIANGLE_CLIP`). The paw stays in line with its forearm,
   and the triangle keeps its hang below the pinch (`trianglePaw()`). A single note strikes the side
   across from the open corner [63]. Before a louder note, the beater turns further back
@@ -413,22 +420,28 @@ The app does not follow these facts:
   table, the paw bends about 110° on its forearm in the 0.6 s at the table, with a twist of about
   20° (`tablePaw()`). No source gives the turn of the hand in a change.
 - **The rest at the suspended cymbal (section 7).** No source gives it. The mallets lie across the
-  body as the snare sticks, above the plate (`SUSPENDED_CYMBAL_HOLD.set`).
+  body as the snare sticks, above the plate, side by side and facing opposite directions, as the
+  set position of a drumline [37] (`SUSPENDED_CYMBAL_HOLD.set`).
 - **The muffle of the suspended cymbal (section 7).** The sources give the stop of the hand cymbals
   at the chest, and no grip of a suspended cymbal. The closed paw rests on the edge, and the mallet
-  points up from the plate, away from the bell (`EdgeDamp.share`). The rule of the rest is the
+  points about 28° up over the plate, away from the bell and from the chest (`EdgeDamp.share`). The rule of the rest is the
   rule of the hand cymbals. A MIDI drum note
   has no written length, so each note before a rest of 0.5 s stops.
 - **The hand cymbals (section 7).** The angle of the flam is 15° at each loudness, smaller than
   the 35° to 45° of [60]: a small angle that keeps the plates not parallel [61]. The plates tilt 15° from vertical [16]. No concert source gives the rest place: in a long
   rest, the arms hang with the plates at the sides, as a marching method holds them [24].
-- **The xylophone grip (section 9).** The wrists stay about 13 cm over the bars, and the mallets
-  slope down to the bars. A real player keeps the hands at most one inch over the keyboard [39]. Each mallet points from a place out from its
+- **The xylophone grip (section 9).** The grip of each mallet stays at most 7 cm over its bar
+  (`PercussionHold.gripRise`), and the mallets slope down to the bars. A real player keeps the
+  hands at most one inch over the keyboard [39]. At the lowest and the highest bars, the forearms
+  slope about 10° down to 3° up, as a real player keeps the forearms a little below level [26]
+  [27]. With no limit, the wrists came up to the shoulders at the end bars. Each mallet points from a place out from its
   shoulder (`PercussionHold.home`), so that the forearms stay out of the leaning belly. Lower
   wrists put the forearms 2.4 cm to 3.1 cm into the belly. The mallets thus point a little
   further in. No source gives this choice.
 - **The rest at the xylophone (section 9).** No source gives it. The mallets lie across the body
-  as the snare sticks (`PercussionHold.set`).
+  as the snare sticks, side by side and facing opposite directions, as the set position of a
+  drumline [37] (`PercussionHold.set`). The two mallets turn up by two angles, so that they do not
+  cross in an X in the front view.
 - **The lean over the xylophone (section 9).** The spine leans forward over the bars
   (`PercussionHold.lean`), because the short arms do not reach the bars from an upright body. The
   hips keep their place, because a small move of the hips tilts the short legs far.
