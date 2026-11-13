@@ -428,20 +428,13 @@ passes.
       scaled bass drum beater. Ask the user if the scale of the badger applies to them too.
 - [ ] Badger bass drummer: between strikes, the paw keeps its turn in the world while the body
       sways, so its twist on the forearm moves 20° in about 1 s.
-- [ ] Tripo badger bass drummer: the short arms (reach 0.195 m, 0.273 m on the old badger) miss
-      the strike spot by up to 58.9 mm (0 % within 5 mm, old 13.0 mm and 78 %), and the beater goes
-      3.7 cm into the drum (limit 1.5 cm, `pnpm hold-fit bass-drummer`). A nearer, lower, or wider
-      drum, a lean up to 0.3, or a strike spot nearer to the player gives 18 mm at best, with the
-      snout or the forearm in the drum. Ask the user: a fit of the whole hold, or longer arms
-      (`armStretch` 1.2 to 1.3, as the panda and the deer) with the drum place.
-- [ ] Tripo badger percussionist: the strikes miss by up to 32.0 mm (0 %, old 0.0 mm), and the
-      claws of the left paw, which holds the triangle up, go 2.4 to 3.8 cm into the head (limit
-      1.5 cm). Other triangle clip places do not fix it. Fit the triangle and tambourine holds to
-      the long snout and the short arms.
-- [ ] Tripo badger xylophonist: the mallets miss by up to 116.7 mm (53.9 % within 5 mm, old
-      39.5 mm and 94.1 %), and the left claws go 2.3 cm into the shoulder. Nearer or lower bars, a
-      larger lean, or homes nearer to the middle do not fix it. Fit the bars and the side move to
-      the short arms.
+- [ ] Tripo badger percussionist: the claws of the left paw, which holds the triangle up, go 3.9 cm
+      into the head in the play and 2.2 cm at rest (limit 1.5 cm, `pnpm hold-fit percussionist`). A
+      higher or wider clip puts them deeper, and a lower clip misses the strikes. Fit the turn of
+      the left paw (`triangleHand`), or ask the user for a triangle at the chest.
+- [ ] Tripo badger xylophonist: the left claws go 3.5 cm into the left shoulder in the play and 3.3
+      cm in the lift (limit 1.5 cm, `pnpm hold-fit xylophonist`). Look at the left paw in a close
+      view at the lowest bars.
 - [ ] Close views: `pnpm close-views play` renders with no fill light. Add a fill to the play mode
       for the checks (9.8).
 - [ ] Recast roles: with `--base`, `pnpm arm-check --views` and `pnpm close-views` render the
@@ -967,10 +960,16 @@ scene of each demo has its seats and stage size with no overlap.
       (`pnpm arm-check oboist`, limit 8, 6 and 8 on the old mouse): the curled digits around the
       oboe, and thin faces at the arm root that fold with a shoulder turn of 2° to 8°
       (`pnpm fold-probe oboist --faces 20`). Look at the paws and the armpits in the app.
-- [ ] Mouse (Tripo hand rig): the larger footprint (the tail 0.35 m behind the feet, the bind arms)
-      moves players of 14 of 18 demos, the mice by 3 cm to 51 cm and other players by up to 1.37 m
-      (the pigs and the wolves of beethoven-1 and beethoven-9). In bach-bwv1047 the mouse stands
-      behind its stand and a rabbit in the default view. Check the layout with the user.
+- [ ] Mouse (Tripo hand rig): the layout moves players of 14 of 18 demos against `7fa9d1e89`, the
+      mice by 5 cm to 1.5 m and other players by up to 1.37 m (the pigs and the wolves of
+      beethoven-1 and beethoven-9), and the penguin riser is 0.1 m lower in beethoven-9. The height
+      of the body causes it, and the footprint does not: at the same H, the eyes stand 0.84 m high
+      (old 0.69 m) and the ears 1.03 m (old head top 0.83 m). With the old footprint, the moves
+      stay. With the old eyes, bach-bwv1047 comes back, and with no sight blocks of the mouse,
+      beethoven-1 and beethoven-9 come back. A footprint with no thin tail, or a sight mesh with no
+      ears, moves the other species by up to 1.8 m. In bach-bwv1047 the mouse stands behind its
+      stand and a rabbit in the default view. Ask the user: a smaller mouse (about 0.82 of its size
+      gives the old eye height), the new seats, or a seat rule for the default view of the winds.
 - [ ] Mouse (Tripo hand rig): the oboe of 0.45 reads small under the paws in the close views. The
       right grip has 1.2 cm of spare reach, so a larger oboe needs a new grip fit.
 - [ ] Mouse (Tripo hand rig): 2 points of each open lid and 1 side point in the blink leave the head
@@ -1048,12 +1047,11 @@ scene of each demo has its seats and stage size with no overlap.
       gets no check.
 - [ ] Badger percussionist: ask the user to confirm the suspended cymbal, or longer arms for hand
       cymbals.
-- [ ] Badger: ask the user to confirm the size of the badger.
 - [ ] Badger: the front fur and the eye stripes are darker than the sheet, and the warm light shows
       the stripes on the head as a mid brown. Show the user the faces.
-- [ ] Badger triangle: the clip hangs from the tip of the thumb a little below the mouth, not at
-      eye level, because the short arm reaches no higher in front of the snout: a clip 2 cm higher
-      twisted the arm 5° more in a lift (margin 3°). Longer arms would let it reach.
+- [ ] Badger triangle: the clip hangs from the tip of the thumb near the shoulder height, below the
+      long snout. A real player holds it near the eye level, but a higher clip puts the left claws
+      further into the snout.
 - [ ] Xylophone: a scale stays in one paw (122 of 127 fast strikes of the test score), because a
       paw never passes the other (`pass` 0), and one paw does not reach the outer bars. A real
       player alternates the hands over the two rows of bars (percussion-technique 9).
