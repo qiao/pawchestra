@@ -482,8 +482,10 @@ export const PERCUSSION_HOLDS = {
     // kettle stands nearer than the right one, so each side has its own reach. The spine leans 3°,
     // and the upper body does not turn: a turn of 17° twisted the chest 13° in 0.06 s at a muffle.
     // The stump paw of the Tripo elephant reaches 0.52 m and 0.51 m, and its rigid low point stays
-    // 2.5 cm over the head, so that its skin touches the head (sweep: paws, forearms, and the trunk
-    // out of the kettles). The grip stays level with the head, and the mallet keeps 0.5 rad of
+    // 3.0 cm over the head, so that its skin touches the head (sweep: paws, forearms, and the trunk
+    // out of the kettles). On the way to the muffle and back, the paw lifts 0.04 H (2.4 cm) in the
+    // middle (arc), so that it passes over the hoop. With 2.5 cm and no arc, the left skin went
+    // 3.3 cm to 3.5 cm into the kettle on the way and 3.0 cm at the muffle (body-clip limit 2.7). The grip stays level with the head, and the mallet keeps 0.5 rad of
     // the pitch (share), so that the mallet head stays out of the head. The paw moves about 25 cm
     // to the muffle, at most at 1.2 m/s (speed). In 0.06 s, it moved 6.7 m/s. With the lean of
     // 15°, the reach of 0.46 m, and a press of 1.7 cm of the old paw, the stump went 5.7 cm and
@@ -496,12 +498,12 @@ export const PERCUSSION_HOLDS = {
       reach: [0.876789, 0.859928],
       rim: 0.05,
       up: 0,
-      press: -0.042153,
+      press: -0.050589,
       share: 1.67,
       lean: 0.05,
       turn: 0,
       speed: 1.2,
-      arc: 0,
+      arc: 0.04,
     },
     // The end of the stump paw of the Tripo elephant closes a little on the shaft
     // (TIMPANI.malletSpotL and malletSpotR). The stump has no fingers: with a curl of 100° (the
