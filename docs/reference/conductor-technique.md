@@ -158,12 +158,17 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
   claws, turned toward the thumb (`STICK_TO_THUMB`, `STICK_TO_PALM`), so that the closed paw
   grips it. The fingers curl around it in the play, at rest, and in the bow
   (`CONDUCTOR_HOLD.batonCurl`). The turn toward the palm also brings the paw near the line of
-  the forearm. The baton itself still stands at an angle to the forearm in the beat, because
-  the beat point and the pivot of the hold set it (`beatPoint`, `batonPivot`): the app differs
-  from the line of section 7a there.
+  the forearm. In the beat, the baton is a longer line of the forearm, a little in, as sources
+  16 and 17 give it: the baton points nearly straight forward at beat 1 (`batonPivot`), the arm
+  reaches out to the tip (`beatPoint`), and the elbow points out to the side (`poleR`). The
+  baton stands about 19° off the forearm (median of the play), and most of that angle is
+  inward. A fist of a bear paw holds the baton at an angle to the paw, so the app does not
+  reach a straight line.
 - **The rest pose.** Before the start and after the bow, the arms hang relaxed beside the body,
-  and the baton points down, a little forward, and a little in (`CONDUCTOR_HOLD.restBaton`). No
-  source of section 9 gives the rest place.
+  and the baton hangs down beside the leg, about 27° forward of the vertical
+  (`CONDUCTOR_HOLD.restBaton`), as the closed hand of section 7a hangs with the arm (derived).
+  No source of section 9 gives the rest place. The baton does not hang straight down, because
+  the right wrist then turns too fast at the start of the lift.
 - **The left hand (section 2).** The left hand rises open in a crescendo and comes down open in a
   diminuendo (`LEFT_HAND_PLACES`, `conductor-left.ts`), and it mirrors the beat in a loud
   passage, outside of the torso (`MIRROR_IN`). In a soft passage, it takes the lowered open palm
@@ -171,6 +176,9 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
   down in a diminuendo and a soft passage (`LEFT_HAND_PLACES`, `palm`), as the palms of section 2.
   The paw twists on its forearm for this turn (`PALM_TWIST`), as the forearm of a conductor
   turns the palm. The twist stops at `MAX_TWIST_L`, so the palm turns only a part of the way.
+  The lowered palm points forward near the line of the forearm, and the places of the left hand
+  turn with the upper body to each side, so that the arm does not reach back across the chest.
+  A cue extends the arm nearly straight to the section (derived).
 - **The breath (section 3).** The chest and the head rise in the preparation before the first
   beat, before each phrase start after a time with no note start, and before each accent
   (`breathLean`, `breathHead`), and the shoulders rise (`breathShrug`). They come down after the
