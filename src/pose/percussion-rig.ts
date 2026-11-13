@@ -695,9 +695,12 @@ export const PERCUSSION_HOLDS = {
     side: null,
     fit: null,
     damp: null,
-    // The left paw closes on the clip of the triangle and the right paw on the short beater with
-    // less curl: at 90°, the left paw folds 10 faces at the knuckles.
-    curl: [75 * MathUtils.DEG2RAD, 75 * MathUtils.DEG2RAD],
+    // The left paw closes on the clip of the triangle with a deep curl, so that the claw tips
+    // touch the thin clip (pnpm wind-grip percussionist): at 118°, the left paw grasps the clip in
+    // 79% of the play and in the rest, with the tips 0.5 cm off it. At 75°, the tips stood 3.0 cm
+    // off, and the paw grasped in no sample. The deep curl folds 16 faces at the knuckles inside
+    // the fist (10 at 75°). The right paw closes on the short beater with less curl.
+    curl: [118 * MathUtils.DEG2RAD, 75 * MathUtils.DEG2RAD],
     // A beater near the line of the forearm turns the paw fast with a roll that removes the
     // side bend, so the forearm lies in the plane of the palm.
     strikeRoll: false,
