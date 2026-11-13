@@ -75,9 +75,11 @@ export const CONDUCTOR_HOLD = {
   /**
    * The curl of the fingers around the baton, in the play, in the rest pose, and in the bow. A
    * conductor keeps the baton in the closed hand also with the arms down. With no curl at rest,
-   * the open paw of the Tripo bear showed the baton under the tips of its claws.
+   * the open paw of the Tripo bear showed the baton under the tips of its claws. From a curl of
+   * about 57°, three thin faces of the knuckle crease of the Tripo bear (104, 105, 1769) fold in
+   * each sample of the play and at rest (`pnpm hold-fit conductor`).
    */
-  batonCurl: 60 * MathUtils.DEG2RAD,
+  batonCurl: 50 * MathUtils.DEG2RAD,
   /**
    * In the lift and in the lowering of the arms (5.2), the baton turns toward this direction: out
    * to the right side and a little down, as a loose wrist lets it fall. Thus its tip leaves the desk
