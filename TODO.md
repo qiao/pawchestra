@@ -1232,10 +1232,6 @@ Done when: the pose tests pass, and the pose and frame targets pass.
       bodies and the back of the bear. Also try a close shot under the wordmark, and compare both
       at 300 px wide. Add a 180 px `apple-touch-icon.png` and a small web app manifest
       (`index.html` links only `favicon.svg`) (7.4).
-- [ ] Ask the user if a click on an animal toggles the solo of its seat, with a label for 2 s
-      ("Violins 1, 4 rabbits"), and a click on the floor clears each solo. Use `isClick()` of
-      `src/app/pick.ts` and the player boxes of `src/shots/clearance.ts`. This changes the rule
-      "A click on an animal does nothing" of 2.3.
 - [ ] Ask the user for a public cast page: a mode `?page=cast` of the gallery with the UI names of
       the instruments, no test controls, and a link from the drawer and `/about`. The gallery and
       `test.html` are development pages with `noindex` now (7.4).
