@@ -1708,6 +1708,26 @@ def tail_key(body, rig):
     )
 
 
+def sit_key(body, rig):
+    """The key `bind_sit`: puts the underside of the haunch behind the hip joints onto the plane of
+    the thigh underside, so that the haunch rests on the seat (`sit_move()` of
+    tools/blender/bind_edit.py with the rule `sit` of the params). The log gives each moved vertex
+    with its move on z, in units."""
+    import bind_edit as be
+
+    restore = be.pose_bind(body, rig)
+    move, facts = be.sit_move(body, rig, P['sit'])
+    count = be.add_bind_move(body, rig, move, 'bind_sit')
+    restore()
+    moved = np.nonzero(move[:, 2])[0]
+    log(
+        f'sit key: {count} vertices move, down at most {-move[:, 2].min():.4f}; hip y '
+        f'{facts["hipY"]:.4f}, thigh plane z {facts["plane"]:.4f}, back y {facts["back"]:.4f}, '
+        f'lowest point over the seat z {facts["lowBefore"]:.4f} to {facts["lowAfter"]:.4f}'
+    )
+    log('sit moves:', ' '.join(f'{i}:{move[i, 2]:.4f}' for i in moved))
+
+
 def mouth_rim(body):
     """Gives the faces of the mouth slit the face attribute `rim`: the app gives each corner of a
     rim face the mean normal of the fur faces at its vertex with no crease angle, so the slit
@@ -1837,6 +1857,8 @@ def main():
     belly_key(body, rig)
     if 'tailLay' in P:
         tail_key(body, rig)
+    if 'sit' in P:
+        sit_key(body, rig)
     if P.get('noseFur'):
         # The nose takes the color map of the source, with its painted nostrils, and the smooth
         # normals of the fur. The flat gloss faces in one dark color showed flat facets and no
