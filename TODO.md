@@ -1220,9 +1220,11 @@ scene of each demo has its seats and stage size with no overlap.
       band of reach and the bars nearer.
 - [ ] Xylophone: on a chord of two near bars, the shafts of the two mallets touch in 0.1% of the
       samples.
-- [ ] Elephant timpanist: the left paw grasps its mallet in 84% of the play and 71% of the lift,
-      and the right paw in 0% of the lowering (wind-grip, as on main). The largest twist step of
-      the left paw was 29° in 0.01 s before the grip change: measure it again.
+- [ ] Elephant timpanist: the shaft lies under the stump, and no part of the paw closes around it
+      (`pnpm wind-grip timpanist`: 0% grasp, the nails 2 cm to 3 cm from the shaft). The stump has
+      no thumb. Ask the user for a thumb lobe on each paw end
+      (`tools/blender/hand/elephant/redits.py`). The largest twist step of the left paw was 29° in
+      0.01 s before the grip changes: measure it again.
 - [ ] Elephant timpanist: at rest, the felt balls lie on the heads, each on its own kettle,
       because each paw reaches only the front kettle of its side. Add a source for the rest of a
       timpanist to `docs/reference/percussion-technique.md`, and check the rest against it.

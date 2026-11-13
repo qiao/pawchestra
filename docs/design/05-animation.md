@@ -740,8 +740,9 @@ The rest of each family:
 
 - Each paw holds its mallet in the closed fingers, with the head out of the front of the fist,
   and keeps one roll on the shaft through the stroke (`MalletSpot`, `gripRoll()`). The palm of
-  each stump paw of the timpanist faces down, and the shaft crosses the lower side of the stump,
-  as in the German grip (`TIMPANI.malletTilt`).
+  each stump paw of the timpanist faces down, as in the German grip, and the shaft lies under the
+  stump, in the skin of its palm side (`TIMPANI.malletSpotL`, `malletButt`). Reason: the stump
+  has no fingers, and a shaft through the stump came out of the lower side of the forearm.
 - **Kept paws.** A hold with `PercussionHold.keepPaw` keeps each paw that holds a piece on the
   hand of the player: the pose gives the paw the turn 0 in the plane of its palm (`pawTurnL`,
   `pawTurnR`, design 4.4). Reason: the piece follows the hand of the player, and the turn of the

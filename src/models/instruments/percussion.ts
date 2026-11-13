@@ -88,33 +88,33 @@ export const TIMPANI = {
    * the shaft across the palm, with the head out of the front of the fist
    * (`docs/reference/percussion-technique.md` 1). The paw of the app has no side bend on the
    * forearm (`PercussionHold.strikeRoll`), so the forearm stands at least 60° from the shaft for a
-   * straight paw. At the strikes of the elephant, the forearm stands 54° to 60° from the shaft, and
-   * the shaft crosses the closed stump. At 45°, the forearm stood 20° to 44° from the shaft, and
-   * the shaft ran along the stump and left its end.
+   * straight paw. At the strikes of the elephant, the forearm stands 45° to 63° from the shaft, and
+   * the shaft crosses the palm side of the stump. At 45°, the forearm stood 20° to 44° from the
+   * shaft, and the shaft ran along the stump and left its end.
    */
   malletTilt: 30 * MathUtils.DEG2RAD,
   /**
-   * The grip of the mallet in the closed left paw of the elephant (`MalletSpot`): 7 cm toward the
-   * palm, at the middle of the palm along the fingers, and 3 cm toward the thumb. The palm of the
-   * stump paw faces down at the kettles, so the shaft runs across the lower side of the stump,
-   * as through a fist, and the paw stays over the head of the kettle. A grip 5 cm along the
-   * fingers put the shaft out of the end of the stump. The left grip lies 0.05 H back from the
-   * middle of the palm toward the wrist and 0.02 H toward the thumb, so that the end of the
-   * stump closes on the shaft (`pnpm wind-grip timpanist`: the paw grasps in 84% of the play
-   * and in each rest and lowering sample). At the middle of the palm, the left paw grasped in
-   * 1% of the play, with the tips 2.1 cm off the shaft.
+   * The grip of the mallet in the left paw of the elephant (`MalletSpot`): 8.6 cm toward the palm,
+   * 0.6 cm along the fingers, and 1.2 cm toward the thumb. The stump is a round column, about
+   * 19 cm thick, with the palm point on its axis, and it has no fingers and no thumb. The palm of
+   * the stump faces down at the kettles, so the shaft lies under the stump, at most 1 cm in its
+   * skin, where the palm side meets the sole, and the head leaves the paw below the nails. The
+   * end of the stump curls down toward the shaft (`PERCUSSION_HOLDS.timpani.curl`). With the grip
+   * 4.2 cm toward the palm, the shaft went 14 cm through the stump and the wrist. With 8.9 cm, the
+   * shaft lay on the outer side of the stump in the side views.
    */
-  malletSpotL: [0.07, -0.05, 0.02],
-  /** The grip of the mallet in the closed right paw, where the right stump closes on it. */
-  malletSpotR: [0.07, 0, 0.03],
+  malletSpotL: [0.145, 0.01, 0.02],
+  /** The grip of the mallet in the right paw, as in the left paw. */
+  malletSpotR: [0.145, 0.01, 0.02],
   /**
-   * The length of each shaft behind its grip, in meters ({@link MALLET_BUTT}). The shaft goes
-   * about 14 cm back through the stump and the wrist, so the butt end sticks out 2 cm to 3 cm
-   * behind the paw, as a real player holds 13 mm to 25 mm behind the hand
-   * (`docs/reference/percussion-technique.md` 1).
+   * The length of each shaft behind its grip, in meters ({@link MALLET_BUTT}). The butt end stays
+   * in the skin of the palm side of the stump, so no view shows it. A real player holds 13 mm to
+   * 25 mm behind the hand (`docs/reference/percussion-technique.md` 1). With 0.165 m, the butt end
+   * came out of the lower side of the forearm, and with 0.07 m, its tip showed on the side of the
+   * stump.
    */
   // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
-  malletButt: 0.165 as number,
+  malletButt: 0.04 as number,
 } as const;
 
 /**

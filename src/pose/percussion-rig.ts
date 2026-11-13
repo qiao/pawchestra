@@ -430,10 +430,10 @@ export const PERCUSSION_HOLDS = {
   // front kettles: each hand strikes the front kettle of its side, and the outer kettles stand
   // beyond its reach (pair). The paw rests above the near rim, and the mallet strikes 0.25 m in
   // from the rim, for the look of the reference images. As a real timpanist with the German grip,
-  // the palm of each paw faces down, the shaft crosses the lower side of the closed stump, and the
-  // head leaves the front of the fist (TIMPANI.malletTilt, malletSpotL). The homes stand 0.66 H
+  // the palm of each paw faces down, the shaft lies under the stump at its palm side, and the
+  // head leaves the paw below the nails (TIMPANI.malletTilt, malletSpotL). The homes stand 0.66 H
   // out from the shoulders, so that the mallets point forward and 27° to 34° in, a V of about 60°,
-  // and each forearm stands 54° to 60° from its shaft at a strike. With the homes 0.48 H out, the
+  // and each forearm stands 45° to 63° from its shaft at a strike. With the homes 0.48 H out, the
   // shaft ran along the forearm and left the end of the stump. With 0.7 H, a right strike missed
   // its target by 7 mm. Between strikes and at rest, each mallet keeps its strike direction, and
   // the wrist lifts the head 0.3 rad (across.pitch): the mallet then slopes 13° to 17° down, and
@@ -468,9 +468,8 @@ export const PERCUSSION_HOLDS = {
     ready: true,
     // At rest, the felt balls lie on the heads (restPitch), because the paws cannot hang beside
     // the large kettles. No source gives the rest of a timpanist. With 0.5
-    // of the pitch, each ball touches its head (0.1 cm, hold-fit rest limit 1.5 cm), and each paw
-    // grasps its mallet (wind-grip). With 0, the balls went 2.4 cm into the heads, and with 0.45,
-    // the left claws stood 0.7 cm off the shaft.
+    // of the pitch, each ball touches its head (0.1 cm, hold-fit rest limit 1.5 cm). With 0, the
+    // balls went 2.4 cm into the heads.
     restPitch: 0.5,
     set: null,
     pair: true,
@@ -508,14 +507,17 @@ export const PERCUSSION_HOLDS = {
       speed: 1.2,
       arc: 0.04,
     },
-    // The end of the stump paw of the Tripo elephant closes a little on the shaft
-    // (TIMPANI.malletSpotL and malletSpotR). The stump has no fingers: with a curl of 100° (the
-    // old paw), the ring of its nails folded 44 and 43 faces at rest, and with 20° 10 and 9.
-    curl: [20 * MathUtils.DEG2RAD, 20 * MathUtils.DEG2RAD],
+    // The end of the stump paw of the Tripo elephant curls 30° down toward the shaft under it
+    // (TIMPANI.malletSpotL and malletSpotR), so that the sole and the nails tilt toward the shaft.
+    // The stump has one bone for its end, no fingers, and no thumb, so it cannot wrap the shaft.
+    // With 45°, the dark color of the sole spread between the nails, and 16 faces of the nail
+    // ring folded at rest. With 60°, the edge of the sole stood out below the stump as a sharp
+    // wedge. With a curl of 100° (the old paw), 44 and 43 faces folded at rest.
+    curl: [30 * MathUtils.DEG2RAD, 30 * MathUtils.DEG2RAD],
     // Each paw turns around the shaft until it has no side bend at the strike, and keeps that roll
-    // between strikes, so that the shaft stays in the closed paw. Each hand strikes one kettle in
-    // one direction, so the roll stays near one value. With no roll, the shafts leave the paws
-    // 80° from the thumb side between strikes, and no paw grasps its mallet.
+    // between strikes, so that the shaft stays under the palm side of the stump. Each hand strikes
+    // one kettle in one direction, so the roll stays near one value. With no roll, the shafts
+    // leave the paws 80° from the thumb side between strikes.
     strikeRoll: true,
     keepPaw: false,
   },

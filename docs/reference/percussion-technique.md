@@ -235,12 +235,11 @@ and the instruments in `src/models/instruments/percussion.ts`. The strokes come 
 The app follows these facts:
 
 - **The grip (sections 1 and 2).** The palm of the stump paw of the Tripo elephant faces down,
-  as in the German grip, and the shaft crosses the lower side of the closed stump, as through a
-  fist (`TIMPANI.malletSpotL`, `malletSpotR`, `malletTilt`). The end of the stump closes 20° onto
-  the shaft (`PercussionHold.curl`), the head leaves the front of the fist, and the butt end
-  sticks out 2 cm to 3 cm behind the paw (`TIMPANI.malletButt`). The left grip lies nearer to the
-  wrist than the right grip (`TIMPANI.malletSpotL`), so that the end of each stump closes on its
-  shaft (`pnpm wind-grip timpanist`).
+  as in the German grip, and the shaft lies under the stump, in the skin of its palm side
+  (`TIMPANI.malletSpotL`, `malletSpotR`, `malletTilt`). The end of the stump curls 30° down
+  toward the shaft (`PercussionHold.curl`), and the head leaves the paw below the nails. The butt
+  end stays in the skin of the stump (`TIMPANI.malletButt`), so no part of the shaft goes through
+  the stump or the forearm.
 - **The rest.** No source of this file gives the rest of a timpanist. At rest, the felt balls lie
   on the heads, and the paws stay over the kettles (`PercussionHold.restPitch`), because the
   hanging paws reach into the large kettles.
@@ -275,7 +274,9 @@ The app does not follow these facts:
   height of the badger (`PercussionHold.fit`), also when the head is far below its elbows. Only
   a body whose belly needs the drum forward sets it higher. With the head below the elbows of each
   body, the sticks of the thin wolf and deer went into the raised drum in the lowering.
-- **The fingers (section 1).** The elephant paw has no fingers to wrap the shaft.
+- **The fingers (section 1).** The stump paw has no fingers and no thumb, and one bone for its
+  end. It cannot pinch the shaft or wrap it: the shaft lies against the palm side, and
+  `pnpm wind-grip timpanist` counts no grasp. The butt end does not stick out behind the paw.
 - **The place of the muffle (section 4).** The paw touches the head between the playing spot and
   the near rim, at least 5 cm in from the rim, as far toward the spot as the short arm reaches
   (`FingersDamp.reach`). The spine leans 3° over the kettles. No source gives a lean. From an
