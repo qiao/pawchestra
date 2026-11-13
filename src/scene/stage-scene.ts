@@ -269,15 +269,21 @@ const heroHead: HeadPoints = { eyeL: [0, 0, 0], eyeR: [0, 0, 0], head: [0, 0, 0]
  * @param view The layout of the frame.
  * @param camera The camera of the frame.
  * @param hero The hero of the shot, or `null`.
+ * @param detail True in a detail insert: with no eye in the frame, the focus stays on the detail.
  * @returns The depth, in meters, or `null` for no hero, or for a hero out of the frame.
  */
-function heroDepth(view: LayoutView, camera: FocusView, hero: number | null): number | null {
+function heroDepth(
+  view: LayoutView,
+  camera: FocusView,
+  hero: number | null,
+  detail: boolean,
+): number | null {
   const index = heroMeshIndex(view, hero);
   const mesh = index === null ? undefined : view.players[index];
   if (!mesh || !writeHeadPoints(mesh, heroHead)) {
     return null;
   }
-  return heroFocusDepth(camera, heroHead, false);
+  return heroFocusDepth(camera, heroHead, detail);
 }
 
 /** The flags of a seat that the solo light reads (design 2.4): `SeatFlags` of the app. */
@@ -1407,8 +1413,9 @@ export class StageScene {
     let focus: Focus;
     if (shot) {
       const focusView = { position, target, fov: camera.fov, aspect: CINEMA_ASPECT };
-      const to = heroDepth(view, focusView, shot.hero ?? null);
-      const from = heroDepth(view, focusView, shot.heroFrom ?? shot.hero ?? null);
+      const detail = shot.detail ?? false;
+      const to = heroDepth(view, focusView, shot.hero ?? null, detail);
+      const from = heroDepth(view, focusView, shot.heroFrom ?? shot.hero ?? null, detail);
       const share = shot.heroShare ?? 1;
       // During a blend, the focus goes from the eye of the hero of the previous shot. A hero with
       // no eye or head in the frame takes the point that the camera looks at.
