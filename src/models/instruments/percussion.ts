@@ -158,12 +158,13 @@ export const XYLOPHONE = {
   sharpStrike: 0.02,
   /**
    * The angle of each mallet below the level in the bind pose, toward the fingers of the hanging
-   * paw, in radians: the shaft runs 30° from the fingers. The paws hang low in front of the belly,
-   * where each mallet runs near the line of its forearm, so the shaft leaves the closed paw under
-   * the curled claws. With {@link PAW_TILT}, the same paws folded more faces at the knuckles.
+   * paw, in radians ({@link PAW_TILT}): the shaft crosses the palm under the curled claws and
+   * leaves the fist at the side of the thumb, in the matched grip of the snare drum
+   * (`docs/reference/percussion-technique.md` 9). At 1.05, the shaft ran 30° from the fingers and
+   * left the paw along the claws, with the claw tips 2.9 cm off it.
    */
   // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
-  malletTilt: 1.05 as number,
+  malletTilt: PAW_TILT,
   /** The grip of each mallet in the closed paw ({@link PAW_SPOT}). */
   malletSpot: PAW_SPOT,
 } as const;

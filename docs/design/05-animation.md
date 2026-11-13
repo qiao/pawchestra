@@ -734,9 +734,10 @@ The rest of each family:
   strike further in than a real timpanist (`PercussionHold.rim`). The short arms of the badger
   cannot hold hand cymbals out of the round body, so it plays a suspended cymbal
   (`SpeciesParams.cymbalForm`). Only a recast body plays the hand cymbals. The xylophone bars are smaller than real bars, so the short arms
-  reach each one. At the xylophone, the right elbow of the badger points far out, and each mallet
-  points from a place out from its shoulder (`PercussionHold.home`), so that the freed round arms
-  stay out of the leaning belly. A home further out misses the bars.
+  reach each one. At the xylophone, each mallet of the badger points from a place out from its
+  shoulder (`PercussionHold.home`), and the spine leans further over the bars, so that the
+  forearms stay out of the leaning belly. The elbows point down and back (`poleL`, `poleR`). A
+  home further in puts the forearms into the belly, and less lean misses the far bars.
 - **Fast rolls.** A roll is a run of single strikes on one target, faster than the visible stroke
   rate. It keeps its first strike and then each `k`-th strike (`thinRolls()`), so the kept strikes
   stay on the note grid and follow the tempo. Two hands in turn strike at most 12 times each

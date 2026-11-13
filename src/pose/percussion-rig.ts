@@ -677,16 +677,20 @@ export const PERCUSSION_HOLDS = {
     // bends the left wrist 53° at the lowest bars, and 2 cm 49°.
     offsetL: [0, 0, 0.02],
     offsetR: [0, 0, -0.02],
-    // The left elbow points out and back, so that the left claws of the Tripo badger go less far
-    // into the left shoulder: 3.5 cm, and 4.4 cm with [-0.8, -1, 0.3].
-    poleL: [-0.8, -1, 0.8],
-    // The rebuilt round arms of the badger are free of the trunk (design 5.3, "Free round arms").
-    // The right elbow points further out, and each mallet points from a place out from the
-    // shoulder, so that the paws stay out from the leaning belly. With the home 0.3 H out, the
-    // mallets miss the bars by up to 4 cm.
-    poleR: [2, -1, 0.3],
+    // The elbows point down, a little out, and back. With the homes out from the shoulders, the
+    // median upper arm stands 31° (left) and 37° (right) out from the side of the body in the
+    // play, and at most 63° and 58°. With the right elbow at [2, -1, 0.3], the right upper arm
+    // stood up to 70° out. With the right elbow at [0.6, -1, 0.6], the right mallet missed a bar
+    // by 4.5 mm.
+    poleL: [-0.5, -1, 0.6],
+    poleR: [1, -1, 0.3],
     rim: 0,
-    home: [0.15, -0.2, -0.75],
+    // Each mallet points from a place 0.35 H out from its shoulder, so that the forearms stay out
+    // of the leaning belly: 1.2 cm and 1.3 cm in the play and the lift (limit 1.5 cm). With the
+    // homes 0.15 H out and the mallets of the old tilt, the left claws went 3.5 cm into the left
+    // shoulder, and with the new tilt the forearms went 2.6 cm into the belly. With 0.3 H, the
+    // forearms went 1.7 cm in.
+    home: [0.35, -0.2, -0.75],
     top: 'up',
     across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 6 },
     // Both heads keep one height between strikes, because the paws do not pass each other.
@@ -705,9 +709,10 @@ export const PERCUSSION_HOLDS = {
     // A bar more than 1.7 H from the shoulder joint goes to the other paw. With 2.175 H, the right
     // mallet of the Tripo badger missed the highest bars by up to 12.5 cm.
     reach: 1.7,
-    // The spine leans 14° over the bars, so that the paws reach the far bars: with 11°, the
-    // mallets missed them by up to 2.6 cm.
-    lean: 0.25,
+    // The spine leans 17° over the bars, so that the paws reach the far bars from the homes out
+    // from the shoulders: with 14°, the mallets missed them by up to 10 mm, and with 11° and the
+    // old homes, by up to 2.6 cm.
+    lean: 0.3,
     // The short legs tilt far with a small move of the hips, and the foot skin then sinks into
     // the floor, so the hips keep their place, and the spine takes the whole move. A lean of 12°
     // moves the shoulders 5.5 cm toward the notes, so that both paws reach more bars of a run. At
@@ -719,7 +724,10 @@ export const PERCUSSION_HOLDS = {
     // A roll that removes the side bend at each strike turns the paws fast between the bars, so
     // the forearm lies in the plane of the palm.
     strikeRoll: false,
-    keepPaw: false,
+    // The paws keep the turn of the hands, so that the curled claws close on the mallets
+    // (`XYLOPHONE.malletTilt`). With the turn of the retarget, the paw turned up to 70° from the
+    // hand, and the paws grasped in no sample (`pnpm wind-grip xylophonist`).
+    keepPaw: true,
   },
 } as const satisfies Readonly<Record<PercussionInstrument, PercussionHold>>;
 
