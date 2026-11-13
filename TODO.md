@@ -185,6 +185,10 @@ passes.
       gesture and at a cue (`readyReach`, `cueReach`), and check the faces 4254, 4258, 4259, and
       4262, which fold in up to 6 % of the play at bends of 89° to 142° (`pnpm fold-probe
       conductor --faces`).
+- [ ] Conductor bear: with the wrist ring out of the paw turn, 6 faces of the inner left wrist
+      fold at wrist bends of 103° to 116° (at most 1.9% of the play, boulanger-matin 58.88 s,
+      `pnpm fold-probe conductor --faces`). The base showed a sharp fin at the same place. Check
+      the wrist rows (`rows.wrist`) at that bend.
 - [ ] Conductor bear: in the held final chord and at a climax, the baton points up past the cheek
       in the view from the front right (The Ember Crown 172 s, Mozart K. 525 30.9 s). The sweep
       finds no depth, so measure the gap of the baton to the head.
@@ -389,13 +393,10 @@ passes.
       The left mirror rows raised the left twist p95 in the lift from 57° to 71°. A row change
       that gives 992 an arm row makes the trunk part of the cat 19 open loops
       (`TRIPO_BODY_LOOPS`).
-- [ ] Hand chains: `turn_paws()` turns each vertex past the mean of the wrist loop along the
-      forearm axis, so a slanted loop turns some of its own vertices with the paw and shears the
-      quads before it into a stretched texture (fixed in the cat chain). The same cut turns loop
-      vertices of the bear (6 of 14 on each side), beaver (5 of 12), dog (2 of 13), hippo (7 of
-      18), monkey (1 of 8, right), panda (5 and 4 of 16), and wolf (4 of 11). Keep the loop, as the
-      cat chain does, and check each wrist in 2x crops. The fox chain takes the turned part by the
-      edges past the far ring, so it turns no loop vertex (`assert not move[A].any()`).
+- [ ] Hippo bassist: on the right paw, 8 faces of the new band of `turn_paws()` and just past
+      ring B keep UV scale ratios of 2.2 to 4.1 (about 1.2 around them). The join of the paw
+      turned by 3 steps and the `turnFit` fade stretch them. Check them in 2x crops, and try a
+      longer fade.
 - [ ] Cat violist: with the viola on its via (`carryVia`), the left forearm goes 2.3 cm (lift) and
       2.1 cm (lowering) into the back of the viola near the rest, in 16% and 17% of the samples
       (1.6 cm and 1.5 cm when the viola hung from the paw, limit 1.5 cm, `pnpm body-clip
