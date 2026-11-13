@@ -100,9 +100,13 @@ left side):
   The legs take no split: their rings stand about each 0.015 to 0.02 units.
 - **Paws turned.** Each vertex past the arm ring at x 0.2814 turns rigidly about the rest forearm
   axis by whole ring steps of 360/13 degrees: -110.8 degrees on the left (4 steps) and 27.7 degrees
-  on the right (1 step), 211 vertices on each side. New quads join the two rings with the step
+  on the right (1 step), 209 vertices on each side. New quads join the two rings with the step
   offset, and the far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units).
   The new quads keep the UVs of the old band. The paws keep their form ("Arm twist").
+- **Wrist loop.** The ring at x 0.2814 does not turn. It is slanted, so 2 of its 13 vertices lie
+  past its mean along the forearm axis. When they turned with the paw, the quads before the ring
+  sheared into a pinched wrist with a slit and a fan of stretched fur: 4 faces on the left and 5 on
+  the right had UV scale ratios of 2.7 to 29.9, against about 1.1 on the faces around them.
 - **Point edits.** One: the edit `paw` of the front paws ("Paw size" below). The trunk, the arms,
   the legs, the feet, and the tail keep the form of the source. The head scale comes after the
   weights ("Head size" below).
@@ -368,7 +372,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/dog.rig.glb` | 1,084,080 bytes | `856c2d5fa31d0c57111d69b266ebf451fd691c4edd9b5c0f1fc00832194a6488` |
-| `tripo-hand/dog.rig.json` | 16,214 bytes | `76f3083f86649b28bbeea049270a265ce3cf8c156b5d4659bae701de13b49c63` |
+| `tripo-hand/dog.rig.glb` | 1,084,080 bytes | `764c55c0b4528b5b85d27da7633a2dbe353a2a8c2062c50591a4013501d64c30` |
+| `tripo-hand/dog.rig.json` | 16,214 bytes | `8f1df5b81092363bff883989308bddcc9cd04577c43fe4d947d9838aaffd51e8` |
 | `tripo-hand/dog-color.webp` | 118,948 bytes, 2048 × 2048 | `a40fcf698fb40ff0d95c1a580f93b7f9999e05e4e3adcadac2eae14abeabaded` |
 | `tripo-hand/dog-normal.webp` | 28,924 bytes, 1024 × 1024 | `9e96ae9a9353cd93673333c33a3907dbef87813ef3858a2d7c5de930786fd075` |
