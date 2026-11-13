@@ -1,5 +1,5 @@
 {
- "sha256": "2f2a486522d9605175bce5cbdd140782c5fedf188138265423b953d3364b0f3d",
+ "sha256": "35b9168f4e2424ac4c403a2ab6bfbca6ed4e96a15efbd30962e7ffb0a6aba7ec",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -278,8 +278,8 @@
   "tail_tip": {
    "head": [
     0.0,
-    0.255422,
-    -0.181891
+    0.272868,
+    -0.18927
    ],
    "vertices": 122,
    "weights": "ba75ebbbf4bf47a5"

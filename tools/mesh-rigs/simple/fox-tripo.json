@@ -332,7 +332,7 @@
     "tailBind": {
       "tail": [
         0,
-        -0.5,
+        -0.35,
         -1
       ],
       "tail_tip": [
@@ -341,7 +341,7 @@
         -0.1
       ]
     },
-    "tailBindNote": "The direction of each tail bone in the seated bind (bind_turns() of tools/blender/rig_mesh.py): the root goes down and a little back over the back edge of the seat, and the tip hangs down behind the chair.",
+    "tailBindNote": "The direction of each tail bone in the seated bind (bind_turns() of tools/blender/rig_mesh.py): the root goes back and 19 degrees down over the back edge of the seat, so that it clears the seat of the sit key bind_sit, and the tip hangs down behind the chair.",
     "legTurns": {
       "thigh": [
         0.644715,
