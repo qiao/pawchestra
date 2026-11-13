@@ -102,9 +102,13 @@ left side):
   poles.
 - **Paws turned.** Each vertex past the arm ring at x 0.2786 turns rigidly about the rest forearm
   axis by whole ring steps of 360/11 degrees: -65.5 degrees on the left (2 steps) and 65.5 degrees
-  on the right, 362 and 363 vertices. New quads join the two rings with the step offset, and the
+  on the right, 358 and 359 vertices. New quads join the two rings with the step offset, and the
   far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units). The new quads
   keep the UVs of the old band. The paws keep their form ("Arm twist").
+- **Wrist loop.** The ring at x 0.2786 does not turn. It is slanted, so 4 of its 11 vertices lie
+  past its mean along the forearm axis. When they turned with the paw, the quads before the ring
+  sheared into a V notch at the wrist: 9 faces on the left and 8 on the right had UV scale ratios of
+  2.6 to 12.9, against about 1.2 on the faces around them.
 - **Point edits.** One: the edit `paw` of the front paws ("Paw size" below). The head, the eyes, the
   muzzle, the trunk, the arms, the legs, and the tail keep the form of the source.
 - **Surface.** `sa.add_surface(wolf, 'wolf', <base color>, eye_fans=False,
@@ -251,7 +255,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/wolf.rig.glb` | 1,308,864 bytes | `4358aa435aebefe376aba342bceac46e0dce0d8f75173ea395d0dc89be1237bc` |
-| `tripo-hand/wolf.rig.json` | 15,687 bytes | `4e98ad5620909eb5feb68cdbcf34d7367475d511e5b4afda535e9e05285a4861` |
+| `tripo-hand/wolf.rig.glb` | 1,308,864 bytes | `fca800f9d1d79e8d1174d7bf6b0a776feff8f3b8dd455bfdb8bbf6045fa992e5` |
+| `tripo-hand/wolf.rig.json` | 15,687 bytes | `1ec320e0df89ac3992bf4fce9d7ce0fa6a52d406ae87b7c8cf7d5c2b1253a679` |
 | `tripo-hand/wolf-color.webp` | 171,898 bytes, 2048 × 2048 | `bc6334af510185d4367b057c36ca289174cfc2936b3cfde64ab2b63a10215efa` |
 | `tripo-hand/wolf-normal.webp` | 62,414 bytes, 1024 × 1024 | `dd4896a3db92b8b187b31e4e9c118e5fbccbf1f9478fb43126727f8222beed59` |
