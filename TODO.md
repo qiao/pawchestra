@@ -529,8 +529,11 @@ passes.
       crops of the lift, and scan the left rest elbow if it shows.
 - [ ] Badger bass drummer: from the front, the drum hides the right arm and the beater, as a real
       drum hides its player. Ask the user if the badger must show more from the front.
-- [ ] Badger: the snare sticks and the mallets keep about real lengths (34 cm), longer than the
-      scaled bass drum beater. Ask the user if the scale of the badger applies to them too.
+- [ ] Badger: the butt of each stick, mallet, and beater goes 1.3 cm to 2.9 cm deep through the
+      wrist end of the thick forearm, and the butt of each snare stick comes out of the side of
+      the forearm. The beater and the mallets hide their butt ends in the wrist. Ask the user if
+      the snare sticks take a short butt too, or if the forearm of the badger gets thinner at the
+      wrist.
 - [ ] Badger snare drummer: in the side views, the butt of the near stick shows over the belly at
       rest. It is no clip: the butts stay out at the sides of the body, at least 16.5 cm from the
       trunk at rest and 11.7 cm in the play, the lift, and the lowering. Ask the user if the rest

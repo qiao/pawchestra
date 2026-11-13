@@ -523,8 +523,9 @@ export const PERCUSSION_HOLDS = {
   },
   // The badger stands behind the drum, and the right paw holds the beater at the near rim of the
   // right head, with the beater along the head, 10° down from the level, as a real player holds it
-  // parallel to the head (docs/reference/percussion-technique.md 5). The beater strikes 18 cm from
-  // the middle of the head toward the player, at its height, 7 cm in from the rim, near one third.
+  // parallel to the head (docs/reference/percussion-technique.md 5). The beater of the real length
+  // strikes 8 cm from the middle of the head toward the player, at its height, a little off the
+  // middle.
   // The beater points from its home, near the elbow, so the head of the beater leaves the drum head
   // along its normal, and the paw and the forearm turn with it, as the stroke of the wrist and the
   // forearm of a real player. The head rests 5 cm off the drum head between strikes, and lifts up
@@ -533,9 +534,10 @@ export const PERCUSSION_HOLDS = {
   // near the side, with the elbow down and back: with the elbow out, the forearm comes within 26°
   // of the shaft, and the shaft leaves the fist along the claws. The rebuilt round arm is free of
   // the trunk, and with the elbow a little in, it went 3.4 cm into the belly. The spine leans 13°
-  // over the drum, and the home stands 0.5 H out, so that the beater of the Tripo badger reaches
-  // each strike spot: with 7° and 0.56 H, it missed by up to 2.7 cm, and with 13° and 0.62 H, by up
-  // to 2.2 cm. The paw holds the beater at the drum and the spine keeps its lean also at rest
+  // over the drum, and the home stands 0.425 H out, so that the paw keeps its place at the near
+  // rim with the longer beater, and the arm stretches to 0.84 of its length. With a spot 12 cm
+  // from the middle, the upper arm slanted 33° back, and with 6 cm, the arm stretched to 0.88. The
+  // paw holds the beater at the drum and the spine keeps its lean also at rest
   // (ready). The left arm hangs while the badger plays, because a single note often needs no
   // muffling. In a rest after a note, the left palm lies on the near part of the far head (damp),
   // and the upper body turns 26° so that the left shoulder comes forward: with 20°, the left
@@ -550,11 +552,11 @@ export const PERCUSSION_HOLDS = {
     offsetL: [0, 0, 0],
     // The middle of the head of the beater one radius of its head off the drum head, so that it
     // touches the head at the note start.
-    offsetR: [0.0215, 0, 0.18],
+    offsetR: [0.0215, 0, 0.08],
     poleL: POLE_L,
     poleR: [0, -0.5, 0.4],
     rim: 0,
-    home: [0.5, -0.389, -0.146],
+    home: [0.425, -0.455, -0.128],
     gripRise: null,
     top: 'up',
     across: null,

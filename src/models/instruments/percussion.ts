@@ -230,10 +230,10 @@ export const SNARE_DRUM = {
 const BADGER_SCALE = 1.038 / 1.683;
 
 /**
- * The length of the shaft of the bass drum beater behind its grip, in meters
- * (`BASS_DRUM.malletButt`).
+ * The length of a concert bass drum beater for the orchestra, in meters, and the radius of its
+ * head (Vic Firth BD3, `docs/reference/percussion-technique.md` 5).
  */
-const BEATER_BUTT = 0.095;
+const BEATER = { length: 0.419, head: 0.0349 } as const;
 
 /**
  * The bass drum on its stand, in meters (design 4.6): in front of the player, with its heads to
@@ -277,20 +277,23 @@ export const BASS_DRUM = {
   /** The grip of each mallet in the closed paw ({@link PAW_SPOT}). */
   malletSpot: PAW_SPOT,
   /**
-   * The length of the shaft behind its grip, in meters ({@link MALLET_BUTT}): the middle of the
-   * closed paw holds the beater about one third up from the butt, as a real player holds it
-   * (`docs/reference/percussion-technique.md` 5), and the butt end sticks out about 8 cm behind
-   * the paw.
+   * The length of the shaft behind its grip, in meters ({@link MALLET_BUTT}). The butt end stays
+   * in the wrist of the thick forearm, so no view shows it. With the 14 cm of a real grip one
+   * third up from the butt (`docs/reference/percussion-technique.md` 5), the butt end came out of
+   * the forearm in some strikes.
    */
   // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
-  malletButt: BEATER_BUTT as number,
+  malletButt: 0.095 as number,
   /**
-   * The length of the beater from the grip to the middle of its head. The whole beater is 25.8 cm
-   * long: a concert beater of 419 mm (Vic Firth BD3) at the {@link BADGER_SCALE}.
+   * The length of the beater from the grip to the middle of its head: 24.4 cm, the length of a
+   * real beater from a grip one third up from its butt, with no scale, as the snare sticks
+   * ({@link SNARE_DRUM.stick}). With the length at the {@link BADGER_SCALE} (14.2 cm), only 5 cm
+   * of the shaft showed between the fist and the head, and the beater looked as a ball on the
+   * fist.
    */
-  mallet: (0.419 - 0.0349) * BADGER_SCALE - BEATER_BUTT,
-  /** The radius of the head of the beater: the head of 69.8 mm of the same beater at the scale. */
-  ball: 0.0349 * BADGER_SCALE,
+  mallet: (2 * BEATER.length) / 3 - BEATER.head,
+  /** The radius of the head of the beater: the head of the real beater at the scale of the drum. */
+  ball: BEATER.head * BADGER_SCALE,
 } as const;
 
 /** The tambourine, in meters (design 4.6). */

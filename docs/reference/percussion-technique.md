@@ -308,11 +308,13 @@ The app follows these facts:
   sticks out behind the paw (`malletButt()`, `MALLET_BUTT`). Each paw keeps the turn of the hand
   of the player (`PercussionHold.keepPaw`), so the claws stay closed on the shaft
   (`pnpm wind-grip`).
-- **The bass drum (section 5).** The beater has the size of a real one [44], and the drum the depth
-  of a real one [43], at the scale of the badger, its head top over the mean height of an adult [45]
-  (`BASS_DRUM`). The badger stands behind the drum, and the right paw holds the beater at the near
-  rim, one third up from the butt. At the strike, the beater lies along the head, as the photos of
-  [13] show, and strikes near one third in from the rim [16]. The left arm hangs while the badger
+- **The bass drum (section 5).** The drum has the depth of a real one [43], at the scale of the
+  badger, its head top over the mean height of an adult [45] (`BASS_DRUM`). The beater has the
+  length of a real one [44] in front of a grip one third up from its butt, with no scale, as the
+  snare sticks, and its head has the scale of the drum (`BASS_DRUM.mallet`, `ball`). The badger
+  stands behind the drum, and the right paw holds the beater at the near rim. At the strike, the
+  beater lies along the head, as the photos of [13] show, and strikes a little off the middle,
+  toward the player [14]. The left arm hangs while the badger
   plays, because a single note often needs no muffling and a march muffles in the rests, not at the
   strikes [13]. After a note with a rest of at least 0.5 s after it, the free left paw lays its open
   palm and fingers on the far head and goes back before the next note, as a player muffles the back
@@ -388,6 +390,9 @@ The app does not follow these facts:
   times from a soft note to a loud note (`gestureSize()`), and a soft note must stay low.
 - **The lean over the bass drum (section 5).** The spine leans over the drum
   (`PercussionHold.lean`), so that the short arm can bend.
+- **The butt of the beater (section 5).** The butt end is shorter than one third of the beater
+  and stays in the wrist of the thick forearm (`BASS_DRUM.malletButt`). With the real length, the
+  butt end came out of the forearm in some strikes.
 - **The width of the bass drum (section 5).** The drum is 32 inches wide (`BASS_DRUM.radius`),
   less than the 36 inches of [43] and the 40 inches of [28], and its middle stands lower. With
   the drum of 36 inches, the snout of the leaning badger touched the top hoop, and a drum further
