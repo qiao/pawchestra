@@ -1549,7 +1549,7 @@ const HIPPO_HOLD = {
  * chest, and the bow at the frog stood up beside the face. The violin sits 0.03 H higher than in
  * the shoulder hold, so that the jaw lies on it, and the left shoulder bone turns 25° forward
  * (`reachL`), so that the left paw reaches the fingerboard of the violin of 0.9
- * (`SpeciesParams.violinScale`) from 0.67 of its length.
+ * (`SpeciesParams.violinScale`) from 0.64 of its length.
  *
  * At rest, the rabbit sits as a seated orchestra violinist (`docs/reference/string-technique.md`,
  * section 2.9): the violin stands upright on the lap (`rest.axis` (0, 1, 0)), the left paw holds
@@ -1578,8 +1578,9 @@ const HIPPO_HOLD = {
  * and the paw flipped early in each lift (`pnpm arm-check violinist`). In the lift and the
  * lowering, the bow tip turns up through the front, (0.3, 0.6, -1), with the hair to the front,
  * and the grip moves 0.3 H out and 0.1 H to the front (`restBow.via`), so that the bow keeps at
- * least 20 cm from the music desk. Each part of each arm then turns at most 43° in the moments of
- * the violinist (assets/models/rabbit/README.md, "Arm twist").
+ * least 20 cm from the music desk. In the play of the fourth Tripo rabbit, the left forearm
+ * twists 13° and the right forearm 10° (`pnpm hold-fit violinist`, assets/models/rabbit/README.md,
+ * "Arm twist").
  *
  * In the middle of the lift and the lowering, the left wrist moves 0.3 H up and 0.15 H to the
  * front (`liftReach`), and the left elbow points out and down, (-1, -1.2, 0) (`liftPoleL`), so

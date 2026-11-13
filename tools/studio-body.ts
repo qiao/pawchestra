@@ -311,14 +311,13 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       eyeFinish: 'varnish',
     },
   ],
-  // The violinist rabbit (design 4.4): the hand rig of the third Tripo P2 mesh
+  // The violinist rabbit (design 4.4): the hand rig of the fourth Tripo P2 mesh
   // (`assets/models/rabbit/tripo-hand/rabbit.blend`), with the form of the source and no arm cut
   // and no stretch, so its chair fits the legs of the source. Its `.blend` holds the facts of the
-  // body: the scale that keeps H of the A-pose rabbit, the crease angle 180°, and a seat 1 cm
-  // deeper, so that its back keeps off the chair back. The thighs of its bind slope 15° down, and
+  // body: the scale that keeps the seated eye height of the third Tripo rabbit, the crease angle
+  // 180°, and a seat 1 cm deeper, so that its back keeps off the chair back. The thighs of its bind slope 15° down, and
   // most of each thigh lies on the seat, as for a seated violinist. The eyes take the finish `eye`
-  // and the eye light: the painted light of the source lies under the upper lid, so with the
-  // finish `varnish` the eyes showed no clear light from the front.
+  // and the eye light, as on the earlier Tripo rabbits.
   [
     'rabbit',
     {
