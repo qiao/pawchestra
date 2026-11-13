@@ -276,8 +276,13 @@ export function footStateAt(plan: PedalPlan, foot: number, time: number, out: Fo
   const change = plan.times[now] ?? 0;
   out.pedal = plan.pedals[now] ?? 0;
   out.share = onPedal(change, time);
-  // The foot comes from the pedal before when it was not back at the rest at the move start.
-  if (before >= 0) {
+  // The foot comes from the pedal before when it was not back at the rest at the move start. It
+  // goes back to its rest after the hold, so the pedal before counts only until then: the share
+  // on the pedal is 1 at that time, so the foot does not jump. With the pedal before in the return
+  // too, the right hoof went back to that pedal at the height of a press, 2.4 cm through the
+  // corner of the base, and jumped 15 cm to the rest at the start of its next move (117.1 s to
+  // 117.6 s of `boulanger-matin`).
+  if (before >= 0 && time < change + m.holdSec) {
     const stay = onPedal(plan.times[before] ?? 0, change - lead);
     if (stay > 0) {
       out.fromPedal = plan.pedals[before] ?? 0;
