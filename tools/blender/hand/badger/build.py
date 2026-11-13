@@ -151,6 +151,73 @@ def subdivide(body):
     me.update()
 
 
+def ring_walk(e0, face):
+    """Walks an edge ring from the edge e0 into `face`, across each quad to its opposite edge.
+    Gives the edges after e0 and the end: the triangle where the walk stops, or 'closed' when the
+    walk comes back to e0."""
+    edges, e = [], e0
+    while True:
+        if len(face.verts) != 4:
+            return edges, face
+        loop = next(lp for lp in face.loops if lp.edge is e)
+        opposite = loop.link_loop_next.link_loop_next.edge
+        if opposite is e0:
+            return edges, 'closed'
+        edges.append(opposite)
+        others = [f for f in opposite.link_faces if f is not face]
+        if len(others) != 1:
+            raise SystemExit(f'The edge ring from edge {e0.index} meets a border.')
+        e, face = opposite, others[0]
+
+
+def seed_rings(body):
+    """Edge ring Subdivide of the arm bands of params ringSeeds. Each band of the badger elbow is a
+    ring of quads around the arm that goes through one triangle, so the loop finder of subdivide()
+    finds no closed loop there. The ring starts at the edge along the arm (|dx| at least 0.7 of
+    its length) whose middle is nearest to the seed (mirrored in x for the right arm), and the walk
+    must end at the same triangle in both directions. The cut goes through the two ring edges of
+    that triangle, so the triangle becomes a smaller triangle and a quad, and the new loop closes."""
+    me = body.data
+    for spec in P.get('ringSeeds', []):
+        for sign, side in ((1.0, 'L'), (-1.0, 'R')):
+            bm = bmesh.new()
+            bm.from_mesh(me)
+            bm.edges.ensure_lookup_table()
+            S = np.array([rings.studio(v.co) for v in bm.verts])
+            seed = np.array(spec['seed']) * (sign, 1, 1)
+            best, e0 = None, None
+            for e in bm.edges:
+                a, b = S[e.verts[0].index], S[e.verts[1].index]
+                d = b - a
+                if abs(d[0]) < 0.7 * np.linalg.norm(d):
+                    continue
+                gap = np.linalg.norm((a + b) / 2 - seed)
+                if best is None or gap < best:
+                    best, e0 = gap, e
+            if best > spec.get('reach', 0.004):
+                raise SystemExit(f'No arm edge within reach of the ring seed {seed.tolist()}.')
+            faces = list(e0.link_faces)
+            one, end_one = ring_walk(e0, faces[0])
+            if end_one == 'closed':
+                ring = [e0] + one
+            else:
+                two, end_two = ring_walk(e0, faces[1])
+                if end_two is not end_one:
+                    raise SystemExit(f'The ring of the seed {seed.tolist()} ends at two triangles.')
+                ring = two[::-1] + [e0] + one
+            tris = sum(len(f.verts) == 3 for f in bm.faces)
+            bmesh.ops.subdivide_edges(bm, edges=ring, cuts=spec['cuts'], use_grid_fill=True)
+            after = sum(len(f.verts) == 3 for f in bm.faces)
+            bm.to_mesh(me)
+            bm.free()
+            log(
+                f'seed ring {side} at {np.round(seed, 4).tolist()}: {len(ring)} edges, '
+                f'{spec["cuts"]} cuts, end {end_one if end_one == "closed" else "triangle"}, '
+                f'triangles {tris} -> {after}'
+            )
+    me.update()
+
+
 def turn_paws(body):
     """Turns each paw rigidly about the rest forearm axis by whole ring steps (pawTurn of the
     params, 45 degrees for the rings of 8 edges): each vertex past the wrist ring at x `turnRing`
@@ -1987,6 +2054,7 @@ def main():
     body.data.polygons.foreach_set('use_smooth', [False] * len(body.data.polygons))
     log('import', len(body.data.vertices), 'vertices', len(body.data.polygons), 'faces')
     subdivide(body)
+    seed_rings(body)
     fold_relax(body)
     turn_paws(body)
     point_edits(body)
