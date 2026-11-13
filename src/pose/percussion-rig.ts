@@ -475,7 +475,9 @@ export const PERCUSSION_HOLDS = {
     across: { rest: -1.2, lift: 0.65, pitch: 0.3, peak: 4 },
     pitchR: 1,
     ready: true,
-    restPitch: 1,
+    // At rest, the felt balls lie on the heads (restPitch), as a real timpanist rests the mallets
+    // on a head (percussion 4), because the paws cannot hang beside the large kettles.
+    restPitch: 0,
     set: null,
     pair: true,
     gap: 0,
