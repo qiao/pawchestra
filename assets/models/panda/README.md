@@ -126,7 +126,8 @@ The weights, in the rest pose:
    eyeball.
 2. Arm rows: each vertex of a side with |x| from 0.13, within 0.085 units of the line of the rest
    arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.13 to 0 at x
-   0.17, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.2125, 0.2275, 0.2425, and 0.2575,
+   0.17, an elbow helper share that grows from 0 at x 0.2 to 1 at the elbow joint (x 0.235) and
+   falls to 0 at x 0.27,
    and the rest on the 4 roll segments. These x are places of the source: a vertex of the
    stretched arm takes the row of its place before the stretch.
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.004 from 0.03 units before
@@ -258,7 +259,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/panda.rig.glb` | 1,152,580 bytes | `801e793b73d167db144c585a74c6c1ac63694c7065040df2a35c0b730f12e101` |
-| `tripo-hand/panda.rig.json` | 16,255 bytes | `86ea4c868d0b9b25b9371e9c58524e3daede6e7e3a702c83c6de05249b2e36b6` |
+| `tripo-hand/panda.rig.glb` | 1,152,576 bytes | `20b3a4ab857d92fb7ae886726002146d1b17c250e467f9efc75123cbda7f90f2` |
+| `tripo-hand/panda.rig.json` | 16,255 bytes | `bc6f05713aa42875aff1093a965db82335753cbf82f09d28c7007b6fdf57f144` |
 | `tripo-hand/panda-color.webp` | 259,152 bytes, 2048 × 2048 | `f630fa99d34ef0f4be8b5c8bafcdf90602ca1488d0f5946fc11420e66165909c` |
 | `tripo-hand/panda-normal.webp` | 52,722 bytes, 1024 × 1024 | `aa537e7099c209fab0f402754cc48d6d45b930806cc567942ab1c56d31e551bb` |
