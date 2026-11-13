@@ -951,8 +951,12 @@ scene of each demo has its seats and stage size with no overlap.
       rabbit, and the cat. Fit each hold, or accept the depth with its reason.
 - [ ] Merge gate: it runs no clearance sweep. Add the pair "instrument in body" of each held role to
       the gate, or end the test pause for it.
-- [ ] Mouse oboist: the big head puts the reed high, so the paws hold the half-size oboe at the
-      height of the shoulders with open elbows. Show the user, and offer a bowed head.
+- [ ] Mouse oboist: the big head and the long muzzle put the reed 11 cm in front of the shoulder
+      joints and high above them, so the paws hold the oboe at the height of the shoulders, with
+      the right elbow bent 28° and the left 49°. Show the user, and offer a bowed head.
+- [ ] Mouse oboist: the mitten paws have one bone for the digit block and none for the thumb, so
+      the digits close together and the thumb lies along the tube. Ask the user if the paws need
+      digit bones and a thumb bone (chain `tools/blender/hand/mouse/`).
 - [ ] Mouse and beaver: find a source for the size of a small oboe and a small bassoon. The mouse
       plays an oboe of 0.5, and the beaver a bassoon of 0.7 (wind-technique 4.2). At 0.7 the bell
       top is 3.5 cm below the head top. At 0.8 the boot goes 8 cm into the belly.
@@ -964,7 +968,7 @@ scene of each demo has its seats and stage size with no overlap.
       the eye, and the tube covers the snout. A longer bocal (`BASSOON_REED`) could move it out, and
       it also moves the grips. Ask the user. The right arm folds p95 are 37 (27 before), and the
       bell top is 7.9 cm below the head top.
-- [ ] Mouse (Tripo hand rig): the oboist folds 20 faces of the left arm and 18 of the right at p95
+- [ ] Mouse (Tripo hand rig): the oboist folds 18 faces of the left arm and 15 of the right at p95
       (`pnpm arm-check oboist`, limit 8, 6 and 8 on the old mouse): the curled digits around the
       oboe, and thin faces at the arm root that fold with a shoulder turn of 2° to 8°
       (`pnpm fold-probe oboist --faces 20`). Look at the paws and the armpits in the app.
@@ -980,9 +984,6 @@ scene of each demo has its seats and stage size with no overlap.
       boulanger-matin by up to 1.62 m and a hippo by 0.18 m against `7fa9d1e89`, and the badgers of
       beethoven-9 by 6 cm. The old mouse gives the same moves, so the badger causes them. Check the
       layout of boulanger-matin with the user.
-- [ ] Mouse (Tripo hand rig): the oboe of 0.45 reads small under the paws in the close views. The
-      right grip has 0.4 cm of spare reach on the smaller body, so a larger oboe needs a new grip
-      fit.
 - [ ] Mouse (Tripo hand rig): 2 points of each open lid and 1 side point in the blink leave the head
       at the socket rim (ray casts of `lids()`). Check the blink in a close view.
 - [ ] Wolf clarinetist: at 35° the right paw reaches its grip with only 0.2 cm to spare, also with
