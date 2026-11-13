@@ -1426,6 +1426,11 @@ beam depth ──> surface 1/2 ──> surface blur 1/2 ────────
   around the pixel. At an outline, it takes the face of three of the four depths, else the
   nearest. The frames change only at some outline pixels, where a draw at half size had another
   face.
+- **Mix of the blur.** The final pass mixes the sharp image and the soft image by the blur at full
+  size: it reads the depth of the beam pass, with a tent over the pixel and its four neighbors
+  (`softShareAt()`). Thus the outline of a sharp subject keeps the anti-alias of the MSAA. With
+  the depth at half size, the outline showed steps of 2 pixels and a dotted dark line. The depth
+  of the beam pass has no hall, so a pixel of the hall reads the depth at half size.
 - The bloom keeps a small part of all light, as a diffusion filter, with a warm halation.
 - **Lens fringe** (`LENS_FRINGE`). The final pass moves the red of the scene a little outward and
   the blue a little inward, with the square of the distance from the middle of the frame, as the

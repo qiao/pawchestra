@@ -128,9 +128,14 @@ float viewDepth(vec2 uv) {
   return -perspectiveDepthToViewZ(texture(uDepth, uv).x, uNear, uFar);
 }
 
-// The signed diameter of the blur disc, as a part of the image height (scene/focus.ts).
+// The signed diameter of the blur disc of a view depth, as a part of the image height
+// (scene/focus.ts).
+float blurOfDepth(float depth) {
+  return clamp(uBlurScale * (1.0 - uFocus / depth), -uMaxNearBlur, uMaxBlur);
+}
+
 float blurAt(vec2 uv) {
-  return clamp(uBlurScale * (1.0 - uFocus / viewDepth(uv)), -uMaxNearBlur, uMaxBlur);
+  return blurOfDepth(viewDepth(uv));
 }
 `;
 
@@ -319,6 +324,31 @@ vec3 hazed(vec3 color) {
   return mix(color, uHazeColor * phase, amount * uHazeOn);
 }
 
+#ifdef DEPTH_OF_FIELD
+// The share of the soft image at one pixel of the full size. The depth of the beam pass has no
+// hall, so a pixel of the hall, and a frame with no such depth (uHazeOn), read the depth at half
+// size.
+float softShare(ivec2 pixel) {
+  ivec2 size = textureSize(uScene, 0);
+  pixel = clamp(pixel, ivec2(0), size - 1);
+  float depth = uHazeOn > 0.5 ? texelFetch(uSceneDepth, pixel, 0).x : 1.0;
+  float blur = depth < 0.99999
+    ? blurOfDepth(-perspectiveDepthToViewZ(depth, uNear, uFar))
+    : blurAt((vec2(pixel) + 0.5) / vec2(size));
+  return smoothstep(0.5, 2.0, abs(blur) * uPixelsPerBlur);
+}
+
+// The share of the soft image of this pixel: a tent over the pixel and its four neighbors at full
+// size, so the outline of a sharp subject keeps the anti-alias of the MSAA.
+float softShareAt() {
+  ivec2 pixel = ivec2(gl_FragCoord.xy);
+  float share = 4.0 * softShare(pixel);
+  share += softShare(pixel + ivec2(1, 0)) + softShare(pixel - ivec2(1, 0));
+  share += softShare(pixel + ivec2(0, 1)) + softShare(pixel - ivec2(0, 1));
+  return share / 8.0;
+}
+#endif
+
 float hash(vec2 p) {
   vec3 q = fract(vec3(p.xyx) * 0.1031);
   q += dot(q, q.yzx + 33.33);
@@ -343,11 +373,10 @@ void main() {
   color.b = texture(uScene, clamp(vUv + shift, uFrame.xy, uFrame.zw)).b;
 #endif
 #ifdef DEPTH_OF_FIELD
-  // The blur of this pixel at full size decides how much of the soft image it takes, so the
-  // outline of a sharp subject stays sharp.
+  // The blur at full size decides how much of the soft image the pixel takes, so the outline of a
+  // sharp subject stays sharp.
   if (uBlurOn > 0.5) {
-    float radius = abs(blurAt(vUv)) * uPixelsPerBlur;
-    color = mix(color, texture(uBlur, halfUv).rgb, smoothstep(0.5, 2.0, radius));
+    color = mix(color, texture(uBlur, halfUv).rgb, softShareAt());
   }
 #endif
 #ifdef SURFACE
