@@ -14,11 +14,13 @@ import type { InstrumentModel } from './types.ts';
  */
 export const CHOIR_FOLDER = {
   /**
-   * The width of one cover, in meters. The grips lie at the outer edges, so a narrow folder puts
-   * the upper flippers of the penguin into the sides of the body. With 0.22 m and the elbows
-   * (1.2, -1, 0.1), the round rebuilt flippers go 2.7 cm into the chest, and 1.5 cm with 0.26 m.
+   * The width of one cover, in meters, about the width of an A4 page. The grips lie beside the
+   * outer edges ({@link CHOIR_FOLDER.gripIn}), 0.23 m from the spine, as far out as the flippers
+   * of the Tripo penguin reach. A grip nearer to the spine puts the upper flippers into the sides
+   * of the body: with the grips 0.19 m from the spine and the elbows (1.2, -1, 0.1), the round
+   * rebuilt flippers went 2.7 cm into the chest, and 1.5 cm with 0.23 m.
    */
-  width: 0.26,
+  width: 0.2,
   /** The height of one cover, in meters. */
   height: 0.27,
   /** The angle between each cover and the plane x-y. The open folder is a flat V. */
@@ -40,6 +42,19 @@ export const CHOIR_FOLDER = {
   forward: 0.74,
   /** The angle by which the folder leans back, so that the pages face the eyes. */
   tilt: 35 * MathUtils.DEG2RAD,
+  /**
+   * The distance of each grip of a palm inside the outer edge of its cover, in meters. A value
+   * below 0 puts the grip outside the edge. The palm of the Tripo penguin then lies beside the
+   * outer edge, and the outer third of the flipper curls around the edge to the front of the
+   * cover, as a hand holds a book. With the grip 3 cm inside the edge of a cover of 0.26 m, each
+   * flipper went through the cover 4.2 cm inside its edge, and the cover cut the outer third of
+   * the flipper in the side view. With 2 cm outside, the flipper still touches the cover at the
+   * edge. A wider cover with the grips outside its edges put the grips out of the reach of the
+   * flippers: the palms missed them by up to 18 mm.
+   */
+  gripIn: -0.03,
+  /** The distance of each grip of a palm in front of its cover, away from the singer, in meters. */
+  gripFront: 0.02,
 };
 
 /**
@@ -69,7 +84,9 @@ export function buildChoirFolder(): InstrumentModel {
       transform(toVec3(page), rotation),
     );
     outer.push(
-      toVec3(new Vector3(side * (f.width - 0.03), -f.height / 4, -0.02).applyQuaternion(turn)),
+      toVec3(
+        new Vector3(side * (f.width - f.gripIn), -f.height / 4, -f.gripFront).applyQuaternion(turn),
+      ),
     );
   }
   const instrument = piece.build(
