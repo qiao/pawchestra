@@ -877,6 +877,9 @@ export function playerWeight(
  * @param audibility One entry for each seat of the score. A missing or `undefined` entry sounds:
  *   the seat has no mute or solo change.
  * @param out The poses to write, from {@link createScenePose}. A new buffer by default.
+ * @param needed A flag for each player, then one for the conductor, or `null` for all. A pose
+ *   with the flag 0 keeps its old values (design 9.7). The pose of each other player does not
+ *   change, because no player reads the pose of another player.
  * @returns `out`, with the poses of the frame.
  */
 export function poseAt(
@@ -886,6 +889,7 @@ export function poseAt(
   transport: Transport,
   audibility: readonly (SeatAudibility | undefined)[],
   out: ScenePoseBuffer = createScenePose(plan),
+  needed: Uint8Array | null = null,
 ): ScenePose {
   const root = createFrame();
   const chest = createFrame();
@@ -954,7 +958,7 @@ export function poseAt(
   for (let i = 0; i < plan.players.length; i++) {
     const player = plan.players[i];
     const pose = out.players[i];
-    if (!player || !pose) {
+    if (!player || !pose || needed?.[i] === 0) {
       continue;
     }
     idleAt(player.idle, wallTime, scratch.idle);
@@ -966,7 +970,7 @@ export function poseAt(
   }
   scratch.leaderNod = 0;
   const { conductor } = plan;
-  if (conductor && out.conductor) {
+  if (conductor && out.conductor && needed?.[plan.players.length] !== 0) {
     idleAt(conductor.idle, wallTime, scratch.idle);
     poseAnimal(
       plan,
