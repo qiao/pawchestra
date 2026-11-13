@@ -240,8 +240,10 @@ Design 4.4 gives the rule and the reason of each config key.
 - A hanging T-pose arm folds the faces under its root. Make them and the first tube ring rigid
   (`rigidPainted`), and join two rigid groups that touch. A rigid group at the front of a root or
   across the chest, or a Smooth of the root weights, moves the fold to its edge as a dark notch.
-- In a hand rig, the play turns the clavicle forward, so a ring whose trunk share drops to 0 next
-  to the trunk loop folds. Move half of the trunk share of the loop to the clavicle.
+- Bone heat gives the front of an armpit a clavicle share of about 0.55. A much lower first arm
+  row folds it when the arm reaches forward: start `rows.control` near that share.
+- Bone heat thigh shares far up the belly pull a seated belly back into a ridge. Move it toward
+  the trunk form with a key (`trunk_belly()` of the panda chain), faded out under the arms.
 - Add a ring at a joint (`refine.rings`) only where `pnpm fold-probe` finds folds. A straight bind
   folds a thick inner elbow: put its rings one arm radius from the joint (`arm_rebuild.py --spec`).
 - Automatic weights give the clavicle most of a thick arm root, and the wrist helper half of a
