@@ -3232,6 +3232,55 @@ interface PlayArgs {
    * ({@link recastPlugin}), and the working tree takes the scale of the size rule.
    */
   readonly recast: PlayRecast | null;
+  /**
+   * The button of the setting "Quality" of `--quality`, such as `High`, or `null` for "Auto". A
+   * pinned tier keeps the automatic tier from a drop during the capture, so that two trees render
+   * on one tier (design 2.6).
+   */
+  readonly quality: PlayQuality | null;
+}
+
+/** The buttons of the setting "Quality" that `--quality` can pin. */
+const PLAY_QUALITIES = ['High', 'Medium', 'Low'] as const;
+
+/** A button of the setting "Quality" that `--quality` can pin. */
+type PlayQuality = (typeof PLAY_QUALITIES)[number];
+
+/**
+ * Reads the tier of `--quality`.
+ *
+ * @param text The value: `high`, `medium`, or `low`, or `null` with no option.
+ * @returns The label of the button, or `null` for "Auto".
+ * @throws Error for another value.
+ */
+function playQuality(text: string | null): PlayQuality | null {
+  if (text === null) {
+    return null;
+  }
+  const found = PLAY_QUALITIES.find((label) => label.toLowerCase() === text);
+  if (!found) {
+    throw new Error(`The quality "${text}" is not known. The values are high, medium, and low.`);
+  }
+  return found;
+}
+
+/**
+ * Pins the setting "Quality" of the page at a tier (design 2.6): it opens the tab "Settings" of
+ * the drawer and clicks the button of the tier.
+ *
+ * @param page The page after the first play.
+ * @param quality The label of the button.
+ */
+async function pinQuality(page: Page, quality: PlayQuality): Promise<void> {
+  const tab = page.getByRole('tab', { name: 'Settings' });
+  if (!(await tab.isVisible())) {
+    await page.locator('.bar button[aria-expanded]').click();
+  }
+  await tab.click();
+  await page
+    .getByRole('group', { name: 'Quality' })
+    .getByRole('button', { name: quality, exact: true })
+    .click();
 }
 
 /** A recast role of the mode `play` (`--recast`). */
@@ -3551,9 +3600,10 @@ function playParts(args: PlayArgs): PlayArgs[] {
 
 /**
  * Reads the command line of the mode `play`:
- * `play <dir> [--demo <id> | --midi <path>] [--time <s>... | --strip <from>:<step>:<count>] [--camera <name>|<dx>,<dy>,<wheel>|<JSON>]... [--camera-file <json>] [--cinematic] [--shot <seat|species>] [--at <seat|species> [--azimuth <deg>]... [--zoom <z>] [--elevation <deg>]] [--url <url>] [--base <ref>] [--set <changes>]... [--size <w>x<h>] [--pause]`.
+ * `play <dir> [--demo <id> | --midi <path>] [--time <s>... | --strip <from>:<step>:<count>] [--camera <name>|<dx>,<dy>,<wheel>|<JSON>]... [--camera-file <json>] [--cinematic] [--shot <seat|species>] [--at <seat|species> [--azimuth <deg>]... [--zoom <z>] [--elevation <deg>]] [--url <url>] [--base <ref>] [--set <changes>]... [--size <w>x<h>] [--pause] [--quality <tier>]`.
  * `--pause` pauses the play at the time of the frame, so that the frame shows the rest pose
- * ({@link pauseFrame}).
+ * ({@link pauseFrame}). `--quality` pins the setting "Quality" at `high`, `medium`, or `low`
+ * ({@link pinQuality}), because the automatic tier can drop during a slow capture.
  * With no `--camera`, the camera is `default`. `--camera-file` gives labelled cameras in place of
  * `--camera` ({@link cameraFile}). `--midi` renders a MIDI file of the user in place
  * of a demo ({@link openMidi}). `--strip` renders frames at exact song times from one page each
@@ -3605,6 +3655,7 @@ function playArgs(args: readonly string[]): PlayArgs | null {
       '--size',
       '--strip',
       '--recast',
+      '--quality',
     ],
     ['--camera', '--azimuth', '--time', '--set'],
     ['--cinematic', '--pause'],
@@ -3666,6 +3717,7 @@ function playArgs(args: readonly string[]): PlayArgs | null {
   }
   const strip = stripText === null ? null : stripTimes(stripText, pieceLength(demo, midi));
   const pause = line.flags.has('--pause');
+  const quality = playQuality(line.options.get('--quality')?.[0] ?? null);
   if (pause && (stripText !== null || shotText !== null)) {
     throw new Error(
       'The option --pause renders the rest pose after a seek, so it takes no --strip or --shot.',
@@ -3702,6 +3754,7 @@ function playArgs(args: readonly string[]): PlayArgs | null {
       strip: null,
       pause,
       recast,
+      quality,
     };
   }
   const [first = PLAY_TIME_SEC, ...others] = (
@@ -3742,6 +3795,7 @@ function playArgs(args: readonly string[]): PlayArgs | null {
     strip,
     pause,
     recast,
+    quality,
   };
 }
 
@@ -4481,6 +4535,9 @@ async function openPlay(
     }
     await page.click(FIRST_PLAY);
     await page.waitForTimeout(1500);
+    if (args.quality !== null) {
+      await pinQuality(page, args.quality);
+    }
     // The open drawer keeps the bar and covers the right side of the stage (design 2.8). A phone
     // layout starts with the drawer closed, so its button does not show.
     await page.click('.close-drawer', { timeout: 2000 }).catch(() => undefined);
