@@ -243,8 +243,9 @@ interface BodyAngles {
   /** The forward lean of the spine, in radians. */
   lean: number;
   /**
-   * The seeded slouch of the player, in radians, on top of {@link BodyAngles.lean}: 0 for a
-   * floor instrument, because a lean brings the head to the neck of the cello.
+   * The seeded slouch of the player, in radians, on top of {@link BodyAngles.lean}: 0 for an
+   * instrument of {@link BASE_BODY_INSTRUMENTS}, because a lean brings the head to the neck of the
+   * cello, and the right upper arm into the neck of the harp.
    */
   slouch: number;
   /**
@@ -444,7 +445,9 @@ function bodyScale(player: PlayerPlan): number {
 /**
  * The instruments whose players keep the base angles of the breath and the sway (design 5.1). A
  * floor instrument does not lean with the body, and a larger sway put the right upper arm of the
- * harpist 0.1 cm deeper into the neck of the harp, in 4% of the samples of the play.
+ * harpist 0.1 cm deeper into the neck of the harp, in 4% of the samples of the play. These players
+ * also take no seeded slouch: with it, the upper arm of the harpist went into the neck of the harp
+ * in the lift and in the rest.
  */
 const BASE_BODY_INSTRUMENTS: ReadonlySet<InstrumentId> = new Set<InstrumentId>([
   'cello',
@@ -538,7 +541,7 @@ function poseAnimal(
   body.turn = 0;
   body.headTurn = 0;
   const floor = FLOOR_INSTRUMENTS.has(player.instrument);
-  body.slouch = floor ? 0 : player.posture.slouch;
+  body.slouch = BASE_BODY_INSTRUMENTS.has(player.instrument) ? 0 : player.posture.slouch;
   body.nod = floor ? 0 : scratch.leaderNod;
   body.nodHead = 0;
   body.roll = 0;
