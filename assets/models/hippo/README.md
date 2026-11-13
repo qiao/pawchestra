@@ -137,8 +137,8 @@ The weights, in the rest pose:
    eyeball, and no tooth.
 2. Arm rows: each vertex of a side with |x| from 0.145, within 0.10 units of the line of the rest
    arm at the root (0.084 units on the forearm and the paw), takes one exact row
-   (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.145 to 0 at x 0.185, an elbow helper
-   share of 0.25, 0.75, 0.75, and 0.25 at x 0.2275, 0.2425, 0.2575, and 0.2725, and the rest on the
+   (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.145 to 0 at x 0.185, an elbow helper share that grows from 0 at x 0.21 to 1 at the elbow joint (x 0.25) and
+   falls to 0 at x 0.287, and the rest on the
    4 roll segments. The 46 vertices of the jowls and the belly side in that reach, which the
    automatic weights give mostly to the head, the neck, or the trunk, keep their rows. The x of a
    control row and of a reach is the x of the source: the build maps the x of each vertex back
@@ -211,7 +211,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/hippo.rig.glb` | 1,130,772 bytes | `312eee3d85f28f8c332678a60e55cdbf6c9a4003ed50160f54b4ceb4c9305f3b` |
-| `tripo-hand/hippo.rig.json` | 16,400 bytes | `a291137a0ce0d05320f176c509cc435330de81f47a1c604152ee381f0d11ed26` |
+| `tripo-hand/hippo.rig.glb` | 1,130,772 bytes | `15049e4152aa4f12538a1dd8dafacdbbca917326c8bc45df2809261dceb43d71` |
+| `tripo-hand/hippo.rig.json` | 16,400 bytes | `d2b58e3d96d50b12d83b44d2fc2bfd43d09dd5a45b1a262f1fa083ae39ca780f` |
 | `tripo-hand/hippo-color.webp` | 66,764 bytes, 2048 × 2048 | `475803ad0c7ff15b5e375da9d97e4d350ac5f024cb7eb7380fa47c845d0473cb` |
 | `tripo-hand/hippo-normal.webp` | 37,300 bytes, 1024 × 1024 | `22136ba7d9c0141efc91d9e0c782ff23c17bd364221bdd73518552b033d0741f` |
