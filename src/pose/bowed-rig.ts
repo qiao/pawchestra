@@ -1541,9 +1541,7 @@ const HIPPO_HOLD = {
  * the violin, straight down and forward, (0, -1, -0.5), as a real violinist swings the left elbow
  * under the instrument (`docs/reference/string-technique.md`, section 1.10). At rest, the left
  * elbow points out, down, and a little back, (-1, -0.9, -0.2). The two elbows and the rest turn
- * move a part of the turn of the left paw from the forearm to the upper arm. Each part of each
- * arm of the third Tripo rabbit takes at most 43° of roll or twist in the moments of the
- * violinist (assets/models/rabbit/README.md, "Arm twist").
+ * move a part of the turn of the left paw from the forearm to the upper arm.
  *
  * The violin lies about level, as a real player holds it (`docs/reference/string-technique.md`,
  * section 1.10): the top plate turns 25° toward up (`violinTurn(-20, 5, 25)`), so that it tilts
@@ -1558,9 +1556,10 @@ const HIPPO_HOLD = {
  * its neck, and the right paw holds the bow up with a fist around the frog. The left upper arm hangs 35°
  * forward and the left elbow bends 80° (`restArms`), so that the elbow stays near the side: with
  * the 49° and 63° of the first hold of this body, the arm reached forward and held the violin up
- * in front of the chest. The left paw holds the neck at 0.5 of the fingerboard (`restPlace`), so
- * that the lower end of the violin rests on the lap: at 0.4, the lower end went into
- * the lap, and at 0.6, it stood 3 cm above it (`pnpm hold-fit violinist --scan`). The paw lies
+ * in front of the chest. The left paw holds the neck at 0.35 of the fingerboard (`restPlace`), so
+ * that the lower end of the violin stands about 2 cm above the lap of the fourth Tripo rabbit: at
+ * 0.5, it stood 4.7 cm above it, and at 0.3, 1.0 cm, but in the lowering the violin went 4.5 cm
+ * into the body (3.7 cm at 0.4, `pnpm hold-fit violinist`). The paw lies
  * 1.5 cm off the neck (`restGapL`), so that the violin stands nearer to the lap (1.4 cm above it
  * with 5 mm). The paw turns 90° in the plane of its palm (`restPawTurnL`), so that the left
  * forearm twists 32° at rest and the paw bends 64° on it: with 100°, the bend was 73°, over the
@@ -1595,7 +1594,7 @@ const RABBIT_HOLD = {
   playTurn: violinTurn(-20, 5, 25),
   reachL: 25 * MathUtils.DEG2RAD,
   rest: { ...SHOULDER_HOLD.rest, axis: [0, 1, 0] },
-  restPlace: 0.5,
+  restPlace: 0.35,
   restArms: {
     L: { forward: 35 * MathUtils.DEG2RAD, bend: 80 * MathUtils.DEG2RAD },
     R: { forward: 10 * MathUtils.DEG2RAD, bend: 50 * MathUtils.DEG2RAD },
