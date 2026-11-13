@@ -912,8 +912,10 @@ and the source joins its left eyeball to the rim of the socket, so a sphere fit 
 that ball (`fused_ball()` of its build). Both eyes keep the paint of the source, with the finish
 `varnish` and a blink lid. No arm band of the source is a clean quad ring, so the arms take no
 ring and no paw turn. It has no chair, and its bind keeps the legs, the trunk, and the tail of the
-source. Its arms are short, so the snare drum and the suspended cymbal stand nearer to it (4.6,
-5.3). The Tripo panda (`assets/models/panda/tripo-hand/`) is the body of the
+source. Its standing crown matches the crown of the older badger (`metersPerUnit` of its chain),
+and its upper arms and forearms are 1.2 times longer than in the source (the point edit
+`armStretch`, as on the panda). Reason: at the H of the older badger, the body stood 13% lower
+and the short arms missed the bass drum, the small percussion, and the xylophone. The Tripo panda (`assets/models/panda/tripo-hand/`) is the body of the
 trombonist, by the same rules. Its eyeballs keep the paint and the size of the source, with the
 finish `varnish` and a blink lid. Its front paws are smaller than in the source (the point edit
 `paw`), as on the Tripo wolf. Reason: against its short arms, the paws of the source read too
@@ -1823,7 +1825,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). The mouse plays a smaller oboe (`oboeScale`), and its shoulders turn forward, so that the short arms of its source reach the grips (5.3). A recast flute or clarinet takes the size rule of the winds. |
 | Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body, with the coil in front of the belly (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. A smaller trombone keeps the footprint of the trombone of the app, so that no seat moves. |
 | Timpani | Kettles of the real size in an arc. The kettles of the elephant move to its short arms, with a gap for its trunk (`TIMPANI`). |
-| Percussion | Drums, a xylophone, a triangle, and a tambourine within the reach of the badger, and a suspended cymbal (`cymbalForm`, `SUSPENDED_CYMBAL`). The snare drum and the suspended cymbal stand near the badger, as near as its short arms need to reach the strike spots (`SNARE_DRUM.forward`, `SUSPENDED_CYMBAL.forward`). The section "Percussion" below gives their parts. |
+| Percussion | Drums, a xylophone, a triangle, and a tambourine within the reach of the badger, and a suspended cymbal (`cymbalForm`, `SUSPENDED_CYMBAL`). The bass drum and its beater have the size of a person-sized drum at the scale of the badger crown (`BADGER_SCALE`), so they follow the body. The xylophone bars stand below the shoulder joints of the badger (`XYLOPHONE.barHeight`). The section "Percussion" below gives their parts. |
 | Choir folder | In both flippers, in front of the chest (`CHOIR_FOLDER`). |
 | Baton | Along the index finger, with its grip in the palm, as a conductor holds it (`BATON_ALONG`). |
 
