@@ -15,7 +15,7 @@ import { cameraAt, createCameraPose } from '../shots/camera-at.ts';
 import type { CameraPose, ShotPlan } from '../shots/types.ts';
 import { CINEMA_ASPECT } from '../shots/view.ts';
 import type { Score, SectionSize } from '../score/types.ts';
-import { focusKindOf } from '../ui/dom.ts';
+import { focusKindOf, keepKeysAfterClick } from '../ui/dom.ts';
 import { Ui } from '../ui/ui.ts';
 import { playWithSilentSwitch, warmAudioOutput } from './audio-session.ts';
 import { DEFAULT_SPEED, DEFAULT_VOLUME, uiShown, volumeGain } from './bar-rules.ts';
@@ -419,6 +419,7 @@ export class App {
       this.#stopCountdown();
       this.#pressKey(event);
     });
+    keepKeysAfterClick(document);
     // Safari on iOS zooms the page on a pinch in spite of `touch-action` of the root. Its own
     // gesture events stop that, so a pinch zooms only the stage (design 2.5).
     const keepPageScale = (event: Event): void => {

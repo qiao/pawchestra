@@ -71,10 +71,14 @@ export function setAttribute(element: Element, name: string, value: string): voi
  * @param element The element with the focus, `document.activeElement`.
  * @returns The kind: a button, a range, a menu or a tab, a text field, or the page for any other
  *   element. A control with `data-focus-kind="page"` uses no key of the page, so it also gives the
- *   page.
+ *   page. A button or a tab that a click focused (`data-pointer-focus`, {@link keepKeysAfterClick})
+ *   also gives the page.
  */
 export function focusKindOf(element: Element | null): FocusKind {
-  if (element instanceof HTMLElement && element.dataset['focusKind'] === 'page') {
+  if (
+    element instanceof HTMLElement &&
+    (element.dataset['focusKind'] === 'page' || element.dataset['pointerFocus'] !== undefined)
+  ) {
     return 'page';
   }
   // A tab of the drawer uses Space, the arrows, and Home, as a menu does.
@@ -97,4 +101,46 @@ export function focusKindOf(element: Element | null): FocusKind {
     return 'text';
   }
   return 'page';
+}
+
+/**
+ * Gives the keys of the page back after a click on a button or a tab (design 2.4). A click
+ * focuses the control, and the control then takes Space and the arrows: a click on the camera
+ * button and then Space would toggle the camera again in place of a pause. A control that a
+ * click focused gets `data-pointer-focus`, so that {@link focusKindOf} gives the page, and the
+ * browser does not click it on the keyup of Space. A focus from the keyboard keeps the keys of
+ * the control. The control also shows no focus ring after a key of the page (design 2.8).
+ *
+ * @param root The document.
+ */
+export function keepKeysAfterClick(root: Document): void {
+  root.addEventListener('focusin', (event) => {
+    const target = event.target;
+    if (
+      target instanceof HTMLElement &&
+      (target instanceof HTMLButtonElement || target.getAttribute('role') === 'tab') &&
+      !target.matches(':focus-visible')
+    ) {
+      target.dataset['pointerFocus'] = '';
+    }
+  });
+  root.addEventListener('focusout', (event) => {
+    if (event.target instanceof HTMLElement) {
+      delete event.target.dataset['pointerFocus'];
+    }
+  });
+  root.addEventListener(
+    'keyup',
+    (event) => {
+      const active = root.activeElement;
+      if (
+        event.key === ' ' &&
+        active instanceof HTMLElement &&
+        active.dataset['pointerFocus'] !== undefined
+      ) {
+        event.preventDefault();
+      }
+    },
+    { capture: true },
+  );
 }

@@ -1203,6 +1203,11 @@ body.is-building #stage {
   outline: none;
 }
 
+/* A button or a tab that a click focused shows no focus ring after a key of the page (2.4). */
+[data-pointer-focus]:focus-visible {
+  outline: none;
+}
+
 /* The current demo: a light row with a gold bar at its left, out of the row (design 2.8). */
 .demo[aria-current='true'] {
   background: rgba(255, 240, 220, 0.07);
