@@ -593,7 +593,7 @@ function findClimaxes(
  * @param seatCount The number of seats of the score.
  * @returns The final chord, or `null`.
  */
-function findFinal(
+export function findFinal(
   notes: readonly PlayerNote[],
   times: Float64Array,
   seatCount: number,

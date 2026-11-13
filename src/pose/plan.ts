@@ -24,7 +24,7 @@ import { conductorRig } from './conductor.ts';
 import type { ConductorRig } from './conductor.ts';
 import { buildLeftHandTrack } from './conductor-left.ts';
 import type { LeftHandTrack } from './conductor-left.ts';
-import { buildExpressionTrack } from './conductor-expression.ts';
+import { buildExpressionTrack, findFinal } from './conductor-expression.ts';
 import type { ExpressionTrack } from './conductor-expression.ts';
 import { buildBatonTrack } from './conductor-notes.ts';
 import type { BatonTrack } from './conductor-notes.ts';
@@ -40,6 +40,7 @@ import { handTracksSteps, handsRig } from './hands.ts';
 import type { HandsRig } from './hands.ts';
 import { idleParams } from './idle.ts';
 import { LONG_REST, findLongRests } from './long-rests.ts';
+import { LOOK_PLAN, planLooks } from './looks.ts';
 import type { IdleParams } from './idle.ts';
 import { noteLoudness } from './loudness.ts';
 import { buildPassages } from './passages.ts';
@@ -250,6 +251,11 @@ export interface PlayerPlan {
   readonly passages: Passages;
   /** The seeded sign, lag, and pulse level of the sway of the beat layer. */
   readonly sway: PlayerSway;
+  /**
+   * The planned looks at the conductor, or at the leader of a chamber group (`planLooks()`,
+   * design 5.1): two song times for each, between which the head is on the target.
+   */
+  readonly looks: Float64Array;
   /**
    * The long rests in which the player lowers its instruments (`findLongRests()`, design 5.2),
    * four song times for each. It is empty for a family that keeps the playing pose in a rest.
@@ -649,6 +655,7 @@ function* preparePlayerSteps(
     lookPitch,
     passages,
     sway: swayOfSeed(seed),
+    looks: planLooks(notes, beats, []),
     longRests,
     note,
   };
@@ -797,6 +804,7 @@ function* prepareConductorSteps(inputs: ConductorInputs, seed: number): Steps<Pl
     lookPitch: 0,
     passages: buildPassages([], []),
     sway: PLAIN_SWAY,
+    looks: new Float64Array(),
     longRests: new Float64Array(),
     note: {
       family: 'conductor',
@@ -997,12 +1005,49 @@ export function* preparePosesSteps(
         mixHash(seed, -1),
       )
     : null;
+  yield;
+  const shared = scoreLooks(score, beats, conductor);
+  const looked: PlayerPlan[] = [];
+  for (const [index, plan] of players.entries()) {
+    const planned = planLooks(notes[index]?.notes ?? [], beats, shared(plan.seatIndex));
+    looked.push({ ...plan, looks: planned });
+  }
   return {
-    players,
+    players: looked,
     conductor,
     leader,
     beats,
     pulses: pulseTimes(score.beats),
     endSec: score.durationSec,
   };
+}
+
+/**
+ * Gives the looks of a score that its players share (design 5.1): a look at each cue of the
+ * conductor to the seats of the cue, and a look at the final chord for each seat.
+ *
+ * @param score The score.
+ * @param beats The times of the conducted beats.
+ * @param conductor The plan of the conductor, or `null` for a chamber group.
+ * @returns The looks of the seat of a player, two song times each: the head comes onto the target
+ *   at the first and leaves it at the second.
+ */
+function scoreLooks(
+  score: Score,
+  beats: Float64Array,
+  conductor: PlayerPlan | null,
+): (seatIndex: number) => (readonly [number, number])[] {
+  const bySeat = new Map<number, [number, number][]>();
+  if (conductor?.note.family === 'conductor') {
+    for (const cue of conductor.note.cues.cues) {
+      for (const seat of cue.seats) {
+        const list = bySeat.get(seat) ?? [];
+        list.push([cue.landSec - cue.beatSec, cue.landSec + LOOK_PLAN.cueHoldSec]);
+        bySeat.set(seat, list);
+      }
+    }
+  }
+  const final = findFinal(score.notes, beats, score.seats.length);
+  const last: [number, number][] = final ? [[final.startSec - final.beatSec, final.endSec]] : [];
+  return (seatIndex) => [...(bySeat.get(seatIndex) ?? []), ...last];
 }
