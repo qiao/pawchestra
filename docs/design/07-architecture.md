@@ -111,21 +111,33 @@ head. The bear sheet has a soft light with no cast shadow, so its page has a lig
 ### Test page
 
 `test.html`, at `/test`, shows one animal of the cast on the stage of the app: the hall, the
-stage floor, the pool light, the beam, and the post effects of `StageScene`. The animal plays
-the test phrase of its role in a loop, with the sound of the app. Thus a person can check the
-real motion and the sound of one role with no MIDI file.
+stage floor, the pool light, the beam, and the post effects of `StageScene`. The animal plays or
+conducts the test phrase of its role in a loop, with the sound of the app. Thus a person can
+check the real motion and the sound of one role with no MIDI file.
 
-- **Roles.** The list holds each species with each instrument of its section, the standing
-  soloist of each instrument whose soloist stands (4.5), and the recast roles of the instruments
-  of the cast matrix (4.4). `testRoles()` of `test-page/roles.ts` makes it.
+- **Roles.** The list holds the conductor (`#bear-conductor`, the species of `CONDUCTOR`), each
+  species with each instrument of its section, the standing soloist of each instrument whose
+  soloist stands (4.5), and the recast roles of the instruments of the cast matrix (4.4).
+  `testRoles()` of `test-page/roles.ts` makes it.
 - **Phrase.** `phraseOf()` of `test-page/phrases.ts` gives each instrument a test note list of
   about 8 s: long notes, fast notes, string crossings or changes of the register, and rests.
-  `phraseFile()` writes it as a MIDI file, and the score rules read it. Thus the sound and the
+  `partsFile()` writes it as a MIDI file, and the score rules read it. Thus the sound and the
   motion come from one `Score`.
+- **Conductor phrase.** `conductorPhrase()` of `test-page/conductor-phrase.ts` gives six sections
+  8 bars of 4/4 at 120 BPM, one player each, because a group of five or fewer has no
+  conductor (4.2). It holds each input of the conductor pose (5.4): a soft legato start, entries
+  after a rest that the left hand cues, a crescendo, a staccato forte with an accent, a tutti
+  that the baton cues, a diminuendo, and a held final chord with a cut-off.
 - **Place.** The layout of the app puts the one player at the stage center (4.2). A role with
   another species or another support takes that place, as a recast role of the role tools does
   (`soloLayoutSteps()`). The page loads only the bodies of the role, of the seat species of the
   score, and of the bear, because the layout builds their models.
+- **Conductor place.** The layout of the app for the conductor phrase moves so that the podium is
+  at the stage center, and the pose plan holds all its animals. The stage shows only the podium,
+  the conductor stand, and the conductor, on the smallest stage (`SMALLEST_STAGE`), and `poseAt()`
+  poses only the conductor. Thus the presets aim at the conductor as at a player, and the near
+  limit of Free mode does not push them out to the edge of an orchestra stage. The sound plays
+  all parts, and the cues turn to the places of the hidden players.
 - **Time.** The pose comes from `preparePosesSteps()` and `poseAt()` of the app. The first play
   has the count-in and the lift of the app (5.2). At the end of the phrase, the page seeks to 0.
   A pause holds the pose at its song time, so the time slider shows each moment of the play.
@@ -133,7 +145,9 @@ real motion and the sound of one role with no MIDI file.
   (`SilentClock`). The button "Start the sound" makes the `Player` in its click, and the
   `Player` then plays on from the song time of the clock.
 - **Camera.** The orbit controls of Free mode turn the camera (2.5). The presets Front, Side,
-  Back, and Close show for one frame as the camera of a shot, and Free mode keeps them. So each
+  Back, and Close show for one frame as the camera of a shot, and Free mode keeps them. The
+  presets turn with the side that the animal faces (`ViewSubject.turn`), so the front view shows
+  the face of the conductor, who faces the orchestra. So each
   preset target stays less than 1 m from the default target, and each camera stays outside the
   near limit (`viewCamera()` of `test-page/views.ts`). The frame moves down by half the bar,
   because the page has no bar.
@@ -150,16 +164,26 @@ the first pass. `vercel.json` routes `/test` to `test.html`, and the html fallba
 it in dev and in preview.
 
 ```typescript
-/** One role of the test page: a species with an instrument and a support. */
-export interface TestRole {
+/** One role of the test page: a player, or the conductor. */
+export type TestRole = PlayerRole | ConductorRole;
+
+export interface PlayerRole {
   /** The name in the URL hash: `<species>-<instrument>`, and `-standing` for a soloist. */
   readonly id: string;
   readonly group: 'section' | 'soloist' | 'recast';
   readonly species: SpeciesId;
-  /** The species that the score rules cast in the seat. The layout builds its model first. */
-  readonly seatSpecies: SpeciesId;
+  /** The role species and the species of the seats. Their bodies load before the build. */
+  readonly bodies: readonly SpeciesId[];
   readonly instrument: PlayedInstrument;
   readonly support: Support;
+}
+
+export interface ConductorRole {
+  /** `<species>-conductor`, with the species of `CONDUCTOR`. */
+  readonly id: string;
+  readonly group: 'conductor';
+  readonly species: SpeciesId;
+  readonly bodies: readonly SpeciesId[];
 }
 ```
 
