@@ -81,7 +81,7 @@ the joints of the source, mapped by the point edits.
 
 | Item | Value |
 |---|---|
-| Size | 381,370 bytes. A new build gives the same export, but not the same `.blend` bytes |
+| Size | 380,605 bytes. A new build gives the same export, but not the same `.blend` bytes |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `fox`: 3,613 vertices and 3,805 faces (3,266 quads and 539 triangles, 7,071 triangles). Flat faces and the surface of `sa.add_surface()`. No face is gloss: the nose takes the slot `fur` and the color map. The 88 faces of the two eye domes have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`) |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The legs and the right ear have joints of their own. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
@@ -243,6 +243,24 @@ with 3 steps the violin paw twisted -1 degree and the flute paw 74 degrees, and 
 and 48 degrees. The flute grip of `pnpm wind-grip flutist` stays the same, because the hold sets
 the palm of the paw. With no elbow axis turn, the right upper arm rolled 84 degrees in the violin play.
 
+**Wrists.** The ring at x 0.2105 is slanted: its vertices lie up to 0.006 units from its mean
+place along the forearm. A paw turn that took each vertex past that mean place plus 0.002 units
+also turned 4 of its 14 vertices on each side. They made fins, slits, and a notch at each wrist,
+in the rest mesh and in each pose. The turn now takes the part that the edges join to the next
+ring, so the ring at x 0.2105 stays. The arm gate (`pnpm arm-check fox-violinist flutist --base
+4bd42c3b9`), in degrees, p95, with the values before the fix in parentheses:
+
+| Role | Arm | Forearm twist | Paw twist | Paw swing | Stretch |
+|---|---|---|---|---|---|
+| Violinist | L | 25 (24) | 46 (46) | 42 (42) | 0.10 (0.12) |
+| Violinist | R | 26 (13) | 47 (22) | 48 (48) | 0.10 (0.10) |
+| Flutist | L | 70 (69) | 138 (138) | 28 (28) | 0.07 (0.11) |
+| Flutist | R | 36 (49) | 67 (93) | 64 (64) | 0.12 (0.12) |
+
+The left paw of the flutist twists most in the rest, the lift, and the lowering, where the free
+paw rests on the haunch with its palm to the body. A left turn of 6 steps gave 164 degrees there
+and 72 on the violin, and 8 steps gave 113 and 60, so the left turn stays at 7 steps.
+
 **Holds.** The holds of the fox before (`FOX_HOLD` of `src/pose/bowed-rig.ts` and `FOX_FLUTE` of
 `src/pose/winds.ts`) fit the new body with no change: they are in H. The measures of the hold tools
 (in parentheses the fox of `62bf447f4`):
@@ -252,7 +270,7 @@ the palm of the paw. With no elbow axis turn, the right upper arm rolled 84 degr
 | Note targets (`pnpm hold-fit`): worst error, share within 5 mm | 0.0 mm, 100 % (0.0 mm, 100 %) | 0.0 mm, 100 % (0.0 mm, 100 %) |
 | Deepest upper arm in the body (the sweep of `hold-fit`): play, lift, rest, lowering | 3.6, 3.5, 1.8, 4.0 cm (3.8, 3.2, 3.0, 4.2 cm) | 2.9, 2.7, 2.6, 2.8 cm (1.3, 1.2, 1.0, 1.3 cm) |
 | Body in the instrument and the seat (`pnpm body-clip`, limit 0.045 H) | CLIP: paws 2.4 cm in the play (0.069 H) and 2.5 cm in the lowering, left forearm 2.0 cm (CLIP: right paw 2.3 cm, left forearm 2.3 cm, left paw 1.9 cm) | PASS: right paw 0.8 cm (PASS: right paw 0.8 cm) |
-| Folded faces at rest (L / R) | 0 / 4 (4 / 5) | 8 / 29 (3 / 0) |
+| Folded faces at rest (L / R) | 0 / 4 (4 / 5) | 8 / 27 (3 / 0) |
 | Violin reach (`pnpm hold-reach`): fingerboard, bow hair | 0.63 to 1.00, 0.160 to 0.345 m (0.42 to 1.00, 0.160 to 0.386 m) | - |
 | Flute grips in the play: room to spare, L / R | - | 1.8 / 2.6 cm (5.9 / 7.4 cm) |
 
@@ -335,8 +353,8 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/fox.rig.glb` | 1,051,916 bytes | `df32832be80fa87d320f729d72c0853995e8768550044e00d4c7351075c3a6d7` |
-| `tripo-hand/fox.rig.json` | 16,272 bytes | `0603078602bc4c545d2d4850b56e2f2ef581720e4f1d433ea1ae31dbf4412d79` |
+| `tripo-hand/fox.rig.glb` | 1,051,856 bytes | `826365e783e48e948b76138b37182565ed9f3c995c2bc0cd482b7046a4df1f79` |
+| `tripo-hand/fox.rig.json` | 16,272 bytes | `b0c3103af258c5f25d346d3a0528e5e8d6b3afe4d129df615f4b9879c916f140` |
 | `tripo-hand/fox-color.webp` | 172,080 bytes, 2048 × 2048 | `1e2a3fc91b1708228c25026edfcffc40a1f5fe8bba5a7390ee46836baf26dcfa` |
 | `tripo-hand/fox-tan-color.webp` | 178,228 bytes, 2048 × 2048 | `77340995571173589a2a609f0099daffb635e8a8638a5617b8458e94d45e81ae` |
 | `tripo-hand/fox-normal.webp` | 99,334 bytes, 1024 × 1024 | `377d69a822300e6f4265a5b8948d86481c9914e26b7d8a99a84e306fdf4f668f` |
