@@ -19,7 +19,14 @@ import type { ArmRig } from './ik.ts';
 import { lapHand } from './lap.ts';
 import type { LapHand } from './lap.ts';
 import { headBow } from './far-mouth.ts';
-import { elbowOutTurn, keepBent, liftShoulder, shoulderLift, turnPoleOut } from './round-arms.ts';
+import {
+  elbowOutTurn,
+  keepBent,
+  keepMoveBend,
+  liftShoulder,
+  shoulderLift,
+  turnPoleOut,
+} from './round-arms.ts';
 import type { WindState } from './wind-notes.ts';
 
 /** The woodwinds and the brass of design 4.6. */
@@ -238,6 +245,13 @@ export interface FreePaw extends LapHand {
    * turn. 0 when it is missing.
    */
   readonly hangRoll?: number;
+  /**
+   * The largest distance from the shoulder joint to the wrist in the middle of the lift and of the
+   * lowering, as a share of the length of the arm (`keepMoveBend()` of `pose/round-arms.ts`,
+   * design 5.2). No limit when it is missing. A short arm whose path leaves the reach takes it,
+   * so that the elbow stays bent in the move.
+   */
+  readonly moveReach?: number;
 }
 
 /**
@@ -1447,6 +1461,8 @@ type FreeRest = (
    * meters in the model axes, with the root in its bind pose ({@link FreePaw.arc}).
    */
   readonly arc: Vec3;
+  /** The reach of the wrist in the middle of the move ({@link FreePaw.moveReach}), or `null`. */
+  readonly moveReach: number | null;
 };
 
 /** The tube that one paw closes around, in the bind pose (`InstrumentGrips.tubeL`). */
@@ -1566,16 +1582,17 @@ function freeRestOf(
   const h = model.body.headHeight;
   const [out, up, forward] = rest.arc;
   const arc: Vec3 = [-out * h, up * h, -forward * h];
+  const moveReach = rest.moveReach ?? null;
   if (angles) {
-    return { kind: 'hang', hang: hangingArm(model, arm, angles), roll: null, arc };
+    return { kind: 'hang', hang: hangingArm(model, arm, angles), roll: null, arc, moveReach };
   }
   if (model.support === 'stand') {
     const roll = rest.hangRoll
       ? toQuat(new Quaternion().setFromAxisAngle(Y_AXIS, rest.hangRoll))
       : null;
-    return { kind: 'hang', hang: hangingArm(model, arm, rest.hang), roll, arc };
+    return { kind: 'hang', hang: hangingArm(model, arm, rest.hang), roll, arc, moveReach };
   }
-  return { kind: 'lap', ...lapHand(model, arm, rest), arc };
+  return { kind: 'lap', ...lapHand(model, arm, rest), arc, moveReach };
 }
 
 /**
@@ -2283,6 +2300,9 @@ function poseSide(
         .applyQuaternion(root.rotation)
         .multiplyScalar(4 * weight * (1 - weight)),
     );
+    if (free.moveReach !== null) {
+      keepMoveBend(side.arm, shoulder.position, free.moveReach, weight, wrist);
+    }
     if (rig.hold.roundArms !== null) {
       keepBent(side.arm, shoulder.position, weight, wrist);
     }

@@ -254,6 +254,16 @@ count-in (5.4, 6.5), and lower them when the hold of `transport.holdSec` after a
   from the rest arm, and not from the moving arm. Reason: the roll toward the elbow of the moving
   arm changes fast where the stick points near the elbow. The upright rest bow of the red fox
   points up to the elbow, and its paw rolled about 180° in the first fifth of each lift.
+- **Bent elbows in the moves.** A hold of short arms keeps each elbow bent in the lift and the
+  lowering (`BowedHold.moveReach`, `FreePaw.moveReach`, `keepMoveBend()` of
+  `pose/round-arms.ts`). The wrist comes no further from the shoulder joint than this share of
+  the arm length, with a soft limit that fades to the whole length at the rest and at the play.
+  The paw keeps its turn, so the bow or the carried instrument follows it. The limit also holds
+  the elbow of a run across two strings (`crossPole()`). Reason: the straight path of a short arm
+  leaves the reach in the middle of a move, so the arm locks straight, and the elbow then folds in
+  a few frames where the path comes back into the reach. On the red fox, the bow elbow and the
+  carrying left elbow went straight in each move, and the free left flute paw of the tan fox
+  folded its elbow in one frame. No source gives the arm path of the lift (strings 3.2).
 - **Seated posture.** Each seated player sits tall off the chair back, with the hips above the
   knees, vertical shins, and the soles flat, as real seated string players sit: "The main point
   is that your hips are higher than your knees" (violinist.com, discussion 9372). The seat stays

@@ -127,6 +127,14 @@ export interface BowedHold {
    */
   readonly stickTurnR: { readonly forearm: number; readonly most: number } | null;
   /**
+   * The largest distance from each shoulder joint to its wrist in the middle of the lift and of
+   * the lowering, as a share of the length of the arm (`keepMoveBend()` of `pose/round-arms.ts`,
+   * design 5.2), or `null` for no limit: the bow arm, the left paw that carries a violin or a
+   * viola, and the elbow of a run across two strings (`crossPole()` of `pose/bowed.ts`). Short
+   * arms whose paths leave the reach take it, so that the elbows stay bent in the move.
+   */
+  readonly moveReach: number | null;
+  /**
    * The curl of the right fingers around the bow stick, in radians (`writeCurl()` of `pose/ik.ts`,
    * design 4.6): `BOWED_HANDS.curlR` for a hold with no own value. A paw with short fingers curls
    * them further, so that the finger tips close over the stick.
@@ -473,6 +481,7 @@ const CHIN_HOLD = {
   farSideR: Math.PI,
   pawBendR: 0,
   stickTurnR: null,
+  moveReach: null,
   curlR: BOWED_HANDS.curlR,
   playShift: [0, -0.05, -0.15],
   playTurn: IDENTITY,
@@ -554,6 +563,7 @@ const FLOOR_HOLD = {
   farSideR: Math.PI,
   pawBendR: 0,
   stickTurnR: null,
+  moveReach: null,
   curlR: BOWED_HANDS.curlR,
   playShift: [0, 0, -0.05],
   playTurn: IDENTITY,

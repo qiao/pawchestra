@@ -11,7 +11,7 @@ import type { TorsoFrames } from './frames.ts';
 import { HAND_FRAMES, handPlaceOf } from './fingering.ts';
 import { ARM_REACH, createArmPose, poseShoulder, solveArm, writeArm, writeCurl } from './ik.ts';
 import type { ArmRig } from './ik.ts';
-import { liftShoulder } from './round-arms.ts';
+import { keepMoveBend, liftShoulder } from './round-arms.ts';
 import { smoothstep } from './rest.ts';
 import type { BowState } from './strokes.ts';
 
@@ -678,10 +678,15 @@ function crossPole(
   state: BowState,
   shoulder: { readonly position: Vector3; readonly rotation: Quaternion },
   hold: Vector3,
+  weight: number,
   out: Vector3,
 ): Vector3 {
   heldBowAt(rig, strings, state.crossMean, state.bow, state.lift, meanTilted, meanBow);
   gripHand(rig, meanBow, 0, meanHand);
+  const reach = rig.hold.moveReach;
+  if (reach !== null) {
+    keepMoveBend(rig.armR, shoulder.position, reach, weight, meanHand.wrist);
+  }
   let elbow = solveArm(
     rig.armR.bind,
     shoulder.position,
@@ -691,6 +696,9 @@ function crossPole(
     meanArm,
   ).elbow;
   gripHand(rig, meanBow, rollToward(rig, meanBow, elbow), meanHand);
+  if (reach !== null) {
+    keepMoveBend(rig.armR, shoulder.position, reach, weight, meanHand.wrist);
+  }
   elbow = solveArm(
     rig.armR.bind,
     shoulder.position,
@@ -1239,6 +1247,9 @@ function carryLift(
     );
   shoulderTurnL(rig, weight, carryTurn);
   const shoulder = poseShoulder(rig.armL, frames.chest, rig.chestBind, carryTurn, carryShoulder);
+  if (hold.moveReach !== null) {
+    keepMoveBend(rig.armL, shoulder.position, hold.moveReach, weight, out.wrist);
+  }
   carryPole.copy(elbow).applyQuaternion(frames.chest.rotation);
   solveArm(rig.armL.bind, shoulder.position, shoulder.rotation, out.wrist, carryPole, carryArm);
   out.wrist.copy(carryArm.wrist);
@@ -1674,7 +1685,7 @@ function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm 
   if (state.crossMean !== state.string && crossShare > 0) {
     mixDirection(
       holdPole,
-      crossPole(rig, strings, state, shoulder, holdPole, tipPole),
+      crossPole(rig, strings, state, shoulder, holdPole, weight, tipPole),
       crossShare,
       holdPole,
     );
@@ -1747,6 +1758,13 @@ function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm 
   out.onStick = 0;
   if (keep !== null) {
     out.onStick = turnOnStick(rig, keep, shoulder.position, shoulder.rotation, pole, heldHand);
+    solveArm(rig.armR.bind, shoulder.position, shoulder.rotation, heldHand.wrist, pole, solved);
+  }
+  const moveReach = rig.hold.moveReach;
+  if (weight < 1 && moveReach !== null) {
+    // The elbow keeps a bend in the move. The hand keeps its turn, so that the roll of the hand
+    // stays the roll of the passes above.
+    keepMoveBend(rig.armR, shoulder.position, moveReach, weight, heldHand.wrist);
     solveArm(rig.armR.bind, shoulder.position, shoulder.rotation, heldHand.wrist, pole, solved);
   }
   out.wrist.copy(heldHand.wrist);

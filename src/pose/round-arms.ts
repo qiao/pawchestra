@@ -121,6 +121,55 @@ export function keepBent(arm: ArmRig, shoulder: Vector3, weight: number, wrist: 
   return distance > limit ? wrist.copy(shoulder).addScaledVector(toWrist, limit / distance) : wrist;
 }
 
+/**
+ * The soft part of the limit of {@link keepMoveBend}, as a share of the length of the arm: the
+ * wrist starts to slow this far inside the limit, and never passes the limit.
+ */
+const MOVE_BEND_SOFT = 0.06;
+
+/**
+ * Keeps the elbow of a move bent by the reach of a hold (design 5.2, "Bent elbows in the
+ * moves"): a wrist further from the shoulder joint than `reach` times the length of the arm comes
+ * nearer to the joint along the line between them, with a soft limit ({@link MOVE_BEND_SOFT}).
+ * The limit fades to the whole length at the rest and at the play (`4 × weight × (1 - weight)`),
+ * so the paw keeps its places there and moves with no jump. A wrist path that leaves the reach in
+ * the middle of a move locks the arm straight, and the elbow angle changes fastest near a
+ * straight arm: the bow arm of the red fox went from a bend of 97° to 0° and back to 88° in a
+ * lift of 0.7 s, and the elbow moved at up to 1.7 m/s.
+ *
+ * @param arm The arm.
+ * @param shoulder The posed shoulder joint.
+ * @param reach The largest distance from the shoulder joint to the wrist in the middle of the
+ *   move, as a share of the length of the arm.
+ * @param weight The eased weight of the playing pose: 0 is the rest pose.
+ * @param wrist The wrist of the move, which the function changes.
+ * @returns `wrist`.
+ */
+export function keepMoveBend(
+  arm: ArmRig,
+  shoulder: Vector3,
+  reach: number,
+  weight: number,
+  wrist: Vector3,
+): Vector3 {
+  if (weight <= 0 || weight >= 1) {
+    return wrist;
+  }
+  const { shoulder: root, elbow, wrist: hand } = arm.bind;
+  const length =
+    Math.hypot(elbow[0] - root[0], elbow[1] - root[1], elbow[2] - root[2]) +
+    Math.hypot(hand[0] - elbow[0], hand[1] - elbow[1], hand[2] - elbow[2]);
+  const share = 4 * weight * (1 - weight);
+  const soft = MOVE_BEND_SOFT * length * share;
+  const knee = length * (1 - (1 - reach) * share) - soft;
+  const distance = toWrist.subVectors(wrist, shoulder).length();
+  if (distance <= knee || soft <= 0) {
+    return wrist;
+  }
+  const limited = knee + soft * Math.tanh((distance - knee) / soft);
+  return wrist.copy(shoulder).addScaledVector(toWrist, limited / distance);
+}
+
 const lift = new Quaternion();
 
 /**
