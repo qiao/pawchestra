@@ -94,6 +94,12 @@ The UI has the style of a video player. The theme is dark only, because the scen
 - A solo moves the spotlight to the soloed players. The solo flags alone give the light, so a
   seek, a pause, and a mute keep it (4.5, 6.6).
 - A click on play starts a count-in of the conductor before the music (5.4, 6.5).
+- The Media Session gives the piece to the system: the title, the composer, `share.jpg`, and the
+  actions play, pause, and seek (`SystemMedia` of `app/system-media.ts`). Thus the lock screen,
+  a headset, and the media keys control the music.
+- During play, a screen Wake Lock keeps the screen on, because a phone locks its screen during a
+  long piece with no touch. A pause and the end release it. The browser releases it when the tab
+  hides, so the app asks for it again when the tab shows.
 - The app makes the `AudioContext` and loads the worklet before the first click, and the click
   resumes it. On iOS, `playWithSilentSwitch()` sets `navigator.audioSession.type = 'playback'`, so
   that the silent switch does not mute the music.

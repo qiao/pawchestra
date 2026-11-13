@@ -62,6 +62,7 @@ import {
   watchTier,
 } from './settings.ts';
 import type { FrameRateSetting, QualitySetting, TierWatch } from './settings.ts';
+import { SystemMedia } from './system-media.ts';
 import { songTimeValue, wholeSeconds } from './time-text.ts';
 import { titleCardLevel } from './title-card.ts';
 import { STOPPED, followSongTime, seekPlayState, setPlaying, startPlay } from './transport.ts';
@@ -289,6 +290,8 @@ export class App {
   #shadeLevels: readonly number[] = [];
   /** The wall time of the last frame, in seconds, for the fall of the title shade. */
   #shadeAt = 0;
+  /** The Media Session and the screen Wake Lock (design 2.4). */
+  readonly #media: SystemMedia;
 
   /**
    * Creates the UI over the canvas and connects its controls.
@@ -394,6 +397,22 @@ export class App {
       document.addEventListener(name, keepPageScale, { passive: false });
     }
     this.#listenForMotion(canvas);
+    const artwork = new URL(`${import.meta.env.BASE_URL}share.jpg`, window.location.href).href;
+    this.#media = new SystemMedia(navigator, document, artwork, {
+      onPlay: () => {
+        if (!this.#state.transport.playing) {
+          this.#clickPlay();
+        }
+      },
+      onPause: () => {
+        if (this.#state.transport.playing) {
+          this.#pause();
+        }
+      },
+      onSeek: (songSec) => {
+        this.#seek(songSec);
+      },
+    });
     // The renderer made its listener first, so it makes its own state again before the steps.
     canvas.addEventListener('webglcontextrestored', () => {
       this.#restoreScene();
@@ -882,6 +901,7 @@ export class App {
   #showTitle(lines: TitleLines, stageFile: boolean): void {
     this.#ui.title.show(lines.title, lines.composer);
     this.#ui.titleCard.setPiece(lines.title, lines.composer);
+    this.#media.showPiece(lines);
     document.title = pageTitle(lines, stageFile);
   }
 
@@ -1146,6 +1166,11 @@ export class App {
       ui.settings.showFrameRate(measuredFrameRate(this.#drawTimes));
     }
     if (piece) {
+      const durationSec = piece.score.durationSec;
+      this.#media.follow(
+        { playing: status.playing, songSec, durationSec, rate: this.#speed },
+        wallTime,
+      );
       const started = status.playing || songSec > 0;
       ui.demoList.showLevels(meterLevels(piece.meter, songSec, this.#meterLevels), started);
       if (this.#seatLevels.length !== piece.score.seats.length) {
