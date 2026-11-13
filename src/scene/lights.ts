@@ -1,5 +1,5 @@
 import { Group, HemisphereLight, MathUtils, Object3D, SpotLight, Vector3 } from 'three';
-import type { Light } from 'three';
+import type { Frustum, Light } from 'three';
 
 import type { ConductorPlace } from '../models/layout.ts';
 import type { Vec3 } from '../models/tuples.ts';
@@ -520,6 +520,27 @@ export function aimRimLights(lights: Group, stageSide: number, x: number, z: num
   for (const [i, rim] of rims.entries()) {
     rim.target.position.set(x + (xs[i] ?? 0), 0, z);
   }
+}
+
+/**
+ * Gives the view of the shadow camera of the key light for the current aim and fit (design 4.5,
+ * 9.7). It updates the world matrices of the light and of its target, and the matrices of the
+ * shadow, as the shadow pass of three.js does before it draws. The shadow pass then calculates
+ * the same values again.
+ *
+ * @param lights The group of {@link createLights}.
+ * @returns The view, or `null` when the key light casts no shadow.
+ */
+export function keyShadowView(lights: Group): Frustum | null {
+  for (const child of lights.children) {
+    if (child instanceof SpotLight && child.name === KEY_NAME && child.castShadow) {
+      child.updateWorldMatrix(true, false);
+      child.target.updateWorldMatrix(true, false);
+      child.shadow.updateMatrices(child);
+      return child.shadow.getFrustum();
+    }
+  }
+  return null;
 }
 
 /**
