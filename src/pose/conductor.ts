@@ -40,20 +40,21 @@ export const CONDUCTOR_HOLD = {
    * because with that tip the claws went 7 cm into the muzzle when the head turned to a section
    * on the right (`pnpm pose-depth conductor`, Mozart K. 525). With the point (0.39, 1.48, -2.0)
    * of a baton across the fist, the baton along the index finger points up 55°, and the arm
-   * stands out to the side.
+   * stands out to the side. The tip is 0.25 H further forward than at the first fit of the Tripo
+   * bear, so that the arm reaches further and the forearm comes nearer to the line of the baton.
    */
-  beatPoint: [0.28, 0.735, -2.177],
+  beatPoint: [0.35, 0.685, -2.43],
   /**
    * The baton points from this place to its tip, from the right shoulder joint: forward, up 18°,
-   * and 20° inward at beat 1, as a conductor points it at the players. The pivot is as far below
-   * the shoulder joint as the tip of {@link CONDUCTOR_HOLD.beatPoint}, so that the baton keeps its
-   * angle. With 25° up, the baton rises past the face in the views from the front. The pivot is
-   * about 0.9 m from the tip, about twice as far as the wrist, so that the wrist follows about
-   * half of the motion of the tip in the beat plane, and the arm beats with the baton. With 15°
-   * up, the right forearm twists more in the lift (p95 28° against 12°), and with 10° inward, the
-   * baton stands straight up from the front.
+   * and 3.5° inward at beat 1, as a conductor points it at the players. The forearm points a
+   * little out of the baton, so that the baton is a longer line of the forearm, a little in
+   * (`conductor-technique.md` 7a): 19° off the forearm (p50 of the play). With 20° inward, the
+   * baton stood 53° off the forearm. With 25° up, the baton rises past the face in the views from
+   * the front. The pivot is about 0.9 m from the tip, about twice as far as the wrist, so that the
+   * wrist follows about half of the motion of the tip in the beat plane, and the arm beats with
+   * the baton.
    */
-  batonPivot: [1.233, -0.17, 0.442],
+  batonPivot: [0.53, -0.22, 0.35],
   /**
    * The beat plane turns this part of the turn of the upper body to a cued section on the left.
    * Thus the arm opens to the right in a turn to the left, and the hand stays beside the head from
@@ -71,8 +72,13 @@ export const CONDUCTOR_HOLD = {
    * left forearm stretches more at the quiet place.
    */
   poleL: [-0.7, -1, -0.3],
-  /** The right elbow points as the left elbow, mirrored. */
-  poleR: [0.4, -1, -0.4],
+  /**
+   * The right elbow points down and out to the side, as the elbow of a conductor is a little away
+   * from the body. Thus the forearm points forward and in to the paw, and the baton continues its
+   * line (`conductor-technique.md` 7a). With the elbow of the left arm mirrored, the baton stood
+   * 53° off the forearm (p50 of the play).
+   */
+  poleR: [1, -1, -0.2],
   /**
    * The curl of the fingers around the baton, in the play, in the rest pose, and in the bow. A
    * conductor keeps the baton in the closed hand also with the arms down. With no curl at rest,
