@@ -1,7 +1,7 @@
 import { DEMOS, DEMO_IDS, demoRowLabel } from '../app/demos.ts';
 import type { DemoId } from '../app/demos.ts';
 import { METER_BARS } from '../app/meter.ts';
-import { clockText } from '../app/time-text.ts';
+import { clockText, spokenTime } from '../app/time-text.ts';
 import { createButton, createElement, setAttribute } from './dom.ts';
 
 /** The height of a bar of the meter at the level 0, as a share of its full height. */
@@ -13,6 +13,12 @@ const METER_FLOOR = 0.15;
  */
 const STILL_LEVELS = [0.35, 0.55, 0.8, 0.6, 0.95, 0.7, 0.5, 0.65, 0.4] as const;
 
+/** The start of the name of the row of a file of the user (design 2.8). */
+export const OWN_FILE_TEXT = 'Your file';
+
+/** The current row of the list: a demo, the file of the user, or none. */
+export type DemoListRow = DemoId | 'file' | null;
+
 /**
  * The demo list of the drawer (design 2.8, 8.2): one row for each demo, with the title of the
  * list, the composer, the cast line, and the length. The current demo has an accent bar on the left
@@ -21,6 +27,10 @@ const STILL_LEVELS = [0.35, 0.55, 0.8, 0.6, 0.95, 0.7, 0.5, 0.65, 0.4] as const;
 export class DemoList {
   readonly element: HTMLElement;
   readonly #rows = new Map<DemoId, HTMLButtonElement>();
+  /** The action of a click on the row of the file of the user. */
+  readonly #onSelectFile: () => void;
+  /** The row of the last file of the user in the session, or `null` before the first file. */
+  #fileRow: HTMLButtonElement | null = null;
   /** The level meter, in the row of the current demo (design 2.8). */
   readonly #meter: HTMLElement;
   readonly #bars: HTMLElement[] = [];
@@ -28,11 +38,13 @@ export class DemoList {
   readonly #shown = new Float32Array(METER_BARS).fill(-1);
 
   /**
-   * Creates the rows of the five demos, in the order of the list.
+   * Creates the rows of the demos, in the order of the list.
    *
    * @param onSelect The action of a click on a row.
+   * @param onSelectFile The action of a click on the row of the file of the user.
    */
-  constructor(onSelect: (id: DemoId) => void) {
+  constructor(onSelect: (id: DemoId) => void, onSelectFile: () => void) {
+    this.#onSelectFile = onSelectFile;
     this.element = createElement('ul', 'list');
     this.element.setAttribute('aria-label', 'Music');
     this.#meter = createElement('span', 'meter');
@@ -45,7 +57,7 @@ export class DemoList {
     }
     for (const id of DEMO_IDS) {
       const demo = DEMOS[id];
-      const row = createButton('demo', demoRowLabel(id));
+      const row = this.#createRow(demoRowLabel(id));
       row.append(
         createElement('span', 'name', demo.title),
         createElement('span', 'length', clockText(demo.lengthSec)),
@@ -55,29 +67,69 @@ export class DemoList {
       row.addEventListener('click', () => {
         onSelect(id);
       });
-      // A row with the focus gives Space to the page, so that Space plays and pauses after a
-      // click on a row (design 2.4). Enter still selects the piece. The browser clicks a button
-      // on the keyup of Space, so the row stops that default.
-      row.dataset['focusKind'] = 'page';
-      row.addEventListener('keyup', (event) => {
-        if (event.key === ' ') {
-          event.preventDefault();
-        }
-      });
-      // The browser shows the focus ring after each key press, also on a row that a click
-      // focused. A row that gets the focus with no ring keeps no ring, so that Space and the
-      // arrows of the page do not show it (design 2.8). A Tab into the list shows the ring.
-      row.addEventListener('focus', () => {
-        row.classList.toggle('is-pointer-focus', !row.matches(':focus-visible'));
-      });
-      row.addEventListener('blur', () => {
-        row.classList.remove('is-pointer-focus');
-      });
       const item = createElement('li');
       item.append(row);
       this.element.append(item);
       this.#rows.set(id, row);
     }
+  }
+
+  /**
+   * Creates the button of a row, with the focus rules of the list.
+   *
+   * @param label The `aria-label` of the row.
+   * @returns The button.
+   */
+  #createRow(label: string): HTMLButtonElement {
+    const row = createButton('demo', label);
+    // A row with the focus gives Space to the page, so that Space plays and pauses after a
+    // click on a row (design 2.4). Enter still selects the piece. The browser clicks a button
+    // on the keyup of Space, so the row stops that default.
+    row.dataset['focusKind'] = 'page';
+    row.addEventListener('keyup', (event) => {
+      if (event.key === ' ') {
+        event.preventDefault();
+      }
+    });
+    // The browser shows the focus ring after each key press, also on a row that a click
+    // focused. A row that gets the focus with no ring keeps no ring, so that Space and the
+    // arrows of the page do not show it (design 2.8). A Tab into the list shows the ring.
+    row.addEventListener('focus', () => {
+      row.classList.toggle('is-pointer-focus', !row.matches(':focus-visible'));
+    });
+    row.addEventListener('blur', () => {
+      row.classList.remove('is-pointer-focus');
+    });
+    return row;
+  }
+
+  /**
+   * Shows the row of the last file of the user at the top of the list, so that the file plays
+   * again after a demo (design 2.8). The row lives in memory only: the page stores no file.
+   *
+   * @param title The title of the file.
+   * @param second The second line of the title, or '' for none.
+   * @param lengthSec The song length in whole seconds.
+   */
+  showFile(title: string, second: string, lengthSec: number): void {
+    const name = `${OWN_FILE_TEXT}: ${title}`;
+    const label = second ? `${name}, ${second}` : name;
+    const row = this.#createRow(`${label}, ${spokenTime(lengthSec)}`);
+    row.classList.add('own-file');
+    row.append(
+      createElement('span', 'name', name),
+      createElement('span', 'length', clockText(lengthSec)),
+      createElement('small', '', second),
+    );
+    row.addEventListener('click', this.#onSelectFile);
+    if (this.#fileRow?.parentElement) {
+      this.#fileRow.parentElement.replaceChildren(row);
+    } else {
+      const item = createElement('li');
+      item.append(row);
+      this.element.prepend(item);
+    }
+    this.#fileRow = row;
   }
 
   /** Moves the keyboard focus to the row of the current demo, or to the first row. */
@@ -88,15 +140,23 @@ export class DemoList {
   }
 
   /**
-   * Marks the current demo.
+   * Marks the current row.
    *
-   * @param current The current demo, or `null` for a piece that is not a demo.
+   * @param current The current demo, `file` for the file of the user, or `null` for none.
    */
-  show(current: DemoId | null): void {
+  show(current: DemoListRow): void {
     for (const [id, row] of this.#rows) {
       setAttribute(row, 'aria-current', String(id === current));
     }
-    const row = current === null ? undefined : this.#rows.get(current);
+    if (this.#fileRow) {
+      setAttribute(this.#fileRow, 'aria-current', String(current === 'file'));
+    }
+    let row: HTMLButtonElement | null | undefined = null;
+    if (current === 'file') {
+      row = this.#fileRow;
+    } else if (current !== null) {
+      row = this.#rows.get(current);
+    }
     if (row) {
       row.querySelector('.length')?.before(this.#meter);
     } else {

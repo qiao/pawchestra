@@ -38,6 +38,9 @@ export function nextMode(mode: CameraMode, event: CameraEvent): CameraMode {
   }
 }
 
+/** The hint over the stage in Free mode until the first drag of the session (design 2.8). */
+export const DRAG_HINT_TEXT = 'Drag to look around';
+
 /**
  * Gives the event of a pointer motion on the stage (design 2.3, 2.5). A motion of more than 4 CSS
  * pixels from the press is a drag of the view, or a pinch with two or more pointers down.

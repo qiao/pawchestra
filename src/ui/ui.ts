@@ -4,6 +4,7 @@ import type { FrameRateSetting, QualitySetting } from '../app/settings.ts';
 import type { SectionSize } from '../score/types.ts';
 import { CLOSE_CREDITS_LABEL, CREDITS_TEXT, licensesUrl } from '../app/credits.ts';
 import { REPOSITORY_LABEL } from '../app/page-title.ts';
+import { DRAG_HINT_TEXT } from '../app/camera-mode.ts';
 import { PHONE_LAYOUT_QUERY } from '../app/phone-layout.ts';
 import { COPY_LINK_TEXT, shareLink, shareStatusText } from '../app/share-link.ts';
 import { isWideLayout } from '../app/wide-layout.ts';
@@ -38,6 +39,8 @@ interface UiActions extends BarActions {
   readonly onWatchFilm: () => void;
   /** A click on a row of the demo list. */
   readonly onSelectDemo: (id: DemoId) => void;
+  /** A click on the row of the last file of the user. */
+  readonly onSelectFile: () => void;
   /** A file that the user selected with the file button or dropped on the page. */
   readonly onFile: (file: File) => void;
   /** A click on the mute or the solo button of a seat. */
@@ -79,6 +82,8 @@ export class Ui {
   readonly creditsDialog: ModalDialog;
   readonly dropOverlay: DropOverlay;
   readonly tooltips: Tooltips;
+  /** The hint "Drag to look around" above the bar in Free mode (design 2.8). */
+  readonly #dragHint = createElement('div', 'drag-hint', DRAG_HINT_TEXT);
   readonly #phone: MediaQueryList;
   /** The number of builds that cover the stage now. */
   #covers = 0;
@@ -137,7 +142,7 @@ export class Ui {
         this.bar.focusPlay();
       },
     });
-    this.demoList = new DemoList(actions.onSelectDemo);
+    this.demoList = new DemoList(actions.onSelectDemo, actions.onSelectFile);
     // The file button stands below the demo list, because it also selects a piece (design 2.8).
     this.drawer.addTab(
       'demos',
@@ -183,8 +188,12 @@ export class Ui {
     if (this.title.element.parentElement !== parent) {
       parent.append(this.title.element);
     }
+    // The hint is for a pointer, and a keyboard does not drag, so a screen reader skips it.
+    this.#dragHint.setAttribute('aria-hidden', 'true');
+    this.#dragHint.hidden = true;
     parent.append(
       this.titleCard.element,
+      this.#dragHint,
       this.firstScreen.element,
       this.bar.element,
       this.message.element,
@@ -269,6 +278,17 @@ export class Ui {
     this.drawer.setOpen(true);
     this.demoList.element.scrollTop = 0;
     this.demoList.focusCurrent();
+  }
+
+  /**
+   * Shows or hides the hint "Drag to look around" (design 2.8).
+   *
+   * @param shown True to show it.
+   */
+  showDragHint(shown: boolean): void {
+    if (this.#dragHint.hidden === shown) {
+      this.#dragHint.hidden = !shown;
+    }
   }
 
   /** True while the pointer is over a control of the title or over the open drawer. */

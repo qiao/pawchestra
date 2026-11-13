@@ -134,6 +134,9 @@ page starts in Free mode (`app/camera-mode.ts`).
 
 - The default view has the angle of view of `orchestra-latest.png` (1). It frames the used seats
   in the free area beside the open drawer (4.5).
+- In Free mode, the canvas has the cursor `grab`, and `grabbing` during a drag. During the first
+  piece, a hint "Drag to look around" shows with the bar above it, until the first drag or pinch
+  of the session (`DRAG_HINT_TEXT`), because nothing else tells that the view turns.
 - **Free** is the orbit camera. After a drag, a pinch, or a wheel in Cinematic mode, it starts
   from the current camera, so the view does not jump. It cannot go below the stage, and a zoom
   stops outside the box of the stage and the players.
@@ -335,7 +338,9 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
     length, and no cover. A long title
     wraps, because an ellipsis would hide a part of it. The current row has a level meter from the
     notes of the score (`meterLevels()`), so the UI owns no audio code. The meter has a column of
-    its own, so the text does not move.
+    its own, so the text does not move. After a file of the user plays, a row "Your file:
+    {title}" at the top of the list plays it again, so that the user can go back to it after a
+    demo. The row holds the file in memory only, so a reload removes it (2.7).
   - **File button**: "Open a MIDI file", with the second line "From this device, or drop it on the
     page" ("From this device" on a touch screen). It stands below the demo list, because it also
     selects a piece. It does not say "Upload", because the file stays on the device.
@@ -441,6 +446,8 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 | First screen, the button that opens the demo list | Select music |
 | First screen, the button that starts the piece in Cinematic mode | Watch as a film |
 | Settings, the button that copies or shares the link of the page | Copy link |
+| Over the stage in Free mode, until the first drag | Drag to look around |
+| Demo list, the row of the last file of the user | Your file: {title} |
 | Status after the link is in the clipboard | The link is copied. |
 | Status after the browser did not copy the link | The link did not copy. Copy it from the address bar. |
 | Seat row, the mute button and the solo button | Mute / Only this |

@@ -283,6 +283,13 @@ export class App {
    * `film=1` in the URL hash (design 2.2). A change of the mode by the user clears it.
    */
   #filmAtPlay = false;
+  /**
+   * The last file of the user in the session, for its row in the demo list (design 2.8), or
+   * `null`. It stays in memory only, so the page stores no file (2.7).
+   */
+  #ownFile: File | null = null;
+  /** True after the first drag or pinch of the view in the session: the drag hint goes (2.8). */
+  #dragged = false;
   /** The camera of the shot of the last frame, which `cameraAt()` writes. */
   readonly #shotCamera = createCameraPose();
   /** The phone layout of design 2.8, which moves the frame above the sheet. */
@@ -353,6 +360,10 @@ export class App {
         onSelectDemo: (id) => {
           this.#ui.closeSheetAfterSelection();
           this.#selectDemo(id);
+        },
+        onSelectFile: () => {
+          this.#ui.closeSheetAfterSelection();
+          this.#selectOwnFile();
         },
         onFile: (file) => {
           this.#audio?.resume();
@@ -579,6 +590,7 @@ export class App {
       }
       const motion = motionEvent(press, { x: event.offsetX, y: event.offsetY }, presses.size);
       if (motion) {
+        this.#dragged = true;
         this.#changeCamera(motion);
       }
     });
@@ -807,6 +819,26 @@ export class App {
   }
 
   /**
+   * Selects the last file of the user again: a click on its row in the demo list (design 2.8). A
+   * click on the row of the file that shows only plays it, as a click on the current demo does.
+   */
+  #selectOwnFile(): void {
+    const file = this.#ownFile;
+    if (!file) {
+      return;
+    }
+    this.#audio?.resume();
+    const piece = this.#piece;
+    if (piece?.file === null) {
+      if (!this.#state.transport.playing && !piece.playWhenReady) {
+        this.#clickPlay();
+      }
+      return;
+    }
+    this.openFile(file).catch(reportError);
+  }
+
+  /**
    * Records a demo file that did not load, and shows the message with "Try again" (design 2.8).
    * The current piece stays. Before the first piece, the title names the demo (`select()`), and
    * the play buttons load the file again.
@@ -871,6 +903,8 @@ export class App {
     const { score, scene, prepared } = built;
     const title = fileTitle(score.sequenceName, file.name);
     const piece = preparePiece({ file: null, title, bytes, score }, scene, true);
+    this.#ownFile = file;
+    this.#ui.demoList.showFile(title.title, title.composer, wholeSeconds(score.durationSec));
     this.#showPiece(piece, prepared);
     // A link cannot open a file of the user, so the hash of the earlier demo goes (design 2.2).
     this.#writeHash();
@@ -919,7 +953,7 @@ export class App {
     this.#changeCamera('new-piece');
     const demo = piece.file !== null && isDemoId(piece.file) ? piece.file : null;
     this.#showTitle(piece.title, piece.file !== null);
-    this.#ui.demoList.show(demo);
+    this.#ui.demoList.show(piece.file === null ? 'file' : demo);
     this.#ui.credits.show(demo);
     this.#showSeats(piece);
     // The button "Auto" of the section size names the size of the new piece (design 2.8).
@@ -1191,6 +1225,16 @@ export class App {
       held: this.#message !== null || ui.creditsDialog.open,
     });
     ui.showPanels(shown.panels);
+    // The hint shows with the bar during the first piece in Free mode, until the first drag.
+    ui.showDragHint(
+      !cinematic &&
+        !this.#dragged &&
+        piece !== null &&
+        piece.played &&
+        shown.bar &&
+        this.#message === null &&
+        !(this.#phone.matches && ui.drawer.open),
+    );
     ui.titleCard.show(
       titleCardLevel({
         cinematic,

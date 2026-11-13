@@ -114,6 +114,38 @@ body:has(.bar.is-hidden) #stage {
   cursor: none !important;
 }
 
+/* In Free mode, the cursor tells that a drag turns the view (design 2.5, 2.8). */
+body:not(:has(.camera[aria-pressed='true'])) #stage {
+  cursor: grab;
+}
+
+body:not(:has(.camera[aria-pressed='true'])) #stage:active {
+  cursor: grabbing;
+}
+
+/* The hint "Drag to look around" above the bar, in the middle of the stage. Beside the open
+   drawer, it moves with the middle of the free area. The pointer goes through it. */
+.drag-hint {
+  position: fixed;
+  left: 50%;
+  bottom: 84px;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--bg-overlay);
+  border: 1px solid var(--line);
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 18px;
+  pointer-events: none;
+}
+
+@media (min-width: 700px) {
+  body:has(.drawer:not([hidden])) .drag-hint {
+    translate: -176px 0;
+  }
+}
+
 svg {
   width: 20px;
   height: 20px;
