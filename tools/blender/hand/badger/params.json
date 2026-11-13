@@ -1,5 +1,15 @@
 {
- "edits": [],
+ "edits": [
+  {
+   "kind": "armStretch",
+   "k": 1.2,
+   "ramp": 0.01,
+   "reach": [
+    0.11,
+    0.13
+   ]
+  }
+ ],
  "sourceTexture": "assets/models/badger/tripo-p2/badger.fbm/badger_basecolor.jpg",
  "palm": [
   0.139,
