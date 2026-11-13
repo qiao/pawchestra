@@ -22,6 +22,11 @@
       </div>
       <label for="time">Time <output id="time-value" for="time">0.00 s</output></label>
       <input id="time" type="range" min="0" max="8" step="0.01" value="0" />
+      <fieldset id="mode">
+        <legend>Mode</legend>
+        <label><input type="radio" name="mode" value="play" checked />Playing</label>
+        <label><input type="radio" name="mode" value="rest" />Resting (no sound)</label>
+      </fieldset>
       <fieldset id="speed">
         <legend>Speed</legend>
         <label><input type="radio" name="speed" value="0.25" />0.25x</label>

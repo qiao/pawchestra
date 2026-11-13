@@ -4,7 +4,13 @@ import { playWithSilentSwitch } from '../app/audio-session.ts';
 import { DEFAULT_VOLUME, volumeGain } from '../app/bar-rules.ts';
 import { loadStudioBodies } from '../app/body-loads.ts';
 import { runSliced } from '../app/slices.ts';
-import { STOPPED, seekPlayState, startPlay } from '../app/transport.ts';
+import {
+  STOPPED,
+  changeAudibility,
+  seekPlayState,
+  setPlaying,
+  startPlay,
+} from '../app/transport.ts';
 import type { PlayState } from '../app/transport.ts';
 import { probeWebgl2 } from '../app/webgl.ts';
 import type { Player } from '../audio/player.ts';
@@ -21,7 +27,7 @@ import { POSE_SEED, headOf, preparePosesSteps } from '../pose/plan.ts';
 import type { PosePlan } from '../pose/plan.ts';
 import { createScenePose, poseAt } from '../pose/pose-at.ts';
 import type { ScenePoseBuffer } from '../pose/pose-at.ts';
-import type { ScenePose, Transport } from '../pose/types.ts';
+import type { ScenePose, SeatAudibility, Transport } from '../pose/types.ts';
 import { watchPixelRatio } from '../scene/pixel-ratio.ts';
 import { startTierOf } from '../scene/quality.ts';
 import { StageScene } from '../scene/stage-scene.ts';
@@ -64,6 +70,9 @@ const HEAD_ROOM = 0.5;
 
 /** The role with no hash or with a hash that names no role. */
 const DEFAULT_ROLE = 'rabbit-violin';
+
+/** The flag of rest mode after the role in the URL hash: `#rabbit-violin&rest`. */
+const REST_FLAG = 'rest';
 
 /** The speeds of the speed buttons. */
 const SPEEDS: ReadonlySet<number> = new Set([0.25, 0.5, 1]);
@@ -255,6 +264,7 @@ function pieceSteps(role: TestRole, stage: StageScene): Steps<Piece> {
  * @param songTime The song time, in seconds.
  * @param wallTime The wall clock time, in seconds.
  * @param transport The play state of the pose.
+ * @param audibility The audibility of each seat: silent in rest mode.
  * @param needed The flags of the stage: one for each shown player, then one for the conductor.
  * @returns The poses that the stage shows.
  */
@@ -263,15 +273,30 @@ function posePiece(
   songTime: number,
   wallTime: number,
   transport: Transport,
+  audibility: readonly (SeatAudibility | undefined)[],
   needed: Uint8Array,
 ): ScenePose {
   const { plan, poses, hidden } = piece;
   if (!hidden) {
-    return poseAt(plan, songTime, wallTime, transport, [], poses, needed);
+    return poseAt(plan, songTime, wallTime, transport, audibility, poses, needed);
   }
   hidden[plan.players.length] = needed[0] ?? 1;
-  poseAt(plan, songTime, wallTime, transport, [], poses, hidden);
+  poseAt(plan, songTime, wallTime, transport, audibility, poses, hidden);
   return piece.shown;
+}
+
+/**
+ * Gives the audibility of each seat of a score in a mode, with no move: a silent seat holds the
+ * rest pose from the first frame.
+ *
+ * @param score The score.
+ * @param rest True for rest mode.
+ * @returns One entry for each seat, or no entry in play mode.
+ */
+function settledAudibility(score: Score, rest: boolean): (SeatAudibility | undefined)[] {
+  return rest
+    ? score.seats.map(() => changeAudibility(undefined, false, Number.NEGATIVE_INFINITY))
+    : [];
 }
 
 /**
@@ -307,6 +332,7 @@ class TestPage {
   readonly #link = element('#link', HTMLAnchorElement);
   readonly #notes = element('#notes', HTMLPreElement);
   readonly #status = element('#status', HTMLParagraphElement);
+  readonly #modes = document.querySelectorAll<HTMLInputElement>('input[name="mode"]');
   /** The shown piece, or `null` before the first build. */
   #piece: Piece | null = null;
   /** The role of the last pick, which a build makes into a piece. */
@@ -322,6 +348,13 @@ class TestPage {
   /** The audio, or `null` before the first click on the sound button. */
   #audio: Audio | null = null;
   #muted = false;
+  /**
+   * True in rest mode: each player holds the rest pose of a long rest, and the page makes no
+   * sound. The conductor holds its rest pose of a pause.
+   */
+  #rest = false;
+  /** The audibility of each seat of the shown piece: all seats silent in rest mode (design 5.5). */
+  #audibility: (SeatAudibility | undefined)[] = [];
   #speed = 1;
   /** False from a loop seek until the song time is in the first half of the phrase again. */
   #loopArmed = true;
@@ -342,8 +375,13 @@ class TestPage {
       this.#pickId(this.#select.value);
     });
     window.addEventListener('hashchange', () => {
-      this.#pickId(location.hash);
+      this.#pickHash(location.hash);
     });
+    for (const input of this.#modes) {
+      input.addEventListener('change', () => {
+        this.#setRest(input.value === REST_FLAG);
+      });
+    }
     this.#play.addEventListener('click', () => {
       this.#togglePause();
     });
@@ -367,7 +405,7 @@ class TestPage {
         this.#showView(button.dataset['view'] ?? 'front');
       });
     }
-    this.#pickId(location.hash);
+    this.#pickHash(location.hash);
   }
 
   /** Fills the list with one option for each role, in one group for each kind of role. */
@@ -386,6 +424,82 @@ class TestPage {
   }
 
   /**
+   * Picks the role and the mode of a URL hash, such as `#rabbit-violin&rest`.
+   *
+   * @param hash The hash, with or without the `#`.
+   */
+  #pickHash(hash: string): void {
+    const [id = '', ...flags] = hash.replace(/^#/u, '').split('&');
+    this.#setRest(flags.includes(REST_FLAG));
+    this.#pickId(id);
+  }
+
+  /**
+   * Gives the URL hash of a role in the current mode.
+   *
+   * @param role The role.
+   * @returns The hash, with the `#`.
+   */
+  #hashOf(role: TestRole): string {
+    return `#${role.id}${this.#rest ? `&${REST_FLAG}` : ''}`;
+  }
+
+  /**
+   * Writes the role and the mode into the URL hash and into the link, so that a reload or a shared
+   * link shows them again.
+   *
+   * @param role The role.
+   */
+  #showLink(role: TestRole): void {
+    const hash = this.#hashOf(role);
+    history.replaceState(null, '', hash);
+    this.#link.href = hash;
+    this.#link.textContent = `Link to this role: ${location.pathname}${hash}`;
+  }
+
+  /**
+   * Changes to rest mode or to play mode (design 7.1). Each seat becomes silent or sounds again,
+   * as a mute in the app does, so each player lowers or lifts its instrument (design 5.5). The
+   * conductor has no seat, so the pose of the conductor pauses or plays, as a pause in the app
+   * does (design 5.2).
+   *
+   * @param rest True for rest mode.
+   */
+  #setRest(rest: boolean): void {
+    for (const input of this.#modes) {
+      input.checked = input.value === (rest ? REST_FLAG : 'play');
+    }
+    if (rest === this.#rest) {
+      return;
+    }
+
+    this.#rest = rest;
+    this.#applyVolume();
+    if (this.#picked) {
+      this.#showLink(this.#picked);
+    }
+    const piece = this.#piece;
+    if (!piece) {
+      return;
+    }
+    const wallTime = performance.now() / 1000;
+    const songTime = Math.max(0, this.#clock().now());
+    this.#audibility = piece.score.seats.map((_, i) =>
+      changeAudibility(this.#audibility[i], !rest, wallTime),
+    );
+    if (piece.role.group === 'conductor') {
+      const state = setPlaying(this.#state, !rest, wallTime, songTime);
+      // A play from rest mode starts in the phrase, so it has no count-in.
+      this.#state = rest ? state : seekPlayState(state, songTime);
+    }
+  }
+
+  /** Sets the volume of the sound: none when muted or in rest mode. */
+  #applyVolume(): void {
+    this.#audio?.player.setVolume(volumeGain(DEFAULT_VOLUME, this.#muted || this.#rest));
+  }
+
+  /**
    * Picks the role of a name, or the default role for a name that names no role. The URL hash
    * then names the role, so that a reload or a shared link shows it again.
    *
@@ -400,9 +514,7 @@ class TestPage {
 
     this.#picked = role;
     this.#select.value = role.id;
-    history.replaceState(null, '', `#${role.id}`);
-    this.#link.href = `#${role.id}`;
-    this.#link.textContent = `Link to this role: ${location.pathname}#${role.id}`;
+    this.#showLink(role);
     this.#notes.textContent = notesText(role);
     this.#showStatus(`Building ${role.label}.`);
     const build = this.#lastBuild.then(async () => this.#build(role));
@@ -463,7 +575,9 @@ class TestPage {
       performance.now() / 1000,
       this.#speed,
     );
-    this.#state = first.state;
+    // In rest mode, the conductor holds the rest pose before the first play (design 5.2).
+    this.#state = this.#rest && piece.role.group === 'conductor' ? STOPPED : first.state;
+    this.#audibility = settledAudibility(piece.score, this.#rest);
     this.#silent = silent;
     this.#loopArmed = true;
     if (!this.#paused) {
@@ -529,7 +643,7 @@ class TestPage {
       return;
     }
     this.#muted = !this.#muted;
-    this.#audio.player.setVolume(volumeGain(DEFAULT_VOLUME, this.#muted));
+    this.#applyVolume();
     this.#showSoundButton();
   }
 
@@ -565,7 +679,7 @@ class TestPage {
       'hall',
     );
     player.setRate(this.#speed);
-    player.setVolume(volumeGain(DEFAULT_VOLUME, this.#muted));
+    player.setVolume(volumeGain(DEFAULT_VOLUME, this.#muted || this.#rest));
     player.context.resume().catch(() => undefined);
     this.#audio = {
       player,
@@ -662,8 +776,9 @@ class TestPage {
     }
 
     const transport = this.#state.transport;
+    const audibility = this.#audibility;
     this.#stage.render(this.#view, PAGE_COVER, null, (needed) =>
-      posePiece(piece, songTime, wallTime, transport, needed),
+      posePiece(piece, songTime, wallTime, transport, audibility, needed),
     );
     this.#view = null;
     const shown = Math.min(Math.max(0, songTime), durationSec);
