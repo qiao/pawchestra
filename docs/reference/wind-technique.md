@@ -548,8 +548,9 @@ The app follows these facts:
   bind of `assets/models/monkey/tripo-hand/`, and `lean` in the play).
 - **The tuba (3, `RHINO_TUBA`).** The rhino stands, and the tuba stands against its body, so the
   paws carry no weight (`INSTRUMENT_SUPPORTS.tuba` of `src/models/player.ts`). The right palm faces
-  the valve tops, and the left paw grips the main branch at its left side, with the back of the paw
-  out to the left. Both elbows point down and out, away from the rib cage. The bell stands at the
+  the valve tops, and the left paw grips the main branch at its back left side, with the back of
+  the paw out to the left and the finger tips on the branch (`gripShiftL`, `aimSide`). The branch is
+  about 15 cm wide, so the paw does not close around it. Both elbows point down and out, away from the rib cage. The bell stands at the
   left of the head, with the eye and the cheek free (`play`, `TUBA_BELL_LEAN`). The rim rests on the lips with its top on the upper lip, and the lead
   pipe starts at the end of the mouthpiece shank, in front of the chin (`lipShift`, `tuba()` of
   `src/models/instruments/brass.ts`).
@@ -634,8 +635,8 @@ The app does not follow these facts:
   and both paws keep the hold of the play (`restAim`, `restGripShiftL`).
 - **The tuba (3).** The app draws no strap. The lead pipe is longer (`SpeciesParams.tubaPipe`),
   because the long muzzle puts the mouthpiece far in front of the shoulder joints. No source gives
-  the length of a lead pipe or the rest. At rest, the tuba moves off the mouth, with both paws on
-  their grips (`rest`).
+  the length of a lead pipe or the rest. At rest, the tuba moves down and forward off the mouth,
+  with the mouthpiece below the chin and both paws on their grips (`rest`, `restShift`).
 
 ## 5. Sources
 
