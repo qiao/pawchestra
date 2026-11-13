@@ -976,6 +976,12 @@ interface PlanReuse {
 }
 
 /**
+ * The seed of the pose of the app. A fixed seed gives each demo the same seeded offsets and idle
+ * motion on each visit (design 5.3).
+ */
+export const POSE_SEED = 1;
+
+/**
  * Calculates the data of a score that the pose needs at each frame (design 5.1): the plan of each
  * player and of the conductor. Pure: the same inputs give the same plan.
  *

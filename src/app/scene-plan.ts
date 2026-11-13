@@ -1,7 +1,7 @@
 import { layoutSceneSteps } from '../models/layout-scene.ts';
 import type { SceneLayout } from '../models/layout.ts';
 import { ModelCache } from '../models/model-cache.ts';
-import { preparePosesSteps } from '../pose/plan.ts';
+import { POSE_SEED, preparePosesSteps } from '../pose/plan.ts';
 import type { PosePlan } from '../pose/plan.ts';
 import { buildScoreSteps } from '../score/score.ts';
 import type { Steps } from '../score/steps.ts';
@@ -9,12 +9,6 @@ import type { Score, SectionSize } from '../score/types.ts';
 import { SHOT_SEED, prepareShotsSteps } from '../shots/prepare.ts';
 import type { ShotPlan } from '../shots/types.ts';
 import { castBodiesSteps } from './body-loads.ts';
-
-/**
- * The seed of the pose. A fixed seed gives each demo the same seeded offsets and idle motion on
- * each visit (design 5.3).
- */
-const POSE_SEED = 1;
 
 /** The scene of a score: the layout, the player models, the pose plan, and the shot plan. */
 export interface ScoreScene {

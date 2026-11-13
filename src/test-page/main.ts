@@ -14,7 +14,7 @@ import { CONDUCTOR } from '../models/cast.ts';
 import type { SceneLayout } from '../models/layout.ts';
 import { ModelCache } from '../models/model-cache.ts';
 import { SPECIES } from '../models/species.ts';
-import { headOf, preparePosesSteps } from '../pose/plan.ts';
+import { POSE_SEED, headOf, preparePosesSteps } from '../pose/plan.ts';
 import type { PosePlan } from '../pose/plan.ts';
 import { createScenePose, poseAt } from '../pose/pose-at.ts';
 import type { ScenePoseBuffer } from '../pose/pose-at.ts';
@@ -37,9 +37,6 @@ import type { RoleGroup, TestRole } from './roles.ts';
 import { soloLayoutSteps } from './solo-layout.ts';
 import { viewCamera } from './views.ts';
 import type { ViewName, ViewSubject } from './views.ts';
-
-/** The seed of the pose: the seed of the app (`POSE_SEED` of `app/scene-plan.ts`, design 5.3). */
-const POSE_SEED = 1;
 
 /**
  * The loop seeks back to 0 this much before the end of the phrase, in song seconds. The processor
