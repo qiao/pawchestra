@@ -103,8 +103,9 @@ instruments:
 - **Rings with no split.** The arm root to x 0.153 stops at poles and triangles. The closed leg
   loops of 12 vertices (y 0.067 to 0.257) take no split, because the knee bends over 3 of them.
 - **Paws turned.** Each vertex past the arm ring at x 0.2105 turns rigidly about the rest forearm
-  axis by whole ring steps of 360/14 degrees: 180 degrees on the left (7 steps) and 77.1 degrees
-  on the right (3 steps). New quads join the two rings with the step offset, the far ring takes the
+  axis by whole ring steps of 360/14 degrees: 180 degrees on the left (7 steps) and 102.9 degrees
+  on the right (4 steps). The turned part is each vertex that the edges join to the next ring with
+  no step through the ring at x 0.2105. New quads join the two rings with the step offset, the far ring takes the
   form of the ring before the turn (a fade to 0 at 0.02 units), and the 28 new quads take the
   planar UVs of the dark sock patch at UV (0.8786, 0.7657) ("Arm twist").
 - **Even arms.** The edit `armEven` moves each point of the left arm past x 0.199 in by s(x): 0 at
@@ -232,12 +233,15 @@ swing)"), in degrees, against the fox of `62bf447f4`:
 | Role | Arm | Before | Now |
 |---|---|---|---|
 | Violinist | L | 43, 39 (-38, 4) | 43, 24 (-22, 9) |
-| Violinist | R | 55, 19 (-14, 12) | 63, 18 (-1, 18) |
+| Violinist | R | 55, 19 (-14, 12) | 63, 32 (-27, 18) |
 | Flutist | L | 60, 33 (21, 26) | 67, 41 (36, 20) |
-| Flutist | R | 26, 85 (61, 62) | 37, 92 (74, 60) |
+| Flutist | R | 26, 85 (61, 62) | 37, 75 (48, 60) |
 
 With no paw turn, the left paw twisted 143 degrees in the play of the violin, and the right paw
-108 degrees. With no elbow axis turn, the right upper arm rolled 84 degrees in the violin play.
+108 degrees. One body plays both roles, so the right turn shares the twist of the two right paws:
+with 3 steps the violin paw twisted -1 degree and the flute paw 74 degrees, and with 4 steps -27
+and 48 degrees. The flute grip of `pnpm wind-grip flutist` stays the same, because the hold sets
+the palm of the paw. With no elbow axis turn, the right upper arm rolled 84 degrees in the violin play.
 
 **Holds.** The holds of the fox before (`FOX_HOLD` of `src/pose/bowed-rig.ts` and `FOX_FLUTE` of
 `src/pose/winds.ts`) fit the new body with no change: they are in H. The measures of the hold tools
