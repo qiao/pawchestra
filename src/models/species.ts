@@ -566,10 +566,11 @@ export const SPECIES = {
    * Badger, the percussion: a dark brown badger with a cream face, a dark brown stripe over each
    * eye, round ears with cream rims, a cream throat, and a cream tail. It has the studio body of
    * the hand rig of the Tripo P2 badger (`assets/models/badger/tripo-hand/`, design 4.4), with the
-   * form and the colors of its source and short arms. It stands at each percussion instrument on
-   * its legs in the pose of the source. Its head height is the head of the studio body, and the
-   * seat height is the seat of the studio body between its legs, in H. Its short arms cannot hold
-   * hand cymbals of a real size out of its round body, so it plays a suspended cymbal.
+   * form and the colors of its source, the crown of the older badger, and arms 1.2 times longer
+   * than in the source. It stands at each percussion instrument on its legs in the pose of the
+   * source. Its head height is the head of the studio body, and the seat height is the seat of the
+   * studio body between its legs, in H. Its arms cannot hold hand cymbals of a real size out of
+   * its round body, so it plays a suspended cymbal.
    */
   badger: {
     body: 'studio-badger',
