@@ -30,7 +30,7 @@ import type {
   HandTrack,
   HandTurns,
 } from './hand-notes.ts';
-import { armRig, limitReach, poseShoulder, writeArm, writeCurl } from './ik.ts';
+import { ARM_REACH, armRig, limitReach, poseShoulder, writeArm, writeCurl } from './ik.ts';
 import { lapHand } from './lap.ts';
 import type { LapHand } from './lap.ts';
 import type { ArmRig } from './ik.ts';
@@ -861,6 +861,13 @@ export function sideLeanAt(rig: HandsRig, left: HandTrack, right: HandTrack, tim
   return MathUtils.clamp((-sideLean * sum) / total, -sideLeanMax, sideLeanMax);
 }
 
+/**
+ * The softness of the reach of the arms of a piano or harp player, as a part of the length of the
+ * arm (design 4.7, `softLimit()`). Near the full reach, the palm comes to its limit on a curve, so
+ * that the elbow does not snap straight in one frame.
+ */
+const REACH_SOFTNESS = 0.05;
+
 const tip = new Vector3();
 const lateral = new Vector3();
 const pivot = new Vector3();
@@ -998,7 +1005,12 @@ function poseHand(
     kickPaw(hand.kick, face, fingers, palm, turn);
   }
   wrist.fromArray(arm.palm).applyQuaternion(turn);
-  limitReach(arm, shoulder.position, wrist.subVectors(palm, wrist));
+  limitReach(
+    arm,
+    shoulder.position,
+    wrist.subVectors(palm, wrist),
+    (REACH_SOFTNESS * arm.reach) / ARM_REACH,
+  );
 
   // In the rest pose, the hand rests in its lap, which does not move with the chest.
   posePoint(root, ORIGIN, side.rest.wrist, restWrist);

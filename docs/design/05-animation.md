@@ -779,6 +779,10 @@ The rest of each family:
 
 **Piano** (`pose/hands.ts`, `pose/piano-keys.ts`, piano):
 
+- **Soft reach.** Near the full reach, the palm of a pianist or a harpist comes to the reach
+  limit on a curve (`REACH_SOFTNESS` of the arm length, `softLimit()` of `pose/ik.ts`). Reason:
+  the hard limit stopped the elbow in one frame, and the forearm of the polar bear snapped up to
+  23° in one frame. Near the limit, the palm stops a little shorter of its key or string.
 - The left hand plays low notes and the right hand high notes (`HANDS_HOLDS`, `splitHands()`).
   Each paw plays only to a few keys past the middle of the keys (`reach`), because a paw that
   crosses further puts its elbow in front of the round chest.

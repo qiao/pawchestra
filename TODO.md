@@ -286,12 +286,13 @@ passes.
       side two times each second. Find a calmer side lean that keeps the reach of the far paw.
 - [ ] Polar bear keys: with the gaps between the white keys, the soft shadow of the paws on the keys
       is weaker. The claws stay at the key top and do not follow a pressed key down.
-- [ ] Polar bear pianist: in `bach-bwv1050`, the left forearm still snaps up to 23° in one frame at
-      30 frames per second (8 snaps over 20°, `scratch/tripo-audit/motion.ts`). At 61.42 s, a
-      thumb pass moves the palm 11 cm in 84 ms, the whole gap after the note before. At 164.30 s,
-      the left elbow jumps 2.5 cm in 8 ms while the palm moves 1.4 cm, near the full reach of the
-      arm. A glide of the palm through the strikes of a run took off 1 snap, and a leap speed of
-      0.75 m/s gave 2 new snaps in `boulanger-matin`.
+- [ ] Polar bear pianist: in `bach-bwv1050`, the arms still make 14 snaps over 10° and 2 over 15°
+      in one step (`scratch/tripo-audit/motion.ts`). The soft reach (`REACH_SOFTNESS`) took off 14
+      snaps over 10°, 10 over 15°, and all 5 over 20°. At 61.42 s, a thumb pass moves the
+      palm 11 cm in 84 ms, the whole gap after the note before. At 164.30 s, the left elbow jumped
+      2.5 cm in 8 ms while the palm moved 1.4 cm, near the full reach of the arm.
+      A glide of the palm through the strikes of a run took off 1 snap, and a leap speed of 0.75 m/s
+      gave 2 new snaps in `boulanger-matin`.
 - [ ] Polar bear pianist: at 1% of the notes of the demos, the arm is at its full reach, and the
       palm stops up to 3.2 cm short of the key (the note target check of the pianist clearance).
       A lean toward the keys for a far black key can give the reach.
@@ -1198,10 +1199,6 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Show the user a lineup of a seeded fur value step of ±5% for each player of a section, as one
       uniform of each player mesh. The posture of each player already varies (`PlayerPlan.posture`),
       and the four foxes of a section still have one face color (5.1).
-- [ ] Add a softness to `solveTwoBone()` (`src/pose/ik.ts`), default 0, so that the elbow comes
-      near the full reach on a curve. Try 5% of the arm length on the pianist and the harpist.
-      The clamp at the full reach causes the snaps of the polar bear and the deer tasks above
-      (4.7).
 - [ ] Turn the clavicle by a share of the lift of the upper arm (try 0.25 above 30°) before the
       IK, on the bow arm of the rabbit first. Now the clavicle takes one constant turn for each
       hold: the violinist shoulder bone turns 0.02° in 20 s, the upper arm 58.6° (4.7).
