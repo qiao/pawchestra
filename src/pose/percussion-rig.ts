@@ -352,10 +352,10 @@ interface PercussionHold {
    */
   readonly headUp: number;
   /**
-   * The curl of the fingers around a mallet, a stick, a beater, or the strap of a cymbal, in
-   * radians, so that the claws close on the shaft.
+   * The curl of the fingers of the left and of the right paw around a mallet, a stick, a beater,
+   * the clip of the triangle, or the strap of a cymbal, in radians, so that the claws close on it.
    */
-  readonly curl: number;
+  readonly curl: readonly [left: number, right: number];
   /**
    * True: each paw with a mallet turns around the shaft until it has no side bend on the forearm
    * at the strike, and keeps that roll through the stroke (`gripRoll()` of `pose/percussion.ts`).
@@ -500,7 +500,7 @@ export const PERCUSSION_HOLDS = {
     // The end of the stump paw of the Tripo elephant closes a little on the shaft
     // (TIMPANI.malletSpotL and malletSpotR). The stump has no fingers: with a curl of 100° (the
     // old paw), the ring of its nails folded 44 and 43 faces at rest, and with 20° 10 and 9.
-    curl: 20 * MathUtils.DEG2RAD,
+    curl: [20 * MathUtils.DEG2RAD, 20 * MathUtils.DEG2RAD],
     // Each paw turns around the shaft until it has no side bend at the strike, and keeps that roll
     // between strikes, so that the shaft stays in the closed paw. Each hand strikes one kettle in
     // one direction, so the roll stays near one value. With no roll, the shafts leave the paws
@@ -569,7 +569,7 @@ export const PERCUSSION_HOLDS = {
       yaw: 0.65,
       turn: 0.45,
     },
-    curl: GRIP_CURL,
+    curl: [GRIP_CURL, GRIP_CURL],
     strikeRoll: true,
     // The right paw keeps the turn of the hand, so that the curled claws close on the beater
     // (`BASS_DRUM.malletTilt`).
@@ -623,7 +623,7 @@ export const PERCUSSION_HOLDS = {
     side: null,
     fit: { drop: 0.07, gap: 0.15 },
     damp: null,
-    curl: GRIP_CURL,
+    curl: [GRIP_CURL, GRIP_CURL],
     strikeRoll: true,
     // The paws keep the turn of the hands, so that the curled claws close on the sticks in each
     // sample (`pnpm wind-grip snare-drummer`). With the turn of the retarget of 24° to 35° in the
@@ -658,7 +658,7 @@ export const PERCUSSION_HOLDS = {
     side: null,
     fit: null,
     damp: { kind: 'chest', restSec: 0.5, hold: 0.8, drop: 0.3, room: 0.04104 },
-    curl: GRIP_CURL,
+    curl: [GRIP_CURL, GRIP_CURL],
     strikeRoll: true,
     keepPaw: false,
   },
@@ -697,7 +697,7 @@ export const PERCUSSION_HOLDS = {
     damp: null,
     // The left paw closes on the clip of the triangle and the right paw on the short beater with
     // less curl: at 90°, the left paw folds 10 faces at the knuckles.
-    curl: 75 * MathUtils.DEG2RAD,
+    curl: [75 * MathUtils.DEG2RAD, 75 * MathUtils.DEG2RAD],
     // A beater near the line of the forearm turns the paw fast with a roll that removes the
     // side bend, so the forearm lies in the plane of the palm.
     strikeRoll: false,
@@ -780,7 +780,7 @@ export const PERCUSSION_HOLDS = {
     side: { span: 0.25, hips: 0, spine: 12 * MathUtils.DEG2RAD, moveSec: 0.6 },
     fit: null,
     damp: null,
-    curl: GRIP_CURL,
+    curl: [GRIP_CURL, GRIP_CURL],
     // A roll that removes the side bend at each strike turns the paws fast between the bars, so
     // the forearm lies in the plane of the palm.
     strikeRoll: false,
@@ -849,7 +849,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
     share: 10,
     lean: 0.16,
   },
-  curl: GRIP_CURL,
+  curl: [GRIP_CURL, GRIP_CURL],
   strikeRoll: true,
   // The paws keep the turn of the hands, so that the curled claws close on the mallets: with the
   // turn of the retarget, the paws grasped in 58% to 63% of the play samples.

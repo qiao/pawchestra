@@ -1516,7 +1516,8 @@ function poseHand(
   );
   // A paw with a mallet holds it also at rest and in the lift. The free paw keeps its fingers
   // open, also with the palm on a drum head.
-  const curl = side.kind === 'free' ? 0 : fingers ? fingerCurl(state.small) : rig.hold.curl;
+  const curl =
+    side.kind === 'free' ? 0 : fingers ? fingerCurl(state.small) : rig.hold.curl[left ? 0 : 1];
   writeCurl(arm, side.kind === 'mallet' ? curl : curl * play, rotations);
   return pawTurn;
 }
