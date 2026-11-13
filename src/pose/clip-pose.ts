@@ -21,6 +21,7 @@ export function createClipPose(): WritablePose {
     slideOffset: [0, 0, 0],
     instrumentOffset: [0, 0, 0],
     pawTurnL: null,
+    pawTurnR: null,
     pawBendR: 0,
     blink: 0,
     keys: null,
@@ -71,6 +72,7 @@ export function clipPoseAt(clip: PlayerClip, time: number, out: WritablePose): W
   out.slideOffset.fill(0);
   out.instrumentOffset.fill(0);
   out.pawTurnL = null;
+  out.pawTurnR = null;
   out.pawBendR = 0;
   out.blink = 0;
   return out;

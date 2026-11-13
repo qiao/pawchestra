@@ -219,6 +219,8 @@ export function stillPose(pose: AnimalPose): AnimalPose {
     instrumentOffset: copy(pose.instrumentOffset ?? [0, 0, 0]),
     // The violin and the viola keep the turn of the playing grip in the left paw (design 5.2).
     pawTurnL: pose.pawTurnL ?? null,
+    // A percussion paw keeps the turn of the hand that holds its piece (design 5.3).
+    pawTurnR: pose.pawTurnR ?? null,
     // The bow paw bends off the forearm by the bend of the hold (design 5.3).
     pawBendR: pose.pawBendR ?? 0,
     blink: 0,

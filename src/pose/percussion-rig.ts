@@ -341,6 +341,14 @@ interface PercussionHold {
    */
   readonly strikeRoll: boolean;
   /**
+   * True: each paw that holds a mallet, a stick, a beater, or the clip of the triangle keeps the
+   * turn of the hand of the player, and the retarget does not turn it in the plane of its palm
+   * toward the forearm (`PAW_TURN` of `models/studio-rig.ts`). The piece follows the hand of the
+   * player, so it then stays where the bind pose holds it in the closed paw. False: the retarget
+   * turns the paw, and a turn of 30° moves the claws off a stick.
+   */
+  readonly keepPaw: boolean;
+  /**
    * The side move of the body behind the notes, with the feet on the floor, or `null`: the body
    * keeps its place.
    */
@@ -472,6 +480,7 @@ export const PERCUSSION_HOLDS = {
     // one direction, so the roll stays near one value. With no roll, the shafts leave the paws
     // 80° from the thumb side between strikes, and no paw grasps its mallet.
     strikeRoll: true,
+    keepPaw: false,
   },
   // The badger stands behind the drum, and the right paw holds the beater at the near rim of the
   // right head, with the beater along the head, 10° down from the level, as a real player holds it
@@ -530,6 +539,7 @@ export const PERCUSSION_HOLDS = {
     },
     curl: GRIP_CURL,
     strikeRoll: true,
+    keepPaw: false,
   },
   // The sticks leave the front of the fists (SNARE_DRUM.malletTilt) and point from homes 0.4 H out
   // from the shoulders, so that they make a V at a strike and slant down, as the matched grip of a
@@ -574,6 +584,7 @@ export const PERCUSSION_HOLDS = {
     damp: null,
     curl: GRIP_CURL,
     strikeRoll: true,
+    keepPaw: false,
   },
   // The lift is the half of the gap between the inner faces of the two cymbals. The elbows point
   // down and a little out, so that fewer faces of the left shoulder of the badger mesh fold in the
@@ -602,6 +613,7 @@ export const PERCUSSION_HOLDS = {
     damp: { kind: 'chest', restSec: 0.5, hold: 0.8, drop: 0.3, room: 0.04104 },
     curl: GRIP_CURL,
     strikeRoll: true,
+    keepPaw: false,
   },
   // The left hand holds the triangle up, and its elbow points out to the left. The beater leaves
   // the front of the right fist (TRIANGLE.malletTilt) and keeps the angle of no twist of the paw
@@ -639,6 +651,7 @@ export const PERCUSSION_HOLDS = {
     // A beater near the line of the forearm turns the paw fast with a roll that removes the
     // side bend, so the forearm lies in the plane of the palm.
     strikeRoll: false,
+    keepPaw: false,
   },
   // The mallets leave the front of the fists (XYLOPHONE.malletTilt), as the sticks of the snare
   // drum, because a real player holds them in the matched grip of the snare drum. Between strikes,
@@ -701,6 +714,7 @@ export const PERCUSSION_HOLDS = {
     // A roll that removes the side bend at each strike turns the paws fast between the bars, so
     // the forearm lies in the plane of the palm.
     strikeRoll: false,
+    keepPaw: false,
   },
 } as const satisfies Readonly<Record<PercussionInstrument, PercussionHold>>;
 
@@ -759,6 +773,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   },
   curl: GRIP_CURL,
   strikeRoll: true,
+  keepPaw: false,
 };
 
 /**

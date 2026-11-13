@@ -271,6 +271,11 @@ interface BoneOffsets {
    */
   readonly pawTurnL: number | null;
   /**
+   * The turn of the right paw in the plane of its palm, in radians, in place of the turn toward
+   * the forearm ({@link PAW_TURN}), or `null` for that turn (`pawTurnR` of `AnimalPose`).
+   */
+  readonly pawTurnR: number | null;
+  /**
    * The bend of the right paw off the line of its forearm, in the plane of its palm, in radians,
    * after the turn toward the forearm ({@link PAW_TURN}): 0 puts the paw on the line of the
    * forearm (`pawBendR` of `AnimalPose`). The bend counts from the forearm, so a new bind of the
@@ -290,6 +295,7 @@ export const NO_OFFSETS: BoneOffsets = {
   instrument: [0, 0, 0],
   slide: [0, 0, 0],
   pawTurnL: null,
+  pawTurnR: null,
   pawBendR: 0,
   digits: null,
 };
@@ -304,6 +310,8 @@ interface PoseOffsets {
   readonly slideOffset: Vec3;
   /** The turn of the left paw in the plane of its palm, or none for the turn of the retarget. */
   readonly pawTurnL?: number | null;
+  /** The turn of the right paw in the plane of its palm, or none for the turn of the retarget. */
+  readonly pawTurnR?: number | null;
   /** The bend of the right paw off the line of its forearm, in radians, or none for 0. */
   readonly pawBendR?: number;
   /** The bend of each digit, or none for no bend. */
@@ -322,6 +330,7 @@ export function studioOffsets(pose: PoseOffsets): BoneOffsets {
     instrument: pose.instrumentOffset ?? NO_OFFSETS.instrument,
     slide: pose.slideOffset,
     pawTurnL: pose.pawTurnL ?? null,
+    pawTurnR: pose.pawTurnR ?? null,
     pawBendR: pose.pawBendR ?? 0,
     digits: pose.digits ?? null,
   };
@@ -1212,8 +1221,8 @@ function upperRoll(armTurn: Quaternion, chestTurn: Quaternion, armBind: Vector3)
  * upper arm and the forearm turn with the elbow axis of the studio onto the plane of the arm, so
  * that the elbow bends as the studio built it. The paw takes the rotation of the hand of the
  * player, turned in the plane of its palm toward the forearm by up to {@link PAW_TURN} (the right
- * paw only toward the baton, and then past it by the bend of the pose, `pawBendR`), or by the
- * turn of the pose for the left paw (`pawTurnL`), and the
+ * paw only toward the baton), or by the turn of the pose (`pawTurnL`, `pawTurnR`). The right
+ * paw then bends past it by the bend of the pose (`pawBendR`), and the
  * forearm twist bone takes {@link TWIST_SHARE} of the twist
  * from the forearm to the paw. The fingers of the studio curl around their own axis by the curl
  * of the fingers of the player. The arm-down shape of each arm takes its weight from the
@@ -1480,8 +1489,8 @@ export function studioPawTwist(
  * @param rig The studio rig.
  * @param arm The arm.
  * @param pose The local rotations of the bones of the player.
- * @param offsets The offsets of the pose: the turn of the left paw in the plane of its palm, and
- *   the bend of the right paw off its forearm.
+ * @param offsets The offsets of the pose: the turn of each paw in the plane of its palm, and the
+ *   bend of the right paw off its forearm.
  * @param out The pose to write.
  */
 function poseArm(
@@ -1512,9 +1521,9 @@ function poseArm(
   // The paw turns in the plane of its palm toward the forearm, or by the turn of the pose. The
   // right paw then bends off the forearm by the bend of the pose.
   const hand = rotations[arm.drivers.hand] ?? local;
-  const ownTurn = arm.side === 'L' ? offsets.pawTurnL : null;
+  const ownTurn = arm.side === 'L' ? offsets.pawTurnL : offsets.pawTurnR;
   const bend = arm.side === 'R' ? offsets.pawBendR : 0;
-  palmTurn.setFromAxisAngle(X_AXIS, ownTurn ?? palmTurnAngle(arm.side, hand, fore) + bend);
+  palmTurn.setFromAxisAngle(X_AXIS, (ownTurn ?? palmTurnAngle(arm.side, hand, fore)) + bend);
   paw.fromArray(arm.paw);
   handTurn.copy(hand).multiply(palmTurn).multiply(paw);
 

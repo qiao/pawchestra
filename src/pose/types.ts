@@ -24,10 +24,17 @@ export interface AnimalPose {
    * The turn of the left paw in the plane of its palm, in radians, in place of the turn of the
    * retarget toward the forearm (`PAW_TURN` of `models/studio-rig.ts`, 4.4), or `null` for that
    * turn. A violin or a viola at rest and in the lift and the lowering keeps the turn of the
-   * playing grip, so that the instrument keeps its place in the paw (5.2). A pose with no value
-   * takes `null`.
+   * playing grip, so that the instrument keeps its place in the paw (5.2). A percussion hold with
+   * `keepPaw` gives 0 to each paw that holds a piece, so that the piece stays in the closed paw
+   * (5.3). A pose with no value takes `null`.
    */
   readonly pawTurnL?: number | null;
+  /**
+   * The turn of the right paw in the plane of its palm, in radians, in place of the turn of the
+   * retarget toward the forearm (4.4), or `null` for that turn: the paw of a percussion hold with
+   * `keepPaw` (5.3). A pose with no value takes `null`.
+   */
+  readonly pawTurnR?: number | null;
   /**
    * The bend of the right paw off the line of its forearm, in radians, after the turn of the
    * retarget toward the forearm (4.4): the bow paw of a hold with `BowedHold.pawBendR` (5.3). A

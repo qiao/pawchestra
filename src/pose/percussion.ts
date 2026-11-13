@@ -1303,8 +1303,9 @@ function lowestPoint(paw: Float32Array, at: Vector3, hand: Quaternion): number {
  * @param chest The posed frame of the chest.
  * @param weight The eased weight of the playing pose.
  * @param rotations The rotations of the pose to write.
- * @returns The turn of the left paw in the plane of its palm at a switch (`pawTurnL` of
- *   `AnimalPose`), or `null` for the turn of the studio body.
+ * @returns The turn of the paw in the plane of its palm (`pawTurnL`, `pawTurnR` of `AnimalPose`):
+ *   0 for a paw that a hold with `keepPaw` keeps on the hand of the player, the mixed turn of the
+ *   left paw or of a kept paw at a switch, or `null` for the turn of the studio body.
  */
 function poseHand(
   rig: PercussionRig,
@@ -1421,10 +1422,13 @@ function poseHand(
     wrist.copy(hanging);
     turn.copy(restHand);
   }
+  // A hold with keepPaw keeps each paw that holds a piece on the hand of the player, so that the
+  // piece stays where the bind pose holds it in the closed paw.
+  const keep = rig.hold.keepPaw && side.kind !== 'free' && side.kind !== 'plate';
   // At a switch, the paws go to the trap table: the left paw from the place of the instrument that
   // it puts down to the place of the instrument that it takes, and the right paw to the beater.
   const swap = state.swap;
-  let pawTurn: number | null = null;
+  let pawTurn: number | null = keep ? 0 : null;
   if (rig.switch && swap.table > 0) {
     const s = rig.switch;
     // The elbow points as on the hanging arm at the table (`writeArm()` below).
@@ -1449,8 +1453,9 @@ function poseHand(
       swap.across,
       swap.table,
       left ? 0 : TAMBOURINE_HOLD.beaterArc * rig.headHeight,
+      keep,
     );
-    pawTurn = left ? palm : null;
+    pawTurn = left || keep ? palm : null;
   }
   limitReach(arm, shoulder.position, wrist);
 
@@ -1510,6 +1515,8 @@ const twistAxis = new Vector3();
  * @param across The share of the move from `from` to `to` (`SwitchState.across`).
  * @param table The weight of the table (`SwitchState.table`).
  * @param arc The move of the wrist forward in the middle of the move to the table, in meters.
+ * @param keep True: the paw at the play place keeps the turn of the hand of the player
+ *   (`PercussionHold.keepPaw`).
  * @returns The turn of the paw in the plane of its palm, in radians.
  */
 function tablePaw(
@@ -1521,9 +1528,10 @@ function tablePaw(
   across: number,
   table: number,
   arc: number,
+  keep: boolean,
 ): number {
   twistAxis.fromArray(bind.fore).normalize();
-  pawKey(bind, arm, joint, wrist, playPole, turn, keyPlay);
+  pawKey(bind, arm, joint, wrist, playPole, turn, keyPlay, keep);
   grip.fromArray(from.wrist);
   pawKey(bind, arm, joint, grip, tablePole, strikeHand.fromArray(from.hand), keyFrom);
   grip.fromArray(to.wrist);
@@ -1570,6 +1578,8 @@ function armJoints(arm: ArmRig, joint: Vector3, at: Vector3, pole: Vector3): voi
  * @param pole The direction to which the elbow points, in the model axes.
  * @param hand The world rotation of the hand of the player.
  * @param out The key to write.
+ * @param keep True: the studio paw keeps the turn of the hand, with no turn in the plane of its
+ *   palm (`PercussionHold.keepPaw`).
  */
 function pawKey(
   bind: PawBind,
@@ -1579,10 +1589,11 @@ function pawKey(
   pole: Vector3,
   hand: Quaternion,
   out: PawKey,
+  keep = false,
 ): void {
   armJoints(arm, joint, limitReach(arm, joint, along.copy(at)), pole);
   forearm.subVectors(joints.wrist, joints.elbow).normalize();
-  out.palm = palmTurnAngle(arm.side, hand, forearm);
+  out.palm = keep ? 0 : palmTurnAngle(arm.side, hand, forearm);
   studioForearmTurn(bind, joint, joints.elbow, joints.wrist, out.paw)
     .invert()
     .multiply(hand)
@@ -1681,8 +1692,8 @@ function fingerHand(rig: PercussionRig, hand: StrikeState, small: SmallState): v
  * @param state The motion of the hands at the song time of the note layer.
  * @param weight The eased weight of the playing pose: 0 is the rest pose (5.2, 5.5).
  * @param rotations The rotations of the pose to write.
- * @returns The turn of the left paw in the plane of its palm at a switch of the small percussion
- *   (`pawTurnL` of `AnimalPose`), or `null` for the turn of the studio body.
+ * @param turns Gets the turn of each paw in the plane of its palm (`pawTurnL`, `pawTurnR` of
+ *   `AnimalPose`), or `null` for the turn of the studio body.
  */
 export function posePercussion(
   rig: PercussionRig,
@@ -1690,8 +1701,16 @@ export function posePercussion(
   state: PercussionState,
   weight: number,
   rotations: Float32Array,
-): number | null {
-  const pawTurnL = poseHand(rig, 'L', state, frames.chest, weight, rotations);
-  poseHand(rig, 'R', state, frames.chest, weight, rotations);
-  return pawTurnL;
+  turns: PawTurns,
+): void {
+  turns.pawTurnL = poseHand(rig, 'L', state, frames.chest, weight, rotations);
+  turns.pawTurnR = poseHand(rig, 'R', state, frames.chest, weight, rotations);
+}
+
+/** The turns of the paws in the planes of their palms that a percussion pose writes. */
+export interface PawTurns {
+  /** The turn of the left paw, or `null` for the turn of the studio body. */
+  pawTurnL: number | null;
+  /** The turn of the right paw, or `null` for the turn of the studio body. */
+  pawTurnR: number | null;
 }
