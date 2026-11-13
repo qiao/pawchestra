@@ -669,6 +669,30 @@ function swingOf(paw: Quaternion, from: Vector3, to: Vector3): Quaternion {
 }
 
 /**
+ * Mixes the wrist of the hanging arm and the wrist of the playing pose, and keeps the distance of
+ * the mix from the shoulder at least at the mix of the two distances (design 5.4). A straight mix
+ * of the left wrist passes near the shoulder in the lift, so the elbow bends more than at both
+ * ends, and the inner elbow of the Tripo bear folded 9 faces at 0.2 s of the lift.
+ *
+ * @param shoulder The posed shoulder joint.
+ * @param from The wrist of the hanging arm.
+ * @param to The wrist of the playing pose. The function writes the mix into it.
+ * @param weight The weight of the playing pose, from 0 to 1.
+ * @returns `to`, with the mix.
+ */
+function mixWrist(shoulder: Vector3, from: Vector3, to: Vector3, weight: number): Vector3 {
+  const reach = MathUtils.lerp(from.distanceTo(shoulder), to.distanceTo(shoulder), weight);
+  to.lerpVectors(from, to, weight);
+  const distance = to.distanceTo(shoulder);
+  if (distance < reach && distance > 1e-6) {
+    to.sub(shoulder)
+      .multiplyScalar(reach / distance)
+      .add(shoulder);
+  }
+  return to;
+}
+
+/**
  * Writes the module frame `hangFrame`: the posed shoulder joint with the rotation of the root.
  *
  * @param shoulder The posed `shoulder` bone, from `poseShoulder()`.
@@ -800,7 +824,7 @@ function poseLeftHand(
     {
       arm: rig.left,
       shoulder: left,
-      wrist: wrist.lerpVectors(hanging, wrist, weight),
+      wrist: mixWrist(left.position, hanging, wrist, weight),
       hand: mixRotation(hangingHand(rig.hangL, hangFrame, restHand), hand, weight, hand),
       pole: mixPole(CONDUCTOR_HOLD.restPoleL, CONDUCTOR_HOLD.poleL, weight),
       maxTwist: MAX_TWIST_L,
