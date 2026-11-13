@@ -162,8 +162,9 @@ demo shows the same motion on each visit.
   the pulse, and a seeded level of one or two pulses to each side (`PlayerPlan.sway`,
   `SWAY_VARIETY`), so that a section does not sway as one copy. The sway and the breath of a
   player are `BODY_MOTION.scale` times the base angles, because the base angles move the head of
-  a player in the default view by about 2 pixels. The cello and the contrabass keep the base
-  angles, because a floor instrument does not lean with the body.
+  a player in the default view by about 2 pixels. The cello, the contrabass, and the harp keep the
+  base angles (`BASE_BODY_INSTRUMENTS`): a floor instrument does not lean with the body, and a
+  larger sway put the right upper arm of the harpist deeper into the neck of the harp.
 - **Section variety.** Each player has a seeded posture (`PlayerPlan.posture`, `POSTURE_VARIETY`):
   a head tilt, a head turn, a slouch of the spine, and an ear spread, so that the players of a
   section do not look like copies. A wind player that plays keeps the head on the mouthpiece, and

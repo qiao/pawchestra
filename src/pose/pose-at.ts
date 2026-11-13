@@ -97,8 +97,8 @@ const BODY_MOTION = {
   sway: 2 * MathUtils.DEG2RAD,
   /**
    * The factor of the breath and the sway of a player. A player in the default view is about 110
-   * pixels high, so the base angles move the head about 2 pixels. The cello and the contrabass
-   * keep the base angles, because a floor instrument does not lean with the body.
+   * pixels high, so the base angles move the head about 2 pixels. The instruments of
+   * {@link BASE_BODY_INSTRUMENTS} keep the base angles.
    */
   scale: 1.5,
   /** The part of a look that the neck turns. The head turns the rest. */
@@ -425,11 +425,25 @@ function swayOf(plan: PosePlan, player: PlayerPlan, noteTime: number, weight: nu
  * Gives the factor of the breath and the sway of an animal (`BODY_MOTION.scale`).
  *
  * @param player The plan of the animal.
- * @returns 1 for the conductor and a player of a floor instrument, else `BODY_MOTION.scale`.
+ * @returns 1 for the conductor and a player of {@link BASE_BODY_INSTRUMENTS}, else
+ *   `BODY_MOTION.scale`.
  */
 function bodyScale(player: PlayerPlan): number {
-  return player.seatIndex < 0 || FLOOR_INSTRUMENTS.has(player.instrument) ? 1 : BODY_MOTION.scale;
+  return player.seatIndex < 0 || BASE_BODY_INSTRUMENTS.has(player.instrument)
+    ? 1
+    : BODY_MOTION.scale;
 }
+
+/**
+ * The instruments whose players keep the base angles of the breath and the sway (design 5.1). A
+ * floor instrument does not lean with the body, and a larger sway put the right upper arm of the
+ * harpist 0.1 cm deeper into the neck of the harp, in 4% of the samples of the play.
+ */
+const BASE_BODY_INSTRUMENTS: ReadonlySet<InstrumentId> = new Set<InstrumentId>([
+  'cello',
+  'contrabass',
+  'harp',
+]);
 
 /**
  * The states that `poseAt()` writes for each player. Each call of `poseAt()` makes them one time,
