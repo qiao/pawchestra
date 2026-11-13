@@ -44,8 +44,9 @@ reads the output ("The asset chain" of `docs/agents/rigging.md`). The steps:
    tail bone, or a ramp along a tail of two bones), the split of the thigh and the shin across
    the knee (`knee`), the haunch, one set of weights for the corners of each short thin face, and the weights of the
    line for the middle corner of each long thin face. Each vertex
-   keeps four bones, in steps of 1/255. With `smooth` of the config, the vertices inside a box
-   first move toward the middle of their neighbors (`smooth_box()`), before the weights. The file
+   keeps four bones, in steps of 1/255. With `smooth` of the config (one rule or a list of
+   rules), the vertices inside the box of each rule first move toward the middle of their
+   neighbors (`smooth_box()`), before the weights. The file
    then gives the move of the head center back to the head before the smoothing (`head_shift()`),
    so that the holds keep their places. With `paintedWeights`, the weights come from a file of
    Blender. With `weightSource`, a mesh before a planar split of some faces, the steps give the
@@ -5236,8 +5237,11 @@ def main():
     verts, source_tris, uvs, texture = load_mesh(config)
     unsmoothed = verts
     if 'smooth' in config:
-        verts, count, largest = smooth_box(verts, source_tris, config['smooth'])
-        log(f'smooth: {count} vertices in the box, the largest move {largest:.4f} u')
+        boxes = config['smooth'] if isinstance(config['smooth'], list) else [config['smooth']]
+        for box in boxes:
+            verts, count, largest = smooth_box(verts, source_tris, box)
+            log(f'smooth: {count} vertices in the box {box["box"]}, the largest move '
+                f'{largest:.4f} u')
     heads, ends, rolls, children = joints_of(config)
     if 'cut' in config:
         before = len(source_tris)
