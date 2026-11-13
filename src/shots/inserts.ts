@@ -23,7 +23,7 @@ import {
   segmentClear,
   targetLineClear,
 } from './clearance.ts';
-import type { Segment, StageClearance } from './clearance.ts';
+import type { ClearBox, Segment, StageClearance } from './clearance.ts';
 import { ANIMAL_FLOOR, animalTooNear, foregroundHead, inFrame, lensScale } from './foreground.ts';
 import type { StageBody, StageHead } from './foreground.ts';
 import { FILM_GRAMMAR, keepsLine } from './grammar.ts';
@@ -572,6 +572,39 @@ function cutKeepsGrammar(main: MainCamera, camera: Vec3, target: Vec3, half: num
   return angle >= FILM_GRAMMAR.jumpAngle;
 }
 
+/** A point of a detail, with the results of the tests of the stage at it. */
+interface StagePoint {
+  /** The point of the detail. */
+  readonly target: Vec3;
+  /** The boxes within `CLEARANCE.bodyReach` of the point: the body of the subject. */
+  readonly held: ReadonlySet<ClearBox>;
+  /** The boxes that the line of sight skips: `held` and each box of the player of the detail. */
+  readonly seen: ReadonlySet<ClearBox>;
+  /** The result of the tests of the stage of each camera, by the turn and the elevation. */
+  readonly results: Map<number, InsertRefusal | null>;
+}
+
+/**
+ * Prepares a point of a detail for the tests of the stage.
+ *
+ * @param clearance The obstacles of the stage.
+ * @param owner The owner of the player of the detail.
+ * @param target The point of the detail.
+ * @returns The point with no results.
+ */
+function stagePoint(clearance: StageClearance, owner: number, target: Vec3): StagePoint {
+  const held = bodyBoxes(clearance, target);
+  const seen = new Set(held);
+  for (const obstacle of clearance.obstacles) {
+    if (obstacle.owner === owner) {
+      for (const box of obstacle.boxes) {
+        seen.add(box);
+      }
+    }
+  }
+  return { target, held, seen, results: new Map() };
+}
+
 /** A detail of an insert in the play pose of the middle of the insert. */
 interface DetailView {
   readonly spot: DetailSpot;
@@ -606,7 +639,7 @@ type InsertRefusal =
  *
  * @param inputs The inputs of the plan.
  * @param spot The detail.
- * @param target The point of the detail.
+ * @param point The point of the detail with its boxes.
  * @param near The camera at the end of the push-in.
  * @param far The camera at the start of the move.
  * @returns The refusal, or `null` for a clear camera.
@@ -614,10 +647,11 @@ type InsertRefusal =
 function stageRefusal(
   inputs: InsertInputs,
   spot: DetailSpot,
-  target: Vec3,
+  point: StagePoint,
   near: Vec3,
   far: Vec3,
 ): InsertRefusal | null {
+  const { target, held, seen } = point;
   const { fov, beamMargin } = INSERT_LENS;
   const aspect = CINEMA_ASPECT;
   const S = inputs.stageSide;
@@ -632,15 +666,6 @@ function stageRefusal(
   );
   if (sides.includes(0) || sides[0] !== sides[1]) {
     return 'beam';
-  }
-  const held = bodyBoxes(clearance, target);
-  const seen = new Set(held);
-  for (const obstacle of clearance.obstacles) {
-    if (obstacle.owner === spot.owner) {
-      for (const box of obstacle.boxes) {
-        seen.add(box);
-      }
-    }
   }
   const path: Segment = {
     ax: near[0],
@@ -732,8 +757,8 @@ function poseRefusal(
  * @param view The detail in the play pose.
  * @param random The seeded generator of the insert.
  * @param accept The test of the cuts into and out of the insert.
- * @param known The results of the tests of the stage at the point of the detail, by the turn
- *   and the elevation of the camera. The call adds its new results.
+ * @param known The point of the detail with the results of its tests of the stage. The call adds
+ *   its new results.
  * @param refused The refusals of the tests of the play pose of the detail at its earlier
  *   inserts, by the turn and the elevation of the camera. The call adds its new refusals.
  * @returns The camera, or `null`.
@@ -743,7 +768,7 @@ function insertCamera(
   view: DetailView,
   random: () => number,
   accept: (camera: InsertCamera) => boolean,
-  known: Map<number, InsertRefusal | null>,
+  known: StagePoint,
   refused: Map<number, InsertRefusal>,
 ): InsertCamera | null {
   const k = INSERT_LENS;
@@ -795,10 +820,10 @@ function insertCamera(
             continue;
           }
           const id = (index * 1000 + Math.round(turn) + 500) * 1000 + Math.round(up);
-          let refusal = known.get(id);
+          let refusal = known.results.get(id);
           if (refusal === undefined) {
-            refusal = stageRefusal(inputs, spot, target, near, far);
-            known.set(id, refusal);
+            refusal = stageRefusal(inputs, spot, known, near, far);
+            known.results.set(id, refusal);
           }
           refusal ??= refused.get(id) ?? null;
           if (refusal === null) {
@@ -1019,7 +1044,7 @@ export function planInserts(inputs: InsertInputs, shots: readonly Shot[]): Shot[
     insertStarts: new Float64Array(0),
   };
   const poses = createScenePose(inputs.poses);
-  const stageResults = new Map<string, Map<number, InsertRefusal | null>>();
+  const stageResults = new Map<string, StagePoint>();
   const poseRefusals = new Map<string, Map<number, InsertRefusal>>();
   const inserts: Shot[] = [];
   let nextFrom = -Infinity;
@@ -1073,22 +1098,22 @@ export function planInserts(inputs: InsertInputs, shots: readonly Shot[]): Shot[
             spot.owner !== last?.owner,
         )
         .toSorted((a, b) => b.score - a.score);
+      const into = mainCamera(main, start);
+      const back = mainCamera(main, end);
       for (const { spot, meanKey } of ranked) {
-        const view = detailView(inputs, spot, poses, (start + end) / 2, meanKey);
-        const { target } = view.detail;
-        const into = mainCamera(main, start);
-        const back = mainCamera(main, end);
-        const point = `${spot.owner} ${spot.detail} ${target.map((v) => v.toFixed(2)).join(',')}`;
-        let known = stageResults.get(point);
-        if (!known) {
-          known = new Map();
-          stageResults.set(point, known);
-        }
         const spotKey = `${spot.owner} ${spot.detail}`;
         let refusedBySpot = poseRefusals.get(spotKey);
         if (!refusedBySpot) {
           refusedBySpot = new Map();
           poseRefusals.set(spotKey, refusedBySpot);
+        }
+        const view = detailView(inputs, spot, poses, (start + end) / 2, meanKey);
+        const { target } = view.detail;
+        const point = `${spotKey} ${target.map((v) => v.toFixed(2)).join(',')}`;
+        let known = stageResults.get(point);
+        if (!known) {
+          known = stagePoint(inputs.clearance, spot.owner, target);
+          stageResults.set(point, known);
         }
         const camera = insertCamera(
           inputs,
