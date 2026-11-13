@@ -133,6 +133,14 @@ passes.
 - [ ] Conductor bear: in the held final chord and at a climax, the baton points up past the cheek
       in the view from the front right (The Ember Crown 172 s, Mozart K. 525 30.9 s). The sweep
       finds no depth, so measure the gap of the baton to the head.
+- [ ] Conductor bear: in the beat, the baton stands 45° to 63° off the line of the forearm, and a
+      conductor holds it as a longer line of the forearm (`conductor-technique.md`, 7a). The beat
+      point, the pivot, and the elbow poles set the angle (`CONDUCTOR_HOLD`, 5.4). Fit them, and
+      keep the clearances of the chin and the muzzle.
+- [ ] Conductor bear: the count-in and the end bow have no 2x crops of the baton paw in the app,
+      because `close-views play` freezes the song time. The paw keeps the curl and the grip of the
+      beat and of the rest in them. Look at the paw in the bow on the test page
+      (`/test#bear-conductor`).
 - [ ] Mouse and beaver: they stand in their seated poses with no chair. Measure their balance (the
       center of mass over the feet), and save the balance probe as a tool.
 - [ ] Rhino tubist: ask the user to confirm the stand, the arms of the mesh, the lead pipe, and the
