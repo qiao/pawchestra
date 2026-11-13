@@ -348,13 +348,14 @@ export const SPECIES = {
    * rig of the Tripo P2 cat (`assets/models/cat/tripo-hand/cat.blend`, design 4.4). It sits with
    * its tail curled on the seat around the left side of the haunch, and stands as a soloist. Its
    * head height is the head of the studio body, and its chair fits its legs: the seat height is the
-   * seat of the studio body, in H. It plays a viola of about 13 inches, with a body of 324 mm,
-   * 0.925 of the viola of the app (`violaScale`), so that the viola reads at its size beside the
+   * seat of the studio body, in H. It plays a viola of about 12 inches, with a body of 298 mm,
+   * 0.85 of the viola of the app (`violaScale`), so that the viola reads at its size beside the
    * body. The arms do not grow, so the hold uses the reach of the arms: the left paw stops the
-   * strings from 0.51 of the fingerboard from the nut, as a player in a high position, and the
-   * scroll stands out past the paw. The bow paw reaches 0.285 m of the hair (`pnpm hold-reach cat
-   * --instrument viola`). With 0.74, the size that a violin shop gives for the arm, the viola read
-   * as a toy under the paws.
+   * strings from 0.20 of the fingerboard from the nut, and the bow paw reaches 0.29 m of the hair
+   * (`pnpm hold-reach cat --instrument viola`). With 0.925, the paw reached the strings only from
+   * 0.51 of the fingerboard, at the upper bout, and the left forearm went through the upper bout
+   * in each sample of the play (`CAT_HOLD` of `pose/bowed-rig.ts`). With 0.74, the size that a
+   * violin shop gives for the arm, the viola read as a toy under the paws.
    *
    * The stick of the bow passes through the middle of the closed right paw. The paw of the studio
    * turns in the plane of its palm toward the forearm by 0° to 70° (`PAW_TURN` of `studio-rig.ts`),
@@ -367,7 +368,7 @@ export const SPECIES = {
     body: 'studio-cat',
     colors: SPECIES_COLORS.cat,
     seatedTail: 'curl',
-    violaScale: 0.925,
+    violaScale: 0.85,
     bowGrip: { at: [-0.002, 0.007, -0.079], turn: 50 * (Math.PI / 180) },
     headHeight: STUDIO_HEIGHTS['studio-cat'].headHeight,
     seatHeight: STUDIO_HEIGHTS['studio-cat'].seatHeight / STUDIO_HEIGHTS['studio-cat'].headHeight,

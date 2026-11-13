@@ -1120,7 +1120,7 @@ export const BOWED_HOLDS = {
  * The hold of the viola under the chin, for the cat mesh (design 4.6, 5.3). The arms of the cat
  * are 1.10 H long, and its jaw lies in front of its chest under the long muzzle, so the tail end
  * of the viola lies about 0.14 m in front of the left shoulder joint. The cat plays a viola of
- * about 13 inches, 0.925 of the viola of the app (`SpeciesParams.violaScale`), larger than a violin
+ * about 12 inches, 0.85 of the viola of the app (`SpeciesParams.violaScale`), larger than a violin
  * shop gives for the arm, and holds it nearer to the body than the viola hold
  * of {@link BOWED_HOLDS}: 0.05 H further right, 0.1 H higher, and 0.23 H further back
  * (`playShift`). The viola points about 48° to the left of the front, near the angle of a real
@@ -1131,10 +1131,13 @@ export const BOWED_HOLDS = {
  * head lifts 5° in the play (`headDrop` below 0), so that the jaw lies on the chin rest and the
  * head stays near straight: with a lift of 15°, the cat looked up over the viola. The left
  * shoulder bone turns 25° forward in the play (`reachL`), so that the left paw reaches the
- * fingerboard from 0.51 of its length (0.07 with the viola of 0.74): with 35° and the viola
- * tilted 5°, the back of the left arm root sinks into pits of 14.5 cm³ in the play. With the 1/2
- * viola (0.87) at the place for longer arms, the arm reaches the fingerboard from 0.69, and the
- * bow 0.26 m of 0.44 m.
+ * fingerboard from 0.20 of its length: with 35° and the viola tilted 5°, the back of the left arm
+ * root sinks into pits of 14.5 cm³ in the play. The nearly straight left arm runs from the
+ * shoulder up to the neck. With the viola of 0.925, the paw reached the fingerboard only from 0.51
+ * of its length, at the upper bout, so that the forearm crossed the upper bout: 2.2 cm deep in
+ * each sample of the play with the tilt of `tiltL`, and with 0.875, 2.2 cm in 99% of the play.
+ * With 0.85, the paw stops the strings nearer to the nut, and the left forearm goes at most 1.6 cm
+ * into the viola in 3% of the lift (limit 1.5, `pnpm body-clip violist`).
  * With the viola 4 cm back, the bow reaches the tip, but the viola goes 2.7 cm into the jaw and
  * the chest (1.2 cm with this hold, limit 2.0). The bow lies square across the strings (`slant`
  * 0), as a real bow: with the slant of -20° of the viola hold, the right paw swings 76° on the
