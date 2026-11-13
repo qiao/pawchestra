@@ -159,8 +159,8 @@ The weights, in the rest pose:
    part. The tail is a part of the body ("Tail behind the chair" gives its rows).
 2. Arm rows: each vertex of a side with |x| from 0.095, within 0.06 units of the line of the rest
    arm, takes one exact row with `sa.set_weight_row()`: a clavicle share from 0.4 at x 0.095 to 0
-   at x 0.135, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.178, 0.193, 0.208, and
-   0.223, and the rest on the 4 roll segments.
+   at x 0.135, an elbow helper share that grows from 0 at x 0.145 to 1 at the elbow joint (x 0.2) and
+   falls to 0 at x 0.236, and the rest on the 4 roll segments.
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.004 from 0.03 units before
    the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.0035 from
    0.024 units before the head of `fingers_<side>`.
@@ -336,8 +336,8 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/cat.rig.glb` | 1,192,172 bytes | `b2228d6c417362a9e98e9b8a68b0cd826b785442ecf2a2fece4abcb5a4d41e23` |
-| `tripo-hand/cat.rig.json` | 18,465 bytes | `5d1e807da2cea80c107496af2c71b3b29873068bbecb9c3062c196ea2840ba8e` |
+| `tripo-hand/cat.rig.glb` | 1,192,172 bytes | `27447d9368147349961821a553d196122fee7e62d49068fd8617face302eec29` |
+| `tripo-hand/cat.rig.json` | 18,465 bytes | `f3770002e8434032ca6bd41f75a75e5be88e60403b4b93708433670d88472c4b` |
 | `tripo-hand/cat-color.webp` | 312,842 bytes, 2048 × 2048 | `cb365d40c472fdd23f5874fd8e5336b7f76fbf7ebfaf4ff0ab1ad76179a11b2a` |
 | `tripo-hand/cat-normal.webp` | 129,298 bytes, 1024 × 1024 | `039d58a13f55967f5152f30696548c0ed672d1186bf8c0d3f8f8279730ccf4f6` |
 
