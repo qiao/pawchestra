@@ -79,8 +79,8 @@ scripts of the Tripo fox (`assets/models/fox/README.md`). `make_config.py` write
 
 | Item | Value |
 |---|---|
-| Size | 404,801 bytes |
-| SHA-256 | `49c0171a16fa980cc00feb2da2b9d6d96b617925b4433bfb6f852bd6f5afd9ff` |
+| Size | 404,710 bytes |
+| SHA-256 | `19e5ea8c69f3db53bc4012fe034c507363e7a88c598cc494a9ca3c7c5c5a34ac` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head before the edits, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `polar_bear`, with the shape key `bind_belly`: 3,772 vertices and 3,950 faces (3,210 quads and 740 triangles, 7,160 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 97 faces of the nose box take the slot `fur` and the color map, with the smooth normals of the fur. The 128 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/polar-bear/tripo-hand/polar-bear-color.webp`) |
 | Armature | `polar_bear_rig`: 60 bones. The 30 body bones, the 20 arm segments and helpers, and the 10 digit bones (`digit1_<side>` at the thumb side, +z, to `digit5_<side>`), at the joints of the config. The Action `bind` holds the seated bind. The properties `palm` (0, 0, -1), `seat`, `hinges`, and `lids` come from the steps below |
@@ -129,8 +129,13 @@ The weights, in the rest pose:
 
 1. Automatic Weights, then Limit Total 4 and Normalize All, on a copy of the mesh with no loose part.
 2. Arm rows: each vertex of a side with |x| from 0.15, within 0.1 units of the line of the rest arm,
-   takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.35 at x 0.15 to 0 at x 0.24,
+   takes one exact row (`sa.set_weight_row()`): a clavicle share of 0.50, 0.38, 0.33, 0.22, 0.10,
+   and 0.04 at x 0.15, 0.17, 0.175, 0.19, 0.21, and 0.225, and 0 from x 0.24,
    an elbow helper share of 0.75 (1 - |x - 0.245| / 0.07), and the rest on the 4 roll segments.
+   The bone heat rows inside x 0.15 give the front of each armpit a clavicle share of about 0.57.
+   A first row of 0.35 folded the front of each armpit when the arm reached for the keys, and a
+   dark slit showed under the right upper arm. With the soft ramp, the fold samples on the
+   clavicles (`pnpm fold-probe pianist`) fell from 19,133 (right) and 24,884 (left) to 58 and 10.
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.004 from 0.04 units before
    the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.0035 from
    0.02 units before the head of `fingers_<side>`.
