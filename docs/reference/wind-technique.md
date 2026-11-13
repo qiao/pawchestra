@@ -451,8 +451,10 @@ The app follows these facts:
   of both paws curl over the top onto the keys (`aimSide`, `gripCurl`). At rest, the flute stands on
   the right thigh in the right paw (`rest`, `restShift`, `gripAround`). A seated flutist can rest
   the free left hand on the thigh, but the short arm of the fox does not reach the top of the thigh.
-  So the seated fox rests the free left paw on the top of the left haunch near the hip, with the
-  palm toward the body (`restFreeL`). A standing fox lets the free left arm hang down along the
+  So the seated fox rests the free left paw on the top of the left haunch near the hip. The paw
+  hangs in line with the forearm, with no bend at the wrist, as a relaxed hand hangs from a loose
+  arm [69], and it turns about its long axis to the turn at which the skin of the paw of the fox
+  chain is nearest to its bind (`restFreeL`). A standing fox lets the free left arm hang down along the
   side with a small bend of the elbow (`FOX_HANG`), with the palm toward the leg (`hangRoll`). The embouchure hole
   sits at the lower lip, under the long muzzle, and the lip plate presses the lips and the chin
   about 0.5 cm, as a flutist rests the plate against the chin (`lipShift`).
@@ -540,8 +542,9 @@ The app follows these facts:
   `src/models/instruments/brass.ts`, `play`). The big head puts the mouth of the Tripo monkey
   farther than its arm from the shoulders. Thus the head bows on the chest, and the trumpet turns
   down with it (`farMouth`), so that the trumpet keeps its angle to the face [22]. The spine turns
-  7° back in the play (`lean`), so the head stays upright, 4° to 6° from the vertical, as a player
-  stands erect with the head up (1.8). Both shoulders turn forward (`reach`, `reachL`). At rest,
+  12° back in the play (`lean`), so the head stays upright, about 2° from the vertical, as a player
+  stands erect with the head up (1.8). The trumpet turns up with the chest, so the lean also brings
+  the trumpet nearer to "slightly down" [19] with no change of the grips. Both shoulders turn forward (`reach`, `reachL`). At rest,
   the trumpet stays in front of the belly with the elbows a little bent (`restShift`). The valves
   follow the trumpet chart (7.3). The rim presses the lips 0.24 cm (`lipShift`). The monkey stands
   erect with the shoulders over the hips (1.8), and its center of mass stays over the soles (the
@@ -611,7 +614,11 @@ The app does not follow these facts:
 - **The right hand in the horn (2.2).** The right hoof lies across the mouth of the bell, near its
   axis and inside the rim (`HORN_PALM_DEPTH`, `gripShiftR`), in place of deep in the bell against
   the wall at 2 o'clock. The hoof is long and thick, and the throat is narrow: a deeper hoof goes
-  through the wall of the throat.
+  through the wall of the throat. A hoof at the far rim of the bell, along its wall, as the hand of
+  a real hornist, needs a forearm that enters the bell nearly along its axis. The bell opens away
+  from the right shoulder, so the right forearm meets the bell axis at 72° to 89° with each turn
+  of the right side of the horn from 35° back to 15° forward, each grip, and each elbow. A hoof
+  off the axis then goes through the wall of the bell.
 - **The horn elbows (2.2).** Tuckwell keeps the elbows near the body. The long snout puts the
   valves far in front of the chest, and with the left elbow down and in, the round left arm goes
   into the belly.
@@ -627,8 +634,10 @@ The app does not follow these facts:
 - **The trumpet angle of a far mouth (2.1).** With the bowed head of a far mouth, the trumpet
   points more than "slightly down" [19]. No source gives the range of the neck flexion of a
   trumpet player in degrees, so the bow stays small (`MAX_BOW`). The line from the mouthpiece to the
-  bell rim of the monkey points about 30° below the level. A higher bell puts the valves out of the
-  reach of its short arms, or the right paw and forearm in front of the mouth.
+  bell rim of the monkey points about 23° below the level (`play`, `lean`). With the trumpet 20°
+  down on the face, the right paw grasps the valves, but its top comes to the height of the
+  mouthpiece, in front of the mouth. With the spine 15° back, the line points 20° below the level,
+  but the head tilts back past the vertical.
 - **The trumpet size and rest (2.1).** The monkey plays the standard trumpet of the app, as an
   adult player does. Its body is large enough that its paws reach the valves with the head upright.
   No source gives the rest. At rest, the trumpet turns down in front of the belly (`restShift`),
