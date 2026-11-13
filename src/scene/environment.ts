@@ -70,7 +70,7 @@ export function buildEnvironmentScene(): Scene {
 const ENVIRONMENT_SIZE = 256;
 
 /** The blur of the environment of the reflections, in radians: the `sigma` of `fromScene()`. */
-const ENVIRONMENT_BLUR = 0.04;
+export const ENVIRONMENT_BLUR = 0.04;
 
 /**
  * Creates the environment texture of the reflections in steps (design 4.5, 7.2): a PMREM of
