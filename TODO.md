@@ -1317,10 +1317,8 @@ navigation menu at the top of the mockup is out of scope.
 - [ ] Read the full-size depth (`uSceneDepth`) for the depth of field mix in `FINAL_FRAGMENT`, and
       take the mean of the mix weight at 4 points. Now the half-size depth gives steps of 2 pixels
       at the outline of the subject, and 4 device pixels on a phone (4.5).
-- [ ] Load the body maps at half size on the medium and low tiers (a second file from the
-      `*-maps.py` tools, or the resize of `createImageBitmap()`). Now 14 color maps and 13 normal
-      maps take 386 MB of GPU memory on each tier, and a phone can lose the WebGL context. Later
-      test KTX2 with the transcoder after the first frame (2.6).
+- [ ] Test KTX2 body maps with the transcoder after the first frame. The high tier keeps the
+      maps at full size: 386 MB of GPU memory in `boulanger-matin` (2.6).
 - [ ] Put two steps between the medium and the low tier: medium at the pixel ratio 1.25, then 1.0.
       Now one slow window of 2 s drops a phone to the low tier, with no bloom and no depth of
       field, for the session (`src/scene/quality.ts`, `src/app/settings.ts`) (2.6).
