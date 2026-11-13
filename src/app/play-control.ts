@@ -115,10 +115,12 @@ export function showsFirstScreen(status: PieceStatus): boolean {
 }
 
 /**
- * The line below the play button of the first screen until the first play of the session: the name
- * of the app and what it does (design 2.8).
+ * The line below the play button of the first screen until the first play of the session: what
+ * the app does (design 2.8). It names the music of the demos first, because most visitors have no
+ * MIDI file. The logo above gives the name.
  */
-export const INTRO_TEXT = 'Pawchestra: an orchestra of animals plays your MIDI file.';
+export const INTRO_TEXT =
+  'An orchestra of animals plays classical music. It also plays your MIDI file.';
 
 /** The text button below {@link INTRO_TEXT}. It opens the drawer at the demo list (design 2.8). */
 export const SELECT_PIECE_TEXT = 'Select music';

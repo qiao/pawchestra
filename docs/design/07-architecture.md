@@ -357,11 +357,11 @@ it with the status 308, so that the old links stay good. The plugin `INDEX_VALUE
   development pages keep their `noindex` (7.1) and stay open in `robots.txt`, because a crawler
   that may not read a page does not see its `noindex`.
 - **Text of the page**: Google renders the page, maybe with no WebGL2. With WebGL2, the page shows
-  the wordmark as its `h1` (2.8), the piece title, and the intro line with the name and one line
-  about the app. With no WebGL2, the full-page message shows the name as its `h1`, `ABOUT_TEXT`,
-  and the message (2.6). Each text is visible, and each visitor gets the same HTML. The start page
-  adds no long text for crawlers, because a visible text block covers the stage and a hidden one
-  breaks this rule. An agent reads the Markdown copy and the site pages.
+  the wordmark as its `h1` (2.8), the piece title, and the intro line about the app. With no
+  WebGL2, the full-page message shows the name as its `h1`, `ABOUT_TEXT`, and the message (2.6).
+  Each text is visible, and each visitor gets the same HTML. The start page adds no long text for
+  crawlers, because a visible text block covers the stage and a hidden one breaks this rule.
+  An agent reads the Markdown copy and the site pages.
 - **Site pages**: `tools/site-pages.ts` writes them from one source into the build. `/about`,
   `/contact`, and `/privacy` are static HTML pages in the colors of the UI, with all text in the
   HTML, because an agent checks such pages before it names a site. The contact page sends each

@@ -305,8 +305,9 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 - **First screen**: a round play button below the front edge of the stage, so that it does not
   cover the orchestra. In Free mode, the camera frame shrinks until the stage is clear of it
   (`clearFirstScreen()`); Cinematic mode keeps its full frame (2.5). A ring shows the load progress of the bytes, and the load text counts
-  the files (`loadText()`). Until the first play, an intro line names the app, and "Select
-  music" opens the demo list. While the drawer shows the demo list, the button has nothing to
+  the files (`loadText()`). Until the first play, an intro line tells what the app does, and
+  "Select music" opens the demo list. The line names the classical music before the MIDI file,
+  because most visitors have no MIDI file. While the drawer shows the demo list, the button has nothing to
   open, so it hides (`visibility: hidden`, so that the first screen keeps its size). A wide window
   opens the drawer at the demo list at start, so there the intro line shows alone. ASD-STE100 has
   no verb "choose", so the buttons say "Select".
@@ -424,7 +425,7 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 | Load progress after a long load, when the sizes are known (megabytes of 1,000,000 bytes, one decimal) | Loading instruments: {done} of {total} ({arrived} of {sum} MB) |
 | Second line of the load text while the piece waits for its samples | The music starts after the load. |
 | Drop overlay | Drop the MIDI file to play it. |
-| First screen, until the first play of the session | Pawchestra: an orchestra of animals plays your MIDI file. |
+| First screen, until the first play of the session | An orchestra of animals plays classical music. It also plays your MIDI file. |
 | First screen, the button that opens the demo list | Select music |
 | Seat row, the mute button and the solo button | Mute / Only this |
 | Row above the seat list that clears each mute and solo flag | All seats |

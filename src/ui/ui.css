@@ -471,7 +471,7 @@ body:has(.camera[aria-pressed='true']) .title .github {
   stroke: var(--text);
 }
 
-/* The line with the name of the app, and the button that opens the demo list (design 2.8). */
+/* The line about the app, and the button that opens the demo list (design 2.8). */
 .first-screen .intro {
   display: grid;
   justify-items: center;
@@ -487,11 +487,6 @@ body:has(.camera[aria-pressed='true']) .title .github {
   /* A narrow first screen beside the stage keeps lines of about the same length. */
   text-wrap: balance;
   color: var(--text-dim);
-}
-
-.first-screen .intro strong {
-  font-weight: 600;
-  color: var(--text);
 }
 
 .first-screen .select-piece {

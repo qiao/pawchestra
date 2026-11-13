@@ -30,8 +30,8 @@ export interface FirstScreenView {
    */
   readonly pending: boolean;
   /**
-   * True until the first play of the session: the line with the name of the app, and the button
-   * that opens the demo list, show below the load text (design 2.8).
+   * True until the first play of the session: the line about the app, and the button that opens
+   * the demo list, show below the load text (design 2.8).
    */
   readonly intro: boolean;
   /** The label of the play button, as the play button of the bar (design 2.2). */
@@ -61,7 +61,7 @@ function createRingCircle(className: string): SVGCircleElement {
  * The first screen (design 2.2, 2.8): a round play button of 72 px in the middle of the stage.
  * While the samples load, a ring around the button shows the progress, and a label below it shows
  * the load text. A polite live region reads the load text (2.8). Until the first play of the
- * session, a line names the app, and a text button opens the demo list.
+ * session, a line tells what the app does, and a text button opens the demo list.
  */
 export class FirstScreen {
   readonly element: HTMLElement;
@@ -100,9 +100,7 @@ export class FirstScreen {
     this.#status = createElement('div', 'status');
     this.#status.setAttribute('aria-live', 'polite');
     this.#intro = createElement('div', 'intro');
-    const [name = '', about = ''] = INTRO_TEXT.split(': ');
-    const line = createElement('p');
-    line.append(createElement('strong', '', name), `: ${about}`);
+    const line = createElement('p', '', INTRO_TEXT);
     const selectPiece = createButton('select-piece', '');
     selectPiece.textContent = SELECT_PIECE_TEXT;
     selectPiece.addEventListener('click', onSelectPiece);
