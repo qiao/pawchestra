@@ -59,6 +59,7 @@ import type { BoneSpheres } from './bounds.ts';
 import {
   aimKeyLight,
   aimRimLights,
+  fitKeyShadow,
   createLights,
   keyLightPosition,
   setLightsTier,
@@ -1117,6 +1118,9 @@ export class StageScene {
     beam = mix(shown.beam, beam, share);
     light = mix(shown.light, light, share);
     spot = mix(shown.spot, spot, share);
+    // A close shot of players fits the key shadow to its subject. The blend of a change of the
+    // mode shows more of the stage, so it keeps the map of the stage (design 4.5).
+    fitKeyShadow(view.lights, shot && share >= 1 ? (shot.shadowFit ?? null) : null);
     this.#lightShot(view, light, spot);
     const postView = this.#letterboxView(cinema);
     view.camera.frameTo(cover, ring, performance.now(), postView.cinema);

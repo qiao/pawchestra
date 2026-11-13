@@ -1345,6 +1345,18 @@ edges of the triangles, so such a line breaks into dashes that move with the cam
   left, acts as the front light of a concert hall. The shadows fall back, beside the players in
   the default view. Each body keeps a lit side and a shade side. The intensity grows with the
   square of the distance, so each stage size gets the same light.
+- **Shadow fit** (`SHADOW_FIT` of `shots/shadow-fit.ts`, `fitKeyShadow()`). The shadow map of the
+  whole stage has texels of about 12 mm on a large stage, so a paw or a bow cast no shadow. A
+  solo or a section shot fits the map to a sphere around the target of the shot, with a radius
+  from the frame of the shot. The shadow camera looks at the sphere, and the light keeps its
+  cone. The near plane of the stage keeps each caster between the light and the sphere. The
+  sphere comes from the shot plan (`CameraPose.shadowFit`), so it is constant in a shot and the
+  shadows do not swim. A blend of two shots holds both spheres. The blur radius gives an edge of
+  `CLOSE_SHADOW_WIDTH`, so the shadows of a close shot are soft, and the normal bias is small.
+  Outside the sphere, a player gets no shadow of the key light, and the shadow pass draws only
+  the players in the view of the map. Thus the wide shots, the side shots (they show the back
+  rows large), the conductor shots, a blend of the camera mode, and Free mode keep the map of the
+  stage.
 - **Rim lights** (`RIM_LIGHT`, `RIM_PLACE`). Warm spotlights far behind and high light the heads
   and the shoulders, so the players stand out of the dark hall. They cast no shadow, so the
   shadows keep one direction. The vertex shaders calculate them (`scene/rim-light.ts`), because a

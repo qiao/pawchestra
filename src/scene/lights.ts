@@ -1,4 +1,5 @@
-import { Group, HemisphereLight, MathUtils, SpotLight, Vector3 } from 'three';
+import { Group, HemisphereLight, MathUtils, Object3D, SpotLight, Vector3 } from 'three';
+import type { Light } from 'three';
 
 import type { ConductorPlace } from '../models/layout.ts';
 import type { Vec3 } from '../models/tuples.ts';
@@ -325,70 +326,157 @@ export const LIGHT_NAMES = {
 } as const;
 
 /**
- * Sets the shadow map size and the shadow blur of a spotlight (design 2.6). The renderer makes a
- * new shadow map of the new size at the next render.
- *
- * @param spot The spotlight.
- * @param mapSize The width and the height of the shadow map, in texels.
- * @param radius The blur radius, in texels.
- */
-function setShadowMap(spot: SpotLight, mapSize: number, radius: number): void {
-  if (spot.shadow.mapSize.x !== mapSize) {
-    spot.shadow.mapSize.set(mapSize, mapSize);
-    spot.shadow.map?.dispose();
-    spot.shadow.map = null;
-  }
-  spot.shadow.radius = radius;
-  spot.shadow.normalBias = spotNormalBias(spot);
-}
-
-/**
- * Sets the shadow of the key light for a quality tier (design 2.6).
+ * Sets the shadow of the key light for a quality tier (design 2.6): the size of the map and the
+ * blur radius of the map of the whole stage. The renderer makes a new shadow map of the new size
+ * at the next render.
  *
  * @param spot The key light.
  * @param tier The quality tier.
  */
 function setKeyTier(spot: SpotLight, tier: QualityTier): void {
   const settings = TIER_SETTINGS[tier];
-  setShadowMap(spot, settings.shadowMapSize, settings.shadowRadius);
+  const shadow = spot.shadow;
+  if (shadow.mapSize.x !== settings.shadowMapSize) {
+    shadow.mapSize.set(settings.shadowMapSize, settings.shadowMapSize);
+    shadow.map?.dispose();
+    shadow.map = null;
+  }
+  const fit = keyFits.get(spot);
+  if (fit) {
+    fit.tierRadius = settings.shadowRadius;
+  }
+  fitShadow(spot);
 }
 
 /**
- * Calculates the normal bias of the shadow of a spotlight for its aim, its shadow map, and its
- * blur ({@link shadowNormalBias}).
- *
- * @param spot The spotlight.
- * @returns The normal bias, in meters.
+ * The width of the soft edge of the key shadow in a close shot, in meters (design 4.5): the
+ * diameter of the blur disc. The map of a close shot has texels of about 1.5 mm to 5 mm on the
+ * high tier, so the blur radius in texels follows from this width. A paw or a bow then casts a
+ * soft shadow that reads, with no hard edge of a cartoon.
  */
-function spotNormalBias(spot: SpotLight): number {
-  return shadowNormalBias(
-    spot.position.distanceTo(spot.target.position),
-    spot.angle * spot.shadow.focus,
-    spot.shadow.mapSize.x,
-    spot.shadow.radius,
-  );
-}
+const CLOSE_SHADOW_WIDTH = 0.025;
 
 /**
- * Fits the shadow camera of a spotlight to its aim ({@link keyShadowFrustum}): the angle, the near
- * and the far plane, and the normal bias.
+ * The fit of the shadow of the key light (design 4.5). The map holds the whole stage, or in a
+ * close shot a sphere around the subject ({@link fitKeyShadow}).
+ */
+interface KeyFit {
+  /** The stage side `S`, in meters. */
+  stageSide: number;
+  /** The blur radius of the tier, in texels, for the map of the whole stage. */
+  tierRadius: number;
+  /** The sphere of a close shot: the center and the radius, in meters. A radius of 0 is none. */
+  readonly sphere: [number, number, number, number];
+  /** The point that the shadow camera looks at for a sphere. It is in no scene. */
+  readonly aim: Object3D;
+}
+
+/** The fit of the shadow of each key light. */
+const keyFits = new WeakMap<SpotLight, KeyFit>();
+
+/**
+ * Gives the key light its fit (design 4.5). three.js aims the shadow camera at the target of the
+ * light. For a sphere, the camera aims at the middle of the sphere in place of the target, so the
+ * light keeps its cone and its aim.
  *
- * @param spot The spotlight.
+ * @param spot The key light.
  * @param stageSide The stage side `S`, in meters.
+ * @returns The fit.
  */
-function fitShadow(spot: SpotLight, stageSide: number): void {
+function addKeyFit(spot: SpotLight, stageSide: number): KeyFit {
+  const fit: KeyFit = { stageSide, tierRadius: 1, sphere: [0, 0, 0, 0], aim: new Object3D() };
+  const shadow = spot.shadow;
+  const update = shadow.updateMatrices.bind(shadow);
+  shadow.updateMatrices = (light: Light): void => {
+    if (fit.sphere[3] <= 0 || !(light instanceof SpotLight)) {
+      update(light);
+      return;
+    }
+    const target = light.target;
+    light.target = fit.aim;
+    update(light);
+    light.target = target;
+  };
+  keyFits.set(spot, fit);
+  return fit;
+}
+
+/**
+ * Fits the shadow camera of the key light to its aim (design 4.5): the angle, the near and the far
+ * plane, the blur radius, and the normal bias. With no sphere, the map holds the stage
+ * ({@link keyShadowFrustum}) with the blur radius of the tier. With a sphere, the map holds the
+ * sphere, and the near plane of the stage keeps each caster between the light and the sphere. The
+ * blur radius gives the width {@link CLOSE_SHADOW_WIDTH}.
+ *
+ * @param spot The key light.
+ */
+function fitShadow(spot: SpotLight): void {
+  const fit = keyFits.get(spot);
+  if (!fit) {
+    return;
+  }
+  const shadow = spot.shadow;
   const frustum = keyShadowFrustum(
-    stageSide,
+    fit.stageSide,
     spot.position.toArray(),
     spot.target.position.toArray(),
     spot.angle,
   );
-  spot.shadow.focus = frustum.halfAngle / spot.angle;
-  spot.shadow.camera.near = frustum.near;
-  spot.shadow.camera.far = frustum.far;
+  const [x, y, z, radius] = fit.sphere;
+  let halfAngle = frustum.halfAngle;
+  let far = frustum.far;
+  let distance = spot.position.distanceTo(spot.target.position);
+  let blur = fit.tierRadius;
+  if (radius > 0) {
+    fit.aim.position.set(x, y, z);
+    fit.aim.updateMatrixWorld();
+    distance = spot.position.distanceTo(fit.aim.position);
+    halfAngle = Math.asin(Math.min(0.99, radius / distance));
+    far = distance + radius + 0.5;
+    const texel = (2 * distance * Math.tan(halfAngle)) / shadow.mapSize.x;
+    blur = Math.max(1, CLOSE_SHADOW_WIDTH / (2 * texel));
+  }
+  shadow.focus = halfAngle / spot.angle;
+  shadow.camera.near = frustum.near;
+  shadow.camera.far = far;
+  shadow.radius = blur;
   // three.js updates the projection for a new angle or far plane, but not for a new near plane.
-  spot.shadow.camera.updateProjectionMatrix();
-  spot.shadow.normalBias = spotNormalBias(spot);
+  shadow.camera.updateProjectionMatrix();
+  shadow.normalBias = shadowNormalBias(distance, halfAngle, shadow.mapSize.x, blur);
+}
+
+/**
+ * Fits the shadow map of the key light to a sphere, or to the whole stage (design 4.5). A close
+ * shot of players gives the sphere of its subject (`CameraPose.shadowFit`), so each paw, bow, and
+ * muzzle casts a fine shadow, and the shadow pass draws only the players in the view of the map.
+ * Outside the sphere, the players get no shadow of the key light. The fit does nothing when the
+ * sphere does not change, so the map does not swim in a shot.
+ *
+ * @param lights The group of {@link createLights}.
+ * @param sphere The center and the radius, in meters, or `null` (or a radius of 0) for the stage.
+ */
+export function fitKeyShadow(
+  lights: Group,
+  sphere: readonly [number, number, number, number] | null,
+): void {
+  for (const child of lights.children) {
+    if (!(child instanceof SpotLight)) {
+      continue;
+    }
+    const fit = keyFits.get(child);
+    if (!fit) {
+      continue;
+    }
+    const now = fit.sphere;
+    const next = sphere && sphere[3] > 0 ? sphere : null;
+    if (next ? next.every((value, i) => value === now[i]) : now[3] === 0) {
+      continue;
+    }
+    for (let i = 0; i < 4; i++) {
+      now[i] = next ? (next[i] ?? 0) : 0;
+    }
+    fitShadow(child);
+  }
 }
 
 /**
@@ -405,7 +493,11 @@ export function aimKeyLight(lights: Group, stageSide: number, x: number, z: numb
   for (const child of lights.children) {
     if (child instanceof SpotLight && child.name === KEY_NAME) {
       child.target.position.set(x, 0, z);
-      fitShadow(child, stageSide);
+      const fit = keyFits.get(child);
+      if (fit) {
+        fit.stageSide = stageSide;
+      }
+      fitShadow(child);
     }
   }
 }
@@ -568,8 +660,8 @@ function createKeyLight(
   spot.castShadow = true;
 
   spot.shadow.bias = -0.0005;
+  addKeyFit(spot, stageSide);
   setKeyTier(spot, tier);
-  fitShadow(spot, stageSide);
   return spot;
 }
 
