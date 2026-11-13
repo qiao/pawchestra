@@ -758,7 +758,7 @@ export const PERCUSSION_HOLDS = {
     // (gripRise): at the end bars, the forearms then slope 10° down to 3° up, the wrists stay 7 cm
     // to 10 cm below the shoulders, and the targets miss by at most 3.5 mm. With 0.2 H, a target
     // missed by 6.8 mm. The paws bend more on the forearms, and the arm gate counts more folded
-    // faces at the wrists (L 35, R 24 in place of 22 and 15), which the 2x paw crops do not show.
+    // faces at the wrists (L 35, R 22 in place of 22 and 15), which the 2x paw crops do not show.
     // A home moved out to the end bars by 0.45 H kept the folds at 19 and 12, but it spread the
     // arms out to the sides as wings, 10 cm past the ends of the bars.
     gripRise: 0.25,
