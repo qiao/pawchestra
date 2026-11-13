@@ -137,7 +137,8 @@ The weights, in the rest pose:
    part.
 2. Arm rows: each vertex of a side with |x| from 0.17, within 0.08 units of the line of the rest
    arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.17 to 0 at x
-   0.21, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.248, 0.263, 0.278, and 0.293,
+   0.21, an elbow helper share that grows from 0 at x 0.235 to 1 at the elbow joint (x 0.27) and
+   falls to 0 at x 0.306,
    and the rest on the 4 roll segments.
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.004 from 0.03 units before
    the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.0035 from
@@ -240,7 +241,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/beaver.rig.glb` | 1,201,140 bytes | `cdd834c1fd362ac994d4659d6e271ae2d356536c22b08c86dc132f9ba03509fb` |
-| `tripo-hand/beaver.rig.json` | 17,197 bytes | `13248f972b56605b4c54f06172513325e3823b205d1e4352e8bf4ade23d4c6dd` |
+| `tripo-hand/beaver.rig.glb` | 1,201,140 bytes | `a8f0e2221084e8ded42b5616d6aa3c1aad5529be1446e288efdf55be9204c814` |
+| `tripo-hand/beaver.rig.json` | 17,197 bytes | `a62cae542d5ce940bbe2957dd1b72a05719a08bb731972fd02a8f907bceccebd` |
 | `tripo-hand/beaver-color.webp` | 199,904 bytes, 2048 × 2048 | `fc5a6f549bc676eefc6837d5398ad00f439d75cf9191a3921707f8034a35bfbc` |
 | `tripo-hand/beaver-normal.webp` | 84,258 bytes, 1024 × 1024 | `aa1edb196f4b423afb6bb80671a424e943ca4f3354f7ba3f01ad755ba0471982` |
