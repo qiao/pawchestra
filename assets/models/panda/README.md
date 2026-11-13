@@ -77,10 +77,10 @@ on the wolf).
 
 | Item | Value |
 |---|---|
-| Size | 401,592 bytes |
-| SHA-256 | `622f298c5798acd2c2adfc452b0e39ec0fba04543dedda942baafad4f314a6d2` |
+| Size | 403,098 bytes |
+| SHA-256 | `744e9123c828de23771036129b04db2989e2f442b08aaf7fe45b97ac292f0378` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the panda faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `panda`: 3,767 vertices and 4,047 faces (3,343 quads and 704 triangles, 7,390 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the nose takes the color map. The 91 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids `lid`. The UV map of the FBX, and the property `texture` (`assets/models/panda/tripo-hand/panda-color.webp`) |
+| Mesh | One object `panda`, with the shape key `bind_belly` ("Belly"): 3,767 vertices and 4,047 faces (3,343 quads and 704 triangles, 7,390 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the nose takes the color map. The 91 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids `lid`. The UV map of the FBX, and the property `texture` (`assets/models/panda/tripo-hand/panda-color.webp`) |
 | Armature | `panda_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 1.133145 (the shoulder joints at 1.807249 m for each unit, so that H is 0.499711 m, the H of the panda of `panda.rig.glb` at cbc8db5e4), `crease` 180, `seatWidth` 0.66 |
 | Eyes | The eyeballs of the mesh at the size of the source, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -143,6 +143,25 @@ The weights, in the rest pose:
 
 **Smooth surface.** No relax and no region colors. The crease angle 180 gives each corner the mean
 normal of the faces at its vertex, as the smooth shading of an FBX viewer.
+
+**Belly.** Bone heat gives the thighs shares far up the belly and the flanks (0.1 at rest z 0.48,
+0.7 on the flank at z 0.34). The seated thighs turn forward, so these shares pulled the belly back
+by up to 0.1 units. The side views showed a hard ridge from each armpit down to the knee, and the
+front view a dark band across the belly. The standing soloist has neither fault, because
+`legs_straight_*` give it the source form. The key `bind_belly` (`belly_key()` and
+`trunk_belly()` of `build.py`, `belly` of `params.json`) fixes the seated bind, and the weights do
+not change:
+
+1. Trunk form: each vertex moves by s (M_hips - M_leg) r, summed over its leg bones with their
+   weights, with r its rest place and M the bind matrix of a bone. s = 0.5 ss(z, 0.26, 0.44)
+   (1 - ss(z, 0.42, 0.50)) (1 - ss(y, -0.06, 0.04)), with ss a smoothstep of the rest place. The
+   top fade keeps the chest under the arms: with no fade, the right upper arm went 1.7 cm into the
+   belly in the play (`pnpm hold-fit trombonist`, limit 1.5 cm, 1.3 cm before).
+2. Relax: 6 rounds of P += 0.5 ((mid - P) . n) n on the vertices with a rest z from 0.20 to 0.36,
+   rest y below 0, atan2(|x|, -y) at most 60 degrees, and a distance below 0.25 from the z axis.
+
+144 vertices move, at most 0.036 units. A thin dark line stays at the lap, where the belly meets
+the thigh tops.
 
 **Arm stretch.** The point edit `armStretch` of `redits.py` (in `params.json`: `{"kind":
 "armStretch", "k": 1.2, "ramp": 0.01, "reach": [0.1, 0.12]}`), the edit of the hippo and the deer
