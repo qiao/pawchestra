@@ -234,8 +234,12 @@ export function poseHarpFeet(
     if (footState.pedal >= 0) {
       const p = footState.pedal;
       pressPoint(feet, p, notches[p] ?? 0, pedalAt);
-      pedalAt.y += PEDAL_LIFT * footState.lift;
       fromAt.lerp(pedalAt, footState.share);
+      // The lift goes on after the mix, so the hoof stands the full lift above the line of its
+      // move. With the lift on the pedal only, the hoof rose half of it in the middle, and the
+      // right hoof went 1.4 cm into the base in a move from one pedal to the next (116.8 s of
+      // `boulanger-matin`, `pnpm body-clip harpist`).
+      fromAt.y += PEDAL_LIFT * footState.lift;
     }
     toeAt.lerp(fromAt, weight);
 
