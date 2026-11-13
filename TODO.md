@@ -1285,8 +1285,6 @@ navigation menu at the top of the mockup is out of scope.
 - [ ] Show the user the key shadow fit of the solo and section shots
       (`reports/2026-11-12-audit-render/t4-shadow/`). Outside the sphere a player gets no key
       shadow, and the soft dark areas of the old wide blur are lit now (4.5).
-- [ ] Pose only the players in the view or in the key shadow sphere of a close shot: `poseAt()`
-      poses all players in each frame (`app/app.ts`) (9.7).
 - [ ] Test KTX2 body maps with the transcoder after the first frame. The high tier keeps the
       maps at full size: 386 MB of GPU memory in `boulanger-matin` (2.6).
 - [ ] Measure on a real phone which step of the automatic tier holds 30 fps: medium, medium at
