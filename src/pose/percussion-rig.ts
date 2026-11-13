@@ -776,7 +776,9 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   },
   curl: GRIP_CURL,
   strikeRoll: true,
-  keepPaw: false,
+  // The paws keep the turn of the hands, so that the curled claws close on the mallets: with the
+  // turn of the retarget, the paws grasped in 58% to 63% of the play samples.
+  keepPaw: true,
 };
 
 /**
