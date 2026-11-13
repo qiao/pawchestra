@@ -243,7 +243,29 @@
   "lidClear": 0.002,
   "refit": true
  },
- "belly": null,
+ "belly": {
+  "z": [
+   0.2,
+   0.36
+  ],
+  "rounds": 6,
+  "radius": 0.25,
+  "trunk": {
+   "z": [
+    0.26,
+    0.44
+   ],
+   "top": [
+    0.42,
+    0.5
+   ],
+   "y": [
+    -0.06,
+    0.04
+   ],
+   "share": 0.5
+  }
+ },
  "turnFit": 0.02,
  "noseFur": true,
  "tailBind": null,
