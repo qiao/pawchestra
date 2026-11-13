@@ -657,6 +657,9 @@ body:has(.camera[aria-pressed='true']) .title::before {
   display: grid;
   justify-items: center;
   gap: 2px;
+  /* The box of the first screen starts at the middle of the window, so its width stops at half
+     the window. The intro takes its own width, so that its two buttons fit in one line. */
+  width: min(360px, calc(100vw - 32px));
   max-width: min(360px, calc(100vw - 32px));
   text-align: center;
   text-shadow: 0 1px 2px #000;
@@ -2237,6 +2240,7 @@ body:has(.first-screen:not([hidden])):has(.drawer:not([hidden])) .messages {
   .first-screen .intro,
   .first-screen .status {
     max-width: 100%;
+    width: auto;
   }
 
   /* Beside the open drawer, the first screen fills the gap between the stage and the drawer. The
