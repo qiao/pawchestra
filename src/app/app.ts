@@ -1,3 +1,4 @@
+import { Vector3 } from 'three';
 import { pieceGainDb } from '../audio/demo-loudness.ts';
 import type { MixName } from '../audio/output-chain.ts';
 import type { LoadProgress, Player } from '../audio/player.ts';
@@ -43,7 +44,10 @@ import {
   playLabel,
 } from './play-control.ts';
 import type { SampleState } from './play-control.ts';
+import { isClick, pickPlayer } from './pick.ts';
 import type { PointerPoint } from './pick.ts';
+import { prepareClearance } from '../shots/clearance.ts';
+import type { StageClearance } from '../shots/clearance.ts';
 import { changedSeats, followAudibility, seatsAudible, toggleSeatFlag } from './seat-flags.ts';
 import type { SeatFlag, SeatFlags } from './seat-flags.ts';
 import { playerCounts, seatRows } from './seat-text.ts';
@@ -106,6 +110,10 @@ interface Piece {
   played: boolean;
   /** The mute and solo buttons of each seat. A new file resets them (design 6.6). */
   flags: readonly SeatFlags[];
+  /** The layout and the player models of the score, for a click on a player (design 2.3). */
+  scene: ScoreScene;
+  /** The obstacles of the layout for a click, or `null` until the first click needs them. */
+  clearance: StageClearance | null;
   /** True for each seat that sounds, from {@link seatsAudible}. */
   audible: readonly boolean[];
   /** The audibility of each seat for `poseAt()` (design 5.5). */
@@ -201,6 +209,8 @@ function preparePiece(source: PieceFile, scene: ScoreScene, playWhenReady: boole
     playWhenReady,
     played: false,
     flags: [],
+    scene,
+    clearance: null,
     audible: score.seats.map(() => true),
     audibility: [],
   };
@@ -570,6 +580,8 @@ export class App {
     const { score, scene, prepared } = built;
     const { layout, plan, shots } = scene;
     piece.score = score;
+    piece.scene = scene;
+    piece.clearance = null;
     piece.mix = stageMix(score, layout);
     piece.plan = plan;
     piece.shots = shots;
@@ -609,6 +621,11 @@ export class App {
       }
     });
     canvas.addEventListener('pointerup', (event) => {
+      const press = presses.get(event.pointerId);
+      const up = { x: event.offsetX, y: event.offsetY };
+      if (press && presses.size === 1 && isClick(press, up)) {
+        this.#clickStage(up);
+      }
       presses.delete(event.pointerId);
     });
     canvas.addEventListener('pointercancel', (event) => {
@@ -621,6 +638,53 @@ export class App {
       },
       { passive: true },
     );
+  }
+
+  /**
+   * Does the action of a click on the stage in Free mode (design 2.3). A click on a player toggles
+   * the solo of its seat and shows the seat for 2 s. A click on the floor or the empty space clears
+   * each solo. A click on the conductor does nothing. In Cinematic mode a tap only shows the hidden
+   * UI, so a click there does nothing.
+   *
+   * @param point The point of the click on the canvas, in CSS pixels.
+   */
+  #clickStage(point: PointerPoint): void {
+    const piece = this.#piece;
+    if (!piece || this.#cameraMode !== 'free') {
+      return;
+    }
+    const camera = this.#scene.viewCamera;
+    if (!camera) {
+      return;
+    }
+    const width = Math.max(1, this.#canvas.clientWidth);
+    const height = Math.max(1, this.#canvas.clientHeight);
+    const origin = camera.getWorldPosition(new Vector3());
+    const far = new Vector3((point.x / width) * 2 - 1, 1 - (point.y / height) * 2, 0.5);
+    const direction = far.unproject(camera).sub(origin).normalize();
+    piece.clearance ??= prepareClearance(piece.scene.layout, piece.scene.models);
+    const ray = { origin: origin.toArray(), direction: direction.toArray() };
+    const player = pickPlayer(piece.clearance, ray);
+    if (player === undefined) {
+      return;
+    }
+    if (player === null) {
+      if (piece.flags.some((seat) => seat.soloed)) {
+        this.#setSeatFlags(piece.flags.map((seat) => ({ ...seat, soloed: false })));
+      }
+      return;
+    }
+    const seatIndex = piece.plan.players[player]?.seatIndex;
+    if (seatIndex === undefined) {
+      return;
+    }
+    this.#toggleSeat(seatIndex, 'soloed');
+    const { seats, soloist } = piece.score;
+    const counts = playerCounts(piece.plan.players, seats.length);
+    const row = seatRows(seats, counts, soloist)[seatIndex];
+    if (row) {
+      this.#ui.showPickLabel(`${row.name}, ${row.animals}`, point);
+    }
   }
 
   /**

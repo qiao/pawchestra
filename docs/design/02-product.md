@@ -82,7 +82,15 @@ The UI has the style of a video player. The theme is dark only, because the scen
   movement of a symphony. The code keeps the names "demo" and "piece". Each tab shows a 16 px
   icon before its text: two notes for "Music", a seat of a hall for "Seats", and two sliders for
   "Settings" (`TAB_ICONS` of `ui/drawer.ts`).
-- Each seat row has a mute button and a solo button. A click on an animal does nothing.
+- Each seat row has a mute button and a solo button. In Free mode, a click on an animal toggles the
+  solo of its seat, and a label shows the seat for 2 s above the click, for example "Violins 1, 4
+  rabbits" (`PICK_LABEL_MS`). A click on the floor or the empty space clears each solo, and a
+  click on the conductor does nothing. A child asks what one animal sounds like, and the animal
+  on the screen is the clearest control. The ray of the click tests the player boxes of
+  `prepareClearance()` (`pickPlayer()` of `app/pick.ts`), and it goes through the stands and the
+  risers, because the box of a thin stand covers the player behind it. A click is a press and a
+  release of at most `CLICK_SLOP_PX`, so a drag still turns the view. In Cinematic mode a tap
+  only shows the hidden UI (2.3).
 - The UI uses the system fonts, so the first download does not grow and no request goes to a
   font server.
 
@@ -458,6 +466,7 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 | Over the stage in Free mode, until the first drag | Drag to look around |
 | Demo list, the row of the last file of the user | Your file: {title} |
 | End card, the two buttons | Play again / Next: {title} |
+| Label above a clicked animal, for 2 s | {seat name}, {animal line} |
 | Status after the link is in the clipboard | The link is copied. |
 | Status after the browser did not copy the link | The link did not copy. Copy it from the address bar. |
 | Seat row, the mute button and the solo button | Mute / Only this |

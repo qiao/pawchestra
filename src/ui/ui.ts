@@ -29,6 +29,9 @@ import { Tooltips } from './tooltip.ts';
 /** The time of the fade of the stage before a build, in milliseconds, as in `ui.css`. */
 const STAGE_FADE_MS = 150;
 
+/** The time that the label of a clicked player stays, in milliseconds (design 2.3). */
+const PICK_LABEL_MS = 2000;
+
 /** The time that the status of "Copy link" stays, in milliseconds (design 2.8). */
 const LINK_STATUS_MS = 4000;
 
@@ -89,6 +92,9 @@ export class Ui {
   readonly tooltips: Tooltips;
   /** The hint "Drag to look around" above the bar in Free mode (design 2.8). */
   readonly #dragHint = createElement('div', 'drag-hint', DRAG_HINT_TEXT);
+  /** The label of the seat of a clicked player (design 2.3). */
+  readonly #pickLabel = createElement('div', 'pick-label');
+  #pickTimer: ReturnType<typeof setTimeout> | undefined;
   readonly #phone: MediaQueryList;
   /** The number of builds that cover the stage now. */
   #covers = 0;
@@ -197,9 +203,13 @@ export class Ui {
     // The hint is for a pointer, and a keyboard does not drag, so a screen reader skips it.
     this.#dragHint.setAttribute('aria-hidden', 'true');
     this.#dragHint.hidden = true;
+    // A screen reader also hears the seat of a click on a player.
+    this.#pickLabel.setAttribute('role', 'status');
+    this.#pickLabel.hidden = true;
     parent.append(
       this.titleCard.element,
       this.#dragHint,
+      this.#pickLabel,
       this.endCard.element,
       this.firstScreen.element,
       this.bar.element,
@@ -285,6 +295,25 @@ export class Ui {
     this.drawer.setOpen(true);
     this.demoList.element.scrollTop = 0;
     this.demoList.focusCurrent();
+  }
+
+  /**
+   * Shows the seat of a clicked player above the point of the click for 2 s (design 2.3), for
+   * example "Violins 1, 4 rabbits".
+   *
+   * @param text The text.
+   * @param point The point of the click on the page, in CSS pixels.
+   */
+  showPickLabel(text: string, point: { readonly x: number; readonly y: number }): void {
+    const label = this.#pickLabel;
+    label.textContent = text;
+    label.style.left = `${Math.round(point.x)}px`;
+    label.style.top = `${Math.round(point.y)}px`;
+    label.hidden = false;
+    clearTimeout(this.#pickTimer);
+    this.#pickTimer = setTimeout(() => {
+      label.hidden = true;
+    }, PICK_LABEL_MS);
   }
 
   /**

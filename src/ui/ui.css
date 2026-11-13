@@ -140,6 +140,24 @@ body:not(:has(.camera[aria-pressed='true'])) #stage:active {
   pointer-events: none;
 }
 
+/* The label of the seat of a clicked player, just above the point of the click (design 2.3). The
+   pointer goes through it. */
+.pick-label {
+  position: fixed;
+  z-index: 2;
+  max-width: calc(100vw - 32px);
+  transform: translate(-50%, calc(-100% - 14px));
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--bg-overlay);
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-size: 13px;
+  line-height: 18px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
 @media (min-width: 700px) {
   body:has(.drawer:not([hidden])) .drag-hint {
     translate: -176px 0;
