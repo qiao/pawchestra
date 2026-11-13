@@ -623,19 +623,21 @@ The rest of each family:
   but the long muzzle of the wolf puts the mouthpiece far in front of the chest, and at 45° the
   arms do not reach the grips.
 - **Oboe of the mouse.** The left paw holds the upper joint and the right paw the lower joint,
-  with the fingers curled over the front of the tube (`MOUSE_OBOE`). The reed goes between the
-  lips at the front of the muzzle, on the middle line (`lipShift`). Reason: a real oboist puts
-  the reed at the middle of the lips (winds 2.3), and the reed under the muzzle further back
-  read as the corner of the mouth. The oboe hangs 30° from the vertical, the angle of the shared
-  oboe. Reason: a real oboist holds it 40° to 45° from the body, but the reed at the front of the
-  long muzzle puts the grips of a larger angle out of the reach of the short arms. Both shoulder
-  bones turn forward, the right more than the left (`reach`, `reachL`), as the shoulder blades of a real
-  player slide forward. Reason: the arms of the Tripo mouse keep the length of its source, and
-  with square shoulders the paws missed their grips by 2.7 cm and 5.2 cm. The scale of an
-  instrument is a factor of the instrument of the app, so the oboe keeps its size in meters when
-  the body scale changes. On the body at the eye height of the older mouse (4.4), the right grip
-  thus sits higher on the tube, and the left grip moves up to keep a clear gap between the paws
-  (`gripShiftL`, `gripShiftR`).
+  each at the tone holes of its joint, with the digits curled over the front of the tube
+  (`MOUSE_OBOE`, `gripShiftL`, `gripShiftR`, `gripCurl`). The reed goes between the lips at the
+  front of the muzzle, on the middle line (`lipShift`). Reason: a real oboist puts the reed at
+  the middle of the lips and the fingers on the holes (winds 2.3), and the reed under the muzzle
+  further back read as the corner of the mouth. The oboe hangs 30° from the vertical, the angle
+  of the shared oboe. Reason: a real oboist holds it 40° to 45° from the body, but the reed at
+  the front of the long muzzle puts the grips of a larger angle out of the reach of the short
+  arms. Both shoulder bones turn forward, the right more than the left (`reach`, `reachL`), as
+  the shoulder blades of a real player slide forward. Reason: the arms of the Tripo mouse keep
+  the length of its source, and with square shoulders the paws missed their grips by 2.7 cm and
+  5.2 cm. The mouse plays a smaller oboe (`oboeScale`, 4.6), the largest size at which the right
+  paw reaches the holes of the lower joint with a bent elbow. The scale of an instrument is a
+  factor of the instrument of the app, so the oboe keeps its size in meters when the body scale
+  changes. The digit block of each paw has one bone and the thumb none, so the paws close as
+  mittens.
 - **Flute and clarinet holds from the body.** The shared flute and clarinet holds (`WIND_HOLDS`)
   take the arm values of the accepted tan fox and wolf, as directions and in `H`, with the lip
   plate or the mouthpiece at the mouth landmark of the body. Each paw keeps the side sign of its
