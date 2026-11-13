@@ -1461,7 +1461,7 @@ shows the main shot at its time, with no focus pull.
 - **Details.** The paws on the keys, the bow on the strings, the left paw of a violin or a viola,
   the paws of a woodwind, the harp strings, the slide of a trombone, the bell of the other brass,
   the heads of the drums under the sticks, the bars, and the baton. The point comes from the play
-  targets and the grips of the instrument (4.6) in the bind pose. The keys and the bars take the
+  targets and the grips of the instrument (4.6). The keys and the bars take the
   place of the mean key of the notes of the insert. A cello or a double bass shows only its bow,
   because its left paw travels along the long neck, away from its grip.
 - **Where.** An insert starts on a downbeat or a middle beat inside one main shot, after its cut,
@@ -1477,10 +1477,37 @@ shows the main shot at its time, with no focus pull.
   A detail of the lead wins, then the most activity, with a seeded jitter. An insert does not
   show the detail or the player of the insert before it, and a detail of the two inserts before
   it loses `repeatLoss`.
+- **Play pose** (`shots/insert-frame.ts`). The planner poses the player of the detail at the
+  middle of the insert with `poseAt()`, and the camera frames the posed point, because a played
+  trumpet holds its bell lower than the bind pose. The posed point snaps to `INSERT_LENS.snap`.
+  The app gives its pose plan to the planner, and a tool with no plan gets the plan of
+  `POSE_SEED`.
 - **Camera.** A long lens (`INSERT_LENS.fov`), as a remote camera on a railing, with a slow
   push-in. The camera stands at a seeded offset from the front of the player, low over the
-  detail. The keys take the side view of a piano shot. Its tests are those of a close shot: the
-  line, one side of the beam, a clear line of sight, no head or large object in the foreground.
+  detail. The keys take the side view of a piano shot. Its tests of the stage are those of a close
+  shot: the line, one side of the beam, a clear line of sight, and no head in the foreground. The
+  line of sight skips the boxes of the player of the detail, because they hold its arms in the
+  bind pose.
+- **Cover** (`insertCover()`, `INSERT_FRAME`). The posed body, instrument, and seat of the
+  player, and the boxes of the other players and the stands, mark a grid of the frame when they
+  are in front of the detail. They cover at most `coverShare` of the frame, as the foreground rule
+  of a close shot, and no cell in the middle, where the detail is. A paw or a part of the
+  instrument within `detailReach` of the detail is the detail. The bell inserts showed the stand
+  over the lower third, and the keys inserts the near shoulder of the pianist over half the frame.
+- **Soft wall.** The parts of the player that the lens blurs by at least `softBlur` cover at most
+  `softShare` of the frame, in front of the detail or behind it. The blur reads the focus of the
+  scene: the nearer eye in the frame, else the detail. The belly of a horn player behind its bell
+  made a soft wall of fur over half of the frame.
+- **Face** (`cutsFace()`). The head of the player is fully out of the frame, or both eyes are in
+  it with `eyeMargin`, because an edge through the eyes or the snout looks like a mistake. A head
+  seen from behind (`backView`) shows no face, so the cover test reads it.
+- **Search.** The camera tries each azimuth and elevation step at the size of its detail
+  (`INSERT_SIZES`), then at the larger sizes of `INSERT_LENS.sizes`: a frame of the paws of a
+  flute cut the snout, and the larger frame holds the eyes. The first camera that passes the tests
+  and the 30° rule at both cuts wins. A detail with no such camera gives no insert, because a weak
+  insert is worse than none. The seeded angles snap to the steps of the search, the planner keeps
+  the results of the stage tests for each point, and a refusal of the play pose for each detail
+  and camera. Thus the plan time stays near the time with no pose.
 - **Floor.** An insert keeps `INSERT_FLOOR` from each point of a body in its frame, lower than
   `ANIMAL_FLOOR`, because its frame holds the paws and the instrument. Each head in its frame
   still keeps `ANIMAL_FLOOR`, because the faces show the facets and the seams from near.
