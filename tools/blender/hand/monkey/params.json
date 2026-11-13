@@ -237,5 +237,15 @@
   "radius": 0.08,
   "band": 0.04
  },
- "noseFur": true
+ "noseFur": true,
+ "foldRelax": {
+  "angle": 45,
+  "pawX": 0.29,
+  "footY": 0.06,
+  "headY": 0.66,
+  "rounds": 40,
+  "lam": 0.5,
+  "clip": 0.015
+ },
+ "foldRelaxNote": "The source has small folds of fur tufts along the back and creases at the backs of the knees. The FBX viewer shades them with the custom normals of the file, but the app makes its normals from the form, so they showed as dark spikes on the outline of the back and dark creases at the knees. fold_relax() of build.py relaxes the vertices of each triangle with a corner normal 45 degrees or more off its face normal, between the feet (y 0.06) and the neck (y 0.66) and inside the paws (|x| 0.29), with each move clipped to 0.015 units. The head keeps its form."
 }
