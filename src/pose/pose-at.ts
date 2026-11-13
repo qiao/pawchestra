@@ -20,7 +20,14 @@ import type { ExpressionState } from './conductor-expression.ts';
 import { batonAt, resumeLift } from './conductor-notes.ts';
 import type { BatonState } from './conductor-notes.ts';
 import { createCueState, cueStateAt } from './cues.ts';
-import { NO_COUNT_IN, countInAt, leaderNodAt, noteLayerTime, readyAt } from './count-in.ts';
+import {
+  NO_COUNT_IN,
+  beatLengthAt,
+  countInAt,
+  leaderNodAt,
+  noteLayerTime,
+  readyAt,
+} from './count-in.ts';
 import type { CountIn } from './count-in.ts';
 import { poseChoir } from './choir.ts';
 import { CHOIR_MOTION, choirStateAt, createChoirState } from './choir-notes.ts';
@@ -86,6 +93,12 @@ const BODY_MOTION = {
   breathChest: 1 * MathUtils.DEG2RAD,
   /** The largest side sway of the spine with the beat, for a gesture size of 1. */
   sway: 2 * MathUtils.DEG2RAD,
+  /**
+   * The factor of the breath and the sway of a player. A player in the default view is about 110
+   * pixels high, so the base angles move the head about 2 pixels. The cello and the contrabass
+   * keep the base angles, because a floor instrument does not lean with the body.
+   */
+  scale: 1.5,
   /** The part of a look that the neck turns. The head turns the rest. */
   lookNeck: NECK_SHARE,
   /** The turn of each ear at the top of a twitch. */
@@ -265,20 +278,19 @@ function writeBody(pose: WritablePose, player: PlayerPlan, scratch: FrameScratch
   const m = BODY_MOTION;
   const r = pose.rotations;
   const { idle, body } = scratch;
+  const breath = idle.breath * bodyScale(player);
   turn.setFromAxisAngle(Y_AXIS, body.turn / 2);
   turn.multiply(second.setFromAxisAngle(Z_AXIS, body.sway));
   setBoneRotation(
     r,
     BONES.spine,
-    turn.multiply(
-      second.setFromAxisAngle(X_AXIS, -body.lean - body.nod - idle.breath * m.breathSpine),
-    ),
+    turn.multiply(second.setFromAxisAngle(X_AXIS, -body.lean - body.nod - breath * m.breathSpine)),
   );
   turn.setFromAxisAngle(Y_AXIS, body.twist + body.turn / 2);
   setBoneRotation(
     r,
     BONES.chest,
-    turn.multiply(second.setFromAxisAngle(X_AXIS, -idle.breath * m.breathChest)),
+    turn.multiply(second.setFromAxisAngle(X_AXIS, -breath * m.breathChest)),
   );
   yawAxis.set(0, Math.cos(body.upright), Math.sin(body.upright));
   rollAxis.set(0, -Math.sin(body.upright), Math.cos(body.upright));
@@ -302,7 +314,8 @@ function writeBody(pose: WritablePose, player: PlayerPlan, scratch: FrameScratch
 /**
  * Gives the side sway of the spine of a player (design 5.1, the beat layer). The player sways
  * with the felt pulse while it plays, and the gesture size follows the loudness of its passage
- * (5.3).
+ * (5.3). The seeded sway of the player gives the side, the lag behind the pulse, and the pulse
+ * level (`PlayerPlan.sway`).
  *
  * @param plan The plan of the score.
  * @param player The plan of the player.
@@ -316,7 +329,27 @@ function swayOf(plan: PosePlan, player: PlayerPlan, noteTime: number, weight: nu
     return 0;
   }
   const gesture = gestureSize(activity.loudness, player.amplitude);
-  return BODY_MOTION.sway * gesture * activity.weight * weight * beatSway(plan.pulses, noteTime);
+  const { sign, lag, pulsesPerSide } = player.sway;
+  const late = noteTime - lag * beatLengthAt(plan.pulses, noteTime);
+  return (
+    BODY_MOTION.sway *
+    bodyScale(player) *
+    sign *
+    gesture *
+    activity.weight *
+    weight *
+    beatSway(plan.pulses, late, pulsesPerSide)
+  );
+}
+
+/**
+ * Gives the factor of the breath and the sway of an animal (`BODY_MOTION.scale`).
+ *
+ * @param player The plan of the animal.
+ * @returns 1 for the conductor and a player of a floor instrument, else `BODY_MOTION.scale`.
+ */
+function bodyScale(player: PlayerPlan): number {
+  return player.seatIndex < 0 || FLOOR_INSTRUMENTS.has(player.instrument) ? 1 : BODY_MOTION.scale;
 }
 
 /**

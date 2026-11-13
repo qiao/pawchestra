@@ -158,7 +158,12 @@ demo shows the same motion on each visit.
 - **Beat layer.** In a passage, a player sways from side to side with the felt pulse
   (`beatSway()`). A real player sways with a slow level of the meter, so the pulse is the
   conducted beat (5.4) up to `PULSE_TEMPO`, the preferred tempo of a listener, and 2 or 4
-  conducted beats above it (`markPulses()`).
+  conducted beats above it (`markPulses()`). Each player has a seeded side, a seeded lag behind
+  the pulse, and a seeded level of one or two pulses to each side (`PlayerPlan.sway`,
+  `SWAY_VARIETY`), so that a section does not sway as one copy. The sway and the breath of a
+  player are `BODY_MOTION.scale` times the base angles, because the base angles move the head of
+  a player in the default view by about 2 pixels. The cello and the contrabass keep the base
+  angles, because a floor instrument does not lean with the body.
 - **Clips.** A clip of a person (4.4) gives a pose from the clip and the clip time alone
   (`clipPoseAt()`), so it keeps the rule of stateless poses. Only the gallery plays a clip now.
 - **Idle layer.** The idle layer uses the wall clock, so the animals stay alive while the music

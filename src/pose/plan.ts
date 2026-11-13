@@ -79,6 +79,45 @@ export const PLAYER_OFFSETS = {
   amplitude: 0.15,
 } as const;
 
+/**
+ * The seeded sway of each player (design 5.1, the beat layer), so that the players of a section
+ * do not sway as one.
+ */
+export const SWAY_VARIETY = {
+  /** The largest lag of the sway behind the pulse, as a part of a pulse. */
+  lagPulses: 0.35,
+  /** The part of the players that sway to each side in two pulses, in place of one. */
+  slowShare: 0.5,
+} as const;
+
+/** The seeded sway of one player (design 5.1). */
+export interface PlayerSway {
+  /** 1 or -1: the side to which the sway goes on the first pulse. */
+  readonly sign: number;
+  /** The lag of the sway behind the pulse, as a part of a pulse, from 0 to `lagPulses`. */
+  readonly lag: number;
+  /** The number of pulses of the sway to one side: 1 or 2. */
+  readonly pulsesPerSide: number;
+}
+
+/** The sway of the conductor and of a player with no seeded sway: with the pulse, to the left. */
+const PLAIN_SWAY: PlayerSway = { sign: 1, lag: 0, pulsesPerSide: 1 };
+
+/**
+ * Chooses the seeded sway of a player (design 5.1).
+ *
+ * @param seed The seed of the player.
+ * @returns The sway.
+ */
+function swayOfSeed(seed: number): PlayerSway {
+  const s = mixHash(seed, 3);
+  return {
+    sign: hashUnit(s, 0) < 0.5 ? 1 : -1,
+    lag: SWAY_VARIETY.lagPulses * hashUnit(s, 1),
+    pulsesPerSide: hashUnit(s, 2) < SWAY_VARIETY.slowShare ? 2 : 1,
+  };
+}
+
 /** The largest turns of the head for a look at the conductor, in radians. */
 const LOOK_LIMITS = { yaw: 1.2, pitch: 0.5 } as const;
 
@@ -209,6 +248,8 @@ export interface PlayerPlan {
   readonly lookPitch: number;
   /** The spans in which the player plays, for the sway of the beat layer. */
   readonly passages: Passages;
+  /** The seeded sign, lag, and pulse level of the sway of the beat layer. */
+  readonly sway: PlayerSway;
   /**
    * The long rests in which the player lowers its instruments (`findLongRests()`, design 5.2),
    * four song times for each. It is empty for a family that keeps the playing pose in a rest.
@@ -607,6 +648,7 @@ function* preparePlayerSteps(
     lookYaw,
     lookPitch,
     passages,
+    sway: swayOfSeed(seed),
     longRests,
     note,
   };
@@ -754,6 +796,7 @@ function* prepareConductorSteps(inputs: ConductorInputs, seed: number): Steps<Pl
     lookYaw: 0,
     lookPitch: 0,
     passages: buildPassages([], []),
+    sway: PLAIN_SWAY,
     longRests: new Float64Array(),
     note: {
       family: 'conductor',
