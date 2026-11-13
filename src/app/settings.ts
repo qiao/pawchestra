@@ -1,8 +1,20 @@
 import type { QualityTier } from '../scene/quality.ts';
 import type { SectionSize } from '../score/types.ts';
 
-/** The value of the setting "Quality": the automatic tier, or a tier of the user (design 2.6). */
-export type QualitySetting = 'auto' | QualityTier;
+/**
+ * The value of the setting "Quality": the automatic tier, or a tier of the user (design 2.6). The
+ * steps of the medium tier have no button.
+ */
+export type QualitySetting = 'auto' | 'high' | 'medium' | 'low';
+
+/** The button of the setting "Quality" that names each tier: a step of the medium tier is Medium. */
+const SETTING_OF_TIER = {
+  high: 'high',
+  medium: 'medium',
+  'medium-125': 'medium',
+  'medium-100': 'medium',
+  low: 'low',
+} as const satisfies Readonly<Record<QualityTier, QualitySetting>>;
 
 /** One button of a segmented control of the settings. */
 export interface SettingOption<T extends string> {
@@ -130,7 +142,7 @@ export function autoLabels(orchestral: boolean | null, tier: QualityTier): AutoL
       orchestral === null
         ? 'Auto'
         : label(SECTION_SIZE_OPTIONS, orchestral ? 'full' : 'one-per-part'),
-    quality: label(QUALITY_OPTIONS, tier),
+    quality: label(QUALITY_OPTIONS, SETTING_OF_TIER[tier]),
   };
 }
 
@@ -206,10 +218,15 @@ export function watchTier(tier: QualityTier): TierWatch {
   return { tier, windowStart: null, lastFrame: 0, intervals: [] };
 }
 
-/** The next lower tier of each tier. The low tier stays low. */
+/**
+ * The next lower tier of each tier (design 2.6). The medium tier first lowers its pixel ratio in
+ * two steps, and drops the post effects only at the low tier. The low tier stays low.
+ */
 const LOWER_TIER = {
   high: 'medium',
-  medium: 'low',
+  medium: 'medium-125',
+  'medium-125': 'medium-100',
+  'medium-100': 'low',
   low: 'low',
 } as const satisfies Readonly<Record<QualityTier, QualityTier>>;
 

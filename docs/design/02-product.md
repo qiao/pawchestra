@@ -216,8 +216,12 @@ pixel ratio of a Retina screen, because the GPU time grows with the pixels and t
 - A touch screen (`(pointer: coarse)`) or a small screen starts at the medium tier, and other
   devices at the high tier. The app does not read the GPU name, because Safari on iOS gives only
   "Apple GPU".
-- The automatic tier drops one tier when the frames are slow for a time window (`followFrame()`
-  in `app/settings.ts`). It measures the time between frames, because the work time of a frame
+- The automatic tier drops one step when the frames are slow for a time window (`followFrame()`
+  in `app/settings.ts`). The steps are High, Medium, Medium at the pixel ratio 1.25 and then 1.0
+  (`medium-125`, `medium-100`), and Low (`LOWER_TIER`). The pixel count goes down before the post
+  effects, because it is a smooth lever and the post effects make the look of the film. The
+  settings show a step as "Auto (Medium)". On a screen with the device pixel ratio 1, the two
+  steps change nothing, so the drop to Low takes two more windows. It measures the time between frames, because the work time of a frame
   does not hold the GPU time. It measures only during play, with a visible tab, with no build of a
   scene, and with the setting "Auto". The slices of a build make the frames slow on each GPU. The
   tier only goes down, so the quality does not go down and up many times.

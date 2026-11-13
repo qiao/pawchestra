@@ -52,10 +52,12 @@ describe('followFrame (design 2.6)', () => {
     expect(run(watchTier('high'), 0, 1 / 60, 600).tier).toBe('high');
   });
 
-  it('drops one tier after 2 s of frames of 25 ms, and the next tier after 2 s more', () => {
+  it('drops one step after each 2 s of frames of 25 ms, down to the low tier', () => {
     expect(run(watchTier('high'), 0, 0.025, 79).tier).toBe('high');
     expect(run(watchTier('high'), 0, 0.025, 82).tier).toBe('medium');
-    expect(run(watchTier('high'), 0, 0.025, 162).tier).toBe('low');
+    expect(run(watchTier('high'), 0, 0.025, 162).tier).toBe('medium-125');
+    expect(run(watchTier('high'), 0, 0.025, 242).tier).toBe('medium-100');
+    expect(run(watchTier('high'), 0, 0.025, 322).tier).toBe('low');
     expect(run(watchTier('high'), 0, 0.025, 1000).tier).toBe('low');
   });
 

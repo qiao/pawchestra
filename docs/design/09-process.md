@@ -141,7 +141,8 @@ The development Mac is an Apple M1 Max with Chrome.
   reason: a run takes about 3 minutes, its guards often refuse the GPU phase while other work runs,
   and a run for each change cost more than it found. CI has no GPU, so this check is local.
 - The frame target leaves a margin of about 4 times for an integrated GPU of the Intel Iris Xe
-  class. The manual test (9.4) checks a real phone at 30 fps or more at the low tier.
+  class. The manual test (9.4) checks on a real phone which step of the automatic tier (2.6) holds
+  30 fps or more.
 
 ## 9.8 Reviews
 

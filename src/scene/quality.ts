@@ -1,5 +1,9 @@
-/** A quality tier of the renderer (design 2.6). */
-export type QualityTier = 'high' | 'medium' | 'low';
+/**
+ * A quality tier of the renderer (design 2.6). `medium-125` and `medium-100` are the steps of the
+ * automatic tier between the medium and the low tier: the medium tier with the largest pixel ratio
+ * 1.25 and 1.0. The setting "Quality" has no button for them.
+ */
+export type QualityTier = 'high' | 'medium' | 'medium-125' | 'medium-100' | 'low';
 
 /** The render values of one quality tier. MSAA is on in all tiers. */
 interface TierSettings {
@@ -43,6 +47,22 @@ interface TierSettings {
   readonly bodyMapScale: 1 | 0.5;
 }
 
+/** The values of the medium tier ({@link TIER_SETTINGS}). Its steps change only the pixel ratio. */
+const MEDIUM_TIER = {
+  shadowMapSize: 1024,
+  shadowRadius: 1,
+  maxPixelRatio: 1.5,
+  bloomLevels: 5,
+  blurSamples: 16,
+  lensFringe: true,
+  motes: 70,
+  beamSamples: 3,
+  contactSamples: 6,
+  surfaceLevel: 2,
+  floorGloss: false,
+  bodyMapScale: 0.5,
+} as const satisfies TierSettings;
+
 /**
  * The values of each tier (design 2.6). The low tier keeps the final pass of the post effects
  * (the tone mapping, the color grade, the vignette, and the grain), because it costs one sample
@@ -56,6 +76,8 @@ interface TierSettings {
  * enough.
  * No tier has the shadows of the side lights: they cost about 0.9 ms of GPU time in each frame of
  * `perf-60.mid`, and they changed only small shadows on the players.
+ * The steps `medium-125` and `medium-100` lower only the pixel ratio of the medium tier, because
+ * the pixel count is a smooth lever, and the post effects make the look of the film.
  */
 export const TIER_SETTINGS = {
   high: {
@@ -76,20 +98,9 @@ export const TIER_SETTINGS = {
     floorGloss: true,
     bodyMapScale: 1,
   },
-  medium: {
-    shadowMapSize: 1024,
-    shadowRadius: 1,
-    maxPixelRatio: 1.5,
-    bloomLevels: 5,
-    blurSamples: 16,
-    lensFringe: true,
-    motes: 70,
-    beamSamples: 3,
-    contactSamples: 6,
-    surfaceLevel: 2,
-    floorGloss: false,
-    bodyMapScale: 0.5,
-  },
+  medium: MEDIUM_TIER,
+  'medium-125': { ...MEDIUM_TIER, maxPixelRatio: 1.25 },
+  'medium-100': { ...MEDIUM_TIER, maxPixelRatio: 1 },
   low: {
     shadowMapSize: 512,
     shadowRadius: 1,
