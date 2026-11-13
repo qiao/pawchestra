@@ -4,11 +4,11 @@ This file is the target of the cinematic camera of the app (Cinematic mode, desi
 It gives the rules of continuity editing, of the frame, and of the film of an orchestra concert,
 with a source for each fact.
 
-**Upkeep.** This file is current. A change of the shot planner (`src/shots/`) updates section 6
+**Upkeep.** This file is current. A change of the shot planner (`src/shots/`) updates section 7
 "Use in the app" and each fact that it finds wrong, in the same commit. Each new fact gets its
 source.
 
-**Source marks.** Each fact names its source by a number of section 7. "(derived)" marks a rule
+**Source marks.** Each fact names its source by a number of section 8. "(derived)" marks a rule
 that this file makes from the facts of its sources. A fact with no mark comes from the text of the
 source.
 
@@ -98,7 +98,35 @@ source.
 - A close-up that stays too long feels uncomfortable. Start to zoom out [9].
 - The script leaves enough time between the shots, because a change of the camera takes time [9].
 
-## 6. Use in the app
+## 6. Inserts, cutaways, and focus
+
+- An insert shows a part of the scene from another angle or focal length than the master shot.
+  The term often means a view of an object or of a body part other than the head [13].
+- An insert directs the attention of the viewer to a detail, such as an object in the hands [13].
+- A cutaway interrupts a continuous action with a view of something else. A cut back to the first
+  shot usually follows it, and the interruption is usually quick [14].
+- In a concert film, the most interesting shots come from the little details of the orchestra
+  [9]. A concert camera zooms in quickly on fingers and faces [15]. A close shot can show a part
+  of one person or of an instrument [16].
+- The detail shows the instrument that plays: the right percussion instrument in the shot [9],
+  and the right musicians at the right moment [8]. The camera goes to the brass when they double
+  the vocal line [16].
+- A stable shot of the conductor can cut to something else and come back to the conductor [9].
+- The director marks each entry in the score and calls the camera of the player who enters [8].
+  Thus an insert at an entry would hide the player who enters (derived from [8]).
+- A concert stream has few takes longer than 5 s, with several hundred cuts in a concert [8].
+- A script with too many angles that change too fast does not work [9].
+- A long shot or an establishing shot sets the place at the start of a scene [16, 17].
+- A multi-camera setup can show one subject at different sizes, and a cut from a far camera with a
+  long lens changes the angle less [18].
+- The remote cameras of a concert hall stand on the railings around the platform, with no operator
+  on the stage [8, 19]. A festival hall covered the front with super-telephoto lenses [20].
+- A shallow focus puts one part of the image over another [21]. The focus puller of a person
+  focuses on the eyes, and a close-up is hard to keep in focus because its depth of field is
+  shallow [22]. A portrait focuses on the nearer eye, because then the whole face has the best
+  chance to be sharp [23].
+
+## 7. Use in the app
 
 The shot planner of `src/shots/prepare.ts` makes the shots of each piece one time from the score,
 and `cameraAt()` of `src/shots/camera-at.ts` gives the camera of each frame (design 5.6).
@@ -161,6 +189,24 @@ The app follows these facts:
   head of a dirty frame, stays at least `ANIMAL_FLOOR` from the camera, because the low-poly
   animals show their facets and the seams of their meshes from near. A blend between two close
   shots keeps the floor too, or it becomes a hard cut.
+- **The focus on the eye (section 6).** Each shot names a hero (`Shot.hero`), and the focus goes
+  to the eye of the hero nearer to the camera. A head seen from behind takes the middle of the
+  head. The focus pull after a cut pulls onto the eye.
+- **Detail inserts (section 6).** The plan cuts away from a main shot to a short insert of a
+  detail of the playing (`planInserts()`, `INSERT_RULES`), and back to the main shot, which moves
+  on under it. The detail plays through the insert, so it shows the instrument that sounds.
+- **Where an insert comes (sections 5 and 6).** No seat enters near an insert, and the music keeps
+  the lead of the window before it, or a tutti goes on. The first and the last shot have none.
+- **The length and the rate of an insert (section 6).** An insert lasts 2 to 4.5 s, as a quick
+  cutaway in a stream of short takes, and at most one comes in each seeded 20 to 30 s, so the
+  film does not change angles too fast.
+- **The lens of an insert (section 6).** An insert takes a long lens (`INSERT_LENS`), as a
+  remote camera on a railing, so the camera stays far from the animals. Its frame holds the paws
+  and the instrument, so it keeps `INSERT_FLOOR` from a body, and `ANIMAL_FLOOR` from a head in
+  its frame. The focus stays on the detail, or on the nearer eye of the player when the eye is in
+  the frame.
+- **The 30° rule at an insert (sections 2 and 6).** Each cut into or out of an insert changes the
+  size of the frame by `FILM_GRAMMAR.jumpSize`, or it turns the view by `jumpAngle`.
 
 The app does not follow these facts:
 
@@ -171,10 +217,13 @@ The app does not follow these facts:
 - **The soft shoulder (section 3).** The lens of the app blurs a point in front of the focus to
   at most `LENS.maxNearBlur` of the image height (design 4.5), so the head at the edge of a dirty
   frame is only a little soft.
+- **Other cutaways (section 6).** The film has no insert of the printed music and no out of focus
+  lamps. No source of this file gives such a cutaway in a concert film, and the music faces the
+  players, away from the cameras of the hall.
 
-## 7. Sources
+## 8. Sources
 
-All sources opened on 2026-10-31.
+Sources 1 to 12 opened on 2026-10-31, and sources 13 to 23 on 2026-11-12.
 
 1. U.S. Navy, "Photography (Basic)", NAVEDTRA 14209, 1993, chapter 13 "Motion Media", pages 13-15
    to 13-20. https://everyspec.com/USN/NAVEDTRA/NAVEDTRA_14209_OCT1993_18402/ (text of the
@@ -209,3 +258,28 @@ All sources opened on 2026-10-31.
 12. N. LaJeunesse, "Over the shoulder shot: Its uses in cinema", Videomaker, section "Camera
     placement".
     https://www.videomaker.com/how-to/shooting/camera-movement/over-the-shoulder-shot-its-uses-in-cinema/
+13. Wikipedia, "Insert (filmmaking)", which cites B. Brown, "Cinematography: Theory and
+    Practice", Focal Press, 2012, p. 25. https://en.wikipedia.org/wiki/Insert_(filmmaking)
+14. Wikipedia, "Cutaway (filmmaking)", which cites B. Brown, "Cinematography: Theory and
+    Practice", Focal Press, 2012, p. 23. https://en.wikipedia.org/wiki/Cutaway_(filmmaking)
+15. D. Vanderwolf, "Conducting for the Cameras", Australian Cinematographer, 2018-09-01.
+    https://acmag.com.au/2018/09/01/conducting-for-the-cameras/
+16. R. Willey, "Video Direction as an Application of the Study of Music", College Music
+    Symposium 56, 2016, companion pages part 1 and part 3.
+    http://www.rkwilley.com/videodirection.html
+17. Wikipedia, "Establishing shot", which cites B. Brown, "Cinematography: Theory and Practice",
+    Focal Press, 2012, p. 18. https://en.wikipedia.org/wiki/Establishing_shot
+18. Wikipedia, "Axial cut". https://en.wikipedia.org/wiki/Axial_cut
+19. B. Zaza, "Lessons learned: Live Multi-Camera Directing in Classical Music, Part I",
+    Orchestras Canada, 2022-07-26.
+    https://oc.ca/lessons-learned-live-multi-camera-directing-in-classical-music-part-i/
+20. D. Offord, "Thank you for the music", Panasonic Connect blog (Edinburgh International
+    Festival). https://eu.connect.panasonic.com/de/en/blog/thank-you-music
+21. Wikipedia, "Shallow focus", which cites J. Mamer, "Film Production Technique", 2013, pages 19
+    to 20. https://en.wikipedia.org/wiki/Shallow_focus
+22. E. Luzi, "How to Measure Distance for Focus Marks", The Black and Blue, 2011-04-25.
+    https://www.theblackandblue.com/2011/04/25/focus-measurements/
+23. Photography Stack Exchange, answer to "Why do portrait photographers focus on the nearest
+    eye?", CC BY-SA, as republished at
+    https://www.uniquephoto.com/community/qa/why-do-portrait-photographers-focus-on-the-nearest-eye-instead-of-a-face-farther-back
+    (a community answer: the weakest source of this file).
