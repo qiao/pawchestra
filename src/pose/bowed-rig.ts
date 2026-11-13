@@ -1263,15 +1263,14 @@ export const BOWED_HOLDS = {
  * With 20°, the fingers still point down to the strings, and the wrist bends 48°. The remaining
  * depth of the forearm at the upper bout is accepted.
  *
- * The left paw tilts 45° over the neck (`tiltL`, 30° in the chin hold), so that it curls around
- * the neck and the fingers come down on the strings from above, as a real violist holds the neck
- * (`docs/reference/string-technique.md`, section 1.9). With 30°, the paw turns 157° on its
- * forearm from the bind, and the skin of the wrist under the neck pinches into a twisted band of
- * thin faces: the wrist ring keeps 0.58 of its narrow axis in the bind. With 45°, the paw turns
- * 147°, the wrist ring keeps 0.66, the left forearm goes 1.5 cm into the viola in the play (2.5 cm
- * with 30°), and the wrist bends 30° from the line of the forearm (15° with 30°). With 40°, the
- * wrist keeps a crease, and with 50°, the wrist bends 34°. In the fifth position, the paw tilts 65°
- * with `highTilt`.
+ * The left paw tilts 25° over the neck (`tiltL`, 30° in the chin hold), so that the fingers come
+ * down on the strings from above and the wrist stays on the side of the back of the viola, as the
+ * wrist of a real violist stays under the neck (`docs/reference/string-technique.md`, section
+ * 1.9). With 55°, the wrist came 2.5 cm over the middle plane of the body of the viola, beside the
+ * neck, so that the left forearm crossed that plane and went 2.6 cm through the upper bout in each
+ * sample of the play and of the rest (`pnpm body-clip violist`). The grip turn of the left paw then
+ * was 63° (limit 45, `pnpm arm-check violist`), and with 25° it is 30°. In the fifth position, the
+ * paw tilts 45° with `highTilt`.
  *
  * In the rest pose, the top plate of the viola faces the front and 30° to the left, toward the
  * audience, as the bridge of a resting violin faces out (`docs/reference/string-technique.md`,
@@ -1279,9 +1278,8 @@ export const BOWED_HOLDS = {
  *
  * The arms of the hand rig of the Tripo P2 cat (design 4.4, "Hand rig") take each turn of the paw
  * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes at most
- * about 45° in each moment of the violist, so that the skin does not twist into a thin neck. Thus
- * the left paw tilts 55° over the neck (`tiltL`): with 45°, the left arm turns 3° further in the
- * play. The left elbow points further out in the play, (-2, -0.8, -0.71), so that the upper arm
+ * about 45° in each moment of the violist, so that the skin does not twist into a thin neck. The
+ * left elbow points further out in the play, (-2, -0.8, -0.71), so that the upper arm
  * takes 44° of the turn: with (-1, -1, -0.75), it takes 15°, and the forearm 90°. At rest, the
  * left elbow points down and a little forward, (0, -1, -0.3), so that the upper arm rolls the other way,
  * and the left paw turns 45° around the normal of the top plate (`restYawL`): with the rest
@@ -1308,7 +1306,7 @@ const CAT_HOLD = {
   reachL: 25 * MathUtils.DEG2RAD,
   headDrop: -5 * MathUtils.DEG2RAD,
   slant: 0,
-  tiltL: 55 * MathUtils.DEG2RAD,
+  tiltL: 25 * MathUtils.DEG2RAD,
   poleL: [-2, -0.8, -0.71],
   elbowPerString: 2 * MathUtils.DEG2RAD,
   highTilt: 20 * MathUtils.DEG2RAD,
