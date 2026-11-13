@@ -111,9 +111,13 @@ left side):
   rows ("Weights" below) take their place.
 - **Hands turned.** Each vertex past the arm ring at x 0.295 turns rigidly about the rest forearm
   axis by whole ring steps of 45 degrees: -135 degrees on the left (3 steps) and 90 degrees on the
-  right (2 steps), 309 and 310 vertices. New quads join the two rings with the step offset, and the
-  far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units). The hands and
-  the fingers keep their form ("Arm twist").
+  right (2 steps), 309 vertices on each side. New quads join the two rings with the step offset,
+  and the far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units). The
+  hands and the fingers keep their form ("Arm twist").
+- **Wrist loop.** The ring at x 0.295 does not turn. It is slanted, so on the right 1 of its 8
+  vertices lies past its mean along the forearm axis. When it turned with the hand, the quads before
+  the ring sheared into a small notch at the wrist: 2 faces had UV scale ratios of 4.3 and 10.4,
+  against about 1.1 on the faces around them.
 - **Point edits.** None.
 - **Surface.** `sa.add_surface(monkey, 'monkey', <base color>, eye_fans=False,
   config=<monkey-tripo.json>)`. The 20 gloss faces are the pink nose in the nose box of the config.
@@ -239,7 +243,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/monkey.rig.glb` | 1,239,404 bytes | `b94049d627e66d6bf6a53df51386e8a5f62cdea80b3c2fa119bf8c383c5f58d8` |
-| `tripo-hand/monkey.rig.json` | 16,671 bytes | `10313b7c7b1f8d57269e4b3bdab774b0234da02a2841af0a33d1d6b5b646bc1c` |
+| `tripo-hand/monkey.rig.glb` | 1,239,404 bytes | `b5258d5b41874e397ed7c80b3ac8a24b84971ebcf6f229c1bc97e8e0012f68e8` |
+| `tripo-hand/monkey.rig.json` | 16,671 bytes | `a3d31f750df83b5bcfbe840cad1de944f1bdc6c5dfe316485dda1aa50bd96ddc` |
 | `tripo-hand/monkey-color.webp` | 178,300 bytes, 2048 × 2048 | `5b9920243e479862e07e602f19b82b5eebdfe1f1ddd6d019c524f619cb34d117` |
 | `tripo-hand/monkey-normal.webp` | 111,326 bytes, 1024 × 1024 | `e81b285a48619d696b4ae23557ee2d203934d8a2be29739b2a7cfd2c88f83dca` |

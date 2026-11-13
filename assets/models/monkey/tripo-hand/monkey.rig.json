@@ -1,5 +1,5 @@
 {
- "sha256": "b94049d627e66d6bf6a53df51386e8a5f62cdea80b3c2fa119bf8c383c5f58d8",
+ "sha256": "b5258d5b41874e397ed7c80b3ac8a24b84971ebcf6f229c1bc97e8e0012f68e8",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -147,7 +147,7 @@
     0.081147
    ],
    "vertices": 219,
-   "weights": "c28870beef735afb"
+   "weights": "963d71bd4d6a7c98"
   },
   "upper_arm_R": {
    "head": [
