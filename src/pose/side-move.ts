@@ -4,7 +4,7 @@ import type { PlayerModel } from '../models/player.ts';
 import { boneIndex } from '../models/rig.ts';
 import { toVec3 } from '../models/tuples.ts';
 import type { Vec3 } from '../models/tuples.ts';
-import { NO_TURN } from './axes.ts';
+import { NO_TURN, Y_AXIS } from './axes.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { setBoneRotation } from './frames.ts';
 import { createArmPose, solveArm } from './ik.ts';
@@ -111,6 +111,8 @@ export interface PlantedLegs {
   readonly left: Leg;
   /** The right leg. */
   readonly right: Leg;
+  /** The bind position of the root bone, around which the body turns. */
+  readonly root: Vec3;
 }
 
 /**
@@ -137,7 +139,7 @@ export function plantedLegs(model: PlayerModel): PlantedLegs {
       foot,
     };
   };
-  return { left: leg('L'), right: leg('R') };
+  return { left: leg('L'), right: leg('R'), root: p[boneIndex('root')] ?? [0, 0, 0] };
 }
 
 /**
@@ -178,6 +180,11 @@ const ankle = new Vector3();
 const move = new Vector3();
 const pole = new Vector3();
 const local = new Quaternion();
+const hipsTurn = new Quaternion();
+const footTurn = new Quaternion();
+const center = new Vector3();
+const middle = new Vector3();
+const half = new Vector3();
 
 /** The lifts of no step: both feet on the floor. */
 const NO_LIFTS = [0, 0] as const;
@@ -212,5 +219,153 @@ export function plantFeet(
       local.copy(legPose.upper).invert().multiply(legPose.lower),
     );
     setBoneRotation(rotations, leg.foot, local.copy(legPose.lower).invert());
+  }
+}
+
+/**
+ * The places of the feet and the hips of a standing player in a turn with steps (design 5.4, the
+ * turn of the conductor at the song end). Each foot turns with its bind place around the vertical
+ * line through the root, so two feet with the same turn stand as in the bind pose.
+ */
+export interface Stance {
+  /** The turn of the root bone around +y, in radians, positive to the left. */
+  turn: number;
+  /** The turn of the left foot around the root, in radians. */
+  footL: number;
+  /** The turn of the right foot around the root, in radians. */
+  footR: number;
+  /** The lift of the left ankle, in meters. */
+  liftL: number;
+  /** The lift of the right ankle, in meters. */
+  liftR: number;
+  /**
+   * The move of the hips from the middle of the ankles toward the left ankle (positive) or the
+   * right ankle (negative), as a share of the way.
+   */
+  weight: number;
+  /** The side move of the hips in the axes of the turned body, in meters. */
+  shift: number;
+  /** The drop of the hips below the height that the legs reach, in meters. */
+  drop: number;
+}
+
+/**
+ * Writes the place of an ankle in a stance: its bind place turned around the root by the turn of
+ * its foot, and lifted.
+ *
+ * @param legs The legs.
+ * @param leg The leg.
+ * @param yaw The turn of the foot, in radians.
+ * @param lift The lift of the ankle, in meters.
+ * @param out The vector to write.
+ * @returns `out`.
+ */
+function stanceAnkle(
+  legs: PlantedLegs,
+  leg: Leg,
+  yaw: number,
+  lift: number,
+  out: Vector3,
+): Vector3 {
+  center.fromArray(legs.root);
+  out.fromArray(leg.bind.wrist).sub(center).applyAxisAngle(Y_AXIS, yaw).add(center);
+  out.y += lift;
+  return out;
+}
+
+/**
+ * Writes the root offset of a stance (design 5.4): the hips over the middle of the feet, moved
+ * toward the foot that carries the weight and by the side move, and the drop that keeps each leg
+ * at most as long as in the bind pose, plus the drop of the stance.
+ *
+ * @param legs The legs.
+ * @param stance The stance.
+ * @param out The root offset to write.
+ */
+export function stanceOffset(
+  legs: PlantedLegs,
+  stance: Stance,
+  out: [number, number, number],
+): void {
+  stanceAnkle(legs, legs.left, stance.footL, 0, ankle);
+  stanceAnkle(legs, legs.right, stance.footR, 0, hip);
+  middle.addVectors(ankle, hip).multiplyScalar(0.5);
+  half.subVectors(ankle, hip).multiplyScalar(0.5);
+  middle.addScaledVector(half, stance.weight);
+  // The middle of the bind ankles, turned with the hips, comes over the middle of the feet.
+  center.fromArray(legs.root);
+  move
+    .fromArray(legs.left.bind.wrist)
+    .add(ankle.fromArray(legs.right.bind.wrist))
+    .multiplyScalar(0.5)
+    .sub(center)
+    .applyAxisAngle(Y_AXIS, stance.turn)
+    .add(center);
+  middle.sub(move);
+  middle.add(move.set(stance.shift, 0, 0).applyAxisAngle(Y_AXIS, stance.turn));
+  out[0] = middle.x;
+  out[2] = middle.z;
+
+  let reach = 0;
+  for (let side = 0; side < 2; side++) {
+    const leg = side === 0 ? legs.left : legs.right;
+    const [hx, hy, hz] = leg.bind.shoulder;
+    const [ax, ay, az] = leg.bind.wrist;
+    const length = Math.hypot(ax - hx, ay - hy, az - hz);
+    stanceAnkle(legs, leg, side === 0 ? stance.footL : stance.footR, 0, ankle);
+    center.fromArray(legs.root);
+    hip
+      .fromArray(leg.bind.shoulder)
+      .sub(center)
+      .applyAxisAngle(Y_AXIS, stance.turn)
+      .add(center)
+      .add(move.set(out[0], 0, out[2]));
+    const dx = ankle.x - hip.x;
+    const dz = ankle.z - hip.z;
+    const height = Math.sqrt(Math.max(0, length ** 2 - dx ** 2 - dz ** 2));
+    reach = Math.max(reach, hip.y - ankle.y - height);
+  }
+  out[1] = -(reach + stance.drop);
+}
+
+/**
+ * Writes the local rotations of the thigh, the shin, and the foot of each leg for a stance
+ * (design 5.4): each ankle at its place of {@link stanceAnkle}, each foot flat with its turn, and
+ * each knee toward the toes of its foot. The root bone turns by the turn of the stance, and the
+ * hips keep the rotation of the bind pose, so the thigh turns from the hips to the foot.
+ *
+ * @param legs The legs.
+ * @param stance The stance.
+ * @param root The offset of the root bone ({@link stanceOffset}).
+ * @param rotations The rotations of the pose to write.
+ */
+export function stepFeet(
+  legs: PlantedLegs,
+  stance: Stance,
+  root: Vec3,
+  rotations: Float32Array,
+): void {
+  hipsTurn.setFromAxisAngle(Y_AXIS, stance.turn);
+  for (let side = 0; side < 2; side++) {
+    const leg = side === 0 ? legs.left : legs.right;
+    const yaw = side === 0 ? stance.footL : stance.footR;
+    center.fromArray(legs.root);
+    hip
+      .fromArray(leg.bind.shoulder)
+      .sub(center)
+      .applyQuaternion(hipsTurn)
+      .add(center)
+      .add(move.fromArray(root));
+    stanceAnkle(legs, leg, yaw, side === 0 ? stance.liftL : stance.liftR, ankle);
+    footTurn.setFromAxisAngle(Y_AXIS, yaw);
+    pole.fromArray(leg.pole).applyQuaternion(footTurn);
+    solveArm(leg.bind, hip, footTurn, ankle, pole, legPose);
+    setBoneRotation(rotations, leg.thigh, local.copy(hipsTurn).invert().multiply(legPose.upper));
+    setBoneRotation(
+      rotations,
+      leg.shin,
+      local.copy(legPose.upper).invert().multiply(legPose.lower),
+    );
+    setBoneRotation(rotations, leg.foot, local.copy(legPose.lower).invert().multiply(footTurn));
   }
 }
