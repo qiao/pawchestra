@@ -329,6 +329,12 @@ interface PercussionHold {
   /** The forward lean of the spine over the instrument while the player plays, in radians. */
   readonly lean: number;
   /**
+   * The share of {@link lean} that the neck and the head turn back up, so that the player looks
+   * ahead over the instrument, as a real player watches the conductor. 0: the head leans with the
+   * spine.
+   */
+  readonly headUp: number;
+  /**
    * The curl of the fingers around a mallet, a stick, a beater, or the strap of a cymbal, in
    * radians, so that the claws close on the shaft.
    */
@@ -445,6 +451,7 @@ export const PERCUSSION_HOLDS = {
     pass: 0,
     reach: Infinity,
     lean: 0,
+    headUp: 0,
     side: null,
     fit: null,
     // After a note before a rest, the paw that struck it muffles its head (damp). The left front
@@ -526,6 +533,10 @@ export const PERCUSSION_HOLDS = {
     pass: 0,
     reach: Infinity,
     lean: 0.22,
+    // The neck and the head turn back up by the whole lean, so that the badger looks ahead to the
+    // conductor over the drum: the head skin then stays at least 6.7 cm from the drum in the play,
+    // and with the head on the leaned spine, the snout came within 1.0 cm of the top hoop.
+    headUp: 1,
     side: null,
     fit: null,
     damp: {
@@ -585,6 +596,7 @@ export const PERCUSSION_HOLDS = {
     pass: 0,
     reach: Infinity,
     lean: 0.05,
+    headUp: 0,
     side: null,
     fit: { drop: 0.07, gap: 0.15 },
     damp: null,
@@ -617,6 +629,7 @@ export const PERCUSSION_HOLDS = {
     pass: 0,
     reach: Infinity,
     lean: 0,
+    headUp: 0,
     side: null,
     fit: null,
     damp: { kind: 'chest', restSec: 0.5, hold: 0.8, drop: 0.3, room: 0.04104 },
@@ -651,6 +664,7 @@ export const PERCUSSION_HOLDS = {
     // The spine leans 6°, so that the beater reaches the lower triangle: with no lean, it missed
     // the strike spots by up to 2.1 cm.
     lean: 0.1,
+    headUp: 0,
     side: null,
     fit: null,
     damp: null,
@@ -720,6 +734,7 @@ export const PERCUSSION_HOLDS = {
     // from the shoulders: with 14°, the mallets missed them by up to 10 mm, and with 11° and the
     // old homes, by up to 2.6 cm.
     lean: 0.3,
+    headUp: 0,
     // The short legs tilt far with a small move of the hips, and the foot skin then sinks into
     // the floor, so the hips keep their place, and the spine takes the whole move. A lean of 12°
     // moves the shoulders 5.5 cm toward the notes, so that both paws reach more bars of a run. At
@@ -779,6 +794,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   pass: 0,
   reach: Infinity,
   lean: 0.05,
+  headUp: 0,
   side: null,
   fit: null,
   damp: {

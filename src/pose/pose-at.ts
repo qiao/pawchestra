@@ -712,6 +712,8 @@ function poseAnimal(
       const { legs } = note.rig;
       const ready = note.rig.hold.ready ? 1 : weight;
       body.lean = note.rig.hold.lean * ready;
+      // The neck and the head turn back up by a share of the lean (`PercussionHold.headUp`).
+      body.lift = note.rig.hold.headUp * body.lean;
       // At a damp of the bass drum, the upper body turns the left shoulder toward the far head, and
       // the head turns back (`PalmDamp.turn`).
       const damp = note.rig.hold.damp;
