@@ -850,8 +850,14 @@ passes.
       beethoven-1 1.07 m), and by 4 cm in pachelbel-p37, where the fox itself stays. Causes: the deeper trunk
       gives a chair 0.386 m deep (0.318 m before) and another footprint, and the head and the trunk
       hide other sight lines. With the old footprint and the old sight eye the large demos still
-      move up to 1.64 m. The seat is 0.179 m (0.249 m before). Decide with the user: accept the
+      move up to 1.64 m. The seat is 0.230 m (0.249 m before). Decide with the user: accept the
       moves, or a layout rule that keeps the seats.
+- [ ] Tripo fox: the turn of the tail root up (`studio.tailBind`, 4.4) puts the feet on the floor,
+      so the fox sits 1.45 cm lower, and the tail tip reaches 1.2 cm farther back. This moves 216
+      of 459 players of the 19 probe demos by more than 0.5 cm against the podium, by up to 2.0 m
+      (mozart-k417), 1.5 m (bach-bwv1050), and 1.3 m (a monkey trumpeter of beethoven-7-4 and
+      beethoven-8-4). The key `bind_sit` alone moves no player. Check the moves in the app with the
+      item above.
 - [ ] Tripo tan fox flutist: the left upper arm goes 2.9 cm into its arm root at each moment of
       `pnpm hold-fit flutist` (1.3 cm before), and 27 faces of the right arm fold at rest (none
       before). Try the clavicle rows and the rest elbows of `FOX_FLUTE`, and check 2x crops.
