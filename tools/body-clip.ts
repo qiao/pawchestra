@@ -28,15 +28,18 @@
  * the probe tests each distinct bind point, with no sampling of the corners.
  *
  * Usage: pnpm body-clip <role|species:instrument> [--demo <id>]... [--step <s>]
- *        [--limit <H share>] [--json <file>], or pnpm body-clip --demo <id>... for each player
- *        of each demo. A role is a role of `pnpm pose-depth`, also a recast role `<role>@<species>`.
- *        With no `--demo`, a target runs on the first demo that has it.
+ *        [--limit <H share>] [--json <file>] [--set <changes>]..., or pnpm body-clip --demo
+ *        <id>... for each player of each demo. A role is a role of `pnpm pose-depth`, also a
+ *        recast role `<role>@<species>`. With no `--demo`, a target runs on the first demo that has
+ *        it. `--set` changes the holds in memory before the run (`tools/hold-sets.ts`), as one
+ *        variant, so that a hold change can be measured with no edit of a source file.
  */
 import { writeFileSync } from 'node:fs';
 
 import { Box3, Quaternion, Triangle, Vector3 } from 'three';
 
 import { findRole, findSweep, roleScene } from './fold-probe.ts';
+import { setHolds } from './hold-sets.ts';
 import { probeDemos } from './probe-demos.ts';
 import type { DemoFile } from './patch-demos.ts';
 import { CONDUCTOR } from '../src/models/cast.ts';
@@ -64,7 +67,7 @@ import type { AnimalPose, Transport } from '../src/pose/types.ts';
 import { scoreOf } from '../src/score/test-score.ts';
 
 /** The usage text of `pnpm body-clip`. */
-const USAGE = `Usage: pnpm body-clip <role|species:instrument> [--demo <id>]... [--step <s>] [--limit <H share>] [--json <file>]
+const USAGE = `Usage: pnpm body-clip <role|species:instrument> [--demo <id>]... [--step <s>] [--limit <H share>] [--json <file>] [--set <changes>]...
        pnpm body-clip --demo <id>... [--step <s>] [--limit <H share>] [--json <file>]
 
 Measures how deep each body region of a player (the upper arms, forearms, and paws L and R, the
@@ -79,6 +82,8 @@ instrument and into its seat, over the play, and the lift, the rest, and the low
   --limit <H share>     The clip limit, as a share of the head height H of the species. Default
                         0.045 H: 1.0 cm at the H 0.221 m of the old deer.
   --json <file>         Also writes the rows as JSON.
+  --set <changes>       Changes the holds in memory, such as 'viola@cat.tiltL=45deg'. Several
+                        --set options make one variant (tools/hold-sets.ts).
 
 A row clips when its depth is over the limit. The exit code is 1 when a row clips.`;
 
@@ -153,6 +158,8 @@ interface ClipOptions {
   readonly limit: number;
   /** The file of `--json`, or `null`. */
   readonly json: string | null;
+  /** The hold changes of each `--set`, separated by `;`, or `null` for the holds of the source. */
+  readonly holds: string | null;
 }
 
 /** A player to measure. */
@@ -254,6 +261,7 @@ function readOptions(args: readonly string[]): ClipOptions {
   let step = DEFAULT_STEP;
   let limit = DEFAULT_LIMIT;
   let json: string | null = null;
+  const sets: string[] = [];
   for (let i = 0; i < args.length; i++) {
     const arg = args[i] ?? '';
     const value = (): string => {
@@ -271,6 +279,8 @@ function readOptions(args: readonly string[]): ClipOptions {
       limit = Number(value());
     } else if (arg === '--json') {
       json = value();
+    } else if (arg === '--set') {
+      sets.push(value());
     } else if (arg.startsWith('--') || target !== null) {
       throw new Error(`The argument ${arg} is unknown.\n${USAGE}`);
     } else {
@@ -283,7 +293,7 @@ function readOptions(args: readonly string[]): ClipOptions {
   if (target === null && demos.length === 0) {
     throw new Error(`Give a role, a <species>:<instrument>, or a --demo.\n${USAGE}`);
   }
-  return { target, demos, step, limit, json };
+  return { target, demos, step, limit, json, holds: sets.length > 0 ? sets.join(';') : null };
 }
 
 /**
@@ -847,6 +857,9 @@ if (import.meta.main) {
     console.log(USAGE);
   } else {
     const options = readOptions(args);
+    if (options.holds !== null) {
+      console.log(`holds: ${setHolds(options.holds).text}`);
+    }
     const results = await runProbe(options);
     if (options.json) {
       writeFileSync(
