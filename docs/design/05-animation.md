@@ -71,6 +71,8 @@ interface Transport {
   startSec: number;
   /** True when a seek during play set `startSec`: no count-in (5.4, 6.5). */
   seekStart: boolean;
+  /** True for the pause at the song end: the conductor bows (5.4). */
+  endedAtSong: boolean;
   /** The time that the instruments stay up after a pause (`REST_TIMES.hold`), or 0. */
   holdSec: number;
   /** The wall clock seconds from a play to its first sound. */
@@ -113,8 +115,6 @@ interface PosePlan {
   /** The conducted beats and the beats of the felt pulse, in song seconds. */
   beats: Float64Array;
   pulses: Float64Array;
-  /** The song end. The conductor bows after it (5.4). */
-  endSec: number;
 }
 
 /** The places of the scene for one `Score` (4.5). */
@@ -1047,9 +1047,9 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   podium to the audience with small steps, bows from the waist with the eyes down, faces the
   audience a moment, and turns back to the orchestra. The arms come down before the turn, so the
   bow does not need the hold of `transport.holdSec` (5.2). `endMotionAt()` gives the motion from
-  the wall seconds after the stop at the song end, so the pose keeps no state, and a play to the
-  end after a seek gives the same pose. After `END_BOW_SEC`, the bear stands in the rest pose
-  that faces the orchestra, as after each other pause.
+  the wall seconds after the stop at the song end (`Transport.endedAtSong`), so the pose keeps no
+  state. A seek while paused keeps the transport, so the bow continues. After `END_BOW_SEC`, the
+  bear stands in the rest pose that faces the orchestra, as after each other pause.
 
   ```text
   wall s  0     silence  lowerSec  stillSec  turnSec  down,hold,up  faceSec  turnSec  END_BOW_SEC
@@ -1064,7 +1064,13 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
     and the baton toward the desk, and the stand checks of two demos failed.
   - The bow turns back to the orchestra. Reason: a conductor turns back to the players after the
     bow, and the rest pose after the bow is then the same as after each other pause.
-  - The end card shows from 2 s after the end (2.8), so the turn and the bow show with the card.
+  - A play during the bow turns the bear back from where it is (`transportEndMotion()`). Each
+    change after the pause at the song end eases the motion at the change back to the rest in
+    `turnSec`, and the feet step for the share of the turn. The arms lift only when the bear
+    nearly faces the orchestra (`armsTurn`). Reason: with no ease, a play during the bow turns the
+    bear to the orchestra and lifts the arms in one frame. A playing arm of a turned body reaches
+    across the body to the beat point.
+  - The end card shows after `END_BOW_SEC` (2.8), because the card stands over the podium.
 
   ```typescript
   /** The motion of the conductor at the song end at one time (`pose/end-bow.ts`). */
