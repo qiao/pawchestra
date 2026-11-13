@@ -771,9 +771,11 @@ export const PERCUSSION_HOLDS = {
  * (`damp`), so that the fingers touch the edge: with no lean, the arm stretched 0.12 of the upper
  * arm (main 0.04), and a grip at the rim point nearest to the shoulder joint twisted the arm in a
  * lift 64° (main 60°). The grip stands 3 cm out from the rim and 5 cm below it, and the wrist
- * lifts the head by 7 shares of the pitch, so that the closed paw rests on the edge and the ball
- * stays off the plate. With the grip 4 cm out and 3 cm down and 3 shares, the paw stood over the
- * rim, and the ball lay on the plate near the bell.
+ * lifts the head by 10 shares of the pitch, so that the closed paw rests on the edge and the
+ * mallet points up from the plate, as a real player stops the cymbal with the hand on the edge:
+ * each ball near the plate stays at least 4.5 cm from the axis of the bell. With 7 shares, a ball
+ * lay on the bell, 1.8 cm from its axis. With the grip 4 cm out and 3 cm down and 3 shares, the
+ * paw stood over the rim.
  */
 export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   hands: 'alternate',
@@ -804,7 +806,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
     rim: 0.2,
     grip: [0.123121, -0.205202],
     around: -0.35,
-    share: 7,
+    share: 10,
     lean: 0.16,
   },
   curl: GRIP_CURL,

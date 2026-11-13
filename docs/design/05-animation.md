@@ -703,8 +703,9 @@ The rest of each family:
   the left upper arm went into the body, and a drum moved or turned to the left put an upper arm
   into the body or the beater off its spot. The paw of the suspended cymbal that did not strike
   the note takes its grip to the near rim, so that the closed paw rests on the edge, and the spine
-  leans further over the cymbal (`EdgeDamp`). The wrist lifts the mallet, so that its ball stays
-  off the plate (`EdgeDamp.share`). The plate of the suspended cymbal is a piece on the `slide`
+  leans further over the cymbal (`EdgeDamp`). The wrist lifts the mallet, so that it points up
+  from the plate and its ball stays away from the bell (`EdgeDamp.share`), as a real player stops
+  the cymbal with the hand on the edge. The plate of the suspended cymbal is a piece on the `slide`
   bone with its pivot at the bell, and it rocks after each strike: the sum of a damped sine of the
   time since each strike (`cymbalSwingAt()`, `CYMBAL_SWING`), with a limit for a roll. The damp
   stops it. The window ends before the next lift of each paw. Reason
