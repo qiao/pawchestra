@@ -1318,8 +1318,8 @@ navigation menu at the top of the mockup is out of scope.
       maps at full size: 386 MB of GPU memory in `boulanger-matin` (2.6).
 - [ ] Measure on a real phone which step of the automatic tier holds 30 fps: medium, medium at
       the pixel ratio 1.25 or 1.0, or low (2.6, 9.4).
-- [ ] Give the thin ears a warm light from behind: in `RIM_VERTEX`, a factor from the skin weights
-      of the ear bones. Show the user a lineup (4.5).
+- [ ] Show the user the ear glow of the rim light (`EAR_GLOW`, a first moderate step) in a lineup
+      of strengths (4.5).
 - [ ] Ask the user for instrument surface detail: a wood grain from a 3D noise in bind space on the
       `varnish` faces (no image file) and a clear coat. Design 4.1 keeps the plain parts of the
       instruments flat. Make a lineup of one violin and one cello first (4.1).
