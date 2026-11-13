@@ -81,10 +81,10 @@ scripts are those of the Tripo beaver with the changes below. `make_config.py` w
 
 | Item | Value |
 |---|---|
-| Size | 381,834 bytes (each run writes other bytes) |
-| SHA-256 | `33323598e115b771a6b5a04f7c77cc543036871c13e94ac7835ac9081a082c83` |
+| Size | 392,270 bytes (each run writes other bytes) |
+| SHA-256 | `91199926c7f064243997edb40178f9290c37a9081428ac3a1214fe3f495fcb98` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the badger faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `badger`: 3,645 vertices and 4,012 faces (3,139 quads and 873 triangles, 7,151 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the nose takes the slot `fur` and the color map. The 114 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/badger/tripo-hand/badger-color.webp`) |
+| Mesh | One object `badger`: 3,765 vertices and 4,132 faces (3,259 quads and 873 triangles, 7,391 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the nose takes the slot `fur` and the color map. The 114 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/badger/tripo-hand/badger-color.webp`) |
 | Armature | `badger_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.636469 (the shoulder joints at 1.038285 m for each unit, so that the crown stands 1.038 m high, as on the badger of `aa8af0dd8`, and H is 0.27948 m), `crease` 180, and `seatWidth` 0.07 ("Stance and seat") |
 | Eyes | The eyeballs of the source, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -94,9 +94,16 @@ left side):
 
 - **Import.** `sa.import_source('assets/models/badger/tripo-p2/badger.fbx', 1e-5)`. No vertex
   merges, and each face is flat.
-- **No arm rings and no knee rings.** The arm of the source has a closed loop only at the wrist (x
-  0.356, 17 vertices). The other arm loops and the leg bands stop at poles, so no band is a clean
-  quad ring, and no ring is split.
+- **Elbow rings.** The arm of the source has a closed loop only at the wrist (x 0.356, 17
+  vertices). The other arm loops stop at poles, and the leg bands too, so `subdivide()` splits no
+  band. Three bands of the elbow are rings of quads around the arm through one triangle each:
+  the inner upper arm (21 edges), the back of the elbow (20 edges), and the back of the forearm
+  (19 edges). `seed_rings()` (`ringSeeds` of the params) starts each ring at the arm edge whose
+  middle is nearest to its seed, (0.2294, 0.5657, 0.0625), (0.2848, 0.6202, -0.0452), and
+  (0.3105, 0.6541, -0.0083), mirrored for the right arm, and cuts it once by edge ring Subdivide.
+  Each cut goes through two edges of its triangle, so the triangle becomes a smaller triangle and
+  a quad, and the count of triangles stays 873. Then a ring stands each 0.3 arm radii over the
+  bend in place of 0.6, and the bent elbow is round in place of a faceted point.
 - **Folds.** `fold_relax()` with the rule of the beaver (`foldRelax` of the params): 27 fold
   triangles become 0 in 4 rounds. 31 vertices move, by 0.0014 units in the mean and 0.0027 units
   (2.4 mm) at most.
@@ -127,8 +134,12 @@ The weights, in the rest pose:
    part.
 2. Arm rows: each vertex of a side with |x| from 0.17, within 0.08 units of the line of the rest
    arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.17 to 0 at x
-   0.21, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.241, 0.256, 0.271, and 0.286,
-   and the rest on the 4 roll segments.
+   0.21, an elbow helper share that grows from 0 at x 0.228 to 1 at the elbow joint (x 0.2625)
+   and falls to 0 at x 0.299, and the rest on the 4 roll segments. The helper turns half of the
+   bend, so the bend share of a row grows linearly from 0 to 1 over the span. The old helper share
+   (0.25, 0.75, 0.75, 0.25) put 0.25 on the upper arm before the joint and on the forearm after
+   it, so the bend share jumped from 0.375 to 0.625 at the joint and creased the bent elbow. Each
+   vertex of the elbow rings takes the row of its own x.
 3. Wrist rows and knuckle rows as on the beaver: the bend share of the paw grows in 12 equal steps
    of 0.004 from 0.03 units before the head of `hand_<side>`, and the fingers share in 12 equal
    steps of 0.0035 from 0.02 units before the head of `fingers_<side>`.
@@ -199,7 +210,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/badger.rig.glb` | 1,235,312 bytes | `11b76f08f08164ef9d0fb35a19d029cfbac149cfc1d0777279d2d7bc49e77ee7` |
-| `tripo-hand/badger.rig.json` | 16,699 bytes | `15c95862a5e5ad57c81c53c2632a2040f348a570a0125bccbd775e95ba53e8c3` |
+| `tripo-hand/badger.rig.glb` | 1,257,288 bytes | `1684c0b25070644de60a58a1672bcce217e7fca310fb3f396e10612ceeb0156c` |
+| `tripo-hand/badger.rig.json` | 16,699 bytes | `5fdc71a28f02914191bafed9478ccc939e7dd7ebb1dd317839054233b15d3d7c` |
 | `tripo-hand/badger-color.webp` | 153,548 bytes, 2048 × 2048 | `11aac51d538ed6221ab83617e707062a40d1f895ec1e19de1710d821b02af718` |
 | `tripo-hand/badger-normal.webp` | 117,358 bytes, 1024 × 1024 | `88d50cb835488a10fc3dbff89e2bac000f8217715d117f2022de2efc1ce0dca0` |
