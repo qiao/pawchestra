@@ -457,7 +457,7 @@ The app follows these facts:
   (`SHOULDER_REST`). Its high end is on the side of the E string, over the left shoulder and the
   upper arm of the animal.
 - **The size of the viola (1.10).** The cat plays a smaller viola (`SpeciesParams.violaScale`),
-  near 13 inches of the chart of [81], and the rabbit a small violin of 0.38 m
+  near 12 inches of the chart of [81], and the rabbit a small violin of 0.38 m
   (`SpeciesParams.violinScale`). The chin rest lies under the long jaw, further from the shoulder
   along the viola than on a person.
 - **The seated rest and the lift (2.9).** The instrument stands upright on the left thigh, and the
@@ -483,12 +483,16 @@ The app does not follow these facts:
 - **The hand on the neck (1.9).** `stopHandAt()` puts the paw below the neck on the side of the
   high strings, with the palm toward the low strings, and tilts it over the neck
   (`BowedHold.tiltL`), so that the fingers come down on the strings from above. The cat tilts
-  further, so that its paw curls around the neck, and a smaller tilt pinches the skin of its
-  wrist. Thus its wrist bends off the line of the forearm in the low positions.
+  less than the chin hold, so that its wrist stays on the side of the back of the viola, as the
+  wrist of a real player stays under the neck. With a larger tilt, its wrist came over the plane
+  of the top plate, and its forearm went through the upper bout.
 - **The thick wrist (1.9).** The thick wrist end of the left forearm of some bodies touches the
   upper bout of the violin in the play (`TODO.md`). The forearm of a real player keeps free of the
   body of the instrument, and the back of the hand is in a straight line with the elbow in the
-  low positions [68].
+  low positions [68]. The short arm of the cat reached the fingerboard only near the upper bout,
+  so the cat plays the largest viola with which its forearm keeps out of the upper bout. The paw
+  of the rabbit lies off the strings in the play (`BowedHold.gapL`), and its forearm still touches
+  the back of the violin.
 - **The left upper arm (1.10).** The left upper arm turns further out to the side than the arm of
   a violin student (`BowedHold.poleL`). With the elbow further in, the left paw twists too far on
   its forearm.
@@ -543,10 +547,12 @@ The app follows these facts:
   clear the body, and the elbows bend forward (`BowedHold.restArms`). The upright violin then stands at the left paw in
   front of the thigh, and the upright bow at the right paw. The rabbit holds its violin upright on
   the lap with the left elbow near the side. Its right paw rests at the top of the right thigh near
-  the hip and holds the bow at the frog in a closed paw, with the tip up and a little out, away
-  from the music desk and the face (`RABBIT_HOLD`, [86]). The cat rests the viola nearer to the
-  hip and at the outer side of the thigh, so that its shorter arm bends with the elbow near the
-  side and the upper arm keeps near the turn of its bind, and closes its paw around the neck.
+  the hip and holds the bow at the frog in a closed paw, with the tip up, out, and a little
+  forward, away from the music desk and the face (`RABBIT_HOLD`, [86]). In a move, its bow tip
+  turns out to the right, so that the bow does not cross the eyes. The cat rests the viola nearer
+  to the hip and at the outer side of the thigh, so that its shorter arm bends with the elbow near
+  the side and the upper arm keeps near the turn of its bind, and closes its paw around the neck,
+  a little off it, so that the thick wrist stays out of the viola.
   The red fox stands its violin near the hip, so that its short left arm reaches the rest grip,
   and holds the bow upright beside the right thigh with the upper arm near the side (`FOX_HOLD`).
 - **The long rest (2.9).** In a rest of at least `LONG_REST.minSec` of the bowed family
@@ -683,7 +689,8 @@ The app does not follow these facts:
 - **The left hand at rest (2.7).** No source gives the rest of an orchestral cellist. The left
   paw of the shared hold holds the neck near the nut (`BowedHold.restPlace`), so that the forearm
   keeps off the upper bout, as the fingers of a player hold the neck and the forearm stays free
-  of the body (1.9). The dog holds the fingerboard lower, at the top of the upper bout.
+  of the body (1.9). The dog holds the fingerboard a little nearer to the nut than the middle, so
+  that its paw keeps out of the upper bout in the lowering.
 - **The bow at rest (2.7).** The short arm does not reach the knee, so the grip is above the
   thigh, in front of the body, and the tip leans out and forward. No source gives the rest of an
   orchestral cellist.
@@ -736,8 +743,10 @@ The app does not follow these facts:
   keeps one place on the stick and a straight wrist. The bow then turns a little in the paw over
   a stroke, as the fingers of a player let the bow turn.
 - **The rest.** No source gives the rest of an orchestral bassist. The contrabass stays at its
-  playing place, and the left paw holds the neck with the elbow out, as in the play. The right
-  arm hangs at the side of the round belly with the bow tip down and a little forward.
+  playing place, and the left paw holds the neck above the upper bout with the elbow out, as the
+  fingers of a player hold the neck and the forearm stays free of the body (1.9). The right arm
+  hangs out from the side of the round belly with the bow tip down and a little forward
+  (`HIPPO_HOLD.restBow`), so that it does not lie on the belly.
 
 ## 4. Sources
 
