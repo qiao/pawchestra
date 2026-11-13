@@ -835,10 +835,14 @@ const SHOULDER_HOLD = {
  * near the jaw goes 1.9 cm into the body: with 0.1 H to the front, it goes 2.1 cm in, and with
  * 0.1 H up and 0.2 H to the front, 2.6 cm. In the middle of the move, the bow tip points to the
  * left, down, and to the front, (-1, -0.6, -0.5), with the hair in and a little down,
- * (-1, -0.3, 0), and the grip moves 0.2 H out, 0.5 H up, and 0.1 H to the front (`restBow.via`),
+ * (-1, -0.3, 0), and the grip moves 0.3 H out, 0.2 H up, and 0.3 H to the front (`restBow.via`),
  * so that the tip passes below the snout, in front of the belly, and to the left of the violin.
- * The rest grip is out of the reach of the short arm, so the arm hangs straight at rest. The grip
- * moves up toward the shoulder in the move, so that the wrist comes into the reach at 0.3 of the
+ * With the grip 0.2 H out, 0.5 H up, and 0.1 H to the front, the roll of the bow paw toward the
+ * elbow changed side at the start of each lift, and the paw turned on its forearm at up to
+ * 5,563°/s (limit 3,000, `pnpm arm-check fox-violinist`). With this grip, the largest turn is
+ * about 1,100°/s, and the right claws go 2.2 cm into the violin in a lowering (2.5 cm before).
+ * The rest grip is near the end of the reach of the short arm. The grip
+ * moves up and to the front in the move, so that the wrist comes into the reach early in the
  * lift and the elbow bends over the rest of the move. With the grip 0.4 H out and 0.5 H to the
  * front, the wrist was 1.55 arm lengths from the shoulder in the middle of the move: the arm stayed
  * straight up to 0.7 of the lift, and then the elbow bent 22° in 1/60 s, so that the forearm
@@ -927,7 +931,7 @@ const FOX_HOLD = {
     lap: { along: 0.5, offset: [0.2, 0, -0.3] },
     tip: [0.1, 1, -0.2],
     hair: [-1, 0, -1],
-    via: { tip: [-1, -0.6, -0.5], hair: [-1, -0.3, 0], reach: [0.2, 0.5, -0.1] },
+    via: { tip: [-1, -0.6, -0.5], hair: [-1, -0.3, 0], reach: [0.3, 0.2, -0.3] },
   },
 } as const satisfies BowedHold;
 
