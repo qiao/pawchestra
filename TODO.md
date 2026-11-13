@@ -97,10 +97,26 @@ passes.
       the source that faces down, away from the key light.
 - [ ] Monkey trumpeter: two thin faces across the wrists (329 and 1090) fold in each play sample.
       Cut the thin faces, or count their pixels in a probe build.
-- [ ] Monkey trumpeter: from the front at the elevation 20, the right paw on the valve tops hides
-      the mouth. A right curl of 69° (92° now) and a side aim of 0.5 or 1 (0.8 now) leave the
-      paw and the forearm in front of the mouth. The right arm has 1.4 cm of spare reach, so the
-      grip cannot move further toward the bell.
+- [ ] Monkey trumpeter: the trumpet now points about 30° below the level, so that the right paw
+      lies below the mouth. A real player holds it "slightly down" (wind-technique 2.1). A higher
+      bell needs longer arms or a right grip nearer to the bell, which the right arm (1.4 cm of
+      spare reach) does not reach.
+- [ ] Rhino tubist: the main branch is about 15 cm wide at the left grip, so the left paw lies
+      against it and does not close around it. A real tubist grips thinner tubing at the side.
+      Option: a thin tube at the left side of the tuba model for the left paw.
+- [ ] Rhino tubist: `pnpm wind-grip tubist` and `pnpm body-clip tubist` take boulanger-matin,
+      in which the tuba rests in about 80% of the play samples, so the play rows show mostly the
+      rest. Read the play pose with `--lines`.
+- [ ] Pig hornist: the right hoof still lies across the mouth of the bell (`PIG_HORN`). Grips
+      nearer to the rim or further out of the bell kept the grasp share at 0% and the palm 90° to
+      134° from the bell axis (`pnpm wind-grip hornist`). A cupped paw in the bell needs a paw
+      that fits the throat of the horn, or a larger horn.
+- [ ] Penguin singer: the flipper tips curl around the outer edges of the folder, and the digits
+      stay about 2.7 cm off the front of the cover. A flex of 45° brought them to 2.0 cm, but the
+      palms then missed their grips by up to 10.7 mm (`pnpm hold-fit singer`).
+- [ ] Beaver bassoonist: from the front, the long joint passes in front of the left cheek and the
+      whiskers, 4.8 cm from the skin, as the bell of a real bassoonist rises at the left of the
+      line of sight (`BEAVER_PLAY_TURN`). Confirm the look in the app.
 - [ ] Monkey trumpeter: the right thumb points back to the mouthpiece. A real player puts it under
       the lead pipe between the first and the second valve casing (wind-technique 2.1).
 - [ ] Monkey: `STUDIO_MONKEY.seatHeight` is the height of the haunch for a body with no chair. Check
@@ -366,7 +382,7 @@ passes.
 - [ ] Red fox and tan fox: thin dark V lines on the white chest are splits of the normals of the fur
       spikes of the mesh. Smooth them like the neck notches, or give them the skin normals.
 - [ ] Tan fox flutist: no left elbow that grasps the flute brings the move twist of the left paw
-      (87°) to 70°.
+      (77°) to 70°.
 - [ ] Rabbit: at rest, a narrow groove runs between the front of each upper arm and the trunk. It is
       the gap of the arm copy. Fill the gap in the copy.
 - [ ] Rabbit violinist: the round elbow patch drops the section of the right upper arm of `pnpm
