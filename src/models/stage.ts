@@ -189,9 +189,7 @@ export const CONDUCTOR_STAND = {
   /**
    * The height of the desk center above the top of the podium: just below the chest of the bear,
    * so that the top edge of the desk is at its shoulders. With 1.10 m, the desk is above the
-   * shoulders of the bear, and the beat must stay at the height of its head. The bear has the
-   * short legs and the long trunk of `bear-views.png`, so its head stays out of the top of the
-   * desk in the bow at the song end. With the shoulders 0.1 m lower, the head goes into the desk.
+   * shoulders of the bear, and the beat must stay at the height of its head.
    */
   deskHeight: 0.8,
   /** The tilt of the desk toward the conductor, as for a music stand. */
@@ -201,9 +199,7 @@ export const CONDUCTOR_STAND = {
    * stands on the stage, just in front of the podium: its base keeps 8 cm from the front of the
    * podium. At 0.35 m on the podium, the lower edge of the desk is 0.24 m in front of the bear,
    * and the belly of the bear (0.36 m) goes through the desk and the score. At 0.6 m in front of
-   * the podium of 1.05 m, the base stands 4.5 cm inside the podium. At 0.68 m, the eyes of the
-   * studio bear, whose muzzle is long, touch the desk in the bow at the song end (3 cm from the
-   * podium).
+   * the podium of 1.05 m, the base stands 4.5 cm inside the podium.
    */
   forward: 0.73,
   /** The radius of the round base of the post. */
