@@ -123,7 +123,8 @@ the head scale):
    no eyeball.
 2. Arm rows: each vertex of a side with |x| from 0.10, within 0.07 units of the line of the rest
    arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.10 to 0 at x
-   0.14, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x 0.183, 0.198, 0.213, and 0.228,
+   0.14, an elbow helper share that grows from 0 at x 0.17 to 1 at the elbow joint (x 0.205) and
+   falls to 0 at x 0.241,
    and the rest on the 4 roll segments. The 8 vertices of the ear tips in that reach, which the
    automatic weights give mostly to the head, the ears, and the neck, keep their rows.
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.004 from 0.04 units before
@@ -367,7 +368,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/dog.rig.glb` | 1,084,080 bytes | `048a6ec3db2484b3c8a83c12da2dd0bbdaf64a232abb5362582ae6e58a917338` |
-| `tripo-hand/dog.rig.json` | 16,214 bytes | `c9b51277c8c151df8c96f2dfc7021a827d014052cef88ebb492f377b30ffeb13` |
+| `tripo-hand/dog.rig.glb` | 1,084,080 bytes | `856c2d5fa31d0c57111d69b266ebf451fd691c4edd9b5c0f1fc00832194a6488` |
+| `tripo-hand/dog.rig.json` | 16,214 bytes | `76f3083f86649b28bbeea049270a265ce3cf8c156b5d4659bae701de13b49c63` |
 | `tripo-hand/dog-color.webp` | 118,948 bytes, 2048 × 2048 | `a40fcf698fb40ff0d95c1a580f93b7f9999e05e4e3adcadac2eae14abeabaded` |
 | `tripo-hand/dog-normal.webp` | 28,924 bytes, 1024 × 1024 | `9e96ae9a9353cd93673333c33a3907dbef87813ef3858a2d7c5de930786fd075` |
