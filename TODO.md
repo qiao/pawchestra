@@ -377,13 +377,24 @@ passes.
       frame. Try a lower WebP quality if the load time of a demo grows.
 - [ ] Bear and elephant: in the gallery light, each arm casts a black band of shadow on the trunk
       beside the belly. Check it in the stage light.
-- [ ] Cat violist: the faces at the back of the bow arm root (2461, 2462, 2342, and 2456, on
-      `upper_arm_seg0_R`) fold in 74% to 89% of the play and in 74% to 75% of the lift
-      (`pnpm fold-probe violist --faces 25`). Look at them in 2x crops from az120 and az180, and
-      fix them in the chain of the cat.
-- [ ] Cat violist: a light shard at the right elbow, a dark dot on the right forearm, and a
-      stretched texture at the right elbow at rest (pose audit L9). The rest hold of the right arm
-      did not change in the string round, so look at the chain of the cat in 2x crops.
+- [ ] Cat violist: the faces at the front of the bow armpit (2461, 2462, 2342, and 2456, on
+      `upper_arm_seg0_R`) fold in 65% to 82% of the play and in 74% to 75% of the lift
+      (`pnpm fold-probe violist --faces 25`), a dark wedge at lift50 from the front. Each face has
+      the corner 992 of the first arm ring, which lies 0.066 units from the arm line (`rows.reach`
+      0.06) and keeps a bone heat row (`upper_arm_seg0_R` 0.20), against 0.75 on the ring. Exact
+      rows there (a reach of 0.07, and half rows on the trunk vertices 989, 991, and 999 under the
+      ring) cut the fold samples from 85,039 to 14,295, but they stretched the trunk side under the
+      arm into a notch at rest and at lift50 (`reports/2026-11-13-c3/armpit-trials/`). Choose a
+      route: an `arm_raise_R` key of the hand rig, or a point edit of the flare under the arm.
+      The left mirror rows raised the left twist p95 in the lift from 57° to 71°. A row change
+      that gives 992 an arm row makes the trunk part of the cat 19 open loops
+      (`TRIPO_BODY_LOOPS`).
+- [ ] Hand chains: `turn_paws()` turns each vertex past the mean of the wrist loop along the
+      forearm axis, so a slanted loop turns some of its own vertices with the paw and shears the
+      quads before it into a stretched texture (fixed in the cat chain). The same cut turns loop
+      vertices of the bear (6 of 14 on each side), beaver (5 of 12), dog (2 of 13), fox (4 of 14),
+      hippo (7 of 18), monkey (1 of 8, right), panda (5 and 4 of 16), and wolf (4 of 11). Keep the
+      loop, as the cat chain does, and check each wrist in 2x crops.
 - [ ] Cat violist: with the viola on its via (`carryVia`), the left forearm goes 2.3 cm (lift) and
       2.1 cm (lowering) into the back of the viola near the rest, in 16% and 17% of the samples
       (1.6 cm and 1.5 cm when the viola hung from the paw, limit 1.5 cm, `pnpm body-clip
