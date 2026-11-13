@@ -573,6 +573,8 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
       // The top of the lift of the right mallet, 0.125 s before its strike (`STRIKE_MOTION`).
       { name: 'up', time: 1.375, rest: false },
       { name: 'right', time: 1.5, rest: false },
+      // The left paw on its head, in the rest after the first note (`FingersDamp`).
+      { name: 'muffle', time: 1.2, rest: false },
       { name: 'rest', time: 0, rest: true },
       ...halfMoves(0.5),
     ],
