@@ -27,10 +27,10 @@ these files and the sections of this file about them.
 
 `tripo-hand/` holds the body of the singer: a hand rig of the Tripo P2 mesh `tripo-p2/penguin.fbx`,
 made by one build script in a headless Blender 5.2, by the route of the Tripo wolf
-(`../wolf/README.md`, "Candidate hand rig") and the Tripo monkey (`../monkey/README.md`). The body
-keeps the form, the colors, and the eyes of the source: no point edit changes the head, the face,
-the trunk, the flippers, the legs, the feet, or the tail. The flippers keep the length of the
-source: no cut, no split from the trunk, and no stretch. The `ANIMALS` entry of the penguin
+(`../wolf/README.md`, "Tripo hand rig") and the Tripo monkey (`../monkey/README.md`). The body keeps
+the form, the colors, and the eyes of the source: no point edit changes the head, the face, the
+trunk, the flippers, the legs, the feet, or the tail. The flippers keep the length of the source: no
+cut, no split from the trunk, and no stretch. The `ANIMALS` entry of the penguin
 (`tools/studio-body.ts`) points to `tripo-hand/penguin.rig.glb`. The files of the earlier penguin
 above do not change.
 

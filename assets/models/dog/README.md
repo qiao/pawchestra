@@ -17,22 +17,21 @@ tripo-hand/dog.rig.glb       rigged mesh, with its summary dog.rig.json
 src/models/studio/dog.ts     studio body of the app
 ```
 
-`tools/blender/hand/README.md` gives the steps of the chain. The section "Candidate hand rig" below
+`tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
 gives the files, their sources, their licenses, and their checksums.
 
 The files of the older body of the route of `pnpm rig-mesh` are removed. Commit `cbc8db5e4` has
 these files and the sections of this file about them.
 
-## Candidate hand rig
+## Tripo hand rig
 
-`tripo-hand/` holds a candidate body ("tripo-hand/dog.blend" below): a hand rig of the Tripo P2
+`tripo-hand/` holds the body of the app ("tripo-hand/dog.blend" below): a hand rig of the Tripo P2
 beagle `tripo-p2/dog.fbx`, made by one build script in a headless Blender 5.2, as the Tripo wolf
 (`../wolf/README.md`). The body keeps the colors and the eyes of the source, and the form of the
 source but for two edits: one point edit makes the front paws smaller ("Paw size"), and one scale
-makes the head smaller ("Head size"). No edit changes the trunk, the legs, the feet, or the tail. The arms
-keep the length of the source: no cut, no split from the trunk, and no stretch. On the branch of the
-candidate, the `ANIMALS` entry of the dog points to `tripo-hand/dog.rig.glb`. The files of the dog
-of main above do not change.
+makes the head smaller ("Head size"). No edit changes the trunk, the legs, the feet, or the tail.
+The arms keep the length of the source: no cut, no split from the trunk, and no stretch. The
+`ANIMALS` entry of the dog points to `tripo-hand/dog.rig.glb`.
 
 | File | Origin | Rebuild |
 |---|---|---|
@@ -71,11 +70,11 @@ muzzle, a smile line, and on each eyeball a brown iris, a black pupil, and two w
 
 ### tripo-hand/dog.blend
 
-The candidate hand rig (design 4.4, "Hand rig"). The chain of the body is in
-`tools/blender/hand/dog/` (`build.py`, `make_config.py`, `params.json`, `base-config.json`,
-`eye-centers.json`, `redits.py`, `rimport.py`, `rings.py`), and `pnpm hand-chain dog` runs it
-(`tools/blender/hand/README.md`). Its scripts are those of the Tripo wolf with the values of the
-beagle. `make_config.py` writes `tools/mesh-rigs/simple/dog-tripo.json`: the joints of the source.
+The hand rig (design 4.4, "Hand rig"). The chain of the body is in `tools/blender/hand/dog/`
+(`build.py`, `make_config.py`, `params.json`, `base-config.json`, `eye-centers.json`, `redits.py`,
+`rimport.py`, `rings.py`), and `pnpm hand-chain dog` runs it (`tools/blender/hand/README.md`). Its
+scripts are those of the Tripo wolf with the values of the beagle. `make_config.py` writes
+`tools/mesh-rigs/simple/dog-tripo.json`: the joints of the source.
 
 | Item | Value |
 |---|---|

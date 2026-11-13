@@ -27,10 +27,10 @@ these files and the sections of this file about them.
 
 `tripo-hand/` holds the body of the elephant of the app ("tripo-hand/elephant.blend" below): a hand
 rig of the Tripo P2 mesh `tripo-p2/elephant.fbx`, made by one build script in a headless Blender
-5.2, by the route of the Tripo wolf (`../wolf/README.md`, "Candidate hand rig"). The source FBX is
-the target of its look: no point edit changes the head, the face, the ears, the trunk, the tusks,
-the paws, the legs, or the tail, and no color changes. The arms keep the length of the source: no
-cut, no split from the trunk, and no stretch. The `ANIMALS` entry of the elephant points to
+5.2, by the route of the Tripo wolf (`../wolf/README.md`, "Tripo hand rig"). The source FBX is the
+target of its look: no point edit changes the head, the face, the ears, the trunk, the tusks, the
+paws, the legs, or the tail, and no color changes. The arms keep the length of the source: no cut,
+no split from the trunk, and no stretch. The `ANIMALS` entry of the elephant points to
 `tripo-hand/elephant.rig.glb`. The files of the old elephant above do not change.
 
 | File | Origin | Rebuild |

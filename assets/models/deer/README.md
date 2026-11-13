@@ -27,12 +27,12 @@ these files and the sections of this file about them.
 
 `tripo-hand/` holds the body of the harpist: a hand rig of the Tripo P2 fawn `tripo-p2/deer.fbx`,
 made by one build script in a headless Blender 5.2, by the route of the Tripo wolf
-(`../wolf/README.md`, "Candidate hand rig"). The body keeps the form, the colors, and the eye paint
-of the source. Two point edits change the form: the eyeballs and their sockets are smaller
-("Eyes"), and the upper arms and the forearms are 1.3 times longer ("Arm stretch"). No point edit
-changes the head, the ears, the trunk, the hooves, the legs, or the tail. The arms have no cut and
-no split from the trunk. The `ANIMALS` entry of the deer
-points to `tripo-hand/deer.rig.glb`. The files of the old deer above do not change.
+(`../wolf/README.md`, "Tripo hand rig"). The body keeps the form, the colors, and the eye paint of
+the source. Two point edits change the form: the eyeballs and their sockets are smaller ("Eyes"),
+and the upper arms and the forearms are 1.3 times longer ("Arm stretch"). No point edit changes the
+head, the ears, the trunk, the hooves, the legs, or the tail. The arms have no cut and no split from
+the trunk. The `ANIMALS` entry of the deer points to `tripo-hand/deer.rig.glb`. The files of the old
+deer above do not change.
 
 | File | Origin | Rebuild |
 |---|---|---|

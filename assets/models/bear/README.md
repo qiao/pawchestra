@@ -18,17 +18,17 @@ src/models/studio/bear.ts   studio body of the app
 ```
 
 The bear has no chain in `tools/blender/hand/`, because its `.blend` is made by hand
-(`tools/blender/hand/README.md`, "Bodies with no chain"). The section "Candidate hand rig" below
+(`tools/blender/hand/README.md`, "Bodies with no chain"). The section "Tripo hand rig" below
 gives the files, their sources, their licenses, and their checksums.
 
 The files of the older body of the route of `pnpm rig-mesh` are removed. Commit `cbc8db5e4` has
 these files and the sections of this file about them.
 
-## Candidate hand rig
+## Tripo hand rig
 
-`tripo-hand/` holds a candidate body ("tripo-hand/bear.blend" below): a hand rig of the Tripo P2
-mesh `tripo-p2/bear.fbx`, made in a live Blender with no arm cut and no limb stretch. On the
-branch of the candidate, the `ANIMALS` entry of the bear points to `tripo-hand/bear.rig.glb`.
+`tripo-hand/` holds the body of the app ("tripo-hand/bear.blend" below): a hand rig of the Tripo P2
+mesh `tripo-p2/bear.fbx`, made in a live Blender with no arm cut and no limb stretch. The `ANIMALS`
+entry of the bear points to `tripo-hand/bear.rig.glb`.
 
 | File | Origin | Rebuild |
 |---|---|---|
@@ -71,9 +71,9 @@ dark brown. The map paints no pads on the paws.
 
 ### tripo-hand/bear.blend
 
-The candidate hand rig of the Tripo P2 mesh (design 4.4, "Hand rig"), made in a live Blender 5.2
-through the Blender MCP tools, in a scene `bear` of its own. The arms and the legs keep the form
-and the length of the source: no cut, no split from the trunk, and no stretch.
+The hand rig of the Tripo P2 mesh (design 4.4, "Hand rig"), made in a live Blender 5.2 through the
+Blender MCP tools, in a scene `bear` of its own. The arms and the legs keep the form and the length
+of the source: no cut, no split from the trunk, and no stretch.
 
 | Item | Value |
 |---|---|
@@ -287,16 +287,16 @@ A point edit in the live Blender (`arm_paw_moves()` and `shin_moves()` of the se
 The legs show no flare at the knee. The rest pose hangs the thinner arms beside the belly, and
 each arm part still takes 36.3° or less.
 
-**Color map.** The app shows the color map of the FBX on the candidate, in place of the face
-colors (design 4.5). `tools/bear-maps.py` writes it: a Lanczos scale of `bear_basecolor.jpg` to
-2048 pixels, then a move in Oklab of each texel of the fur, the muzzle, and the claw triangles of
-the rig file (the region of a triangle is its face color). The lightness and the chroma scale
-by the ratios of the median source color of the region to its target, and the hue turns by their
-hue step, so each strand keeps its contrast. The gutters of the atlas take the fur step. The fur
-goes from sRGB (160, 87, 36) to the fur face color of the bear of main, (95, 60, 32), and the
-muzzle from (232, 152, 89) to the light muzzle of main, (234, 192, 148), and the claws from
-(87, 58, 32) to the dark grey claw face color of main, (48, 46, 44), as the claws of the bear of
-main. The mouth line keeps its colors. The eyes take the eye color of the app ("Eyes" below).
+**Color map.** The app shows the color map of the FBX on the body, in place of the face colors
+(design 4.5). `tools/bear-maps.py` writes it: a Lanczos scale of `bear_basecolor.jpg` to 2048
+pixels, then a move in Oklab of each texel of the fur, the muzzle, and the claw triangles of the rig
+file (the region of a triangle is its face color). The lightness and the chroma scale by the ratios
+of the median source color of the region to its target, and the hue turns by their hue step, so each
+strand keeps its contrast. The gutters of the atlas take the fur step. The fur goes from sRGB (160,
+87, 36) to the fur face color of the bear of main, (95, 60, 32), and the muzzle from (232, 152, 89)
+to the light muzzle of main, (234, 192, 148), and the claws from (87, 58, 32) to the dark grey claw
+face color of main, (48, 46, 44), as the claws of the bear of main. The mouth line keeps its colors.
+The eyes take the eye color of the app ("Eyes" below).
 
 An offset step (the anchors of `tools/fox-maps.py`) did not work for the bear: the source belly
 and back are lighter than its sides, those texels took a part of the muzzle step, and the back

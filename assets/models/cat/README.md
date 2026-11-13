@@ -17,21 +17,21 @@ tripo-hand/cat.rig.glb       rigged mesh, with its summary cat.rig.json
 src/models/studio/cat.ts     studio body of the app
 ```
 
-`tools/blender/hand/README.md` gives the steps of the chain. The section "Candidate hand rig" below
+`tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
 gives the files, their sources, their licenses, and their checksums.
 
 The files of the older bodies are removed: the route of `pnpm rig-mesh`, an older hand rig, and an
 older Tripo mesh. Commit `cbc8db5e4` has these files and the sections of this file about them.
 
-## Candidate hand rig
+## Tripo hand rig
 
-`tripo-hand/` holds a candidate body ("tripo-hand/cat.blend" below): a hand rig of the fourth Tripo
-P2 mesh `tripo-p2/cat.fbx`, made by one build script in headless Blender 5.2, by the route of the
-Tripo wolf (`../wolf/README.md`, "Candidate hand rig"). The body keeps the form and the colors of
+`tripo-hand/` holds the body of the app ("tripo-hand/cat.blend" below): a hand rig of the fourth
+Tripo P2 mesh `tripo-p2/cat.fbx`, made by one build script in headless Blender 5.2, by the route of
+the Tripo wolf (`../wolf/README.md`, "Tripo hand rig"). The body keeps the form and the colors of
 the source: no point edit changes the trunk, the legs, or the tail, on the head only the eyes and
-the mouth corners change, and the front paws are smaller ("Paw size"). The arms keep the length of the source: no cut, no split
-from the trunk, and no stretch. The edits are only those that the rig, the seat, the viola, the
-eyes, a slight smile, and smaller front paws need.
+the mouth corners change, and the front paws are smaller ("Paw size"). The arms keep the length of
+the source: no cut, no split from the trunk, and no stretch. The edits are only those that the rig,
+the seat, the viola, the eyes, a slight smile, and smaller front paws need.
 
 | File | Origin | Rebuild |
 |---|---|---|
@@ -72,12 +72,12 @@ muzzle, white paws, a pink nose, pink inner ears, and a thin mouth line.
 
 ### tripo-hand/cat.blend
 
-The candidate hand rig (design 4.4, "Hand rig"). The chain of the body is in
-`tools/blender/hand/cat/` (`build.py`, `make_config.py`, `params.json`, `base-config.json`,
-`redits.py`, `rimport.py`, `rings.py`, `tail.py`), and `pnpm hand-chain cat` runs it
-(`tools/blender/hand/README.md`). Its scripts follow the scripts of the third Tripo cat and of the
-Tripo wolf. `make_config.py` writes `tools/mesh-rigs/simple/cat-tripo.json`: the joints of the
-source, mapped by the paw turns and the eye edit.
+The hand rig (design 4.4, "Hand rig"). The chain of the body is in `tools/blender/hand/cat/`
+(`build.py`, `make_config.py`, `params.json`, `base-config.json`, `redits.py`, `rimport.py`,
+`rings.py`, `tail.py`), and `pnpm hand-chain cat` runs it (`tools/blender/hand/README.md`). Its
+scripts follow the scripts of the third Tripo cat and of the Tripo wolf. `make_config.py` writes
+`tools/mesh-rigs/simple/cat-tripo.json`: the joints of the source, mapped by the paw turns and the
+eye edit.
 
 | Item | Value |
 |---|---|

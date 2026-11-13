@@ -17,19 +17,18 @@ tripo-hand/polar-bear.rig.glb       rigged mesh, with its summary polar-bear.rig
 src/models/studio/polar-bear.ts     studio body of the app
 ```
 
-`tools/blender/hand/README.md` gives the steps of the chain. The section "Candidate hand rig" below
+`tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
 gives the files, their sources, their licenses, and their checksums.
 
 The files of the older bodies are removed: the route of `pnpm rig-mesh`, an older hand rig, and an
 older Tripo mesh. Commit `cbc8db5e4` has these files and the sections of this file about them.
 
-## Candidate hand rig
+## Tripo hand rig
 
-`tripo-hand/` holds a candidate body ("tripo-hand/polar-bear.blend" below): a hand rig of the
-Tripo P2 mesh `tripo-p2/polar-bear.fbx`, made by scripted point edits in a headless Blender 5.2.
-The arms keep the length of the source: no cut, no split from the trunk, and no stretch. On the
-branch of the candidate, the `ANIMALS` entry of the polar bear points to
-`tripo-hand/polar-bear.rig.glb`.
+`tripo-hand/` holds the body of the app ("tripo-hand/polar-bear.blend" below): a hand rig of the
+Tripo P2 mesh `tripo-p2/polar-bear.fbx`, made by scripted point edits in a headless Blender 5.2. The
+arms keep the length of the source: no cut, no split from the trunk, and no stretch. The `ANIMALS`
+entry of the polar bear points to `tripo-hand/polar-bear.rig.glb`.
 
 | File | Origin | Rebuild |
 |---|---|---|
@@ -71,12 +70,11 @@ mouth line in a smile, and brown claws.
 
 ### tripo-hand/polar-bear.blend
 
-The candidate hand rig (design 4.4, "Hand rig"), made in headless Blender 5.2 (`blender -b
---factory-startup`) by one build script. The chain of the body is in
-`tools/blender/hand/polar-bear/` (`build.py`, `make_config.py`, `params.json`, `base-config.json`,
-`redits.py`, `rimport.py`, `rings.py`), and `pnpm hand-chain polar-bear` runs it
-(`tools/blender/hand/README.md`). Its scripts follow the scripts of the Tripo fox
-(`assets/models/fox/README.md`). `make_config.py` writes
+The hand rig (design 4.4, "Hand rig"), made in headless Blender 5.2 (`blender -b --factory-startup`)
+by one build script. The chain of the body is in `tools/blender/hand/polar-bear/` (`build.py`,
+`make_config.py`, `params.json`, `base-config.json`, `redits.py`, `rimport.py`, `rings.py`), and
+`pnpm hand-chain polar-bear` runs it (`tools/blender/hand/README.md`). Its scripts follow the
+scripts of the Tripo fox (`assets/models/fox/README.md`). `make_config.py` writes
 `tools/mesh-rigs/simple/polar-bear-tripo.json`: the joints of the source, mapped by the point edits.
 
 | Item | Value |

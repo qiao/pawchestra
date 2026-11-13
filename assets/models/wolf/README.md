@@ -17,21 +17,20 @@ tripo-hand/wolf.rig.glb       rigged mesh, with its summary wolf.rig.json
 src/models/studio/wolf.ts     studio body of the app
 ```
 
-`tools/blender/hand/README.md` gives the steps of the chain. The section "Candidate hand rig" below
+`tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
 gives the files, their sources, their licenses, and their checksums.
 
 The files of the older body of the route of `pnpm rig-mesh` are removed. Commit `cbc8db5e4` has
 these files and the sections of this file about them.
 
-## Candidate hand rig
+## Tripo hand rig
 
-`tripo-hand/` holds a candidate body ("tripo-hand/wolf.blend" below): a hand rig of the Tripo P2
+`tripo-hand/` holds the body of the app ("tripo-hand/wolf.blend" below): a hand rig of the Tripo P2
 mesh `tripo-p2/wolf.fbx`, made by one build script in a headless Blender 5.2. The body keeps the
 form, the colors, and the eye paint of the source, but one point edit makes the front paws smaller
 ("Paw size"). No point edit changes the head, the trunk, the legs, or the tail. The arms keep the
-length of the source: no cut, no split from the trunk, and no stretch. On the branch of the
-candidate, the `ANIMALS` entry of the wolf points to `tripo-hand/wolf.rig.glb`. The files of the
-wolf of main above do not change.
+length of the source: no cut, no split from the trunk, and no stretch. The `ANIMALS` entry of the
+wolf points to `tripo-hand/wolf.rig.glb`.
 
 | File | Origin | Rebuild |
 |---|---|---|
@@ -71,12 +70,11 @@ pupil, white, a dark lash line, and a white light.
 
 ### tripo-hand/wolf.blend
 
-The candidate hand rig (design 4.4, "Hand rig"). The chain of the body is in
-`tools/blender/hand/wolf/` (`build.py`, `make_config.py`, `params.json`, `base-config.json`,
-`eye-centers.json`, `redits.py`, `rimport.py`, `rings.py`), and `pnpm hand-chain wolf` runs it
-(`tools/blender/hand/README.md`). Its scripts follow the scripts of the Tripo fox
-(`../fox/README.md`). `make_config.py` writes `tools/mesh-rigs/simple/wolf-tripo.json`: the joints
-of the source.
+The hand rig (design 4.4, "Hand rig"). The chain of the body is in `tools/blender/hand/wolf/`
+(`build.py`, `make_config.py`, `params.json`, `base-config.json`, `eye-centers.json`, `redits.py`,
+`rimport.py`, `rings.py`), and `pnpm hand-chain wolf` runs it (`tools/blender/hand/README.md`). Its
+scripts follow the scripts of the Tripo fox (`../fox/README.md`). `make_config.py` writes
+`tools/mesh-rigs/simple/wolf-tripo.json`: the joints of the source.
 
 | Item | Value |
 |---|---|

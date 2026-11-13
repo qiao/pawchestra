@@ -17,13 +17,13 @@ tripo-hand/fox.rig.glb       rigged mesh, with its summary fox.rig.json
 src/models/studio/fox.ts     studio body of the app
 ```
 
-`tools/blender/hand/README.md` gives the steps of the chain. The section "Candidate hand rig" below
+`tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
 gives the files, their sources, their licenses, and their checksums.
 
 The files of the older body of the route of `pnpm rig-mesh` are removed. Commit `cbc8db5e4` has
 these files and the sections of this file about them.
 
-## Candidate hand rig
+## Tripo hand rig
 
 `tripo-hand/` holds the body of the red fox and the tan fox ("tripo-hand/fox.blend" below): a hand
 rig of the Tripo P2 mesh `tripo-p2/fox.fbx` with four digits on each front paw

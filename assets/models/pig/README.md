@@ -25,13 +25,13 @@ these files and the sections of this file about them.
 
 ## Tripo hand rig
 
-`tripo-hand/` holds the body of the pig of the app ("tripo-hand/pig.blend" below): a hand rig of
-the Tripo P2 mesh `tripo-p2/pig.fbx`, made by one build script in a headless Blender 5.2, by the
-route of the Tripo wolf (`../wolf/README.md`, "Candidate hand rig"). The body keeps the form, the
-colors, and the eye paint of the source: no point edit changes the head, the face, the ears, the
-trunk, the hooves, the legs, or the tail. The arms keep the length of the source: no cut, no split
-from the trunk, and no stretch. The `ANIMALS` entry of the pig points to `tripo-hand/pig.rig.glb`.
-The files of the old pig above do not change.
+`tripo-hand/` holds the body of the pig of the app ("tripo-hand/pig.blend" below): a hand rig of the
+Tripo P2 mesh `tripo-p2/pig.fbx`, made by one build script in a headless Blender 5.2, by the route
+of the Tripo wolf (`../wolf/README.md`, "Tripo hand rig"). The body keeps the form, the colors, and
+the eye paint of the source: no point edit changes the head, the face, the ears, the trunk, the
+hooves, the legs, or the tail. The arms keep the length of the source: no cut, no split from the
+trunk, and no stretch. The `ANIMALS` entry of the pig points to `tripo-hand/pig.rig.glb`. The files
+of the old pig above do not change.
 
 | File | Origin | Rebuild |
 |---|---|---|
