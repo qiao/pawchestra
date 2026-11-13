@@ -327,9 +327,15 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
     page" ("From this device" on a touch screen). It stands below the demo list, because it also
     selects a piece. It does not say "Upload", because the file stays on the device.
   - **Seats**: a row with a dot in the fur color, the seat name, the animal line, and the toggle
-    buttons "M" and "S" ("Mute {name}", "Solo {name}"). Only a screen reader reads the source line.
-    The dot is small and faint while its seat is silent, and full with a soft glow while it plays
-    (`seatLevels()`). A dark fur gets a lighter glow that keeps 3:1 (`ringColor()`).
+    buttons "Mute" and "Only this" (`aria-label` "Mute {name}" and "Only this: {name}"). The words
+    replace the letters M and S of audio software, because the app is for the public, and they
+    fit on a phone too. Each label starts with the visible word, for voice control (WCAG 2.5.3).
+    Only a screen reader reads the source line. The dot keeps its full size and color, because it
+    links the row to the animals. The level shows only in a ring around the dot with a soft glow
+    (`seatLevels()`). A dark fur gets a lighter ring that keeps 3:1 (`ringColor()`). A silent seat
+    has a dim dot and dim text, so a solo shows in each row.
+  - **All seats**: a row above the seat list. A click clears each mute and solo flag. It is
+    pressed and dim while no seat has a flag, and in the accent color while a flag is on.
   - **Settings**: "Section size" (Auto, One per part, Full), "Quality" (Auto, High, Medium, Low),
     and "Frame rate" (Auto, 60 fps, 30 fps). "Auto" names its current value, such as "Auto
     (Full)". `SETTING_HELP` gives the help lines. A counter beside "Frame rate" shows the drawn
@@ -383,8 +389,8 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 `app/seat-text.ts` makes the texts.
 
 - A seat with one player takes the name in the column "One player". The soloist (3.8) that does
-  not sit at a keyboard adds "soloist", for example "Flute soloist", because "Solo flute" would
-  make the solo button read "Solo Solo flute". A chamber group of 4.2 names no soloist.
+  not sit at a keyboard adds "soloist", for example "Flute soloist", because "Solo flute" reads
+  as an action. A chamber group of 4.2 names no soloist.
 - A seat of the section "piano" takes the name of its first program (`keyboardName()`): programs 0
   to 5 "Piano", 6 "Harpsichord", 7 "Clavinet", 8 "Celesta", 16 to 20 "Organ", 21 and 23
   "Accordion", and 22 "Harmonica". The piano model stays.
@@ -419,6 +425,8 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 | Drop overlay | Drop the MIDI file to play it. |
 | First screen, until the first play of the session | Pawchestra: an orchestra of animals plays your MIDI file. |
 | First screen, the button that opens the demo list | Select music |
+| Seat row, the mute button and the solo button | Mute / Only this |
+| Row above the seat list that clears each mute and solo flag | All seats |
 
 **Accessibility**
 
