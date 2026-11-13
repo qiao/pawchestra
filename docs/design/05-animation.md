@@ -463,7 +463,10 @@ The rest of each family:
   valves. Its spine also turns back in the play (`WindHold.lean`), and the trumpet turns further
   down on the face (`play`), so the head bows only 4° to 6° from the vertical. Reason: the arms
   reach the valves of the trumpet of the app, while the head stays over the chest and the hips and
-  the center of mass over the middle of the soles. With the head bowed 14° to 16° from the vertical,
+  the center of mass over the middle of the soles. The right paw lies on the valves below the
+  mouth (`gripShiftR`), and the right forearm stays below the chin. Reason: a real player keeps
+  the right hand on the valves below the face (winds 2.1), and the front view is the default
+  view. With the paw nearer to the mouthpiece, the paw and the forearm covered the mouth. With the head bowed 14° to 16° from the vertical,
   the head center stood 6 cm to 8 cm in front of the soles, and the body read as if it fell forward.
 - Version 1 has no extra effects, for example no music-note particles.
 

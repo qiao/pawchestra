@@ -535,7 +535,8 @@ The app follows these facts:
   stay off the horn.
 - **The trumpet (2.1, `MONKEY_TRUMPET`).** The right paw presses the valves, and the left paw
   holds the trumpet around the upright casings (`faceTube`). The right palm lies above the valves
-  and faces down. The trumpet points down, straight ahead (`trumpet()` of
+  and faces down, and the right paw lies below the mouth, with the forearm below the chin, as a
+  real player keeps the right hand on the valves below the face (`gripShiftR`). The trumpet points down, straight ahead (`trumpet()` of
   `src/models/instruments/brass.ts`, `play`). The big head puts the mouth of the Tripo monkey
   farther than its arm from the shoulders. Thus the head bows on the chest, and the trumpet turns
   down with it (`farMouth`), so that the trumpet keeps its angle to the face [22]. The spine turns
@@ -624,8 +625,9 @@ The app does not follow these facts:
   and level, the right upper arm goes flat.
 - **The trumpet angle of a far mouth (2.1).** With the bowed head of a far mouth, the trumpet
   points more than "slightly down" [19]. No source gives the range of the neck flexion of a
-  trumpet player in degrees, so the bow stays small (`MAX_BOW`). The bell of the monkey points 20°
-  to 22° below the level. A higher bell puts the valves out of the reach of its short arms.
+  trumpet player in degrees, so the bow stays small (`MAX_BOW`). The line from the mouthpiece to the
+  bell rim of the monkey points about 30° below the level. A higher bell puts the valves out of the
+  reach of its short arms, or the right paw and forearm in front of the mouth.
 - **The trumpet size and rest (2.1).** The monkey plays the standard trumpet of the app, as an
   adult player does. Its body is large enough that its paws reach the valves with the head upright.
   No source gives the rest. At rest, the trumpet turns down in front of the belly (`restShift`),
