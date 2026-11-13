@@ -1232,10 +1232,6 @@ Done when: the pose tests pass, and the pose and frame targets pass.
       bodies and the back of the bear. Also try a close shot under the wordmark, and compare both
       at 300 px wide. Add a 180 px `apple-touch-icon.png` and a small web app manifest
       (`index.html` links only `favicon.svg`) (7.4).
-- [ ] Ask the user for an end card: the title, "Play again", and "Next: {title}" with a 10 s ring
-      that a tap stops, then the next demo of `DEMO_IDS`. Its opacity follows the song time, as
-      `titleCardLevel()`. This changes the rule "the bar offers no next demo" of 2.8. An applause
-      sample needs the license check of 8.1 and loads with the samples.
 - [ ] Ask the user if a click on an animal toggles the solo of its seat, with a label for 2 s
       ("Violins 1, 4 rabbits"), and a click on the floor clears each solo. Use `isClick()` of
       `src/app/pick.ts` and the player boxes of `src/shots/clearance.ts`. This changes the rule
