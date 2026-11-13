@@ -1099,12 +1099,22 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   baton in the closed hand. Reason: the open rest paw of the Tripo bear showed the baton under
   the tips of its claws. The curl stays below the angle at which the knuckle crease of the Tripo
   bear folds.
+- **Baton line.** In the beat, the baton is a longer line of the forearm, a little in
+  ([conductor technique](../reference/conductor-technique.md) 7a). The baton points nearly
+  straight forward at beat 1 (`batonPivot`), the tip is far enough forward that the arm reaches
+  out (`beatPoint`), and the right elbow points out to the side (`poleR`), so the forearm points
+  forward and a little out. Reason: with the baton 20° in and the elbow down, the baton stood
+  about 50° off the forearm.
 - **Paws of the arm gate.** In the ready gesture the left palm faces in and down, as in the quiet
   place (`readyRoll`), so the left forearm does not twist from the one to the other. In the rest
   pose the arms hang relaxed beside the round belly, a little forward, with a small bend of the
   elbows and the elbows down and back (`restArm`, `restPoleL`, `restPoleR`). The baton of the
-  hanging paw points down, a little forward, and a little in (`restBaton`), as a conductor holds
-  it before the start. The paw turns with no twist on its forearm. The elbow of a nearly
+  hanging paw hangs down beside the leg, a little forward (`restBaton`), as the baton hangs in the
+  relaxed hand of a conductor with the arms down. The paw turns with no twist on its forearm, so
+  the baton comes only near to its direction. A baton nearer to the vertical turns the right wrist
+  too fast at the start of a lift (`move turn` of the arm gate). The ready gesture keeps a loose
+  left fist below the curl at which the knuckle crease folds (`readyCurl`), and a nearly straight
+  arm (`readyReach`). The elbow of a nearly
   straight hanging arm is ill defined, so the conductor gives it a fixed direction. The search of
   the swing out to the side sees the body only along x, so the rest arm adds an extra swing
   (`restArm.extraOut`). Reason: with the swing of the search alone, both elbows go into the round
@@ -1185,7 +1195,9 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   side, and the left hand rises less at the cue point. The Tripo bear takes 35°, 30°, and 12°.
   Reason: with the head turn of 50° and the hand 30° up, the right forearm of an earlier Tripo bear
   went 3.3 cm into the cheek in a turn to the right, and its left paw 5.6 cm into the head in a cue
-  to the left. With these facts, no paw and no forearm of the bear goes into its head.
+  to the left. With these facts, no paw and no forearm of the bear goes into its head. At the cue
+  point, the left arm is nearly straight (`CUE_MOTION.cueReach`), as a conductor extends the arm
+  to the section. Reason: the bent elbow of the Tripo bear folds at its inner side.
 
   ```text
   time (s)    -1.1        -0.5      0           0.6         1.2
@@ -1255,7 +1267,14 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
 - **Left hand between the cues** (`pose/conductor-left.ts`). A real conductor uses the left hand
   for the dynamics, for held notes, and for a mirror of the beat (`LEFT_HAND_PLACES`). The mirror
   stays outside of the torso (`MIRROR_IN`). The places
-  stand at the left of the head, so the hand shows from behind.
+  stand at the left of the head, so the hand shows from behind. The places turn with the upper
+  body to each side. Reason: places that stayed in a turn to the right made the left arm reach
+  back across the turned chest, and the left forearm stretched past the limit of the arm gate.
+  The paw of each place stays near the line of its forearm, and the left elbow points down and
+  out (`CONDUCTOR_HOLD.poleL`). Reason: a paw bent far on its forearm stretched the forearm skin
+  of the Tripo bear, and an elbow nearer the body put the upper arm into the shoulder. In the
+  lift, the left wrist keeps its distance from the shoulder (`mixWrist()`), because a straight
+  mix bent the elbow more than at both ends and folded the inner elbow.
 
   ```text
   quiet --mirror--> --swell--> --fade--> --hold--> --open--> --cue or ready--> wrist, fingers
