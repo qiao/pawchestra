@@ -1,0 +1,229 @@
+{
+ "edits": [],
+ "sourceTexture": "assets/models/badger/tripo-p2/badger.fbm/badger_basecolor.jpg",
+ "palm": [
+  0.139,
+  -0.99,
+  -0.005
+ ],
+ "ringEdges": 17,
+ "legTurnsIdentity": true,
+ "trunkOpen": 0,
+ "tailBind": {
+  "tail": [
+   0,
+   -0.08,
+   -0.065
+  ],
+  "tail_tip": [
+   0,
+   -0.07,
+   -0.057
+  ]
+ },
+ "chair": {
+  "halfWidth": 0.04,
+  "front": 0.05,
+  "back": -0.1,
+  "note": "The badger has no chair: it stands at each percussion instrument in the pose of the source. The seat is level, and its top is the lowest point of the body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py): the crotch between the legs. The half width stays inside the inner sides of the legs (|x| from 0.05), so that no shin or foot lies over the seat."
+ },
+ "eyeBox": [
+  [
+   0.045,
+   0.83,
+   0.125
+  ],
+  [
+   0.1,
+   0.89,
+   0.18
+  ]
+ ],
+ "noseBox": [
+  [
+   -0.045,
+   0.76,
+   0.27
+  ],
+  [
+   0.045,
+   0.84,
+   0.33
+  ]
+ ],
+ "eyeBoxNote": "The eye box holds the loose right eyeball of the source (x -0.087 to -0.054, y 0.839 to 0.876, z 0.138 to 0.170), mirrored to the left side. The left eyeball of the source joins the rim of its socket, and fusedBall finds it. The nose box holds the dark brown nose.",
+ "body": {
+  "crease": 180,
+  "seatWidth": 0.07
+ },
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+ "metersPerUnit": 0.905218,
+ "metersPerUnitNote": "The scale of the app: H of the badger of main (assets/models/badger/badger.rig.glb at aa8af0dd8), 0.243662 m.",
+ "eyeSize": 0.269175,
+ "jointsNote": "The joints of the source, measured on sections of the mesh: the arm axis at y 0.613, the shoulder where the arm leaves the trunk (x 0.17), the wrist at the closed loop of 17 vertices (x 0.356), the knuckles where the digits part (x 0.41), the elbow halfway, the legs on the sections of the feet and the shins, and the tail on its middle line.",
+ "rings": {
+  "arm": [],
+  "leg": []
+ },
+ "rows": {
+  "start": 0.17,
+  "reach": 0.08,
+  "control": [
+   [
+    0.17,
+    0.4,
+    0
+   ],
+   [
+    0.18,
+    0.25,
+    0
+   ],
+   [
+    0.19,
+    0.12,
+    0
+   ],
+   [
+    0.2,
+    0.04,
+    0
+   ],
+   [
+    0.21,
+    0,
+    0
+   ],
+   [
+    0.228,
+    0,
+    0
+   ],
+   [
+    0.241,
+    0,
+    0.25
+   ],
+   [
+    0.256,
+    0,
+    0.75
+   ],
+   [
+    0.271,
+    0,
+    0.75
+   ],
+   [
+    0.286,
+    0,
+    0.25
+   ],
+   [
+    0.299,
+    0,
+    0
+   ]
+  ],
+  "wrist": {
+   "start": -0.03,
+   "band": 0.004,
+   "count": 12
+  },
+  "knuckle": {
+   "start": -0.02,
+   "band": 0.0035,
+   "count": 12
+  }
+ },
+ "pawTurn": {},
+ "earPlane": {
+  "points": [
+   [
+    0.1,
+    0.93,
+    -0.02
+   ],
+   [
+    0.165,
+    0.89,
+    -0.02
+   ],
+   [
+    0.13,
+    0.91,
+    -0.07
+   ],
+   [
+    0.13,
+    0.91,
+    0.03
+   ]
+  ],
+  "band": 0.008,
+  "xmin": 0.002
+ },
+ "texture": {
+  "path": "assets/models/badger/tripo-hand/badger-color.webp",
+  "plainSmall": 30
+ },
+ "smooth": false,
+ "trunk": null,
+ "eyeVerts": [
+  60,
+  80
+ ],
+ "tailRule": {
+  "z": -0.2,
+  "yMax": 0.3,
+  "rowRoot": [
+   0.0,
+   0.04
+  ],
+  "bend": 0.03
+ },
+ "lids": {
+  "back": 135,
+  "psi": [
+   -60,
+   60
+  ],
+  "lam": [
+   -75,
+   80
+  ],
+  "steps": [
+   12,
+   12
+  ],
+  "radius": 1.15,
+  "strip": 1.12,
+  "angle": 125,
+  "srgb": [
+   80,
+   61,
+   46
+  ],
+  "uv": [
+   0.8584,
+   0.6131
+  ],
+  "density": 0.68,
+  "refit": true,
+  "rayReach": 1.0
+ },
+ "noseFur": true,
+ "foldRelax": {
+  "angle": 75,
+  "pawX": 0.36,
+  "footY": 0.06,
+  "rounds": 40,
+  "lam": 0.5,
+  "clip": 0.02
+ },
+ "fusedBall": {
+  "band": 0.004,
+  "reach": 1.06
+ },
+ "fusedBallNote": "The left eyeball of the source is a part of the head: its faces join the rim of its socket. The faces of the ball lie within reach ball radii of the middle of a sphere fit to the head vertices within band units of the sphere of the loose right ball, mirrored (fused_ball() of build.py)."
+}
