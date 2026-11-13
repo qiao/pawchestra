@@ -72,7 +72,11 @@ export const CONDUCTOR_HOLD = {
   poleL: [-0.4, -1, -0.4],
   /** The right elbow points as the left elbow, mirrored. */
   poleR: [0.4, -1, -0.4],
-  /** The curl of the fingers around the baton. */
+  /**
+   * The curl of the fingers around the baton, in the play, in the rest pose, and in the bow. A
+   * conductor keeps the baton in the closed hand also with the arms down. With no curl at rest,
+   * the open paw of the Tripo bear showed the baton under the tips of its claws.
+   */
   batonCurl: 60 * MathUtils.DEG2RAD,
   /**
    * In the lift and in the lowering of the arms (5.2), the baton turns toward this direction: out
@@ -630,7 +634,8 @@ export function poseConductor(
     chest.rotation,
     rotations,
   );
-  writeCurl(rig.right, hold.batonCurl * weight, rotations);
+  // The fingers stay closed around the baton in each pose, also with the arms down.
+  writeCurl(rig.right, hold.batonCurl, rotations);
 
   poseLeftHand(rig, frames, state, weight, rotations);
 }
