@@ -1801,6 +1801,84 @@ def tail_key(body, rig):
     )
 
 
+def sit_key(body, rig):
+    """The key `bind_sit`: puts the underside of the haunch behind the hip joints onto the plane
+    of the thigh underside in the bind, so that the haunch and the thighs sit on one seat plane.
+    A knob of the source at the back of the haunch was 0.039 units below the thighs, and
+    `seatHeightOf()` put the seat top under it, so the thighs floated over the seat. The step
+    comes after the other keys `bind*`, and it changes no weight.
+
+    Blender axes: the animal faces -Y, +X is the left side, +Z is up. The body points are the
+    vertices over the seat (|x| at most the seat halfWidth) with a share of the tail, the shins,
+    the feet, the toes, and the arms below 0.5. The plane is the lowest z of the body points with
+    a thigh share above 0.5 from the seat front to the hip joints. For each body point p behind
+    hip y - ramp and at most 2.5 band above the plane: bottom is the lowest z of the body points
+    within `radius` of p in x and y with z at most 3 band above the plane, and gap = bottom -
+    plane. p moves along z by -min(gap, most) * ss(hip y - ramp, hip y, p.y) * (1 - ss(0, band,
+    p.z - bottom)) * (1 - free share), and, for gap > 0, also by (1 - ss(back - 2 end, back - end,
+    p.y)), with back the largest y of those low points. Thus a low point rises to the plane and a
+    hollow goes down to it, and the round back of the haunch keeps its form."""
+    rule = P.get('sit')
+    if not rule:
+        return
+    import bind_edit as be
+
+    band, most, ramp, end, radius = (rule[k] for k in ('band', 'most', 'ramp', 'end', 'radius'))
+    restore = be.pose_bind(body, rig)
+    Pb = be.bind_points(body)
+    n = len(Pb)
+    names = {g.index: g.name for g in body.vertex_groups}
+    deform = {b.name for b in rig.data.bones if b.use_deform}
+    total, thigh, free = np.zeros(n), np.zeros(n), np.zeros(n)
+    arm = ('arm', 'hand', 'finger', 'clavicle', 'thumb', 'digit', 'seg', 'wrist', 'elbow')
+    for v in body.data.vertices:
+        for g in v.groups:
+            nm = names[g.group]
+            if nm not in deform:
+                continue
+            total[v.index] += g.weight
+            root = nm.split('_')[0]
+            if root == 'thigh':
+                thigh[v.index] += g.weight
+            elif nm.startswith('tail') or root in ('shin', 'foot', 'toes') or any(k in nm for k in arm):
+                free[v.index] += g.weight
+    total = np.maximum(total, 1e-9)
+    thigh /= total
+    free = np.clip(free / total, 0.0, 1.0)
+    seat = rig['seat']
+    over = (np.abs(Pb[:, 0]) <= float(seat['halfWidth'])) & (free < 0.5)
+    front = -float(seat['front'])
+    heads = [np.array(rig.matrix_world @ rig.pose.bones[f'thigh_{s}'].head) for s in 'LR']
+    hip_y = float(np.mean([h[1] for h in heads]))
+    plane = float(Pb[over & (thigh > 0.5) & (Pb[:, 1] >= front) & (Pb[:, 1] <= hip_y), 2].min())
+    before = float(Pb[over & (Pb[:, 1] >= front), 2].min())
+    cand = np.nonzero(over & (Pb[:, 1] >= hip_y - ramp) & (Pb[:, 2] <= plane + 2.5 * band))[0]
+    low = Pb[over & (Pb[:, 2] <= plane + 3 * band)]
+    back = float(low[:, 1].max())
+    move = np.zeros_like(Pb)
+    for i in cand:
+        p = Pb[i]
+        near = low[np.hypot(low[:, 0] - p[0], low[:, 1] - p[1]) <= radius]
+        bottom = float(near[:, 2].min()) if len(near) else p[2]
+        gap = bottom - plane
+        drop = min(gap, most) * ce.smoothstep(hip_y - ramp, hip_y, p[1])
+        if gap > 0:
+            drop *= 1.0 - ce.smoothstep(back - 2 * end, back - end, p[1])
+        drop *= 1.0 - ce.smoothstep(0.0, band, p[2] - bottom)
+        move[i, 2] = -drop * (1.0 - free[i])
+    count = be.add_bind_move(body, rig, move, 'bind_sit')
+    restore()
+    Q = Pb + move
+    after = float(Q[over & (Q[:, 1] >= front), 2].min())
+    ids = np.nonzero(np.abs(move[:, 2]) > 0)[0]
+    log(
+        f'sit key: hip y {hip_y:.4f}, seat front y {front:.4f}; thigh plane z {plane:.4f}, lowest '
+        f'body point over the seat z {before:.4f} before, {after:.4f} after; {count} vertices move, '
+        f'down at most {max(0.0, -move[:, 2].min()):.4f}, up at most {max(0.0, move[:, 2].max()):.4f}'
+    )
+    log('sit key vertices', ids.tolist())
+
+
 def mouth_rim(body):
     """Gives the faces of the mouth slit the face attribute `rim`: the app gives each corner of a
     rim face the mean normal of the fur faces at its vertex with no crease angle, so the slit
@@ -1930,6 +2008,7 @@ def main():
     belly_key(body, rig)
     if 'path' in P.get('tailLay', {}):
         tail_key(body, rig)
+    sit_key(body, rig)
     if P.get('noseFur'):
         # The nose takes the color map of the source, with its painted nostrils, and the smooth
         # normals of the fur. The flat gloss faces in one dark color showed flat facets and no

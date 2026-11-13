@@ -301,5 +301,13 @@
  "hingeTurn": {
   "L": 15.0,
   "R": -40.0
- }
+ },
+ "sit": {
+  "band": 0.04,
+  "most": 0.05,
+  "ramp": 0.03,
+  "end": 0.02,
+  "radius": 0.012
+ },
+ "sitNote": "The key bind_sit of build.py (sit_key()), in units of the source: puts the underside of the haunch behind the hip joints onto the plane of the thigh underside, so that the seat top goes under the thighs and the haunch. band: the falloff above the underside. most: the largest move down. ramp: the fade in front of the hip joints. end: the fade at the back of the haunch, over the last 2 end. radius: the reach in x and y of the underside of a point."
 }
