@@ -72,16 +72,20 @@ STRANDS = {
     'direction_sigma': 24.0,
     #: The sigma in texels at SIZE of the blur of the noise: the width of a strand.
     'width_sigma': 1.4,
-    #: The half length in texels at SIZE of a strand, and the step of its samples.
-    'half_length': 22.0,
+    #: The half length in texels at SIZE of a strand, and the step of its samples. Longer strands
+    #: lay long parallel grooves over the body, which read as carved wood or clay.
+    'half_length': 11.0,
     'step': 1.0,
     #: The sigma in texels at SIZE of the blur that the height of the strands loses (a high pass).
     'high_pass_sigma': 10.0,
-    #: The root mean square of the x, y tilt of the strands in the normal map.
-    'tilt': 0.06,
+    #: The root mean square of the x, y tilt of the strands in the normal map. The color strands
+    #: and the tilts come from one height, so each dark groove of the color map is also a groove of
+    #: the normals. The two cues add, so a smaller tilt than the tilts of the Tripo cat and wolf
+    #: is sufficient.
+    'tilt': 0.03,
     #: The luma factor of the strands in the color map, for each standard deviation of the height:
     #: a strand crest is lighter, and a groove darker.
-    'luma': 0.16,
+    'luma': 0.08,
     #: The largest height of a strand, in standard deviations.
     'clip': 2.5,
 }

@@ -272,8 +272,8 @@ colors. The gaze shift of `tools/gaze_shift.py` is off (`GAZE_SHIFT`).
 the sRGB gamut takes the largest chroma in the gamut at its new lightness and hue. The share of the
 step of a texel falls to 0 for a chroma below 0.09, a lightness above 0.82, or a hue more than 25
 degrees from 50 degrees, so the cream, the dark socks, the lines, and the white keep the colors of
-the source. The texels of the fur (58.1 % of the map) go from the median Oklab L 0.612, C 0.166,
-h 46.0 to L 0.672, C 0.149, h 63.9.
+the source. The texels of the fur (58.3 % of the map) go from the median Oklab L 0.613, C 0.167,
+h 46.0 to L 0.673, C 0.149, h 63.9.
 
 **Normal map.** The same run writes `fox-normal.webp` from the normal map of the FBX: each x, y tilt
 limited to 0.2 (0.65 % of the texels), a box scale to 1024 pixels, plus the tilts of the strands,
@@ -291,8 +291,21 @@ mean at 2048 pixels, and the tilt of the normal map at 1024 pixels):
 | Normal: tilt, median | 0.006 | 0.006 | 0.028 | 0.023 |
 | Normal: tilt, mean | 0.018 | 0.018 | 0.044 | 0.052 |
 
-So the maps tool adds the strands of `strands()` (`STRANDS`, seed 7) as on the fox before: the
-strand contrast of the web color map is 0.137 by the same measure.
+So the maps tool adds the strands of `strands()` (`STRANDS`, seed 7): the RMS tilt 0.03, the luma
+factor 0.08, and the half length 11 texels at 2048 pixels. The strand contrast of the web color
+map is 0.065 by the same measure over the fur faces of the rig file.
+
+The first strands had the tilt 0.06, the luma factor 0.16, and the half length 22 texels (the
+strand contrast 0.128 by the same measure). In the hall they read as deep carved grooves, as in
+wood or clay. One height gives the color strands and the tilts, so each dark groove of the color
+map is also a groove of the normals, and the two cues add. The long strands were also more regular
+than the strands of the Tripo bakes (`scratch/fur_measure.py` of the round, at 1024 pixels):
+
+| Measure | Fox, first strands | Fox now | Tripo cat | Tripo wolf | Tripo dog |
+|---|---|---|---|---|---|
+| Strand length (half the peak of the autocorrelation), texels | 10.6 | 6.5 | 4.1 | 8.8 | 5.6 |
+| Coherence of the strand direction, color map | 0.78 | 0.58 | 0.58 | 0.67 | 0.45 |
+| High-pass RMS tilt | 0.051 | 0.027 | 0.055 | 0.059 | 0.015 |
 
 **Hall colors.** The median Oklab L, C, h of the orange fur (C above 0.05, h 20 to 80 degrees, L
 0.25 to 0.85) in crops of `pnpm close-views play --demo beethoven-5-4 --at <species> --azimuth 40
@@ -320,9 +333,9 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 |---|---|---|
 | `tripo-hand/fox.rig.glb` | 1,051,916 bytes | `df32832be80fa87d320f729d72c0853995e8768550044e00d4c7351075c3a6d7` |
 | `tripo-hand/fox.rig.json` | 16,272 bytes | `0603078602bc4c545d2d4850b56e2f2ef581720e4f1d433ea1ae31dbf4412d79` |
-| `tripo-hand/fox-color.webp` | 237,596 bytes, 2048 × 2048 | `525a47451e4c3bd6e8c963bc21e9e5e78507027f6349261f067b103c30e08ec3` |
-| `tripo-hand/fox-tan-color.webp` | 245,498 bytes, 2048 × 2048 | `6ef2c30fd7a77716a5a68a4b5e23ac83823f257a21fd0064be2a0d07180514e6` |
-| `tripo-hand/fox-normal.webp` | 180,102 bytes, 1024 × 1024 | `dee8e1cf237bcfad901a1e441d6b66f49b71d1ef59c7ce342552eb5828e587d8` |
+| `tripo-hand/fox-color.webp` | 172,080 bytes, 2048 × 2048 | `1e2a3fc91b1708228c25026edfcffc40a1f5fe8bba5a7390ee46836baf26dcfa` |
+| `tripo-hand/fox-tan-color.webp` | 178,228 bytes, 2048 × 2048 | `77340995571173589a2a609f0099daffb635e8a8638a5617b8458e94d45e81ae` |
+| `tripo-hand/fox-normal.webp` | 99,334 bytes, 1024 × 1024 | `377d69a822300e6f4265a5b8948d86481c9914e26b7d8a99a84e306fdf4f668f` |
 
 ### History
 
