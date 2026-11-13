@@ -181,6 +181,11 @@ demo shows the same motion on each visit.
   `LOOK_BLINK.closeSec` and opens in `openSec`, as a real blink closes fast and opens slower. Each
   turn of a look passes its end by `LOOK_OVERSHOOT.size` and settles (`overshoot()`), as a real
   head passes the end of a fast turn a little.
+- **Overlap.** The ears lag behind the head, and the tail behind the sway, as loose parts do
+  (`OVERLAP` of `pose/pose-at.ts`). The drag is the change of the look and of the side sway in the
+  last `lagSec`, from the closed forms of the look and the sway at the two times, so the pose
+  keeps no state. Each drag has a limit, and a hanging ear takes a part of it, because the hanging
+  ear of the dog lies near the cello.
 - **Blink.** A blink rises from 0 to 1 and falls back in `blinkSec`. A bead eye scales on y by
   `max(CLOSED_EYE_SCALE, 1 - blink)` about its eye bone. A body with lids (4.4, "Hand rig") turns
   each eye bone about the hinge axis of its lid, through the middle of the eyeball, by the share

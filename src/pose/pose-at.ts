@@ -115,6 +115,28 @@ const BODY_MOTION = {
   tail2: 12 * MathUtils.DEG2RAD,
 } as const;
 
+/**
+ * The overlap of the ears and the tail (design 5.1): a loose part lags behind the motion of the head
+ * and the trunk. The drag is the change of the angle of the head, or of the side sway of the spine,
+ * in the last `lagSec`, so the pose stays a function of the times.
+ */
+const OVERLAP = {
+  /** The time over which the change of the angles is taken, in seconds. */
+  lagSec: 0.08,
+  /** The turn of each ear for each radian of change of the angles of the head. */
+  ear: 1,
+  /**
+   * The largest drag of an ear around each axis. A hanging ear takes `hanging` of it, because the
+   * hanging ear of the dog lies near the cello.
+   */
+  earMax: 10 * MathUtils.DEG2RAD,
+  hanging: 0.5,
+  /** The turn of the first tail bone for each radian of change of the side sway of the spine. */
+  tail: 3,
+  /** The largest drag of the first tail bone. The second bone turns in the ratio of the tail sway. */
+  tailMax: 8 * MathUtils.DEG2RAD,
+} as const;
+
 const BONES = {
   spine: boneIndex('spine'),
   chest: boneIndex('chest'),
@@ -209,6 +231,8 @@ const rollAxis = new Vector3();
 interface BodyAngles {
   /** The side sway of the spine with the beat, in radians. */
   sway: number;
+  /** The change of {@link BodyAngles.sway} in the last `OVERLAP.lagSec`, for the drag of the tail. */
+  swayStep: number;
   /** The forward lean of the spine, in radians. */
   lean: number;
   /**
@@ -317,12 +341,39 @@ function writeBody(pose: WritablePose, player: PlayerPlan, scratch: FrameScratch
     turn.multiply(second.setFromAxisAngle(yawAxis, yaw * part));
     setBoneRotation(r, bone, turn.multiply(second.setFromAxisAngle(X_AXIS, pitch * part)));
   }
+  // The ears lag behind the turn of the head and the sway, and the tail behind the sway.
+  const { idleBefore, plannedBefore } = scratch;
+  const lookBefore = plannedBefore.weight + idleBefore.look * (1 - clamp01(plannedBefore.weight));
+  const peekBefore =
+    MathUtils.clamp(player.lookYaw, -m.peek, m.peek) * plannedBefore.weight * body.peek;
+  const o = OVERLAP;
+  const earMax = player.earTwitch === 0 ? o.earMax * o.hanging : o.earMax;
+  const drag = (change: number, factor: number, max: number): number =>
+    MathUtils.clamp(-factor * change, -max, max);
+  const dragYaw = drag(
+    player.lookYaw * (look - lookBefore) * body.look + peek - peekBefore,
+    o.ear,
+    earMax,
+  );
+  const dragPitch = drag(player.lookPitch * (look - lookBefore) * body.look, o.ear, earMax);
+  const dragRoll = drag(body.swayStep, o.ear, earMax);
   const ear = idle.ear * player.earTwitch * m.ear;
-  setBoneRotation(r, BONES.earL, turn.setFromAxisAngle(Z_AXIS, ear));
-  setBoneRotation(r, BONES.earR, turn.setFromAxisAngle(Z_AXIS, -ear));
+  for (const [bone, twitch] of [
+    [BONES.earL, ear],
+    [BONES.earR, -ear],
+  ] as const) {
+    turn.setFromAxisAngle(Z_AXIS, twitch + dragRoll);
+    turn.multiply(second.setFromAxisAngle(Y_AXIS, dragYaw));
+    setBoneRotation(r, bone, turn.multiply(second.setFromAxisAngle(X_AXIS, dragPitch)));
+  }
   const tail = idle.tail * player.tailSway;
-  setBoneRotation(r, BONES.tail1, turn.setFromAxisAngle(Y_AXIS, tail * m.tail1));
-  setBoneRotation(r, BONES.tail2, turn.setFromAxisAngle(Y_AXIS, tail * m.tail2));
+  const tailDrag = drag(body.swayStep, o.tail, o.tailMax) * player.tailSway;
+  setBoneRotation(r, BONES.tail1, turn.setFromAxisAngle(Y_AXIS, tail * m.tail1 + tailDrag));
+  setBoneRotation(
+    r,
+    BONES.tail2,
+    turn.setFromAxisAngle(Y_AXIS, (tail * m.tail1 + tailDrag) * (m.tail2 / m.tail1)),
+  );
   pose.blink = Math.max(idle.blink, planned.blink);
   chainFrames(player.skeleton, r, scratch.chain, pose.rootOffset);
 }
@@ -381,6 +432,9 @@ interface FrameScratch {
   readonly idle: IdleState;
   /** The planned look of the current animal at the song time. */
   readonly planned: PlannedLook;
+  /** The idle motion and the planned look of the current animal `OVERLAP.lagSec` earlier. */
+  readonly idleBefore: IdleState;
+  readonly plannedBefore: PlannedLook;
   /** The body angles of the current animal. */
   readonly body: BodyAngles;
   readonly bow: BowState;
@@ -435,11 +489,16 @@ function poseAnimal(
   const note = player.note;
   // The conductor does not sway with the beat. It sways with the phrase (design 5.4).
   const body = scratch.body;
+  const lagged = noteTime - OVERLAP.lagSec;
   body.sway = note.family === 'conductor' ? 0 : swayOf(plan, player, noteTime, weight);
+  body.swayStep =
+    note.family === 'conductor' ? 0 : body.sway - swayOf(plan, player, lagged, weight);
   body.lean = 0;
   body.look = 1;
   body.peek = 0;
   plannedLookAt(player.looks, noteTime, scratch.planned);
+  plannedLookAt(player.looks, lagged, scratch.plannedBefore);
+  idleAt(player.idle, scratch.wallTime - OVERLAP.lagSec, scratch.idleBefore);
   body.lift = 0;
   body.twist = 0;
   body.turn = 0;
@@ -783,8 +842,11 @@ export function poseAt(
     torso: { root, chest },
     idle: createIdleState(),
     planned: { weight: 0, blink: 0 },
+    idleBefore: createIdleState(),
+    plannedBefore: { weight: 0, blink: 0 },
     body: {
       sway: 0,
+      swayStep: 0,
       lean: 0,
       look: 1,
       peek: 0,
