@@ -1493,7 +1493,10 @@ const DOG_HOLD = {
  * 1.9). At 0.6, where the neck meets the upper bout, the left claws went 4.4 cm into the bass at
  * rest and up to 4.7 cm in the lift and the lowering (limit 2.3, `pnpm body-clip bassist`), and at
  * 0.4, 2.8 cm. The right arm hangs at the side of the belly with the bow tip down and a little
- * forward. In the lift and the lowering, the tip turns through the front.
+ * forward, and the grip rests 1.0 H out from the right knee, so that the arm hangs off the round
+ * belly: with 0.65 H, the right elbow went 6.4 cm into the belly at rest, and the arm lay flat on
+ * it with a crease at the shoulder (`pnpm hold-fit bassist --sets lift,rest,lower`), and with
+ * 1.0 H, 2.9 cm. In the lift and the lowering, the tip turns through the front.
  *
  * In pizzicato, the right paw comes up from the side, right of the strings (`pluckSide`), and
  * the bow tip points down and forward (`pizzicatoTip`): with the tip down, the bow went 17.6 cm
@@ -1534,7 +1537,7 @@ const HIPPO_HOLD = {
   restPoleR: [0.3, -1, 0.5],
   restPoleL: [-1, -0.3, 0],
   restBow: {
-    lap: { along: 1, offset: [0.65, 0.5, -0.2] },
+    lap: { along: 1, offset: [1, 0.5, -0.2] },
     tip: [0.2, -1, -0.5],
     hair: HANGING_BOW.hair,
     via: { ...UPRIGHT_BOW.via, tip: [0.3, 0, -1], reach: [0.1, 0.5, -0.9] },
