@@ -148,8 +148,10 @@ The weights, in the rest pose:
    to 0 at x 0.1965, and the rest on the 4 roll segments ("Arm roots"). The rows take x of the
    source, mapped back through the arm stretch (`arm_source_x()`).
 3. Wrist rows: the bend share of the paw grows in 12 equal steps of 0.003 from 0.03 units before
-   the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.003 from
-   0.017 units before the head of `fingers_<side>`.
+   the head of `hand_<side>`. Knuckle rows: the fingers share grows in 12 equal steps of 0.0045
+   from 0.017 units before the head of `fingers_<side>`. Reason: with steps of 0.003 on the knuckles
+   of the longer paw, the curled fingers of the flutist folded more palm faces (arm gate, folds p95
+   L 34 and R 50, against 20 and 31 now).
 4. The eye domes and the nose take {`head` 1}.
 5. Ear rows: a plane across the base of each ear, through (0.035, 0.905, 0.05), (0.13, 0.86,
    0.05), (0.085, 0.882, 0), and (0.085, 0.882, 0.10) (x mirrored on the right). Each head vertex
