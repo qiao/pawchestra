@@ -554,9 +554,8 @@ export const PERCUSSION_HOLDS = {
   // position of a real player (1 to 2 inches, percussion 6). Before a strike, the wrist lifts the
   // tip higher by the loudness (sizes.lift, across.peak): about 11 cm above the head at a velocity
   // of 40, 14 cm at 100, and 15 cm at 127, below the 8 inches of a full stroke, and about 10 cm in
-  // a roll. The ball at the tip touches the head at a strike (offsetL, offsetR). The elbows point
-  // out, so that the upper arms stay out of the belly (design 5.3). The drum takes its place from the body (fit): at
-  // the bind place, the forearms or the paws of the recast elephant, bear, hippo, and panda went
+  // a roll. The ball at the tip touches the head at a strike (offsetL, offsetR). The drum takes
+  // its place from the body (fit): at the bind place, the forearms or the paws of the recast elephant, bear, hippo, and panda went
   // 6.4 cm to 7.8 cm into the belly. With a room of 0.3 H, the paws of the recast hippo and panda
   // missed their targets by 4.7 cm to 5.8 cm more, and with the full raise for each body, the
   // sticks of the recast wolf and deer went into the raised drum.
@@ -567,8 +566,13 @@ export const PERCUSSION_HOLDS = {
     // note start. With no lift, the ball went 8 mm into the head.
     offsetL: [-0.04, SNARE_DRUM.tip, 0],
     offsetR: [0.04, SNARE_DRUM.tip, 0],
-    poleL: POLE_L,
-    poleR: POLE_R,
+    // The elbows point down and a little out and forward, so that the upper arms hang near the
+    // body, as a real player keeps the elbows about a fist from the body (percussion 6): the
+    // median upper arm stands 19° and 20° out from the side of the body in the play, as the
+    // hanging arm of the badger (21° to 22°). With the elbows at [±1, -1, 0.3], 33° and 34°. The
+    // upper arms go 1.7 cm into the arm roots (limit 2.5 cm).
+    poleL: [-0.3, -1, 0.5],
+    poleR: [0.3, -1, 0.5],
     rim: 0,
     home: [0.4, -0.3, -0.5],
     top: 'up',
