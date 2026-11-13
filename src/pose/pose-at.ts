@@ -6,6 +6,8 @@ import { DIGITS } from '../models/studio-format.ts';
 import { X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { poseBowed } from './bowed.ts';
+import { END_BOW, createEndMotion, endMotionAt } from './end-bow.ts';
+import type { EndMotion } from './end-bow.ts';
 import { createIdleState, idleAt } from './idle.ts';
 import { poseConductor } from './conductor.ts';
 import type { ConductorState } from './conductor.ts';
@@ -61,7 +63,7 @@ import { createSwitchState } from './percussion-switch.ts';
 import type { PercussionState } from './percussion.ts';
 import type { IdleState } from './idle.ts';
 import type { NoteLayer, PlayerPlan, PosePlan } from './plan.ts';
-import { END_BOW, clamp01, endBowAt, seatHeight, smoothstep, transportHeight } from './rest.ts';
+import { clamp01, seatHeight, transportHeight } from './rest.ts';
 import { hipsOffset, plantFeet, sideMoveAt } from './side-move.ts';
 import { createStrikeState, strikeStateAt } from './strikes.ts';
 import { createDampState, dampStateAt } from './damps.ts';
@@ -144,6 +146,7 @@ const OVERLAP = {
 } as const;
 
 const BONES = {
+  root: boneIndex('root'),
   spine: boneIndex('spine'),
   chest: boneIndex('chest'),
   neck: boneIndex('neck'),
@@ -231,6 +234,8 @@ const HEAD_SHARES = [
 
 const turn = new Quaternion();
 const second = new Quaternion();
+/** The lifts of the feet of the conductor in a step of its turn at the song end, in meters. */
+const stepLifts: [number, number] = [0, 0];
 const yawAxis = new Vector3();
 const rollAxis = new Vector3();
 
@@ -492,6 +497,8 @@ interface FrameScratch {
   readonly songTime: number;
   /** The wall seconds since the pause at the song end, or `NaN` before the song end. */
   readonly endElapsed: number;
+  /** The motion of the conductor at the song end (design 5.4). */
+  readonly end: EndMotion;
   /**
    * The nod of the current animal in the count-in, in radians: the nod of the leader of a chamber
    * group, scaled by its playing pose, or 0 (design 5.4).
@@ -751,7 +758,10 @@ function poseAnimal(
       break;
     }
     case 'conductor': {
-      const { conductor, expression, chordPoint } = scratch;
+      const { conductor, expression, chordPoint, end } = scratch;
+      // At the song end, the arms come down, and the bear turns to the audience and bows.
+      endMotionAt(scratch.endElapsed, note.audienceTurn, end);
+      const arms = weight * end.arms;
       conductor.ready = readyAt(scratch.countIn, noteTime);
       batonAt(note.baton, noteTime, conductor.baton, conductor.ready);
       // The expression changes the beat at a climax and on the final chord (design 5.4).
@@ -780,40 +790,39 @@ function poseAnimal(
       );
       conductor.left.hold = Math.max(conductor.left.hold, expression.hold);
       conductor.left.close = Math.max(conductor.left.close, expression.close * expression.final);
-      cue.torsoYaw *= weight;
-      cue.headYaw *= weight;
-      cue.headPitch *= weight;
+      cue.torsoYaw *= arms;
+      cue.headYaw *= arms;
+      cue.headPitch *= arms;
       body.turn = cue.torsoYaw;
       body.headTurn = cue.headYaw;
       // The body comes up from a forward lean for a cue of the left hand.
       const upright = 1 - EXPRESSION_MOTION.cueUpright * cue.hand;
-      conductor.lean = expression.lean * weight * (expression.lean > 0 ? upright : 1);
-      conductor.sway = expression.sway * weight;
-      conductor.climax = expression.climax * weight;
-      conductor.shrug = expression.shrug * weight;
+      conductor.lean = expression.lean * arms * (expression.lean > 0 ? upright : 1);
+      conductor.sway = expression.sway * arms;
+      conductor.climax = expression.climax * arms;
+      conductor.shrug = expression.shrug * arms;
       // The upper body twists further toward a cued section, and the head keeps its aim.
       body.twist = EXPRESSION_MOTION.cueTwist * cue.torsoYaw;
       body.headTurn -= body.twist;
       cue.handYaw += body.twist;
       // The hips move against the side lean of the sway and drop with the knees. The feet stay.
-      hipsOffset(note.rig.legs, expression.shift * weight, pose.rootOffset);
-      pose.rootOffset[1] -= expression.drop * weight;
+      hipsOffset(note.rig.legs, expression.shift * arms, pose.rootOffset);
+      pose.rootOffset[1] -= expression.drop * arms;
       conductor.shift = pose.rootOffset[0];
       conductor.drop = -pose.rootOffset[1];
-      // The bow at the song end bends the spine and the head forward (design 5.4).
-      const bend = endBowAt(scratch.endElapsed);
-      body.lean = bend + conductor.lean;
+      // The bow at the song end bends the spine and the head forward, and the whole body turns
+      // around the root (design 5.4).
+      body.lean = end.bend + conductor.lean;
       body.sway = conductor.sway;
-      // The left hand comes down to the side as the bow starts, and stays down.
-      conductor.bow = Number.isNaN(scratch.endElapsed)
-        ? 0
-        : smoothstep((scratch.endElapsed - END_BOW.startSec) / END_BOW.downSec);
-      body.lift = cue.headPitch - bend * END_BOW.head + expression.head * weight;
+      body.lift = cue.headPitch - end.bend * END_BOW.head + expression.head * arms;
+      setBoneRotation(pose.rotations, BONES.root, turn.setFromAxisAngle(Y_AXIS, end.turn));
       writeBody(pose, player, scratch);
-      if (conductor.drop > 0 || conductor.shift !== 0) {
-        plantFeet(note.rig.legs, pose.rootOffset, pose.rotations);
+      if (conductor.drop > 0 || conductor.shift !== 0 || end.stepL > 0 || end.stepR > 0) {
+        stepLifts[0] = end.stepL * END_BOW.stepLift * note.rig.headHeight;
+        stepLifts[1] = end.stepR * END_BOW.stepLift * note.rig.headHeight;
+        plantFeet(note.rig.legs, pose.rootOffset, pose.rotations, stepLifts);
       }
-      poseConductor(note.rig, scratch.torso, conductor, weight, pose.rotations);
+      poseConductor(note.rig, scratch.torso, conductor, arms, pose.rotations);
       break;
     }
     default: {
@@ -920,7 +929,6 @@ export function poseAt(
       cue: createCueState(),
       ready: 0,
       left: createLeftHandState(),
-      bow: 0,
       lean: 0,
       sway: 0,
       drop: 0,
@@ -938,6 +946,7 @@ export function poseAt(
       !transport.playing && transport.changedAtWall !== null && songTime >= plan.endSec - 1e-3
         ? wallTime - transport.changedAtWall
         : Number.NaN,
+    end: createEndMotion(),
     leaderNod: 0,
   };
   // In the count-in after a pause, the note layers hold the pause point (design 5.2).

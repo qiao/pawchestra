@@ -292,42 +292,6 @@ export function seatHeight(
 }
 
 /**
- * The bow of the conductor at the song end (design 5.4). The bow marks the end of a piece. With
- * no bow, the last wide shot holds, and the players only lower their instruments. The times are
- * wall seconds after the pause at the song end.
- */
-export const END_BOW = {
-  /** The bow starts this long after the pause, while the instruments are still up (5.2). */
-  startSec: 0.8,
-  /** The upper body bends forward in this time, holds, and comes up in the same time. */
-  downSec: 0.7,
-  holdSec: 0.6,
-  /** The bend of the spine, in radians. */
-  angle: (32 * Math.PI) / 180,
-  /** The head bends this part of the bend more. */
-  head: 0.5,
-} as const;
-
-/**
- * Calculates the bend of the bow of the conductor at the song end (design 5.4): 0, then down in
- * 0.7 s, a hold of 0.6 s, and up in 0.7 s, with a smoothstep.
- *
- * @param elapsed The wall seconds after the pause at the song end, or `NaN` when the song does
- *   not stand at its end.
- * @returns The bend of the spine, in radians.
- */
-export function endBowAt(elapsed: number): number {
-  const b = END_BOW;
-  if (Number.isNaN(elapsed)) {
-    return 0;
-  }
-  const t = elapsed - b.startSec;
-  const down = smoothstep(t / b.downSec);
-  const up = smoothstep((t - b.downSec - b.holdSec) / b.downSec);
-  return b.angle * (down - up);
-}
-
-/**
  * Tells if all animals end the move of a transport by a wall time (design 5.2). After that time,
  * the height of each animal is the end of the move, whatever came before the transport.
  *

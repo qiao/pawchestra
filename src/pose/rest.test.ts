@@ -3,12 +3,10 @@ import { describe, expect, it } from 'vitest';
 import { mulberry32 } from './random.ts';
 import {
   CONDUCTOR_MOTION,
-  END_BOW,
   LIFT_FIT_SEC,
   LOWER_MAX_SEC,
   REST_MOTION,
   easeMove,
-  endBowAt,
   liftScale,
   moveProgress,
   restMotion,
@@ -280,18 +278,5 @@ describe('moveProgress and liftScale (design 5.2)', () => {
     expect(moveProgress(move, 0.5, scale)).toBe(1);
     expect(liftScale(CONDUCTOR_MOTION, 10)).toBe(1);
     expect(liftScale(CONDUCTOR_MOTION, Infinity)).toBe(1);
-  });
-});
-
-describe('endBowAt (design 5.4, UX audit 2026-10-05, AM2)', () => {
-  it('bends down after the arms come down, holds, and comes up', () => {
-    const b = END_BOW;
-    expect(endBowAt(Number.NaN)).toBe(0);
-    expect(endBowAt(0)).toBe(0);
-    expect(endBowAt(b.startSec)).toBe(0);
-    expect(endBowAt(b.startSec + b.downSec / 2)).toBeCloseTo(b.angle / 2, 9);
-    expect(endBowAt(b.startSec + b.downSec + b.holdSec / 2)).toBeCloseTo(b.angle, 9);
-    expect(endBowAt(b.startSec + 2 * b.downSec + b.holdSec)).toBeCloseTo(0, 9);
-    expect(endBowAt(60)).toBe(0);
   });
 });

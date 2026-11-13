@@ -395,11 +395,6 @@ export interface ConductorState {
   /** The weights of the places of the left hand between its cues. */
   readonly left: LeftHandState;
   /**
-   * The part of the bow at the song end that has started, from 0 to 1. The left hand comes down
-   * to the side by this weight, so that the head does not bow into it.
-   */
-  bow: number;
-  /**
    * The lean of the expression (design 5.4), in radians: the forward lean of the spine, scaled by
    * the playing pose. The places of the hands lean with it.
    */
@@ -427,9 +422,8 @@ const hangFrame = createFrame();
 
 /**
  * The part of the turn of the upper body that a hanging arm follows. In the bow at the song end,
- * arms that follow the whole bend of 32° swing the paws 2.8 cm into the belly of the studio bear,
- * and arms that hang straight down from the bent shoulders put the left paw on the conductor
- * stand.
+ * arms that follow the whole bend swing the paws into the belly of the studio bear (2.8 cm at a
+ * bend of 32°).
  */
 const HANG_FOLLOW = 0.5;
 const tip = new Vector3();
@@ -786,22 +780,21 @@ function poseLeftHand(
   if (ready > 0) {
     hand.premultiply(readyTurn.setFromAxisAngle(direction, CONDUCTOR_HOLD.readyRoll * ready));
   }
-  const up = weight * (1 - state.bow);
   levelOf(left, frames.root);
   hangingWrist(rig.hangL, hangFrame, hanging);
   writeArm(
     {
       arm: rig.left,
       shoulder: left,
-      wrist: wrist.lerpVectors(hanging, wrist, up),
-      hand: mixRotation(hangingHand(rig.hangL, hangFrame, restHand), hand, up, hand),
-      pole: mixPole(CONDUCTOR_HOLD.restPoleL, CONDUCTOR_HOLD.poleL, up),
+      wrist: wrist.lerpVectors(hanging, wrist, weight),
+      hand: mixRotation(hangingHand(rig.hangL, hangFrame, restHand), hand, weight, hand),
+      pole: mixPole(CONDUCTOR_HOLD.restPoleL, CONDUCTOR_HOLD.poleL, weight),
       maxTwist: MAX_TWIST_L,
       twist: palmTwist,
-      twistWeight: palmWeight * up,
+      twistWeight: palmWeight * weight,
     },
     chest.rotation,
     rotations,
   );
-  writeCurl(rig.left, curl * up, rotations);
+  writeCurl(rig.left, curl * weight, rotations);
 }
