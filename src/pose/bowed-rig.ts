@@ -1197,10 +1197,12 @@ export const BOWED_HOLDS = {
  * into the belly (limit 1.5). With 0.2 H in, the viola goes 2.6 cm into the body. The left paw
  * closes around the neck in the rest grip, as a seated violist holds the neck with the left hand
  * (`docs/reference/string-technique.md`, section 2.9): the playing grip at the rest place, curled
- * 115°, with the palm on the neck (`restGapL` 0), and turned 10° around the normal of the top
+ * 115°, 0.02 H off the neck (`restGapL`), and turned 10° around the normal of the top
  * plate, and the paw takes a turn of 42° in the plane of its palm (`restPawTurnL`), so that the
  * grip in the paw changes by 29° in a move. The neck then runs through the closed paw, and the
- * paw goes 0.4 cm into the viola. Curled 90° and 11 mm off the neck, the paw closes beside the
+ * paw goes 0.4 cm into the viola. With the palm on the neck, the thick wrist end of the forearm
+ * went 1.8 cm into the viola of 0.85 at rest (limit 1.5, `pnpm body-clip violist`), and with
+ * 0.02 H, it goes less than 1.5 cm in. Curled 90° and 11 mm off the neck, the paw closes beside the
  * neck as a fist and does not hold the viola. With a turn of 12° around the normal, the wrist skin
  * flattens in the lift (flat p5 0.70 against 0.75).
  *
@@ -1284,9 +1286,14 @@ export const BOWED_HOLDS = {
  * about 45° in each moment of the violist, so that the skin does not twist into a thin neck. The
  * left elbow points further out in the play, (-2, -0.8, -0.71), so that the upper arm
  * takes 44° of the turn: with (-1, -1, -0.75), it takes 15°, and the forearm 90°. At rest, the
- * left elbow points down and a little forward, (0, -1, -0.3), so that the upper arm rolls the other way,
- * and the left paw turns 45° around the normal of the top plate (`restYawL`): with the rest
- * elbow and the turn of the mesh cat, the left forearm twists 117° at rest.
+ * left elbow points down, a little out, and a little forward, (-0.3, -1, -0.3), so that the upper
+ * arm rolls the other way, and the left paw turns 45° around the normal of the top plate
+ * (`restYawL`): with the rest elbow and the turn of the mesh cat, the left forearm twists 117° at
+ * rest. With the elbow (0, -1, -0.3) and the viola of 0.85, the left elbow went 4.4 cm into the
+ * belly at rest and 5.4 cm in the lowering (`pnpm hold-fit violist`), and with this elbow, the arm
+ * root goes 2.8 cm and 3.4 cm into the body, as with the viola of 0.925. The viola then turns
+ * 69° off the short arc in one lift of `bach-bwv1048` (40° with the viola of 0.925,
+ * `pnpm carry-check violist`).
  *
  * The thighs of the Tripo cat are thinner than the thighs of the mesh cat. With the viola 0.22 H
  * out and 0.05 H up, its lower end stood 8.8 cm off the skin beside the hip, and the left paw held
@@ -1319,7 +1326,7 @@ const CAT_HOLD = {
   pluckSide: 0.294654,
   reach: 36 * MathUtils.DEG2RAD,
   restPoleR: [0.6, -1, 0.1],
-  restPoleL: [0, -1, -0.3],
+  restPoleL: [-0.3, -1, -0.3],
   restPlace: 0.55,
   rest: {
     axis: LAP_VIOLIN.axis,
@@ -1330,6 +1337,7 @@ const CAT_HOLD = {
   restCurlL: 115 * MathUtils.DEG2RAD,
   restPawTurnL: 42 * MathUtils.DEG2RAD,
   restYawL: 45 * MathUtils.DEG2RAD,
+  restGapL: 0.02,
   liftPoleL: [0.6, 1, 0.5],
   restBow: {
     lap: { along: 0.6, offset: [0.3, 0.3, -0.2] },
