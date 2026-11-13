@@ -829,7 +829,14 @@ passes.
       for the next body of the cat before a fix.
 - [ ] Tripo red fox violinist: the rest frog of the bow is 38.7 cm over the right thigh (16.3 cm
       on the fox of 62bf447f4), because the short arm does not reach it. At rest the left upper arm
-      goes 1.8 cm into the left shoulder (3.0 cm into the belly before).
+      goes 1.7 cm into its arm root (`pnpm hold-fit fox-violinist`).
+- [ ] Tripo red fox violinist rest (5.2): the left paw holds the neck from the outer side with a
+      straight wrist and the elbow bent 74°. Check the rest and the moves in the app. The paw
+      twists 67° on its forearm at rest (43° before) and turns up to 246°/s in the fastest lift
+      (pachelbel-p37), with a smooth rise and fall. The upper arm twist (24°, base 16°, margin
+      10°) and the forearm twist (35°, base 23°, margin 15°) of `pnpm arm-check fox-violinist` are
+      2° and 3° under `WORSE`. The bow paw bends more in the lift with this rest (see the move
+      task below): the cause is not found. Images: `reports/2026-11-13-fox-left/`.
 - [ ] Tripo red fox violinist: the last lowering of boulanger-matin starts from the pizzicato pose
       (tip up and to the right), and the bow passes 15 cm to 20 cm in front of the face for 0.41 s
       (0.22 s before the via reach of 2026-11-12). The cause is the pizzicato tip
@@ -855,13 +862,13 @@ passes.
 - [ ] Tripo red fox violinist: with the right paw turn of 4 steps, the bow paw twists 45° (p95)
       and the move twist is 48° (77° before the bent elbows of 5.2). Check the bow paw in the lift
       and the lowering in the app.
-- [ ] Tripo red fox violinist moves (5.2): the bow paw bends up to 63° on its forearm in the
-      middle of a move (69° before), over a longer time, so the paw swing p95 of `pnpm arm-check
-      fox-violinist` is 47° (33°). At about 0.8 of each lift, the roll of the play hold on the
+- [ ] Tripo red fox violinist moves (5.2): the bow paw bends up to 69° on its forearm in the
+      middle of a move, over a longer time, so the paw swing p95 of `pnpm arm-check
+      fox-violinist` is 53° (33°). With the old rest of the violin, it was 63° and 47°. At about
+      0.8 of each lift, the roll of the play hold on the
       moving violin changes 7° in one step of 0.01 s, where its arm comes into the reach, and the
       bow paw bends 4° in that step. The bow elbow dips about 10° at each edge of the move limit
-      (`keepMoveBend()`). The bow goes 1.1 cm into the violin in a lowering (0.6 cm) (`pnpm
-      hold-fit fox-violinist`). Images: `reports/2026-11-13-fox-move/`.
+      (`keepMoveBend()`). Images: `reports/2026-11-13-fox-move/`.
 - [ ] Tripo red fox violinist: the paws go up to 2.5 cm into the violin and the left forearm 2.0
       cm (`pnpm body-clip fox-red:violin`, limit 0.045 H), as on the fox before (2.3 cm).
 - [ ] Tripo tan fox flutist: with the longer paw, the right paw at rest and in the lift lies 69°
