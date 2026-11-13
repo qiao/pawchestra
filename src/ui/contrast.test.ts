@@ -3,14 +3,7 @@ import { join } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import {
-  LINE_MARGIN,
-  LOGO_BACKDROP_LIMIT,
-  SHADE_ALPHA,
-  SHADE_RGB,
-  TEXT_BACKDROP_LIMIT,
-  shadeLevel,
-} from './title-shade.ts';
+import { SHADE_ALPHA, SHADE_RGB } from './title-shade.ts';
 
 /** The stylesheet of the UI. */
 const UI_CSS = readFileSync(join(import.meta.dirname, 'ui.css'), 'utf8');
@@ -131,8 +124,8 @@ function contrast(a: Rgba, b: Rgba): number {
   return ((high ?? 0) + 0.05) / ((low ?? 0) + 0.05);
 }
 
-/** The selector of the shade of each line of the title. */
-const LINE_SHADE = '.title .logo::before,\n.title h2::before,\n.title p::before';
+/** The selector of the title shade: one fixed gradient behind the title (design 2.8). */
+const LINE_SHADE = '.title::before';
 
 /** White, the lightest color behind the panel of the drawer: white fur in a close shot. */
 const WHITE: Rgba = { r: 255, g: 255, b: 255, a: 1 };
@@ -206,7 +199,7 @@ describe('the title over a light animal (design 2.8, audit 2026-10-05-ux-design,
 });
 
 /**
- * The backdrops of the level test: each gray, and the colors of the scene (white and gold fur,
+ * The backdrops of the shade test: each gray, and the colors of the scene (white and gold fur,
  * the warm floor, the beam, and full red, green, and blue) at each brightness.
  */
 const BACKDROPS: readonly Rgba[] = [
@@ -232,12 +225,12 @@ const BACKDROPS: readonly Rgba[] = [
   ),
 ];
 
-describe('the level of the title shade over each backdrop (design 2.8)', () => {
+describe('the title shade over each backdrop (design 2.8)', () => {
   const shade = color(UI_CSS, declaration(UI_CSS, LINE_SHADE, 'background'));
   const lines = {
-    logo: [color(UI_CSS, declaration(UI_CSS, '.title .logo', 'color')), LOGO_BACKDROP_LIMIT],
-    title: [color(UI_CSS, declaration(UI_CSS, ':root', 'color')), TEXT_BACKDROP_LIMIT],
-    composer: [color(UI_CSS, declaration(UI_CSS, '.title p', 'color')), TEXT_BACKDROP_LIMIT],
+    logo: color(UI_CSS, declaration(UI_CSS, '.title .logo', 'color')),
+    title: color(UI_CSS, declaration(UI_CSS, ':root', 'color')),
+    composer: color(UI_CSS, declaration(UI_CSS, '.title p', 'color')),
   } as const;
 
   it('has the color and the alpha of --title-shade', () => {
@@ -245,36 +238,10 @@ describe('the level of the title shade over each backdrop (design 2.8)', () => {
     expect(shade.a).toBe(SHADE_ALPHA);
   });
 
-  it.each(Object.entries(lines))(
-    'keeps 4.5:1 for the %s over each backdrop',
-    (_, [text, limit]) => {
-      for (const backdrop of BACKDROPS) {
-        const level = shadeLevel(luminance(backdrop), limit);
-        const behind = over(shade, level, backdrop);
-        expect(contrast(text, behind), JSON.stringify(backdrop)).toBeGreaterThanOrEqual(AA_TEXT);
-      }
-    },
-  );
-});
-
-describe('the shape of the title shade (design 2.8, audit 2026-10-06-ux-design-2, N21)', () => {
-  const [vertical = '', horizontal = ''] = declaration(UI_CSS, LINE_SHADE, 'inset').split(/\s+/u);
-  const blur = Number(/^blur\((\d+)px\)$/u.exec(declaration(UI_CSS, LINE_SHADE, 'filter'))?.[1]);
-
-  it('follows the text of each line', () => {
-    expect(declaration(UI_CSS, '.title .logo,\n.title h2,\n.title p', 'width')).toBe('fit-content');
-  });
-
-  it('is a blurred pill, with no straight edge', () => {
-    expect(declaration(UI_CSS, LINE_SHADE, 'border-radius')).toBe('999px');
-    expect(blur).toBeGreaterThanOrEqual(8);
-  });
-
-  it('is opaque over the text and the margin that the app reads', () => {
-    // A blur of the radius r keeps more than 99% of the shade at 2.5 r inside its edge.
-    for (const inset of [vertical, horizontal]) {
-      const px = -Number(/^(-\d+)px$/u.exec(inset)?.[1]);
-      expect(px - LINE_MARGIN, inset).toBeGreaterThanOrEqual(2.5 * blur);
+  it.each(Object.entries(lines))('keeps 4.5:1 for the %s over each backdrop', (_, text) => {
+    for (const backdrop of BACKDROPS) {
+      const behind = over(shade, 1, backdrop);
+      expect(contrast(text, behind), JSON.stringify(backdrop)).toBeGreaterThanOrEqual(AA_TEXT);
     }
   });
 });
@@ -295,11 +262,10 @@ describe('the GitHub mark in the logo line (design 2.8)', () => {
   );
 
   it.each(Object.entries(marks))(
-    'keeps 4.5:1 at %s over each backdrop with the level of the logo',
+    'keeps 4.5:1 at %s over each backdrop with the title shade',
     (_, mark) => {
       for (const backdrop of BACKDROPS) {
-        const level = shadeLevel(luminance(backdrop), LOGO_BACKDROP_LIMIT);
-        const behind = over(shade, level, backdrop);
+        const behind = over(shade, 1, backdrop);
         expect(contrast(mark, behind), JSON.stringify(backdrop)).toBeGreaterThanOrEqual(AA_TEXT);
       }
     },

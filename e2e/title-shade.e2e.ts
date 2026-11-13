@@ -20,7 +20,7 @@ const MOST_STEP = 12;
 /** The smallest contrast ratio of WCAG 2.2 AA for text of normal size. */
 const AA_TEXT = 4.5;
 
-/** The selectors of the lines of the title, in the order of `Title.lines`. */
+/** The selectors of the lines of the title, from the top. */
 const LINES = ['.title .logo', '.title h2', '.title p'] as const;
 
 /**
@@ -103,7 +103,7 @@ async function cornerPixels(page: Page, width: number, height: number): Promise<
  * text. The colors are the color of the line and of each element in it that holds text.
  *
  * @param page The page.
- * @returns The lines, in the order of `Title.lines`.
+ * @returns The lines, from the top.
  */
 async function linesOnPage(page: Page): Promise<LineOnPage[]> {
   const lines = await page.evaluate(
@@ -187,24 +187,7 @@ function largestStep(values: readonly number[]): number {
   return most;
 }
 
-/**
- * Reads the opacity of the shade of each line of the title: its level from 0 to 1.
- *
- * @param page The page.
- * @returns The opacity of each shade, in the order of `Title.lines`.
- */
-async function shadeOpacities(page: Page): Promise<number[]> {
-  return page.evaluate(
-    (selectors) =>
-      selectors.map((selector) => {
-        const element = document.querySelector(selector);
-        return element ? Number(getComputedStyle(element, '::before').opacity) : Number.NaN;
-      }),
-    [...LINES],
-  );
-}
-
-test.describe('the shade of each title line (design 2.8, audit 2026-10-06-ux-design-2, N21)', () => {
+test.describe('the title shade (design 2.8, audit 2026-11-12-design-audit, V2)', () => {
   for (const [width, height] of SIZES) {
     test(`is dark behind the text and has no straight edge at ${width} × ${height}`, async ({
       page,
@@ -213,11 +196,7 @@ test.describe('the shade of each title line (design 2.8, audit 2026-10-06-ux-des
       await page.goto('./');
       await page.waitForSelector('#stage[data-demo]');
       const lines = await linesOnPage(page);
-      // The probe of the backdrop reads the hidden canvas, so the test sets the full level.
-      await page.addStyleTag({
-        content: `${WHITE_PAGE}
-          .title *::before { opacity: 1 !important; transition: none !important; }`,
-      });
+      await page.addStyleTag({ content: WHITE_PAGE });
       await page.waitForTimeout(100);
 
       const right = Math.max(...lines.map((line) => line.right));
@@ -249,59 +228,4 @@ test.describe('the shade of each title line (design 2.8, audit 2026-10-06-ux-des
       }
     });
   }
-});
-
-test.describe('the level of the title shade (design 2.8)', () => {
-  test('shows no shade behind the logo and the composer in the default view', async ({ page }) => {
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('./');
-    await page.waitForSelector('#stage[data-demo]');
-    // The mockup shows the logo and the composer over the dark hall, with no shade.
-    await expect
-      .poll(async () => {
-        const [logo, , composer] = await shadeOpacities(page);
-        return [logo, composer];
-      })
-      .toEqual([0, 0]);
-  });
-
-  test('keeps 4.5:1 for each line over a white frame', async ({ page }) => {
-    // With the attribute `data-white-frame` on the root, each read of the frame behind the title
-    // gives white pixels, as white fur in a close shot.
-    await page.addInitScript(() => {
-      // oxlint-disable-next-line typescript/unbound-method -- the wrapper gives it its context.
-      const read = WebGL2RenderingContext.prototype.getBufferSubData;
-      WebGL2RenderingContext.prototype.getBufferSubData = function white(
-        this: WebGL2RenderingContext,
-        ...args: Parameters<WebGL2RenderingContext['getBufferSubData']>
-      ): void {
-        read.apply(this, args);
-        if (document.documentElement.dataset['whiteFrame'] !== 'on') {
-          return;
-        }
-        const [, , destination] = args;
-        new Uint8Array(destination.buffer, destination.byteOffset, destination.byteLength).fill(
-          255,
-        );
-      };
-    });
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto('./');
-    await page.waitForSelector('#stage[data-demo]');
-    await expect.poll(async () => (await shadeOpacities(page))[0]).toBe(0);
-    const lines = await linesOnPage(page);
-
-    await page.addStyleTag({ content: WHITE_PAGE });
-    await page.evaluate(() => {
-      document.documentElement.dataset['whiteFrame'] = 'on';
-    });
-    // Each shade rises to the level that its text needs over white (ui/title-shade.ts).
-    await expect.poll(async () => Math.min(...(await shadeOpacities(page)))).toBeGreaterThan(0.75);
-    await page.waitForTimeout(300);
-
-    const pixels = await cornerPixels(page, 600, 200);
-    for (const line of lines) {
-      expect(lineContrast(pixels, line), JSON.stringify(line)).toBeGreaterThanOrEqual(AA_TEXT);
-    }
-  });
 });

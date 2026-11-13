@@ -279,7 +279,7 @@ and the layout, and `reference/mockup.png` is the target of the look. The CSS of
 | `--accent-strong` | `#f0c676` (hover) |
 | `--on-accent` | `#1a140d` (an icon or a text on `--accent`) |
 | `--danger` | `#e0796a` |
-| `--title-shade` | `rgba(11, 9, 8, 0.8)` (the shade behind each title line at the level 1) |
+| `--title-shade` | `rgba(11, 9, 8, 0.8)` (the darkest part of the title shade) |
 | `--github-mark` | `#c8c8c8` (the neutral gray of the GitHub mark, as the logo rules of GitHub ask) |
 | `--track` | `rgba(255, 240, 220, 0.2)` (the track of a slider, where it is not filled) |
 | Font | `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif` |
@@ -305,9 +305,13 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   paint (7.2). A hash that names a demo clears the lines before the first paint, and the app
   writes the title of its demo. The full-page message of 2.6 removes the header. In Cinematic
   mode, the header shows only the logo (2.3).
-- **Title shade**: each title line has a soft shade. Its level comes from the frame behind the
-  line (`shadeLevel()` in `ui/title-shade.ts`), because a shade from the camera mode does not see a
-  free camera. A shade comes in at once and goes out slowly, so that it does not flicker.
+- **Title shade**: one fixed gradient in `--title-shade` from the top-left corner of the frame
+  covers the title and fades out below it and right of it (`.title::before` of `ui/ui.css`), with
+  a tight text shadow on the letters. It keeps 4.5:1 for each line over a white animal, and it has
+  no visible shape. In Cinematic mode it covers only the logo line. A shade for each line, with a
+  level from a read of the frame behind it, showed as a dark smudge on the light beam, and the
+  read raised the p95 of the main thread by about 1 ms. `e2e/title-shade.e2e.ts` checks the
+  contrast and the edges.
 - **Title card**: in Cinematic mode, the song start shows the composer in spaced gold capitals, a
   short gold rule, and the piece title in the serif, centered in the lower part of the frame, as
   the main title of a film (`ui/title-card.ts`). A window in portrait shows it in the top bar of
