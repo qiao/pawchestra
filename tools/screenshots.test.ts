@@ -177,6 +177,7 @@ function planOf(list: readonly [ShotKind, number][]): ShotPlan {
       from: key,
       to: key,
       blendSec: 0,
+      hero: null,
     };
   });
   return { stageSide: 10, shots, starts: Float64Array.from(shots, (s) => s.startSec) };

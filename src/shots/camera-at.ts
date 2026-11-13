@@ -29,6 +29,9 @@ export function createCameraPose(): CameraPoseBuffer {
     light: 0,
     spot: 0,
     focusPull: 1,
+    hero: null,
+    heroFrom: null,
+    heroShare: 1,
     shadowFit: [0, 0, 0, 0],
   };
 }
@@ -176,8 +179,10 @@ function copyPoint(from: Vec3, out: [number, number, number]): void {
  *    shot, as the factor of the beam. The default view has the light of the stage.
  * 8. The view drifts a little around the camera position ({@link CAMERA_DRIFT}), with the size of
  *    the kind of the shot, blended as the beam. With `still`, it does not drift.
- * 9. After a hard cut into a close shot, the focus pulls onto the subject ({@link FOCUS_PULL}).
- *    With `still`, the focus is on the subject.
+ * 9. The pose names the hero of the shot, whose nearer eye the scene finds and focuses on. A
+ *    blend moves the focus from the eye of the hero of the previous shot. After a hard cut into a
+ *    close shot, the focus pulls onto the eye ({@link FOCUS_PULL}). With `still`, the focus is
+ *    on the eye.
  * 10. A shot from the front of players fits the shadow map of the key light to a sphere around
  *    its target (`writeShadowFit()`). A blend holds the spheres of both shots.
  *
@@ -209,6 +214,9 @@ export function cameraAt(
     out.light = 0;
     out.spot = 0;
     out.focusPull = 1;
+    out.hero = null;
+    out.heroFrom = null;
+    out.heroShare = 1;
     out.shadowFit[3] = 0;
     return out;
   }
@@ -225,6 +233,9 @@ export function cameraAt(
   // A blend joins two close shots, so the kind of the current shot holds for the blend.
   out.close = isCloseShot(current.kind);
   out.focusPull = 1;
+  out.hero = current.hero;
+  out.heroFrom = current.hero;
+  out.heroShare = 1;
   const previous = plan.shots[i - 1];
   const sinceCut = time - current.startSec;
   const share = CAMERA_DRIFT.shares[current.kind];
@@ -242,6 +253,8 @@ export function cameraAt(
   }
   writeShadowFit(current, previous, out.shadowFit);
   const w = smoothstep(sinceCut / current.blendSec);
+  out.heroFrom = previous.hero;
+  out.heroShare = w;
   const fov = writeShotCamera(plan, previous, 1, aspect, blendStart, blendLook);
   for (let k = 0; k < 3; k++) {
     const p = blendStart[k] ?? 0;

@@ -71,6 +71,7 @@ function shot(startSec: number, endSec: number): Shot {
     from: key,
     to: key,
     blendSec: 0,
+    hero: null,
   };
 }
 

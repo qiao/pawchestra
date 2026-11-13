@@ -77,6 +77,12 @@ export interface Shot {
   readonly to: ShotKey;
   /** The time of the blend from the previous shot, in song seconds. 0 is a hard cut. */
   readonly blendSec: number;
+  /**
+   * The hero of the shot (design 5.6): the player whose nearer eye takes the focus, as its index
+   * in `SceneLayout.players`, or `CONDUCTOR_OWNER` for the conductor. `null` keeps the focus on
+   * the point that the camera looks at.
+   */
+  readonly hero: number | null;
 }
 
 /** The shots of one score. `prepareShots()` makes it. */
@@ -119,6 +125,18 @@ export interface CameraPose {
    */
   readonly focusPull?: number;
   /**
+   * The hero of the shot ({@link Shot.hero}). The scene finds the nearer eye of its posed head and
+   * focuses on it (design 4.5, 5.6). A pose with no value focuses on the point that it looks at.
+   */
+  readonly hero?: number | null;
+  /**
+   * The hero of the previous shot during a blend, else the same as {@link CameraPose.hero}. The
+   * focus goes from its eye to the eye of the hero over the blend.
+   */
+  readonly heroFrom?: number | null;
+  /** The weight of the eye of {@link CameraPose.hero} against the eye of `heroFrom`, from 0 to 1. */
+  readonly heroShare?: number;
+  /**
    * The sphere that the shadow map of the key light holds (design 4.5): the center and the radius,
    * in meters. It is constant in a shot (`writeShadowFit()`). A radius of 0, or a pose with no
    * value, holds the whole stage.
@@ -136,6 +154,9 @@ export interface CameraPoseBuffer {
   light: number;
   spot: number;
   focusPull: number;
+  hero: number | null;
+  heroFrom: number | null;
+  heroShare: number;
   shadowFit: [number, number, number, number];
 }
 

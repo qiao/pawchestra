@@ -46,6 +46,7 @@ import { FRAME_MARGINS, SHOT_SIZES, frameHalfHeight } from './shot-size.ts';
 import type { ShotSize } from './shot-size.ts';
 import { barLengthAt, beatLengthAt, entriesIn, musicIn, prepareMusic, restingIn } from './music.ts';
 import type { ScoreMusic, WindowMusic } from './music.ts';
+import { leadHero, subjectHero } from './hero.ts';
 import {
   SUBJECT_SIZES,
   activeMiddle,
@@ -558,6 +559,8 @@ interface Planner {
   readonly seed: number;
   /** The cut of the shot that the planner chooses now, in song seconds. */
   cut: number;
+  /** The music of the window after the cut, which chooses the hero of a shot. */
+  window: WindowMusic;
   /** The start of the last shot, in song seconds. */
   readonly lastStart: number;
   readonly planned: PlannedShot[];
@@ -661,6 +664,11 @@ interface Framing {
   readonly held: ReadonlySet<ClearBox>;
   /** The place of the subject in the frame, or `null` for the target in the middle. */
   readonly composition: Composition | null;
+  /**
+   * The hero of the shot (`Shot.hero`), or `null` for a wide or a high shot, whose hero is the
+   * lead player of the window ({@link leadHero}).
+   */
+  readonly hero: number | null;
 }
 
 /**
@@ -1568,6 +1576,7 @@ function searchClose(
       part: subject.part,
       held,
       composition: composed().composition,
+      hero: subjectHero(planner.subjects, planner.window, subject),
     };
   };
   // The low band tries only the wanted elevation, with a full search.
@@ -1670,6 +1679,7 @@ function wideFraming(planner: Planner): Framing {
     part: null,
     held: new Set(),
     composition: null,
+    hero: null,
   };
 }
 
@@ -1698,6 +1708,7 @@ function openingFraming(planner: Planner): Framing {
     part: null,
     held: new Set(),
     composition: null,
+    hero: null,
   };
 }
 
@@ -1745,6 +1756,7 @@ function highFraming(planner: Planner): Framing | null {
       part: null,
       held: new Set(),
       composition: null,
+      hero: null,
     };
   }
   return null;
@@ -2524,6 +2536,7 @@ function addShot(
       composition: framing.composition,
       from: framing.from,
       to: framing.to,
+      hero: framing.hero ?? leadHero(planner.subjects, planner.window, framing.target),
     },
     id: candidate.id,
     group: candidate.group,
@@ -2661,6 +2674,7 @@ function* planShotsSteps(
     master: defaultView(layout.stageSide, CINEMA_ASPECT, 1).position,
     seed,
     cut: 0,
+    window: musicIn(music, 0, SHOT_TIMES.choiceWindowSec),
     lastStart: lastStartOf(music, score.durationSec),
     planned: [],
     sightCache: new Map(),
@@ -2694,6 +2708,7 @@ function* planShotsSteps(
     yield;
     planner.cut = cut;
     const window = musicIn(music, cut, cut + SHOT_TIMES.choiceWindowSec);
+    planner.window = window;
     let chosen: { candidate: Candidate; framing: Framing } | null = null;
     const traced =
       trace && cut >= trace.range.fromSec - 1e-9 && cut <= trace.range.toSec + 1e-9
@@ -2841,6 +2856,7 @@ function* planShotsSteps(
 
   // The closing: the camera cranes up from the low wide view into the default view, and it holds
   // after the song end. A pull-out reverses the push-in of the shot before it.
+  planner.window = musicIn(music, cut, cut + SHOT_TIMES.choiceWindowSec);
   const to = defaultKey(1);
   const low = lowered(DEFAULT_TARGET, farDistance(planner.stageSide, true, 1), DEFAULT_ELEVATION);
   addShot(
@@ -2855,6 +2871,7 @@ function* planShotsSteps(
       part: null,
       held: new Set(),
       composition: null,
+      hero: null,
     },
     {
       startSec: cut,
