@@ -827,8 +827,9 @@ export const PERCUSSION_HOLDS = {
  * loudness (`sizes.lift`, `across.peak`): about 6 cm for a soft note and 13 cm for a loud note.
  * With the rest direction across the forearm, the heads swing out past the rim. At rest, the
  * mallets lie across the body over the plate, as the snare sticks of the set position, with the
- * left mallet 7° up and the right mallet 7° down (`set.rise`), so that the shafts lie side by
- * side and do not cross: with 0° and 9° up, they crossed in an X. In a rest after a
+ * left mallet 20° up and the right mallet level (`set.rise`), so that the shafts lie side by
+ * side and do not cross: with 0° and 9° up, they crossed in an X. With the right mallet 7° down,
+ * the right paw turned 37° from its accepted grip in the play (arm gate limit 30° from the base). In a rest after a
  * note, the paw that did not strike takes its grip to the near rim, and the spine leans 9° more
  * (`damp`), so that the fingers touch the edge: with no lean, the arm stretched 0.12 of the upper
  * arm (main 0.04), and a grip at the rim point nearest to the shoulder joint twisted the arm in a
@@ -854,7 +855,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   pitchR: 1,
   ready: false,
   restPitch: 1,
-  set: { raise: 0.246243, rise: [0.12, -0.12] },
+  set: { raise: 0.246243, rise: [0.35, 0] },
   pair: false,
   gap: 0,
   pass: 0,
