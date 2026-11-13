@@ -1832,7 +1832,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | Timpani | Kettles of the real size in an arc. The kettles of the elephant move to its short arms, with a gap for its trunk (`TIMPANI`). |
 | Percussion | Drums, a xylophone, a triangle, and a tambourine within the reach of the badger, and a suspended cymbal (`cymbalForm`, `SUSPENDED_CYMBAL`). The bass drum and its beater have the size of a person-sized drum at the scale of the badger crown (`BADGER_SCALE`), so they follow the body. The xylophone bars stand below the shoulder joints of the badger (`XYLOPHONE.barHeight`). The section "Percussion" below gives their parts. |
 | Choir folder | In both flippers, in front of the chest (`CHOIR_FOLDER`). |
-| Baton | Along the index finger, with its grip in the palm, as a conductor holds it (`BATON_ALONG`). |
+| Baton | The butt in the heel of the palm, and the stick out through the palm under the curled claws, turned toward the thumb, as a conductor holds it with the butt against the palm (`BATON_GRIP`, `BATON_ALONG`). |
 
 Each mallet, stick, and beater slants down toward the line of the forearm, as a real player holds
 the shaft along the thumb (`malletTilt`). Each shaft of the badger but the triangle beater takes
