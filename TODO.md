@@ -384,8 +384,8 @@ passes.
 - [ ] Cat violist: a light shard at the right elbow, a dark dot on the right forearm, and a
       stretched texture at the right elbow at rest (pose audit L9). The rest hold of the right arm
       did not change in the string round, so look at the chain of the cat in 2x crops.
-- [ ] Cat violist: with the viola on its via (`carryVia`), the left forearm goes 2.0 cm (lift) and
-      2.2 cm (lowering) into the back of the viola near the rest, in 16% and 23% of the samples
+- [ ] Cat violist: with the viola on its via (`carryVia`), the left forearm goes 2.3 cm (lift) and
+      2.1 cm (lowering) into the back of the viola near the rest, in 16% and 17% of the samples
       (1.6 cm and 1.5 cm when the viola hung from the paw, limit 1.5 cm, `pnpm body-clip
       violist`). An elbow out, (-1, -0.5, 0), keeps it at 1.2 cm, but the paw then twists past 180°
       on its forearm in a lowering of `mozart-k525`. The left arm gate folds 43 faces at rest (the
