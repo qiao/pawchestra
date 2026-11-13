@@ -1584,7 +1584,7 @@ const HIPPO_HOLD = {
  *
  * The right upper arm swings 10° forward and the elbow bends 50° (`restArms`), so that the paw
  * rests at the top of the right thigh near the hip, with the elbow near the side. The paw holds the
- * bow at the frog with the tip up, out, and a little forward, (0.45, 1, -0.3), as a seated
+ * bow at the frog with the tip up, out, and forward, (0.45, 1, -0.45), as a seated
  * violinist rests the bow pointing up with a fist around the frog
  * (`docs/reference/string-technique.md`, section 2.9). With the tip (0.2, 1, 0.1), the stick stood
  * up in front of the right cheek and the whiskers in the side view.
@@ -1595,12 +1595,13 @@ const HIPPO_HOLD = {
  * twists 44° at rest (`pnpm hold-fit violinist --sets rest`): with the hair to the back and out,
  * (1, 0, 1), the forearm twisted 8° at rest, but the bow turned about 150° in a move,
  * and the paw flipped early in each lift (`pnpm arm-check violinist`). In the lift and the
- * lowering, the bow tip turns out to the right through the front, (0.7, 0.3, -1), with the hair to
- * the front, and the grip moves 0.3 H out and 0.1 H to the front (`restBow.via`), so that the bow
- * keeps at least 20 cm from the music desk. With the tip (0.3, 0.6, -1), the bow tip stood over
- * the right eye in the front view in the middle of the lift, and the stick crossed the mouth in
- * the lowering. With the tip (1, 0.2, -0.5), the right paw turned at 17,169°/s in a lowering
- * (limit 3,000, `pnpm arm-check violinist`). In the play of the fourth Tripo rabbit, the left forearm
+ * lowering, the bow tip turns out to the right through the front, (0.7, 0.05, -1), with the hair
+ * to the front, and the grip moves 0.3 H out and 0.1 H to the front (`restBow.via`), so that the
+ * bow keeps at least 20 cm from the music desk. With the tip (0.3, 0.6, -1), the bow tip stood
+ * over the right eye in the front view in the middle of the lift, and the stick crossed the mouth
+ * in the lowering. With the tip (0.7, 0.3, -1), the tip came to the right eye in the lowering.
+ * With the tip (1, 0.2, -0.5), the right paw turned at 17,169°/s in a lowering (limit 3,000,
+ * `pnpm arm-check violinist`). In the play of the fourth Tripo rabbit, the left forearm
  * twists 13° and the right forearm 10° (`pnpm hold-fit violinist`, assets/models/rabbit/README.md,
  * "Arm twist").
  *
@@ -1636,9 +1637,9 @@ const RABBIT_HOLD = {
   liftPoleL: [-1, -1.2, 0],
   restBow: {
     ...SHOULDER_HOLD.restBow,
-    tip: [0.45, 1, -0.3],
+    tip: [0.45, 1, -0.45],
     hair: [-1, 0, -1],
-    via: { tip: [0.7, 0.3, -1], hair: [0, 0, -1], reach: [0.3, 0, -0.1] },
+    via: { tip: [0.7, 0.05, -1], hair: [0, 0, -1], reach: [0.3, 0, -0.1] },
   },
 } as const satisfies BowedHold;
 
