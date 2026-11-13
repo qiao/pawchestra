@@ -1054,11 +1054,12 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   larger body of the Tripo panda at the same H moves the players of the four demos with
   trombones.
 - The seated bind of the Tripo panda and of the Tripo polar bear has a key `bind_belly`. On the
-  panda, it moves the belly half way to the form that the trunk bones alone give, from the lap up
-  to below the arms, and relaxes the lap rows. Reason: bone heat gives the thighs shares far up
-  the belly and the flanks, and the seated thighs pulled the belly back into a hard ridge from
-  each armpit to the knee and a dark band across the belly. The key fades out under the arms, so
-  that the upper arms keep their room. The standing soloist keeps the form of the source.
+  panda, it moves the belly half way to the form that the trunk bones alone give, from the lower
+  belly over the thigh tops up to below the arms, and relaxes the lap rows. Reason: bone heat gives
+  the thighs shares far up the belly and the flanks, and the seated thighs pulled the belly back
+  into a hard ridge from each armpit to the knee, a dark band across the belly, and a groove with
+  a black line at the lap. The key fades out under the arms, so that the upper arms keep their
+  room. The standing soloist keeps the form of the source.
 - The Tripo fawn keeps the long legs of its mesh, with flat hooves, on the stool of the old deer
   (`seatWidth`). Its shins lean 35° forward, so that the seat is lower. Its short tail hangs behind
   the back edge of the seat. Reason: with vertical shins, the higher seat moved players of the

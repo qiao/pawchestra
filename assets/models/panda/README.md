@@ -154,15 +154,20 @@ front view a dark band across the belly. The standing soloist has neither fault,
 not change:
 
 1. Trunk form: each vertex moves by s (M_hips - M_leg) r, summed over its leg bones with their
-   weights, with r its rest place and M the bind matrix of a bone. s = 0.5 ss(z, 0.26, 0.44)
+   weights, with r its rest place and M the bind matrix of a bone. s = 0.5 ss(z, 0.18, 0.36)
    (1 - ss(z, 0.42, 0.50)) (1 - ss(y, -0.06, 0.04)), with ss a smoothstep of the rest place. The
    top fade keeps the chest under the arms: with no fade, the right upper arm went 1.7 cm into the
    belly in the play (`pnpm hold-fit trombonist`, limit 1.5 cm, 1.3 cm before).
 2. Relax: 6 rounds of P += 0.5 ((mid - P) . n) n on the vertices with a rest z from 0.20 to 0.36,
    rest y below 0, atan2(|x|, -y) at most 60 degrees, and a distance below 0.25 from the z axis.
 
-144 vertices move, at most 0.036 units. A thin dark line stays at the lap, where the belly meets
-the thigh tops.
+175 vertices move, at most 0.052 units. The trunk form starts at the lower belly (rest z 0.18).
+With a start at z 0.26, the lower belly kept thigh shares of 0.5 to 0.7. The seated thighs pulled
+it about 0.09 units back behind the thigh tops, so a groove with a black line showed across the
+lap in each front view. Now the belly rests on the thigh tops. In the front views of the
+trombonist, the pixels with a luma below 30 in the lap fall from 7,941 to 2,015 (rest) and from
+6,031 to 2,093 (first position). A start at z 0.14 also moved the crotch, and the belly then
+covered the tops of the dark thighs.
 
 **Arm stretch.** The point edit `armStretch` of `redits.py` (in `params.json`: `{"kind":
 "armStretch", "k": 1.2, "ramp": 0.01, "reach": [0.1, 0.12]}`), the edit of the hippo and the deer
