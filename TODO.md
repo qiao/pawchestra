@@ -1191,11 +1191,10 @@ scene of each demo has its seats and stage size with no overlap.
       of the viola, the right paw of the cat goes 2.7 cm into the viola (0.1 cm deeper than the
       lowering after a pause), and the rest pose of the contrabass puts the left paw of the hippo
       4.4 cm into the neck (5.2).
-- [ ] Give `swayOf()` a seeded sign, phase lag, and pulse level for each player. The sway of the 14
-      string players of `beethoven-5-4` correlates at 0.991 or more, and the spine turns at most
-      2.2°, about 2 pixels in the default view. Show the user a lineup at 1.5, 2, and 3 times.
-      Then give each player a level and trend track, as the conductor has: a lean into a
-      crescendo, a chest turn with a long bow, a bell lift at a phrase peak (5.1).
+- [ ] Show the user a lineup of the body layer at 1.5 (now, `BODY_MOTION.scale`), 2, and 3 times.
+      Then give each player a level and trend track, as the conductor has
+      (`buildExpressionTrack()`): a lean into a crescendo, a chest turn with a long bow, a bell lift
+      at a phrase peak. The sway of each player already has a seeded side, lag, and level (5.1).
 - [ ] Show the user a lineup of a seeded fur value step of ±5% for each player of a section, as one
       uniform of each player mesh. The posture of each player already varies (`PlayerPlan.posture`),
       and the four foxes of a section still have one face color (5.1).
