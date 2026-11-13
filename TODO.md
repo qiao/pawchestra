@@ -850,9 +850,16 @@ passes.
       (`bandPatch`), so a straight light line shows where the band meets the forearm in the play
       view (`reports/2026-11-13-fox-wrist/play-red-fox/pair-az0-wrists-2x.png`). Try UVs that
       continue the forearm fur on the near ring.
-- [ ] Tripo red fox violinist: with the right paw turn of 4 steps, the bow paw twists 47° (p95,
-      22° with 3 steps) and the move twist is 122° (97°). Check the bow paw in the lift and the
-      lowering in the app.
+- [ ] Tripo red fox violinist: with the right paw turn of 4 steps, the bow paw twists 45° (p95)
+      and the move twist is 48° (77° before the bent elbows of 5.2). Check the bow paw in the lift
+      and the lowering in the app.
+- [ ] Tripo red fox violinist moves (5.2): the bow paw bends up to 63° on its forearm in the
+      middle of a move (69° before), over a longer time, so the paw swing p95 of `pnpm arm-check
+      fox-violinist` is 47° (33°). At about 0.8 of each lift, the roll of the play hold on the
+      moving violin changes 7° in one step of 0.01 s, where its arm comes into the reach, and the
+      bow paw bends 4° in that step. The bow elbow dips about 10° at each edge of the move limit
+      (`keepMoveBend()`). The bow goes 1.1 cm into the violin in a lowering (0.6 cm) (`pnpm
+      hold-fit fox-violinist`). Images: `reports/2026-11-13-fox-move/`.
 - [ ] Tripo red fox violinist: the paws go up to 2.5 cm into the violin and the left forearm 2.0
       cm (`pnpm body-clip fox-red:violin`, limit 0.045 H), as on the fox before (2.3 cm).
 - [ ] Tripo red fox: `bowGrip` of `src/models/species.ts` is the grip of the paw of the fox of
