@@ -1771,9 +1771,11 @@ export const SUSPENDED_CYMBAL = {
 export function buildSuspendedCymbal(scale: number): InstrumentModel {
   const c = SUSPENDED_CYMBAL;
   const piece = new PieceBuilder();
-  // The bell is up, so the rim hangs below the strap.
+  // The bell is up, so the rim hangs below the strap. The plate is a piece of its own on the
+  // `slide` bone, with its pivot at the middle of the bell, so that it can swing after a strike.
   const center: Vec3 = [0, c.height - CYMBAL_RIM * scale, -c.forward];
-  addCymbalPlate(piece, center, scale);
+  const plate = new PieceBuilder();
+  addCymbalPlate(plate, [0, 0, 0], scale);
   const under = center[1] + CYMBAL_INNER * scale;
   addStand(piece, [center[0], 0, center[2]], [center[0], center[1] + 0.035, center[2]], 0.24);
   addCymbalNut(piece, center, scale);
@@ -1795,7 +1797,12 @@ export function buildSuspendedCymbal(scale: number): InstrumentModel {
   return {
     id: 'cymbals',
     parent: 'root',
-    pieces: [instrument, left.piece, right.piece],
+    pieces: [
+      instrument,
+      plate.build('slide', hold('instrument', [0, 0, 0], undefined, center)),
+      left.piece,
+      right.piece,
+    ],
     grips: handGrips(),
     targets: [
       { kind: 'head', bone: 'instrument', from: spot, to: spot, normal: [0, 1, 0], keys: null },
