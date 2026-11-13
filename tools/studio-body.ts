@@ -114,9 +114,9 @@ export interface AnimalSettings {
   readonly crease: number;
   /**
    * The largest difference of two face colors of the fur that blend at a vertex, in each sRGB
-   * channel from 0 to 1 (`StudioBody.colorBlend`, design 4.5). The bears take it, so that the
-   * steps of the paint and of the baked occlusion fade across the smooth fur.
-   * With no value, each face keeps its color.
+   * channel from 0 to 1 (`StudioBody.colorBlend`, design 4.5), so that the steps of the paint and
+   * of the baked occlusion fade across the smooth fur. No body of the app takes it. With no value,
+   * each face keeps its color.
    */
   readonly colorBlend?: number;
   /**
