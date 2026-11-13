@@ -956,22 +956,25 @@ scene of each demo has its seats and stage size with no overlap.
       the eye, and the tube covers the snout. A longer bocal (`BASSOON_REED`) could move it out, and
       it also moves the grips. Ask the user. The right arm folds p95 are 37 (27 before), and the
       bell top is 7.9 cm below the head top.
-- [ ] Mouse (Tripo hand rig): the oboist folds 19 faces of the left arm and 18 of the right at p95
+- [ ] Mouse (Tripo hand rig): the oboist folds 20 faces of the left arm and 18 of the right at p95
       (`pnpm arm-check oboist`, limit 8, 6 and 8 on the old mouse): the curled digits around the
       oboe, and thin faces at the arm root that fold with a shoulder turn of 2° to 8°
       (`pnpm fold-probe oboist --faces 20`). Look at the paws and the armpits in the app.
-- [ ] Mouse (Tripo hand rig): the layout moves players of 14 of 18 demos against `7fa9d1e89`, the
-      mice by 5 cm to 1.5 m and other players by up to 1.37 m (the pigs and the wolves of
-      beethoven-1 and beethoven-9), and the penguin riser is 0.1 m lower in beethoven-9. The height
-      of the body causes it, and the footprint does not: at the same H, the eyes stand 0.84 m high
-      (old 0.69 m) and the ears 1.03 m (old head top 0.83 m). With the old footprint, the moves
-      stay. With the old eyes, bach-bwv1047 comes back, and with no sight blocks of the mouse,
-      beethoven-1 and beethoven-9 come back. A footprint with no thin tail, or a sight mesh with no
-      ears, moves the other species by up to 1.8 m. In bach-bwv1047 the mouse stands behind its
-      stand and a rabbit in the default view. Ask the user: a smaller mouse (about 0.82 of its size
-      gives the old eye height), the new seats, or a seat rule for the default view of the winds.
+- [ ] Mouse (Tripo hand rig): at the eye height of the old mouse, the layout gives the seats of
+      `7fa9d1e89` in 12 of 18 demos, with the penguin riser at 1.10 m in beethoven-9. The footprint
+      of the mouse still moves players of 5 demos: beethoven-5-4 (a tan fox 0.55 m), mozart-k191
+      (a dog 0.39 m, the stage side 9.45 m to 9.25 m), mozart-k315 (a pig 0.25 m), mozart-k417 (the
+      mouse 0.18 m), and beethoven-9 (the mouse 5 cm). With the boxes of the old tail, only the
+      mouse of mozart-k417 (0.22 m) and a red fox of mozart-k191 (8 cm) move. The tail of the
+      source lies straight back (0.03 m wide), and the tail of the old mouse curled to the side
+      (0.19 m wide). Ask the user: keep these seats, or a tail bind that curls to the side.
+- [ ] Badger (Tripo hand rig, larger crown): the layout moves the mice and the tan foxes of
+      boulanger-matin by up to 1.62 m and a hippo by 0.18 m against `7fa9d1e89`, and the badgers of
+      beethoven-9 by 6 cm. The old mouse gives the same moves, so the badger causes them. Check the
+      layout of boulanger-matin with the user.
 - [ ] Mouse (Tripo hand rig): the oboe of 0.45 reads small under the paws in the close views. The
-      right grip has 1.2 cm of spare reach, so a larger oboe needs a new grip fit.
+      right grip has 0.4 cm of spare reach on the smaller body, so a larger oboe needs a new grip
+      fit.
 - [ ] Mouse (Tripo hand rig): 2 points of each open lid and 1 side point in the blink leave the head
       at the socket rim (ray casts of `lids()`). Check the blink in a close view.
 - [ ] Wolf clarinetist: at 35° the right paw reaches its grip with only 0.2 cm to spare, also with
