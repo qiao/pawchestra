@@ -282,10 +282,11 @@ The rest of each family:
   arm root. On the new rabbit body, the lap places at the knees made both arms reach nearly
   straight forward. The rabbit holds its violin upright on the lap with the left elbow near the
   side. Its right paw rests at the top of the right thigh near the hip, with the elbow bent near
-  the side, and holds the bow at the frog with the tip up and a little out
-  (`RABBIT_HOLD.restArms`, `restBow`). In a move, its bow tip turns up through the front
-  (`restBow.via`). Reason: a seated violinist rests the bow pointing up, with a fist around the
-  frog (strings 2.9). The paw grips the stick across the palm, so the stick rises from the thumb
+  the side, and holds the bow at the frog with the tip up, out, and a little forward
+  (`RABBIT_HOLD.restArms`, `restBow`). In a move, its bow tip turns out to the right through the
+  front (`restBow.via`). Reason: a seated violinist rests the bow pointing up, with a fist around
+  the frog (strings 2.9). A tip only a little out stood in front of the cheek, and a tip that
+  turned up through the front crossed the right eye in the front view. The paw grips the stick across the palm, so the stick rises from the thumb
   side of the closed paw, and a tip down twists the forearm. The hair of the rest bow faces the
   front and in, so that the bow turns little from the rest to the move and the paw does not flip. The cat rests the instrument upright on the left thigh, with the elbows near
   the sides, as a seated violinist does. The cat rests the viola at the outer side
@@ -301,10 +302,12 @@ The rest of each family:
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
   the right knee with the tip up, as a cellist does. Its grip lies low and out, and both elbows
   point out, so that the round upper arms stay off the chest (5.3, "Free round arms"). The hippo
-  hangs the right arm at the side of the belly, with the bow tip down and a little forward. Its
-  left paw holds the neck (`restPlace`) with the elbow out to the side, as in the play. Reason:
-  with the arm out to the side, the hippo read as stiff, and a rest elbow far from the play elbow
-  twists the left forearm in the moves.
+  hangs the right arm at the side of the belly, with the bow tip down and a little forward, and
+  with the grip out from the knee, so that the arm hangs off the round belly
+  (`HIPPO_HOLD.restBow`). Its left paw holds the neck (`restPlace`) with the elbow out to the
+  side, as in the play. Reason: with the arm far out to the side, the hippo read as stiff, and a
+  rest elbow far from the play elbow twists the left forearm in the moves. With the grip near the
+  side, the arm lay flat on the belly with a crease at the shoulder.
 - **Winds.** The head lifts, and the instrument moves off the mouth. Both paws keep their grips
   (`restAim`), so no paw slides along the tube. A real player can rest the instrument on a leg,
   but the mouse stands with no lap, and the round bellies of the beaver and the pig cover their
@@ -590,10 +593,22 @@ The rest of each family:
   forearm free of the body of the instrument (strings 1.9), and at the grip of the hold, the thick
   wrist end goes into the upper bout. The play keeps its grip, because no move of the wrist and no
   turn of the elbow moves the thick wrist end out of the upper bout (`TODO.md`).
-- **Cello rest grip on the neck.** At rest, the left paw of the shared cello hold holds the neck
-  near the nut (`restPlace`). The dog holds it at 0.3 of the fingerboard. Reason: at 0.6, the paw
+- **Left forearm clear of the upper bout.** The left wrist of a violin or a viola stays on the
+  side of the back of the instrument, so that the forearm passes under the upper bout, as the
+  wrist of a real player stays under the neck (strings 1.9). The cat tilts its paw less over the
+  neck than the chin hold (`CAT_HOLD.tiltL`), and plays the largest viola with which its paw
+  reaches the fingerboard far enough from the upper bout (`violaScale`). Reason: the short left
+  arm of the cat runs nearly straight from the shoulder to the neck, and it reached the
+  fingerboard only near the upper bout. With the wrist over the plane of the top plate, its
+  forearm went through the upper bout in each sample of the play and of the rest. The thick paw
+  of the rabbit lies off the strings in the play (`RABBIT_HOLD.gapL`). Its forearm still touches
+  the back of the violin (`TODO.md`).
+- **Cello and contrabass rest grip on the neck.** At rest, the left paw of the shared cello hold
+  holds the neck near the nut (`restPlace`). The dog holds it nearer to the nut than the middle,
+  and the hippo holds the neck of the contrabass above the upper bout. Reason: at 0.6, the paw
   holds the fingerboard at the top of the upper bout, and the left forearm or the paw of most
-  recast bodies, and the paw of the dog, goes into the upper bout at rest and in the moves.
+  recast bodies, the paw of the dog, and the claws of the hippo go into the upper bout at rest
+  and in the moves.
 - **Violin left elbow of the rabbit.** In the play, the left elbow of the rabbit comes in under
   the violin, straight down and forward (`RABBIT_HOLD.poleL`), as a violinist swings the elbow
   under the instrument (strings 1.10). At rest, it points out (`RABBIT_HOLD.restPoleL`). Reason:
