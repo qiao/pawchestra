@@ -208,12 +208,16 @@ export const LEFT_HAND_PLACES = {
     palm: 'up',
   },
   /**
-   * The lowered hand of a diminuendo and of a soft passage, open with the palm down, out at the
-   * left at the height of the shoulder.
+   * The lowered hand of a diminuendo and of a soft passage, open with the palm down, forward and
+   * out at the left at the height of the shoulder. The fingers point forward and a little out and
+   * down, near the line of the forearm. With the fingers 31° down and the wrist less forward
+   * (-0.59, 0.06, -0.78), the paw bent 53° on the forearm, and the left forearm stretched 0.42 of
+   * the upper arm (p95 of the arm gate, limit 0.35). With the wrist 0.06 H further in, the left
+   * upper arm went 1.6 cm into the shoulder in a turn to the right (limit 1.5 cm).
    */
   fade: {
-    wrist: [-0.59, 0.06, -0.78],
-    fingers: [0, -0.6, -1],
+    wrist: [-0.56, 0, -0.84],
+    fingers: [-0.3, -0.1, -1],
     curl: 5 * MathUtils.DEG2RAD,
     palm: 'down',
   },
