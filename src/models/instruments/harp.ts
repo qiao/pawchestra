@@ -69,47 +69,48 @@ export const HARP = {
  * The place of the harp at the player (design 4.6). As a harpist sits, the base stands on the
  * floor in front of the player, between the knees, with the pedals at the feet, and the soundbox
  * rests on the right shoulder, near the neck of the player (`docs/reference/harp-technique.md`,
- * sections 2 and 7.7). The deer is the only harp player, and its body sets the place. Its chest
- * stands 17 cm in front of its shoulder joints, so a soundbox on the shoulder put the strings out
- * of the reach of its arms. The top of the soundbox thus stands at the right side of the chest,
- * below the right shoulder, and the right arm hangs outside it. The base stands near the stool,
- * so that the arms of the Tripo fawn reach the strings, and to the right, so that the soundbox
- * stays off the chest. With this place, every 0.5 s of `boulanger-matin` and in the lift, the
- * rest, and the lowering (`scratch/dh/evalc.ts` of the round 2026-11-13), no arm goes through
- * the strings, each note target lies within 5 mm, and only the right hoof goes more than 1.3 cm
- * into a harp part, in a pedal move. `pnpm hold-fit --set` and the other probes change it as
- * `harpPlace`.
+ * sections 2 and 7.7). The deer is the only harp player, and its body sets the place. The base
+ * stands in front of the chest, a little to the left of the floor point, and the top of the
+ * soundbox rests against the chest, in front of and below the right shoulder joint. Thus the right
+ * shoulder stands behind the shortest treble strings, and the right arm passes outside the top of
+ * the soundbox to the strings. The base stands as near to the stool as the chest lets it, so that
+ * the long arms of the Tripo fawn reach the bass strings. With this place, every 0.5 s of
+ * `boulanger-matin` and in the lift, the rest, and the lowering (`scratch/dh/evalc.ts` of the round
+ * 2026-11-13), no arm goes through the strings, and each note target lies within 5 mm. The chest
+ * touches the neck and the top of the soundbox: it goes 1.5 cm into the neck in 2 % of the
+ * samples. `pnpm hold-fit --set` and the other probes change it as `harpPlace`.
  */
 export const HARP_PLACE = {
   /**
-   * The move of the base to the right of the floor point under the seat, in head heights. At
-   * 0.26 H, the left paw goes 1.7 cm into the body, against 0.7 cm.
+   * The move of the base to the right of the floor point under the seat, in head heights: the
+   * base stands to the left. At -0.2 H, the chest goes 2.2 cm into the top of the soundbox in each
+   * sample, and at -0.3 H, 1.7 cm. At 0.22 H, the place of the harp of 0.85, the treble strings
+   * of the harp of 0.975 pass through the right shoulder.
    */
-  side: 0.22,
+  side: -0.25,
   /** The move of the base up, in meters, at the scale 1 of the harp: 0, on the floor. */
   lift: 0,
   /**
-   * The distance of the base in front of the floor point, in meters, at the scale 1. At 0.16 m,
-   * the left paw goes 3.1 cm into the body in 11 % of the samples. At 0.22 m, the right arm goes
-   * through the strings in 5 % of the samples, and the right paw misses 4 % of its note targets.
+   * The distance of the base in front of the floor point, in meters, at the scale 1. At 0.25 m,
+   * the chest goes 2.2 cm into the top of the soundbox in each sample, and the paws miss their
+   * note targets by up to 1.4 cm.
    */
-  front: 0.19,
+  front: 0.23,
   /**
    * The tilt of the harp back to the player. A concert harp leans back onto the shoulder, but the
-   * soundbox of the model already leans 33° toward the player. With a tilt of 3°, the left paw goes
-   * 7.2 cm into the body in 55 % of the samples, and the right thigh 1.8 cm into the soundbox. So
-   * the harp stands upright, as some smaller harps do (section 1).
+   * soundbox of the model already leans 33° toward the player. On the harp of 0.85, with a tilt of
+   * 3°, the left paw went 7.2 cm into the body in 55 % of the samples, and the right thigh 1.8 cm
+   * into the soundbox. So the harp stands upright, as some smaller harps do (section 1).
    */
   tilt: 0,
   /**
    * The turn of the harp around the vertical, seen from above, so that the column goes to the
    * front left: the harp is diagonal to the player. The left hand plays the bass strings at the
-   * front left, and the right hand the treble strings near the right shoulder. A larger turn
-   * brings the bass strings nearer to the left paw, and the strings nearer to the chest. At 45°,
-   * the right upper arm goes 1.4 cm into the neck of the harp in 1.3 % of the samples. At 51°, it
-   * goes 1.4 cm into the soundbox in 3.2 %, and the left paw 2.3 cm into the body.
+   * front left, and the right hand the treble strings near the right shoulder. At 43°, the chest
+   * goes 1.5 cm into the neck in 29 % of the samples. At 49°, it goes 1.6 cm into the top of the
+   * soundbox in 85 %.
    */
-  turn: 48 * MathUtils.DEG2RAD,
+  turn: 46 * MathUtils.DEG2RAD,
 };
 
 /**
