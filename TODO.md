@@ -496,6 +496,10 @@ passes.
       drum hides its player. Ask the user if the badger must show more from the front.
 - [ ] Badger: the snare sticks and the mallets keep about real lengths (34 cm), longer than the
       scaled bass drum beater. Ask the user if the scale of the badger applies to them too.
+- [ ] Badger snare drummer: in the side views, the butt of the near stick shows over the belly at
+      rest. It is no clip: the butts stay out at the sides of the body, at least 16.5 cm from the
+      trunk at rest and 11.7 cm in the play, the lift, and the lowering. Ask the user if the rest
+      must change, such as the two sticks in one paw.
 - [ ] Badger bass drummer: between strikes, the paw keeps its turn in the world while the body
       sways, so its twist on the forearm moves 20° in about 1 s.
 - [ ] Badger cymbalist: the upper arms stand 35° out from the side of the body in the play (21° to
