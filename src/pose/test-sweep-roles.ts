@@ -94,6 +94,10 @@ const BODY_LOOPS = 2;
  * - The hippo: 10 open loops, the cuts to the two upper arms, the rims of the 2 eyeballs, the 2
  *   holes of the head under them, the 2 teeth, and the edges of the 2 lids.
  * - The monkey: 6 open loops, the cuts to the two upper arms and 4 open loops of the Tripo monkey.
+ * - The mouse: 22 open loops, the cuts to the two upper arms, 18 open loops of the Tripo mouse (the
+ *   8 whisker strips, the rims and the inner edges of the 2 eye sockets, 4 small holes beside the
+ *   eyes, a hole at the root of the left ear, and an edge pair at the lower belly), and the edges
+ *   of the 2 lids.
  * - The panda: 6 open loops, the cuts to the two upper arms, the open rims of the 2 eyeballs of the
  *   Tripo panda, and the edges of the 2 lids.
  * - The penguin: 22 open loops, the cuts to the two upper arms, 18 open loops of the Tripo penguin
@@ -117,6 +121,7 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/fox/tripo-hand/fox.rig.glb', 8],
   ['assets/models/hippo/tripo-hand/hippo.rig.glb', 10],
   ['assets/models/monkey/tripo-hand/monkey.rig.glb', 6],
+  ['assets/models/mouse/tripo-hand/mouse.rig.glb', 22],
   ['assets/models/penguin/tripo-hand/penguin.rig.glb', 22],
   ['assets/models/pig/tripo-hand/pig.rig.glb', 7],
   ['assets/models/panda/tripo-hand/panda.rig.glb', 6],
@@ -134,13 +139,6 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
 function bodyLoops(posed: PosedSkeleton, loops: number): number {
   return TRIPO_BODY_LOOPS.get(posed.model.studio.body.source) ?? loops;
 }
-
-/**
- * The open loops of {@link BODY_BONES} of the mouse mesh: the cuts to the two upper arms, 10 open
- * loops of the whiskers (0.10 m to 0.57 m long, each a thin strip beside the muzzle), and two open
- * edge pairs of 1.4 cm and 2.8 cm at the right toes.
- */
-const MOUSE_BODY_LOOPS = 14;
 
 /**
  * The open loops of {@link BODY_BONES} of the rhino mesh in a T-pose: the roots of the two upper
@@ -227,17 +225,6 @@ function* playSamples(scene: TestScene): Generator<SweepSample> {
  */
 function bodySurface(posed: PosedSkeleton): ClosedSurface {
   return closedPart(posed, BODY_BONES, bodyLoops(posed, BODY_LOOPS));
-}
-
-/**
- * The closed surface of the body of the mouse mesh: {@link BODY_BONES} with a cap on each open loop
- * ({@link MOUSE_BODY_LOOPS}).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function mouseBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, MOUSE_BODY_LOOPS);
 }
 
 /**
@@ -1576,7 +1563,7 @@ const OBOIST_SWEEP: RoleSweep = {
   ...FLUTIST_SWEEP,
   role: 'oboist',
   obstacles: [
-    { name: 'body', surface: mouseBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'oboe', surface: instrumentSurface },
   ],
   hasRole: (score) => score.seats.some((seat) => seat.section === 'oboe'),
