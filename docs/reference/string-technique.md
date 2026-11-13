@@ -463,7 +463,9 @@ The app follows these facts:
 - **The seated rest and the lift (2.9).** The instrument stands upright on the left thigh, and the
   left paw holds the neck. In the lift, the instrument turns with the paw the short way: the
   scroll stays up, and the body swings in and up to the jaw (`carryLift()`,
-  `BowedHold.liftPoleL`).
+  `BowedHold.liftPoleL`). The viola of the cat leads on a via, and the paw follows it
+  (`BowedHold.carryVia`): the scroll swings up and to the left with the strings to the front,
+  then the top plate turns up to the jaw. Thus the strings never point to the floor.
 
 The app does not follow these facts:
 
@@ -616,8 +618,8 @@ The app does not follow these facts:
   no place of the right hand. The short arms of the rabbit do not reach the top of the thigh in
   front of the hip, so its frog end stands beside the thigh and not on it. The frog end of the
   red fox stays 16 cm above the thigh. In a move, the bow tip of the red fox turns to the left
-  below the snout, and its grip moves up toward the shoulder, so that the elbow bends over the
-  whole move (`restBow.via`).
+  below the snout, and its grip moves out and to the front, so that the roll of the paw on the stick
+  changes over the whole move (`restBow.via`).
 
 ### 3.3 The cello on the chair and at rest
 
