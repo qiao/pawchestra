@@ -826,16 +826,19 @@ const PANDA_TROMBONE = {
  * the left paw missed its grip by 2.7 cm and the right paw by 5.2 cm in the play
  * (`pnpm hold-fit oboist`), and the left upper arm went 2.3 cm into the shoulder. Each paw aims
  * across the tube (`aimAcross`) with no side aim (`aimSide`), each palm faces the tube
- * (`faceTube`), and the fingers curl 130° (left) and 110° (right) over its front
+ * (`faceTube`), and the fingers curl 120° (left) and 100° (right) over its front
  * (`gripCurl`). The thumbs then point up the oboe to the reed, as an oboist curves the fingers over
  * the keys with the thumb behind the tube (`docs/reference/wind-technique.md` 2.3). Both paws grasp
  * the oboe in each sample of the play, the lift, and the rest (`pnpm wind-grip oboist`). With a
- * left curl of 100°, the tips of the short left digits of the Tripo mouse stood 1.6 cm off the
- * tube at rest, and the left paw grasped it in no rest sample. With the grips behind the tube and a side aim
- * of half, each paw lies behind the tube with its palm to the audience and its thumb down the oboe.
+ * left curl of 110°, the tips of the short left digits of the Tripo mouse stood 0.9 cm off the
+ * tube at rest, and the left paw grasped it in no rest sample. With a right curl of 90°, the right
+ * paw grasped it in no rest sample. With 130° and 110°, the digits folded 4 more faces of the left
+ * paw and 2 more of the right paw at rest (`pnpm hold-fit oboist`). With the grips behind the tube
+ * and a side aim of half, each paw lies behind the tube with its palm to the audience and its thumb
+ * down the oboe.
  * With the left grip on the axis (0.04 H toward it), the roll to the tube has no direction, and the
- * paw turns over. With 70° on the right, the right arm folds 18 faces at p95 of the play, and the
- * left arm 20 (`pnpm arm-check oboist`, limit 8).
+ * paw turns over. With 70° on the right, the right arm folds 15 faces at p95 of the play, and the
+ * left arm 18 (`pnpm arm-check oboist`, limit 8): the curled digits and thin faces at the arm root.
  *
  * In the rest, the oboe stands upright in front of the belly, 0.29 H below the mouth point, as a
  * real oboist holds it vertical in a short rest. The rest place moves by the opposite step of the
@@ -880,7 +883,7 @@ const MOUSE_OBOE = {
   gripShiftL: [-0.08, 0.06, -0.05],
   gripShiftR: [-0.08, 0.06, -0.05],
   restAim: 1,
-  gripCurl: curls(130, 110),
+  gripCurl: curls(120, 100),
 } as const satisfies WindHold;
 
 /** The forward turns of the shoulder bones of the bassoon beaver while it plays, in degrees. */
