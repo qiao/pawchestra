@@ -353,7 +353,8 @@ The app follows these facts:
   In the rest, the paws put down one instrument and take the other (`SWITCH_MOTION`).
 - **The triangle (section 8).** The left paw holds the upper end of the clip between the tip of
   the thumb and the curled fingers, with the thumb down, and the clip and the triangle hang below
-  the paw in a loop of cord [15] [25] (`TRIANGLE_CLIP`). A single note strikes the side
+  the paw in a loop of cord [15] [25] (`TRIANGLE_CLIP`). The paw stays in line with its forearm,
+  and the triangle keeps its hang below the pinch (`trianglePaw()`). A single note strikes the side
   across from the open corner [63]. Before a louder note, the beater turns further back
   (`MalletAcross.peak`). A roll moves the beater fast between the two sides of the closed lower
   corner, from inside [25] [63] (`TRIANGLE_ROLL`, `triangleRolls()`).
@@ -391,10 +392,11 @@ The app does not follow these facts:
 - **The rolls (sections 7 and 8).** A roll of the suspended cymbal strikes at most 12 times each
   second with the two paws in turn (`STRIKE_MOTION.rollSec`, `thinRolls()`). A triangle roll
   strikes at most 6 times each second (`handRollSec`).
-- **The hold of the triangle (section 8).** The clip is a little below the mouth, not at eye
-  level (`PERCUSSION_PLACES.triangleClip`), because the short arm reaches no higher in front of
-  the long snout: a clip 2 cm higher twisted the arm past the margin of the arm gate in a lift.
-  No source gives the turn of the hand.
+- **The hold of the triangle (section 8).** The clip is a little below the mouth
+  (`PERCUSSION_PLACES.triangleClip`). A real player holds it near eye level, but the long snout of
+  the badger stands there: a clip 0.4 H higher put the claws 5.8 cm into the snout. The paw turns
+  90° around its forearm, so that the palm faces the clip (`triangleTwist`). No source gives the
+  turn of the hand.
 - **The change of the instrument (section 8).** A switch takes 2.7 s of rest: 0.2 s after the
   note, two moves of 0.45 s, 0.6 s at the table, and the lift of 1 s before the next note
   (`switchRestSec()`). No source gives the time [67]. With a shorter rest, the left paw keeps the
@@ -413,8 +415,9 @@ The app does not follow these facts:
 - **The rest at the suspended cymbal (section 7).** No source gives it. The mallets lie across the
   body as the snare sticks, above the plate (`SUSPENDED_CYMBAL_HOLD.set`).
 - **The muffle of the suspended cymbal (section 7).** The sources give the stop of the hand cymbals
-  at the chest, and no grip of a suspended cymbal. The closed paw rests on the edge, with the mallet
-  lifted off the plate, and the rule of the rest is the rule of the hand cymbals. A MIDI drum note
+  at the chest, and no grip of a suspended cymbal. The closed paw rests on the edge, and the mallet
+  points up from the plate, away from the bell (`EdgeDamp.share`). The rule of the rest is the
+  rule of the hand cymbals. A MIDI drum note
   has no written length, so each note before a rest of 0.5 s stops.
 - **The hand cymbals (section 7).** The angle of the flam is 15° at each loudness, smaller than
   the 35° to 45° of [60]: a small angle that keeps the plates not parallel [61]. The plates tilt 15° from vertical [16]. No concert source gives the rest place: in a long
