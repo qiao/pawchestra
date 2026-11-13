@@ -15,7 +15,7 @@ model folder gives the files of each step.
 | --- | --- | --- |
 | bear | Hand rig, made by hand in Blender (no chain). Stands on the podium. | `conductor` |
 | polar-bear | Hand rig, a digit bone for each claw. Sits on a bench that fits the legs, with the thighs sloped down (`benchFitOf()`). | `pianist` |
-| rabbit | Hand rig, a smaller violin. | `violinist` |
+| rabbit | Hand rig of the fourth Tripo rabbit at the seated eye height of the third rabbit, arms of the girth of the third rabbit (`armGirth`), a smaller violin. | `violinist` |
 | fox-red | Hand rig of a copy with four-digit front paws (`fox_paws.py`). | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
 | cat | Hand rig, a tail curled on the seat, a viola of `violaScale`. | `violist` |
