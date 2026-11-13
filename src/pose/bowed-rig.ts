@@ -21,6 +21,8 @@ import {
   rollToward,
   shoulderTurn,
   shoulderTurnL,
+  soundingPointAt,
+  steadyHand,
   stopHandAt,
   stringsAt,
 } from './bowed.ts';
@@ -1843,6 +1845,12 @@ export interface BowedRig {
   /** The part of the bow hair that the bow arm reaches on all strings (design 5.3). */
   readonly bowRange: BowRange;
   /**
+   * False when the bow arm reaches no place of the hair on all strings. Then
+   * {@link BowedRig.bowRange} is the 0.04 m around the nearest place, and the bow shows nearly no
+   * stroke. The probe tools warn about such a hold (`bowWarning()` of `tools/bow-warning.ts`).
+   */
+  readonly bowReached: boolean;
+  /**
    * The part of the target `fingerboard` that the left arm reaches, from 0 at the nut to 1 at the
    * end (design 5.3). The places of the notes map into it.
    */
@@ -1850,7 +1858,7 @@ export interface BowedRig {
 }
 
 /** The points of a rig before its ranges. */
-export type RigPoints = Omit<BowedRig, 'bowRange' | 'stopRange'>;
+export type RigPoints = Omit<BowedRig, 'bowRange' | 'bowReached' | 'stopRange'>;
 
 /**
  * Finds a target of an instrument.
@@ -1899,20 +1907,46 @@ export function playingFrames(rig: RigPoints): TorsoFrames {
   };
 }
 
+/** The reached part of the bow hair of a rig ({@link bowRangeOf}). */
+interface BowReach {
+  /** The longest reached part of the hair, in meters from the frog end. */
+  readonly range: BowRange;
+  /** False when the arm reaches no place, and the range is the part around the nearest place. */
+  readonly reached: boolean;
+}
+
 /**
  * Finds the part of the bow hair that the bow arm reaches on all strings in the playing pose, from
  * the frog hair of the hold (`BowedHold.frogHair`) on. A small player cannot reach the tip of a
  * long bow.
  *
+ * A hold whose bow hand turns on the stick (`BowedHold.stickTurnR`) takes the hand of the pose
+ * (`steadyHand()` of `pose/bowed.ts`), at the sounding point of the hold in piano and in forte
+ * (`BowedHold.soundingPoint`). The turn and the further rolls move the wrist, and the sounding
+ * point of the hippo lies 0.19 m from the contact point of the model. With one roll of the bind
+ * grip at the contact point of the model, the search gave the dog 0.10 m of hair near the tip and
+ * the hippo no place, and the arms of the pose reach 0.17 m and 0.01 m. Each other hold keeps
+ * that search.
+ *
  * @param rig The points of the player.
- * @returns The longest reached part of the hair, in meters from the frog end. If the arm reaches
- *   no part, the 0.04 m around the nearest place.
+ * @returns The longest reached part of the hair. If the arm reaches no part, the 0.04 m around
+ *   the nearest place, with `reached` false.
  */
-function bowRangeOf(rig: RigPoints): BowRange {
+function bowRangeOf(rig: RigPoints): BowReach {
   const frames = playingFrames(rig);
   const { place, strings, bow: placed, hand } = createBowPlaces();
   const tilted = { grip: new Vector3(), rotation: new Quaternion() };
-  stringsAt(rig, instrumentAt(rig, frames, 1, place), strings);
+  instrumentAt(rig, frames, 1, place);
+  const keep = rig.hold.stickTurnR;
+  // The contact points of the search: the sounding point in piano and in forte for the hand of
+  // the pose, else the contact point of the model.
+  const contacts = (keep ? [0, 1] : []).map((loudness) =>
+    soundingPointAt(rig, loudness, stringsAt(rig, place, strings)).contact.clone(),
+  );
+  stringsAt(rig, place, strings);
+  if (!keep) {
+    contacts.push(strings.contact.clone());
+  }
   const pole = new Vector3(...rig.hold.poleR).applyQuaternion(frames.chest.rotation);
   const shoulder = poseShoulder(
     rig.armR,
@@ -1921,8 +1955,12 @@ function bowRangeOf(rig: RigPoints): BowRange {
     shoulderTurn(rig, 1, new Quaternion()),
   );
   // The hand rolls so that its back points to the elbow of the hold, as in the pose.
-  const wristAt = (string: number, at: number): Vector3 => {
+  const wristAt = (contact: Vector3, string: number, at: number): Vector3 => {
+    strings.contact.copy(contact);
     heldBowAt(rig, strings, string, at, 0, tilted, placed);
+    if (keep) {
+      return steadyHand(rig, placed, shoulder, pole, hand).wrist;
+    }
     const wrist = gripHand(rig, placed, 0, hand).wrist;
     const { elbow } = solveArm(rig.armR.bind, shoulder.position, shoulder.rotation, wrist, pole);
     return gripHand(rig, placed, rollToward(rig, placed, elbow), hand).wrist;
@@ -1945,10 +1983,14 @@ function bowRangeOf(rig: RigPoints): BowRange {
   let nearestDistance = Infinity;
   let previous = frog;
   for (const [k, bow] of places.entries()) {
-    const distance = Math.max(
-      wristAt(0, bow).distanceTo(shoulder.position),
-      wristAt(3, bow).distanceTo(shoulder.position),
-    );
+    let distance = 0;
+    for (const contact of contacts) {
+      distance = Math.max(
+        distance,
+        wristAt(contact, 0, bow).distanceTo(shoulder.position),
+        wristAt(contact, 3, bow).distanceTo(shoulder.position),
+      );
+    }
     if (distance < nearestDistance) {
       nearestDistance = distance;
       nearest = bow;
@@ -1966,7 +2008,9 @@ function bowRangeOf(rig: RigPoints): BowRange {
     }
     previous = bow;
   }
-  return best ?? [Math.max(0, nearest - 0.02), nearest + 0.02];
+  return best
+    ? { range: best, reached: true }
+    : { range: [Math.max(0, nearest - 0.02), nearest + 0.02], reached: false };
 }
 
 /** The step of the search for the reached part of the fingerboard. */
@@ -2209,7 +2253,8 @@ export function bowedRig(
       ? armRest(model, rig, hold.restArms)
       : rig;
   const round = liftShoulders(model, roundElbows(model, rest));
-  return { ...round, bowRange: bowRangeOf(round), stopRange: stopRangeOf(round) };
+  const bow = bowRangeOf(round);
+  return { ...round, bowRange: bow.range, bowReached: bow.reached, stopRange: stopRangeOf(round) };
 }
 
 /**

@@ -645,7 +645,11 @@ export function restHandAt(
  * @param strings The strings at their posed place. The function moves the contact point in place.
  * @returns `strings`.
  */
-function soundingPointAt(rig: RigPoints, loudness: number, strings: StringsPlace): StringsPlace {
+export function soundingPointAt(
+  rig: RigPoints,
+  loudness: number,
+  strings: StringsPlace,
+): StringsPlace {
   const [piano, forte] = rig.hold.soundingPoint;
   const share = piano + (forte - piano) * loudness;
   strings.contact.addScaledVector(strings.axis, (share - rig.contactShare) * rig.stringLength);
@@ -1570,6 +1574,48 @@ function mixWrist(arm: ArmRig, shoulder: Vector3, share: number, out: Vector3): 
   const distance = Math.sqrt(upper ** 2 + lower ** 2 - 2 * upper * lower * Math.cos(bend));
   mixDirection(wristFrom, wristTo, share, out);
   return out.multiplyScalar(distance).add(shoulder);
+}
+
+const steadyArm = createArmPose();
+
+/**
+ * Places the right hand on a bow that plays on the strings, as the steady hold of
+ * {@link holdArm}: the hand rolls so that its back points to the elbow, {@link ROLL_PASSES}
+ * times, and then it turns on the stick (`BowedHold.stickTurnR`). The search for the reached part
+ * of the bow hair uses it (`bowRangeOf()` of `pose/bowed-rig.ts`), so that it tests the wrist of
+ * the pose.
+ *
+ * @param rig The points of the player.
+ * @param bow The bow of the hand on the strings ({@link heldBowAt}).
+ * @param shoulder The posed right shoulder joint and the rotation of the `shoulder` bone.
+ * @param elbowPole The direction of the right elbow, in the model axes.
+ * @param out The hand to write.
+ * @returns `out`, with the wrist and the rotation of the hand.
+ */
+export function steadyHand(
+  rig: RigPoints,
+  bow: BowPlace,
+  shoulder: { readonly position: Vector3; readonly rotation: Quaternion },
+  elbowPole: Vector3,
+  out: BowHand,
+): BowHand {
+  gripHand(rig, bow, 0, out);
+  for (let pass = 0; pass < ROLL_PASSES; pass++) {
+    const { elbow } = solveArm(
+      rig.armR.bind,
+      shoulder.position,
+      shoulder.rotation,
+      out.wrist,
+      elbowPole,
+      steadyArm,
+    );
+    gripHand(rig, bow, rollToward(rig, bow, elbow), out);
+  }
+  const keep = rig.hold.stickTurnR;
+  if (keep !== null) {
+    turnOnStick(rig, keep, shoulder.position, shoulder.rotation, elbowPole, out);
+  }
+  return out;
 }
 
 /** The parts of the pose that {@link holdArm} reads. */
