@@ -35,11 +35,30 @@ function createRepositoryLink(): HTMLAnchorElement {
   return link;
 }
 
+/** The class of the root element that names the font Fraunces for the titles (`ui/ui.css`). */
+const TITLE_FONT_CLASS = 'title-font';
+
+/**
+ * Loads the brand font of the piece title, the title card, and the end card after the first frame
+ * of the app (design 2.8, 7.2). The app makes the title before it asks for its first animation
+ * frame. The callback here thus runs in that frame, and the timeout adds the class in a task after
+ * the frame. The browser then loads the font, and swaps it for the fallback face when it is ready.
+ *
+ * @param root The root element of the page.
+ */
+function loadTitleFont(root: HTMLElement): void {
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      root.classList.add(TITLE_FONT_CLASS);
+    });
+  });
+}
+
 /**
  * The title at the top left (2.8): the logo with the link to GitHub, then the piece title (`h2`)
- * in a serif (24 px to 36 px) and the composer. It is a polite live region, so that a screen reader
- * reads the current piece when it changes. The logo does not change, so the region does not read
- * it again.
+ * in Fraunces (24 px to 36 px) and the composer. It is a polite live region, so that a screen
+ * reader reads the current piece when it changes. The logo does not change, so the region does not
+ * read it again.
  */
 export class Title {
   /** The `header` element of the title. */
@@ -79,6 +98,7 @@ export class Title {
     if (!this.#title.isConnected || !this.#composer.isConnected) {
       this.element.append(this.#title, this.#composer);
     }
+    loadTitleFont(document.documentElement);
     this.repositoryLink.addEventListener('pointerenter', () => {
       this.#hovered = true;
     });

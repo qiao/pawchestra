@@ -1,5 +1,30 @@
 /* The tokens and the layout of the UI prototype, docs/prototype/ui.html (design 2.8). */
 
+/* The brand font of the piece title, the title card, and the end card (design 2.8): a static
+   subset of Fraunces at the weight 600 (tools/title-font.py). Only the class `title-font` of the
+   root names it, and the title sets that class after the first frame (design 7.2). Thus the font
+   is not in the first download, and its request does not delay the first paint. */
+@font-face {
+  font-family: Fraunces;
+  src: url('/fonts/fraunces-title.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+}
+
+/* The local serif before the swap: Georgia Bold with the advance and the line metrics of the
+   Fraunces instance, so the title keeps its width, its line breaks, and its baseline at the swap.
+   `tools/title-font.py --fallback` gives the values. A system with no Georgia uses the system
+   serif of `--font-serif`. */
+@font-face {
+  font-family: 'Fraunces Fallback';
+  src: local('Georgia Bold'), local('Georgia-Bold');
+  font-weight: 600;
+  size-adjust: 86.93%;
+  ascent-override: 112.51%;
+  descent-override: 29.34%;
+  line-gap-override: 0%;
+}
+
 :root {
   --bg-overlay: rgba(16, 13, 11, 0.72);
   --panel: #17130f;
@@ -34,9 +59,11 @@
   /* The center of the play button of the first screen: 72% of the height, and at least 230 px
      above the bottom, so that the texts below it stay clear of the bar (design 2.8). */
   --play-y: min(72%, calc(100% - 230px));
-  /* The serif of the piece title, from the fonts of the system (design 2.8). */
+  /* The serif of the credits, from the fonts of the system (design 2.8). */
   --font-serif:
     'Palatino Linotype', Palatino, 'Book Antiqua', 'Iowan Old Style', Georgia, 'Noto Serif', serif;
+  /* The font of the piece title before the first frame: the fallback face of Fraunces. */
+  --font-title: 'Fraunces Fallback', var(--font-serif);
   /* The left edge of the title: 36 px at 1280 px, as in the mockup. */
   --title-left: clamp(16px, 2.8vw, 40px);
   /* The top edge of the title box: the logo starts here. */
@@ -55,6 +82,12 @@
   /* A pinch zooms only the stage, not the page (design 2.5). A list can still scroll. The orbit
      controls set touch-action none on the canvas and take the pinch there. */
   touch-action: pan-x pan-y;
+}
+
+/* After the first frame, the titles name Fraunces, and the browser loads it. Until it loads, they
+   keep the fallback face. */
+:root.title-font {
+  --font-title: Fraunces, 'Fraunces Fallback', var(--font-serif);
 }
 
 *,
@@ -368,10 +401,10 @@ body:has(.camera[aria-pressed='true']) .title::before {
 
 .title h2 {
   margin: 0;
-  font-family: var(--font-serif);
+  font-family: var(--font-title);
   /* 32 px at 1280 px, as in the mockup. */
   font-size: clamp(24px, 2.5vw, 36px);
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.15;
   text-wrap: balance;
 }
@@ -383,7 +416,7 @@ body:has(.camera[aria-pressed='true']) .title::before {
 }
 
 /* The title card of Cinematic mode at the song start (design 2.8): the composer in spaced gold
-   capitals, a short gold rule, and the piece title in the serif, centered in the lower part of the
+   capitals, a short gold rule, and the piece title in Fraunces, centered in the lower part of the
    letterbox frame, as the main title of a film. The app sets its opacity from the song time
    (`--card-level`, `titleCardLevel()` of app/title-card.ts), so it needs no transition. A soft
    shade behind it keeps 4.5:1 over a lit stage. It takes no pointer. */
@@ -436,9 +469,9 @@ body:has(.camera[aria-pressed='true']) .title::before {
 }
 
 .title-card-title {
-  font-family: var(--font-serif);
+  font-family: var(--font-title);
   font-size: clamp(22px, 3vw, 46px);
-  font-weight: 400;
+  font-weight: 600;
   line-height: 1.15;
   letter-spacing: 0.02em;
   text-wrap: balance;
@@ -1658,7 +1691,7 @@ body.is-building #stage {
   margin-top: 20px;
 }
 
-/* The name of the author has the serif of the title of the piece. It is a link with a faint
+/* The name of the author has the system serif (`--font-serif`). It is a link with a faint
    underline. */
 .credits .credits-author {
   margin-top: 6px;
@@ -1726,7 +1759,7 @@ body.is-building #stage {
   font-size: 12px;
 }
 
-/* The current piece has the serif of the title of the piece. */
+/* The current piece has the system serif (`--font-serif`). */
 .piece.now .piece-title {
   margin-bottom: 2px;
   font-family: var(--font-serif);

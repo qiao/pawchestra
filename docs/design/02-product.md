@@ -290,12 +290,24 @@ and the layout, and `reference/mockup.png` is the target of the look. The CSS of
 | `--github-mark` | `#c8c8c8` (the neutral gray of the GitHub mark, as the logo rules of GitHub ask) |
 | `--track` | `rgba(255, 240, 220, 0.2)` (the track of a slider, where it is not filled) |
 | Font | `system-ui, -apple-system, "Segoe UI", Roboto, sans-serif` |
-| `--font-serif` | `"Palatino Linotype", Palatino, "Book Antiqua", "Iowan Old Style", Georgia, "Noto Serif", serif` (the piece title) |
+| `--font-title` | `Fraunces, "Fraunces Fallback", var(--font-serif)` at the weight 600 (the piece title, the title card, and the end card). Before the first frame, the stack has no `Fraunces` |
+| `--font-serif` | `"Palatino Linotype", Palatino, "Book Antiqua", "Iowan Old Style", Georgia, "Noto Serif", serif` (the credits) |
 | Font sizes | 12 px for times (tabular numbers), 13 px for secondary text, 14 px body. The piece title is `clamp(24px, 2.5vw, 36px)` (32 px at 1280 px), and the composer `clamp(13px, 1.15vw, 16px)` |
 | Radius | 10 px for panels, 12 px for the floating panel of the drawer and for the bar, 8 px for buttons |
 | Control size | at least 40 px for the controls of the bar and the first screen. 32 px for the compact controls in the drawer, in messages, and in dialogs (tabs, M, S, segmented buttons, close, the link "Credits"). At least 44 px for every control on a touch screen |
 | Focus | a 2 px ring in `--accent`, with a 2 px offset, and the button radius on a slider |
 | Button states | the hover and the color change in 120 ms (none with reduced motion), and a pressed button gets `rgba(255, 240, 220, 0.18)`. The large play button gets `--accent-strong` and the scale 0.96 while pressed |
+
+**Title font**
+
+The piece title, the title card, and the end card use the brand font Fraunces of the wordmark, so
+each platform shows the same title. The file `fonts/fraunces-title.woff2` is a static subset
+at the weight 600 (`tools/title-font.py`, `assets/fraunces/README.md`). The controls, the drawer,
+and the credits keep the fonts of the system. `Title` adds the class `title-font` to the root
+after the first frame, and only that class names Fraunces, so the font loads late (7.2). Until
+the swap (`font-display: swap`), the titles show the face `Fraunces Fallback`: Georgia Bold with
+`size-adjust` and the line metrics of Fraunces. The swap thus keeps the width, the line breaks,
+and the baseline of each title. A system with no Georgia shows `--font-serif` until the swap.
 
 **Components**
 
@@ -303,9 +315,9 @@ The modules of `ui/` and `app/` hold the sizes, the places, and the motions. Eac
 instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over the scene.
 
 - **Title**: the logo (a gold paw and the wordmark "Pawchestra" in Fraunces, one SVG path
-  `WORDMARK_PATH`, so no font file loads), the piece title, and the composer. The wordmark is the
-  `h1` of the page, with the name as its accessible name, because the page is the app. The piece
-  title is an `h2`. A gray pill with the
+  `WORDMARK_PATH`), the piece title in Fraunces, and the composer in the system sans. The
+  wordmark is the `h1` of the page, with the name as its accessible name, because the page is the
+  app. The piece title is an `h2`. A gray pill with the
   GitHub mark and "Open source" (`REPOSITORY_TEXT`) links to `REPOSITORY_URL`. It is gray, because
   the logo rules of GitHub permit only white, black, or gray. `index.html` holds the title lines
   of the default demo, and the app keeps that header, so the piece title paints with the first
@@ -320,7 +332,7 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   read raised the p95 of the main thread by about 1 ms. `e2e/title-shade.e2e.ts` checks the
   contrast and the edges.
 - **Title card**: in Cinematic mode, the song start shows the composer in spaced gold capitals, a
-  short gold rule, and the piece title in the serif, centered in the lower part of the frame, as
+  short gold rule, and the piece title in Fraunces, centered in the lower part of the frame, as
   the main title of a film (`ui/title-card.ts`). A window in portrait shows it in the top bar of
   the letterbox, just above the frame. Its opacity is a function of the song time
   (`TITLE_CARD`, `titleCardLevel()` of `app/title-card.ts`), so a pause holds it and a seek is
