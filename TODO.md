@@ -1228,10 +1228,6 @@ Done when: the pose tests pass, and the pose and frame targets pass.
 - [ ] Make `pnpm keyboard` pass again. At 1440 × 900 the check "Tooltips of the speed menu and the
       volume slider" fails, and `checkHiddenBarTap` stops at a timeout, because the UI has no
       `.collapse` element now. Thus the run never reaches its last checks.
-- [ ] Make a new share card with `pnpm share-image`. `public/share.jpg` shows the old faceted
-      bodies and the back of the bear. Also try a close shot under the wordmark, and compare both
-      at 300 px wide. Add a 180 px `apple-touch-icon.png` and a small web app manifest
-      (`index.html` links only `favicon.svg`) (7.4).
 - [ ] Ask the user for a public cast page: a mode `?page=cast` of the gallery with the UI names of
       the instruments, no test controls, and a link from the drawer and `/about`. The gallery and
       `test.html` are development pages with `noindex` now (7.4).
