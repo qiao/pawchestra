@@ -892,7 +892,9 @@ because the bone heat of the hanging head gave the snout shares of the shoulders
 shares of its belly fall to 0 below the arms (`belly_rows()` of its build). Reason: the bone heat
 gave the belly thigh shares up to the arms and none from there, so the seated bind pulled the
 belly back under the chest, and a pale flat panel with a hard corner showed in front of each upper
-arm. The Tripo
+arm. The key `bind_belly` of its build relaxes the lower belly into the thigh tops (`belly` of the
+params). Reason: with the belly rows, the round belly hung over the thigh tops, and a black wedge
+of shadow showed in the lap. The Tripo
 penguin (`assets/models/penguin/tripo-hand/`) is the body of the singer, by the same rules. Its
 eyeballs stay, with the finish `varnish` and a blink lid. The flat flippers are its arms: each
 flipper takes edge-ring rings at the shoulder, the elbow, and the wrist, and the paw bones take the
