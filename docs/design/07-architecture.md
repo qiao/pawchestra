@@ -340,15 +340,21 @@ it with the status 308, so that the old links stay good. The plugin `INDEX_VALUE
   players fill most of the width with depth. The camera stands a little left of the middle line,
   because the layout is wider on the right. The conductor stands in the middle of the lower half, no
   player is cut, and the head of each back row shows above the row in front of it. The front edge of
-  the stage crosses the bottom. The build of the tool hides the visible beam of the stage (4.5),
-  and the card adds no beam, so that the logo stands out on a dark wall. The target image has a cone
-  of light behind the title, and the card leaves it out for this reason. The top third stays dark
-  for the title: the paw and the wordmark in gold, and under them the line "A web-based MIDI player
-  with an animal orchestra." in Fraunces (`SHARE_LINE`). The layer of `tools/share-card.ts` adds a
-  vignette, a warm grade, and a soft glow. It blurs the hall wall behind the title, so that the wall is dark and smooth and no lamp
-  shows there. Chromium draws the layer from HTML and CSS, so the tool needs no image library. The
-  font file of the line (`assets/fraunces/fraunces.ttf`) stays out of the build, so the license file
-  (7.3) does not change.
+  the stage crosses the bottom. The build of the tool hides the visible beam of the stage (4.5), and
+  the card adds no beam, so that the logo stands out on a dark wall. The target image has a cone of
+  light behind the title, and the card leaves it out for this reason. The top third stays dark for
+  the title: the paw and the wordmark in gold, and under them the line "A web-based MIDI player with
+  an animal orchestra." in Fraunces (`SHARE_LINE`). The layer of `tools/share-card.ts` adds a
+  vignette, a warm grade, and a soft glow. It blurs the hall wall behind the title, so that the wall
+  is dark and smooth and no lamp shows there. Chromium draws the layer from HTML and CSS, so the
+  tool needs no image library. The font file of the line (`assets/fraunces/fraunces.ttf`) stays out
+  of the build, so the license file (7.3) does not change. A close shot of the players under the
+  wordmark shows the faces larger at 300 px wide (`--camera` of the tool), but each trial cut or
+  blurred a body at an edge or in front, so the card keeps the stage view of the target.
+- **Icons and manifest**: `index.html` links `favicon.svg`, `apple-touch-icon.png` (180 px, the
+  paw of the favicon on a full square, because iOS rounds the corners), and `site.webmanifest`
+  with the name, the colors of the page, and both icons. The browser asks for them only when it
+  needs them, so the first download (7.2) does not grow. The manifest names no service worker.
 - **Structured data**: a JSON-LD `WebApplication` with the name, the URL, the description, the
   image, the category, the need for WebGL2 (2.6), and a free offer. It holds no personal data, so
   it has no `Organization` with a contact point and a postal address.

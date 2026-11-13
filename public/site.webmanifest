@@ -1,0 +1,13 @@
+{
+  "name": "Pawchestra",
+  "short_name": "Pawchestra",
+  "description": "An orchestra of animals plays classical music. It also plays your MIDI file.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0908",
+  "theme_color": "#0b0908",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
