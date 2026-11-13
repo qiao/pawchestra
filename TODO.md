@@ -1228,10 +1228,6 @@ Done when: the pose tests pass, and the pose and frame targets pass.
 - [ ] Make `pnpm keyboard` pass again. At 1440 × 900 the check "Tooltips of the speed menu and the
       volume slider" fails, and `checkHiddenBarTap` stops at a timeout, because the UI has no
       `.collapse` element now. Thus the run never reaches its last checks.
-- [ ] Small control gaps: show the time at the pointer in the tooltip of the seek bar, give the
-      canvas `cursor: grab` in Free mode with one line "Drag to look around" until the first drag,
-      and give a dropped file a row "Your file: {title}" for the session, in memory only (2.3,
-      2.8).
 - [ ] Make a new share card with `pnpm share-image`. `public/share.jpg` shows the old faceted
       bodies and the back of the bear. Also try a close shot under the wordmark, and compare both
       at 300 px wide. Add a 180 px `apple-touch-icon.png` and a small web app manifest
