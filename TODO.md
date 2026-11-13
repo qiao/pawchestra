@@ -165,17 +165,20 @@ passes.
       planted foot (`TURN_STEPS`, 5.4). Check the skin of the hips and the thighs in 2x crops.
 - [ ] Conductor bear: at rest, the right arm folds 5 faces (p95, limit 8) against 1 before the
       relaxed arms and the turned rest baton. Check the right wrist in a 2x crop.
+- [ ] Conductor bear: in the beat, the baton stands 32° off the forearm (p50, was 53°), nearly all
+      of it inward (`batonPivot`, 5.4). A baton 3.5° in gives 19°, but it touches the desk of the
+      stand when the arms come down after the final chord of `beethoven-8-4`. Move the baton of
+      the lowering clear of the desk, then point the baton less in.
+- [ ] Conductor bear: the rest baton hangs 27° forward of the vertical (`restBaton`, 5.4). A baton
+      nearer the vertical (22°) turns the right wrist 2,794°/s at the start of a lift (limit
+      3,000, the base 1,594). Spread the turn of the paw over the lift, then hang the baton lower.
+- [ ] Conductor bear: the left inner elbow (faces 443, 5222, 5223, 5226) folds from a bend of
+      about 45°, in the ready gesture and at a cue (4 faces). The pose keeps those arms nearly
+      straight (`readyReach`, `cueReach`). Add an elbow ring by an edge ring split in the bear
+      chain if a bent left arm is needed.
 - [ ] Conductor bear: in the held final chord and at a climax, the baton points up past the cheek
       in the view from the front right (The Ember Crown 172 s, Mozart K. 525 30.9 s). The sweep
       finds no depth, so measure the gap of the baton to the head.
-- [ ] Conductor bear: in the beat, the baton stands 45° to 63° off the line of the forearm, and a
-      conductor holds it as a longer line of the forearm (`conductor-technique.md`, 7a). The beat
-      point, the pivot, and the elbow poles set the angle (`CONDUCTOR_HOLD`, 5.4). Fit them, and
-      keep the clearances of the chin and the muzzle.
-- [ ] Conductor bear: the count-in and the end bow have no 2x crops of the baton paw in the app,
-      because `close-views play` freezes the song time. The paw keeps the curl and the grip of the
-      beat and of the rest in them. Look at the paw in the bow on the test page
-      (`/test#bear-conductor`).
 - [ ] Mouse and beaver: they stand in their seated poses with no chair. Measure their balance (the
       center of mass over the feet), and save the balance probe as a tool.
 - [ ] Rhino tubist: ask the user to confirm the stand, the arms of the mesh, the lead pipe, and the
@@ -358,11 +361,9 @@ passes.
 - [ ] Close views: the pianist has no lift or lowering moment in `ROLE_VIEWS`, so `close-views
       pianist --moments lift50` fails. Give the role the moments of `halfMoves()`.
 - [ ] Bear: at rest, the arms swing 20° more out around the round belly (`restArm.extraOut`), and
-      the upper arms still go 3.7 cm into the sides of the chest (limit 4 cm). In the lift and the
-      lowering they go 4.0 cm in (limit 4 cm, the older bear 3.8 cm). Check the arm roots in 2x
-      crops from az150 and az-150.
-- [ ] Bear: in the play, the left upper arm root goes 2.4 cm into the trunk (limit 1.5 cm, the
-      older bear 0.0 cm, `boulanger-matin` 59.38 s). Check the armpit in a 2x crop.
+      the upper arms still go 3.7 cm into the sides of the chest (limit 4 cm), also in the lift
+      and the lowering (the older bear 3.8 cm). Check the arm roots in 2x crops from az150 and
+      az-150.
 - [ ] Bear right paw: three thin faces of the knuckle crease (104, 105, 1769) fold in 99% of the
       play at the baton curl, and one wrist face (1833) in 77% (`pnpm fold-probe conductor
       --faces 6`). The fist hides them in the hall view. Check them in a 2x crop.
