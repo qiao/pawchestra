@@ -160,6 +160,9 @@ page starts in Free mode (`app/camera-mode.ts`).
   shots of 5.6 take this aspect in each view, so a piece gives the same film on each screen. The
   drawer and the bar do not move the frame. The title stands at its top-left corner (2.3). Free
   mode has no bars.
+- On a touch screen in portrait, the frame fills about a fifth of the screen height, so one line
+  below it says "Turn the phone for a larger film." (`TURN_HINT_TEXT`). A portrait shot plan
+  would break the rule of the same film on each screen, so the frame stays.
 - **Mode blend** (`MODE_BLEND`, `scene/mode-blend.ts`). The toggle moves the camera into the new
   mode as a crane move of a film, with a smoothstep, because a cut from the orbit view into a
   close shot was jarring. A blend into Cinematic mode goes to the live camera of the shots, which
@@ -467,6 +470,7 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 | Demo list, the row of the last file of the user | Your file: {title} |
 | End card, the two buttons | Play again / Next: {title} |
 | Label above a clicked animal, for 2 s | {seat name}, {animal line} |
+| Below the frame of Cinematic mode on a phone in portrait | Turn the phone for a larger film. |
 | Status after the link is in the clipboard | The link is copied. |
 | Status after the browser did not copy the link | The link did not copy. Copy it from the address bar. |
 | Seat row, the mute button and the solo button | Mute / Only this |

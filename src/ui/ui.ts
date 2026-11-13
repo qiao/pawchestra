@@ -4,7 +4,7 @@ import type { FrameRateSetting, QualitySetting } from '../app/settings.ts';
 import type { SectionSize } from '../score/types.ts';
 import { CLOSE_CREDITS_LABEL, CREDITS_TEXT, licensesUrl } from '../app/credits.ts';
 import { REPOSITORY_LABEL } from '../app/page-title.ts';
-import { DRAG_HINT_TEXT } from '../app/camera-mode.ts';
+import { DRAG_HINT_TEXT, TURN_HINT_TEXT } from '../app/camera-mode.ts';
 import { PHONE_LAYOUT_QUERY } from '../app/phone-layout.ts';
 import { COPY_LINK_TEXT, shareLink, shareStatusText } from '../app/share-link.ts';
 import { isWideLayout } from '../app/wide-layout.ts';
@@ -206,10 +206,14 @@ export class Ui {
     // A screen reader also hears the seat of a click on a player.
     this.#pickLabel.setAttribute('role', 'status');
     this.#pickLabel.hidden = true;
+    // `ui.css` shows the hint only in Cinematic mode on a touch screen in portrait (design 2.5).
+    const turnHint = createElement('p', 'turn-hint', TURN_HINT_TEXT);
+    turnHint.setAttribute('aria-hidden', 'true');
     parent.append(
       this.titleCard.element,
       this.#dragHint,
       this.#pickLabel,
+      turnHint,
       this.endCard.element,
       this.firstScreen.element,
       this.bar.element,

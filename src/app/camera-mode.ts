@@ -38,6 +38,12 @@ export function nextMode(mode: CameraMode, event: CameraEvent): CameraMode {
   }
 }
 
+/**
+ * The hint below the frame of Cinematic mode on a phone in portrait (design 2.5), where the frame
+ * of the aspect 21:9 fills about a fifth of the screen height.
+ */
+export const TURN_HINT_TEXT = 'Turn the phone for a larger film.';
+
 /** The hint over the stage in Free mode until the first drag of the session (design 2.8). */
 export const DRAG_HINT_TEXT = 'Drag to look around';
 
