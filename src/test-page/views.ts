@@ -10,14 +10,15 @@ export type ViewName = 'front' | 'side' | 'back' | 'close';
 /** The direction of a preset around the stage center, and its distance rule. */
 interface ViewAngles {
   /**
-   * The turn around the vertical line, in degrees. 0 is the audience side (+z), where the player
-   * faces, and 90 is the side +x, at the left hand of a player who faces the audience.
+   * The turn around the vertical line from the side that the animal faces, in degrees. For a
+   * player who faces the audience, 0 is the audience side (+z), and 90 is the side +x, at its left
+   * hand.
    */
   readonly azimuth: number;
   /** The angle above the stage top, in degrees, inside the orbit limits of 10° to 80°. */
   readonly elevation: number;
   /**
-   * True if the frame shows the whole player, from the stage top to above its head. A close view
+   * True if the frame shows the whole animal, from the stage top to above its head. A close view
    * comes as near as the near limit of Free mode lets it.
    */
   readonly whole: boolean;
@@ -41,16 +42,22 @@ const TARGET_REACH = 0.9;
 /** The space between a preset camera and the near limit of Free mode, in meters. */
 const LIMIT_MARGIN = 0.1;
 
-/** The part of the height of the player that a whole view adds above its head. */
+/** The part of the height of the animal that a whole view adds above its head. */
 const HEAD_MARGIN = 0.1;
 
 /** The step of the search of the distance of a preset camera, in meters. */
 const DISTANCE_STEP = 0.05;
 
-/** The player of the test page, as the presets see it. */
+/** The animal of the test page, as the presets see it: a player or the conductor. */
 export interface ViewSubject {
-  /** The top of the player above the stage top, in meters: the ears or the head. */
+  /** The top of the animal above the stage top, in meters: the ears or the head. */
   readonly top: number;
+  /**
+   * The turn of the side that the animal faces from the audience side, around the vertical line,
+   * in radians: 0 for a player, who faces the audience, and π for the conductor, who faces the
+   * orchestra. Thus the front view shows the face of each animal.
+   */
+  readonly turn: number;
   /** The stage side `S`, in meters. */
   readonly stageSide: number;
   /** The top of the players for the near limit of Free mode, in meters (`playersTop()`). */
@@ -62,7 +69,7 @@ export interface ViewSubject {
  *
  * @param from The point: the orbit target, or the target of the default view.
  * @param camera The camera position.
- * @param subject The player and its stage.
+ * @param subject The animal and its stage.
  * @returns True if the camera is outside the box of the stage and the players.
  */
 function keepsLimit(from: Vector3, camera: Vector3, subject: ViewSubject): boolean {
@@ -78,12 +85,12 @@ function keepsLimit(from: Vector3, camera: Vector3, subject: ViewSubject): boole
 
 /**
  * Calculates the camera of a preset of the test page (design 7.1, "Test page"). The camera looks
- * at the player at the stage center. A whole view shows the player from the stage top to above
+ * at the animal at the stage center. A whole view shows the animal from the stage top to above
  * its head. No camera comes inside the near limit of Free mode. Thus Free mode keeps the camera after the
- * frame of the preset (`StageCamera.update()`), and the orbit controls turn around the player.
+ * frame of the preset (`StageCamera.update()`), and the orbit controls turn around the animal.
  *
  * @param name The preset.
- * @param subject The player and its stage.
+ * @param subject The animal and its stage.
  * @returns The camera, with the beam and the light of the stage.
  */
 export function viewCamera(name: ViewName, subject: ViewSubject): CameraPose {
@@ -95,7 +102,7 @@ export function viewCamera(name: ViewName, subject: ViewSubject): CameraPose {
   }
   const target = center.clone().add(reach);
 
-  const azimuth = view.azimuth * MathUtils.DEG2RAD;
+  const azimuth = view.azimuth * MathUtils.DEG2RAD + subject.turn;
   const elevation = view.elevation * MathUtils.DEG2RAD;
   const direction = new Vector3(
     Math.sin(azimuth) * Math.cos(elevation),

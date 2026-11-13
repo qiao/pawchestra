@@ -140,6 +140,7 @@ function* pieceSteps(role: TestRole, stage: StageScene): Steps<Piece> {
   const head = headOf(model, place)[1];
   const subject = {
     top: boundsOf([model.mesh]).max[1],
+    turn: 0,
     stageSide: layout.stageSide,
     playersTop: head + HEAD_ROOM,
   };
