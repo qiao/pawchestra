@@ -744,8 +744,19 @@ passes.
       move up to 1.64 m. The seat is 0.179 m (0.249 m before). Decide with the user: accept the
       moves, or a layout rule that keeps the seats.
 - [ ] Tripo tan fox flutist: the left upper arm goes 2.9 cm into its arm root at each moment of
-      `pnpm hold-fit flutist` (1.3 cm before), and 29 faces of the right arm fold at rest (none
+      `pnpm hold-fit flutist` (1.3 cm before), and 27 faces of the right arm fold at rest (none
       before). Try the clavicle rows and the rest elbows of `FOX_FLUTE`, and check 2x crops.
+- [ ] Tripo fox wrists: the 28 band quads of the paw turn take one planar patch of the color map
+      (`bandPatch`), so a straight light line shows where the band meets the forearm in the play
+      view (`reports/2026-11-13-fox-wrist/play-red-fox/pair-az0-wrists-2x.png`). Try UVs that
+      continue the forearm fur on the near ring.
+- [ ] Tripo tan fox flutist: the left paw twists 138° on its forearm (p95 of `pnpm arm-check
+      flutist`) and the forearm 70°, in the rest, the lift, and the lowering, because the left paw
+      turn of 7 steps fits the violin. Try a rest of the free left paw (`restFreeL` of
+      `FOX_FLUTE`) that needs less twist from the turned paw.
+- [ ] Tripo red fox violinist: with the right paw turn of 4 steps, the bow paw twists 47° (p95,
+      22° with 3 steps) and the move twist is 122° (97°). Check the bow paw in the lift and the
+      lowering in the app.
 - [ ] Tripo red fox violinist: the paws go up to 2.5 cm into the violin and the left forearm 2.0
       cm (`pnpm body-clip fox-red:violin`, limit 0.045 H), as on the fox before (2.3 cm).
 - [ ] Tripo red fox: `bowGrip` of `src/models/species.ts` is the grip of the paw of the fox of
