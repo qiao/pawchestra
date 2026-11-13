@@ -271,9 +271,12 @@ The rest of each family:
   instrument turns the short way from the rest to the play: the scroll stays up, and the body
   swings in and up to the jaw. The elbow in the middle of the move (`BowedHold.liftPoleL`) sets
   the way, because the paw supinates on the arm, and the frame of the arm turns with the elbow. On
-  the cat, the elbow points up, back, and a little in. Reason: with the elbow out and down, the
-  supination took the viola the long way, upside down past the paw. `pnpm carry-check` gives the
-  detour of each move from the short arc. A
+  the cat, the elbow points up, back, and a little in, and the viola leads on a via
+  (`BowedHold.carryVia`): it turns near a middle turn with the scroll up and to the left and the
+  strings to the front, and the paw follows it by its grip. Reason: when the viola hung from the
+  paw, the supination took it up to 69° off the short arc, with the strings down. An elbow out
+  and down keeps the forearm off the viola, but the paw then twists past 180° on its forearm.
+  `pnpm carry-check` gives the detour of each move from the short arc. A
   standing player hangs the bow with the tip down (`HANGING_BOW`). In the shared violin hold and
   the hold of the rabbit, the arms at rest hang out to the sides until they clear the body, with a forward swing and an elbow
   bend of each arm (`BowedHold.restArms`, `hangingArm()`). The left paw holds the upright violin at
