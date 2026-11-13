@@ -771,11 +771,14 @@ The rest of each family:
   higher by the loudness of the note (`StrikeSizes.lift`, `MalletAcross.peak`), and the tip comes
   back to the ready height after the rebound. Reason: with a large pitch and no higher lift, the
   tips stood high above the head between strikes, and the stroke did not grow with the loudness.
-- **Short arms at the snare drum and the cymbal.** The spine of the badger leans a little over
-  the snare drum and the suspended cymbal, and the homes of the sticks and the mallets stand near
-  the shoulders (`PercussionHold.lean`, `PercussionHold.home`). Reason: the arms of the Tripo
-  badger are short, and with an upright spine and the homes further out, the sticks and the
-  mallets missed the strike spots by up to 4.5 cm.
+- **Reach of the badger.** The spine of the badger leans over each instrument, and the homes of
+  the sticks and the mallets stand near the shoulders (`PercussionHold.lean`,
+  `PercussionHold.home`). Reason: with an upright spine and the homes further out, the sticks, the
+  beater, and the mallets missed their strike spots. At the xylophone, a bar past `reach` of one
+  shoulder goes to the other paw, so that each paw strikes only the bars near its side. At the bass
+  drum, the upper body turns further at a muffle (`PalmDamp.turn`), so that the left forearm stays
+  out of the belly. The triangle hangs from the left paw below the snout (`triangleClip`), so that
+  the claws go less far into the head.
 - **Snare drum from the body.** The shared snare drum hold takes the place of the drum from the
   body (`PercussionHold.fit`, `fitDrumPlace()`). The drum goes forward until its near rim stands a
   room in front of the trunk on the middle line, from the head up to the shoulder joints. A deep
