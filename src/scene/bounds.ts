@@ -114,6 +114,53 @@ export function boneSpheres(geometry: BufferGeometry, boneCount: number): BoneSp
   return { centers, radii, weightError };
 }
 
+/**
+ * Calculates the sphere of a skinned geometry in its bind pose from its bone spheres
+ * ({@link boneSpheres}): the middle of the box of the bone centers, and the farthest bone sphere
+ * from it.
+ *
+ * @param spheres The bone spheres of the geometry.
+ * @param out The sphere to write, in the axes of the geometry.
+ * @returns `out`.
+ */
+export function bindSphere(spheres: BoneSpheres, out: Sphere): Sphere {
+  const { centers, radii } = spheres;
+  let lowX = Infinity;
+  let lowY = Infinity;
+  let lowZ = Infinity;
+  let highX = -Infinity;
+  let highY = -Infinity;
+  let highZ = -Infinity;
+  for (let b = 0; b < radii.length; b++) {
+    if ((radii[b] ?? -1) < 0) {
+      continue;
+    }
+    const x = centers[b * 3] ?? 0;
+    const y = centers[b * 3 + 1] ?? 0;
+    const z = centers[b * 3 + 2] ?? 0;
+    lowX = Math.min(lowX, x);
+    lowY = Math.min(lowY, y);
+    lowZ = Math.min(lowZ, z);
+    highX = Math.max(highX, x);
+    highY = Math.max(highY, y);
+    highZ = Math.max(highZ, z);
+  }
+  out.center.set((lowX + highX) / 2, (lowY + highY) / 2, (lowZ + highZ) / 2);
+
+  let radius = 0;
+  for (let b = 0; b < radii.length; b++) {
+    const r = radii[b] ?? -1;
+    if (r >= 0) {
+      const dx = (centers[b * 3] ?? 0) - out.center.x;
+      const dy = (centers[b * 3 + 1] ?? 0) - out.center.y;
+      const dz = (centers[b * 3 + 2] ?? 0) - out.center.z;
+      radius = Math.max(radius, Math.sqrt(dx * dx + dy * dy + dz * dz) + r);
+    }
+  }
+  out.radius = radius;
+  return out;
+}
+
 /** The inverse of the world matrix of a mesh, written before each read. */
 const inverse = new Matrix4();
 
