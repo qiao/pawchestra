@@ -22,7 +22,7 @@ model folder gives the files of each step.
 | dog | Hand rig of the beagle. | `cellist` |
 | panda | Hand rig, arms 1.2 times longer. Stands as a soloist. | `trombonist` |
 | hippo | Hand rig, arms 1.2 times longer. Stands at the contrabass. | `bassist` |
-| mouse | Longer rebuilt arms (`wind_arms.py`), a long tail on the floor, a smaller oboe, no chair (`noChair`). | `oboist` |
+| mouse | Hand rig, a long tail on the floor, a smaller oboe. No chair: it stands on the legs of its source. | `oboist` |
 | elephant | Hand rig. Stands at the timpani. | `timpanist` |
 | beaver | Hand rig. No chair: it stands on its short legs. | `bassoonist` |
 | pig | Hand rig. Stands as a soloist. | `hornist` |
@@ -61,7 +61,7 @@ Three routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each 
 ("Models") gives the chain in a diagram.
 
 - **Mesh rig.** `arm_rebuild.py` or `<a>_arms.py` rebuilds the arms, and `pnpm rig-mesh` rigs
-  the mouse, the rhino, and the mannequin. A mesh whose arms join the trunk takes this
+  the rhino and the mannequin. A mesh whose arms join the trunk takes this
   route.
 - **Simple route.** `simple_rig.py` writes the `.blend` of a hand rig from a clean quad mesh with
   the arms apart (design 4.4). The skill `pawchestra-body` runs it in a candidate tree.
