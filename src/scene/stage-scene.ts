@@ -17,6 +17,7 @@ import type {
   Camera,
   Material,
   Object3D,
+  PerspectiveCamera,
   SkinnedMesh,
   WebGLRenderer,
   WebGLShadowMap,
@@ -909,6 +910,11 @@ export class StageScene {
   /** The unit direction of the view of the camera of the last frame, for the probes. */
   get cameraLook(): Vec3 | null {
     return this.#view ? this.#view.camera.camera.getWorldDirection(new Vector3()).toArray() : null;
+  }
+
+  /** The camera of the last frame, for the ray of a click on the stage (design 2.3). */
+  get viewCamera(): PerspectiveCamera | null {
+    return this.#view?.camera.camera ?? null;
   }
 
   /** The vertical field of view of the camera of the last frame, in degrees, for the probes. */
