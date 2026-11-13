@@ -381,6 +381,18 @@ passes.
       frame. Try a lower WebP quality if the load time of a demo grows.
 - [ ] Bear and elephant: in the gallery light, each arm casts a black band of shadow on the trunk
       beside the belly. Check it in the stage light.
+- [ ] Occlusion bake (4.5): no call gives `parents` to `createGeometry()`, so `bakeOcclusion()`
+      and `OCCLUSION` of `src/models/shading.ts` change no pixel. Pose audit 3 named them as the
+      cause of a black band. Remove them with the parameter `parents`, the look root `OCCLUSION`,
+      and their tests, and set the limit of `shading-speed.test.ts` again.
+- [ ] Gallery light (7.1): the gallery has no contact shade, no back-row lights, no rim lights,
+      and no part `FILL.players`, so the shade of a fold can differ from the shade of the app. Give
+      the gallery these terms if an audit needs the exact shade of the app.
+- [ ] Deer and cat in the gallery light with the environment: the dark marks on the tail tip and
+      the two slits on the back of the head of the deer stay, and the saw-tooth edge where the
+      haunch of the deer and of the cat meets the seat stays, with a softer tone
+      (`reports/2026-11-13-fix-shade/round-d/`). The fold behind each arm root of the deer is a
+      soft shade now.
 - [ ] Cat violist: the faces at the front of the bow armpit (2461, 2462, 2342, and 2456, on
       `upper_arm_seg0_R`) fold in 65% to 82% of the play and in 74% to 75% of the lift
       (`pnpm fold-probe violist --faces 25`), a dark wedge at lift50 from the front. Each face has
