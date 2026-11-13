@@ -45,9 +45,12 @@ describe('fileFromHash (design 2.2)', () => {
 });
 
 describe('demoRowLabel (design 2.8)', () => {
-  it('names the title, the composer, the cast, and the spoken length of a demo row', () => {
+  it('names the title, the composer, and the spoken length of a demo row', () => {
     expect(demoRowLabel('beethoven-9')).toBe(
-      'Symphony No. 9, Op. 125: Ode to Joy, Ludwig van Beethoven, Penguin choir, full orchestra, 2 minutes 38 seconds',
+      'Symphony No. 9, Op. 125: Ode to Joy, Ludwig van Beethoven, 2 minutes 38 seconds',
+    );
+    expect(demoRowLabel('boulanger-matin')).toBe(
+      "D'un matin de printemps, Lili Boulanger, 4 minutes 40 seconds",
     );
   });
 });
@@ -75,14 +78,12 @@ describe('DEMOS (design 8.2)', () => {
     expect(DEMOS['boulanger-matin']).toEqual({
       title: "D'un matin de printemps",
       composer: 'Lili Boulanger',
-      cast: 'Deer harp, badger percussion, full orchestra',
       credit: 'Score: OpenScore Orchestra, CC0. MIDI file made with MuseScore 4.',
       lengthSec: 280,
     });
     expect(DEMOS['beethoven-9']).toEqual({
       title: 'Symphony No. 9, Op. 125: Ode to Joy',
       composer: 'Ludwig van Beethoven',
-      cast: 'Penguin choir, full orchestra',
       credit:
         'Score: OpenScore Orchestra, CC0. Bars 543 to 590 and 851 to 940 of the finale. MIDI file made with MuseScore 4.',
       lengthSec: 158,

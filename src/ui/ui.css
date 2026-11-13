@@ -1214,7 +1214,7 @@ body.is-building #stage {
   position: relative;
   display: grid;
   grid-template-columns: [text] 1fr [meter] 34px [length] auto;
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto auto;
   column-gap: 12px;
   row-gap: 1px;
   place-items: initial;
@@ -1267,17 +1267,11 @@ body.is-building #stage {
   line-height: 16px;
 }
 
-/* The cast line of a demo row (design 8.2) is a third line in the accent color, so that it reads
-   as the reason to select the piece. */
-.demo small.cast {
-  color: var(--accent);
-}
-
 /* The level meter of the current demo: nine gold bars that move with the music (design 2.8).
    `ui/demo-list.ts` scales each bar from its foot. */
 .demo .meter {
   grid-column: meter;
-  grid-row: 1 / -1;
+  grid-row: 1 / span 2;
   display: flex;
   align-items: flex-end;
   gap: 2px;
@@ -1295,7 +1289,7 @@ body.is-building #stage {
 
 .demo .length {
   grid-column: length;
-  grid-row: 1 / -1;
+  grid-row: 1 / span 2;
   color: var(--text-dim);
   font-variant-numeric: tabular-nums;
   font-size: 12px;

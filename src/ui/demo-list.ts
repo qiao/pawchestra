@@ -21,7 +21,7 @@ export type DemoListRow = DemoId | 'file' | null;
 
 /**
  * The demo list of the drawer (design 2.8, 8.2): one row for each demo, with the title of the
- * list, the composer, the cast line, and the length. The current demo has an accent bar on the left
+ * list, the composer, and the length. The current demo has an accent bar on the left
  * and a level meter that moves with the music.
  */
 export class DemoList {
@@ -62,7 +62,6 @@ export class DemoList {
         createElement('span', 'name', demo.title),
         createElement('span', 'length', clockText(demo.lengthSec)),
         createElement('small', '', demo.composer),
-        createElement('small', 'cast', demo.cast),
       );
       row.addEventListener('click', () => {
         onSelect(id);
