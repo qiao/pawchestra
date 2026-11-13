@@ -403,9 +403,6 @@ passes.
       `StudioBody.upperTwist`, `upper_twist()` of `tools/blender/rig_mesh.py`, and design 4.4). No
       body uses it, because the pig now has arm segments.
 - [ ] Hippo: the nose tip lies on a nostril 2.7 cm from the middle plane, and the rig checks warn.
-- [ ] Mouse: the light of the left bead eye in the front view stands 0.25 of the eye width left of
-      the visible middle, against 0.02 right on the other eye. `EYE_LIGHT_INNER` 1.0 moved it only
-      to 0.17. The ovals lean 7° with the tops in.
 - [ ] Rhino, polar bear: the lights of the two bead eyes stand at mirror places in the front close
       view (light x 0.09 / -0.10 and 0.08 / -0.13 of the eye width), so they point toward each
       other. The rhino gap was 0.05 before its eyes moved up (`eyeShift`).
@@ -510,12 +507,6 @@ passes.
       elbow radius times the bend (design 4.4), and the gate ring at 0.85 of the upper arm lies
       inside that span. Decide: accept the narrower elbows, move the ramp onto the forearm over
       more rings, or blend the arm skin with dual quaternions in the app.
-- [ ] Mouse with the neutral bind: the folds grow. The oboist folds 8 faces of the right arm at
-      p95 at rest (limit 8, base 7) and 6 of the left arm (base 4). In the cast matrix, the snare
-      drum recast folds 9 faces of the left arm in the play (limit 8, base 3) and 8 of the right
-      (base 2). Its paws are pronated, so the large bind supination (127° and 119°) is far from
-      them. The violin recast takes the left paw 1.6 cm into the violin in the lift (limit 1.5 cm,
-      base 1.5 cm).
 - [ ] Test mannequin: the forearm twist p95 of the left violin arm is 48 against 38 of the base
       (limit 80, margin 15), because the forearm segments spread the paw twist along the forearm.
       Decide if the margin holds against a base with no segments.
@@ -972,10 +963,18 @@ scene of each demo has its seats and stage size with no overlap.
       the eye, and the tube covers the snout. A longer bocal (`BASSOON_REED`) could move it out, and
       it also moves the grips. Ask the user. The right arm folds p95 are 37 (27 before), and the
       bell top is 7.9 cm below the head top.
-- [ ] Mouse: the loop of the long tail lies on the floor behind the mouse, and the footprint is
-      0.764 m deep. Check the tail between the rows of the stage with the user.
-- [ ] Mouse: with no chair, the haunch hangs 0.076 m above the floor, and it seems to float in the
-      low side view. Offer the user a lower haunch, or the heels further back.
+- [ ] Mouse (Tripo hand rig): the oboist folds 19 faces of the left arm and 18 of the right at p95
+      (`pnpm arm-check oboist`, limit 8, 6 and 8 on the old mouse): the curled digits around the
+      oboe, and thin faces at the arm root that fold with a shoulder turn of 2° to 8°
+      (`pnpm fold-probe oboist --faces 20`). Look at the paws and the armpits in the app.
+- [ ] Mouse (Tripo hand rig): the larger footprint (the tail 0.35 m behind the feet, the bind arms)
+      moves players of 14 of 18 demos, the mice by 3 cm to 51 cm and other players by up to 1.37 m
+      (the pigs and the wolves of beethoven-1 and beethoven-9). In bach-bwv1047 the mouse stands
+      behind its stand and a rabbit in the default view. Check the layout with the user.
+- [ ] Mouse (Tripo hand rig): the oboe of 0.45 reads small under the paws in the close views. The
+      right grip has 1.2 cm of spare reach, so a larger oboe needs a new grip fit.
+- [ ] Mouse (Tripo hand rig): 2 points of each open lid and 1 side point in the blink leave the head
+      at the socket rim (ray casts of `lids()`). Check the blink in a close view.
 - [ ] Wolf clarinetist: at 35° the right paw reaches its grip with only 0.2 cm to spare, also with
       the right shoulder 45° forward (`pnpm hold-reach wolf --instrument clarinet`), and a palm
       misses its grip by up to 13.9 mm (`pnpm hold-fit clarinetist`, note targets, 6.2 mm before
@@ -1292,8 +1291,6 @@ navigation menu at the top of the mockup is out of scope.
 - [ ] Do the hall of the scene look task before the color tasks. Wide film shots show the stage in
       a black space, with no wall and no seats. Also do the bow of the conductor to the audience
       early: the end of a piece now has no reward (2.4, 5.4).
-- [ ] The mouse is a faceted body beside fur bodies in one frame. Check that a Tripo hand body of
-      the mouse is in the body plan (4.3).
 - [ ] Show the user the key shadow fit of the solo and section shots
       (`reports/2026-11-12-audit-render/t4-shadow/`). Outside the sphere a player gets no key
       shadow, and the soft dark areas of the old wide blur are lit now (4.5).
