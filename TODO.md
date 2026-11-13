@@ -329,10 +329,10 @@ passes.
       head only.
 - [ ] Bear and elephant: in the gallery light, each arm casts a black band of shadow on the trunk
       beside the belly. Check it in the stage light.
-- [ ] Cat violist: a small dark pinch stays behind the bow arm root at the crossing from az120 and
-      at the frog from the back (`reports/2026-11-05-cat-bow-arm/crops/pair-crossing-az120.png`,
-      `pair-frog-az180.png`). At the tip, the small faces 817-850-848 and 817-818-850 fold, and the
-      fourth `raise` shape is 0 there.
+- [ ] Cat violist: the faces at the back of the bow arm root (2461, 2462, 2342, and 2456, on
+      `upper_arm_seg0_R`) fold in 74% to 89% of the play and in 74% to 75% of the lift
+      (`pnpm fold-probe violist --faces 25`). Look at them in 2x crops from az120 and az180, and
+      fix them in the chain of the cat.
 - [ ] Bind paws: the bind paws of most configs start pronated, so the cellist, the bassist, and the
       oboist twist the left paw near 170°. Try `studio.bindSupination`.
 - [ ] Red fox and tan fox: at rest, the crook of the right elbow keeps a soft fold, because the
