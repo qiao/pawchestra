@@ -619,11 +619,11 @@ passes.
       thick paw over the neck.
 - [ ] Dog cellist: the fitted place (`cello@dog.fit`) with a cello of 0.87 gives the arm gate of
       `DOG_HOLD` on two demos. Sweep the dog with it, then remove `DOG_HOLD` if it is not worse.
-- [ ] Dog cellist left arm (5.3): the lowered elbow of `DOG_HOLD` keeps the bend of the elbow,
-      about 62° between the upper arm and the forearm, so the elbow skin still makes a sharp point
-      from behind (`reports/2026-11-05-dog-left-arm/crop-elbow-az-150.png`). Only a grip further
-      from the shoulder opens it (the place of the cello). Run the cast matrix with the new elbow
-      on `CELLO_HOLD`, and move it into the shared hold if the recast cells do not get worse.
+- [ ] Dog cellist left arm (5.3): the lowered elbow of `DOG_HOLD` keeps the elbow bent 51° to
+      57° from straight in the mean of the play of three demos. Look at the elbow skin of the
+      Tripo beagle from behind in a 2x crop (az-150). Only a grip further from the shoulder opens
+      the elbow (the place of the cello). Run the cast matrix with the new elbow on `CELLO_HOLD`,
+      and move it into the shared hold if the recast cells do not get worse.
 - [ ] Dog cellist left elbow height (5.3): the left upper arm of the Tripo beagle is about level
       in the play (from 1° up to 5° down in the mean of `pachelbel-p37`, `boulanger-matin`, and
       `beethoven-5-4`), and a cellist holds it about 45° down on the A string (strings 1.8). Lower
