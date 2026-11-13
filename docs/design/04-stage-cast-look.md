@@ -1085,6 +1085,15 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   into a hard ridge from each armpit to the knee, a dark band across the belly, and a groove with
   a black line at the lap. The key fades out under the arms, so that the upper arms keep their
   room. The standing soloist keeps the form of the source.
+- The seated bind of the Tripo fox has a key `bind_sit`. It puts the underside of the haunch
+  behind the hip joints onto the plane of the thigh underside, so that the thighs and the haunch
+  sit on one seat plane, and the hip joints stand about 0.3 H over the seat, as on the cat, the
+  pig, and the wolf. Reason: a small knob of the source at the back of the haunch was the lowest
+  point over the seat, so the seat top went under it, and the thighs and the haunch floated over
+  the seat as in a squat. The root of its tail turns up a little (`studio.tailBind`), so that the
+  tail clears the back edge of the higher seat and the feet, in place of the tail tip, stand on
+  the floor. The fox thus sits a little lower, and its tail reaches a little farther back, so the
+  layout (4.5) moves players in most demos.
 - The Tripo fawn keeps the long legs of its mesh, with flat hooves, on the stool of the old deer
   (`seatWidth`). Its shins lean 35° forward, so that the seat is lower. Its short tail hangs behind
   the back edge of the seat. Reason: with vertical shins, the higher seat moved players of the
