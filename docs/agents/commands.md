@@ -31,7 +31,7 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
 |---|---|
 | `pnpm install` | Installs the dependencies. `prepare` sets the git hooks of `tools/git-hooks/`. |
 | `pnpm prepare-site` | Writes the SF3 presets into `public/sf/` and the changed demos into `public/demos/` (design 8.3). `dev`, `build`, `smoke`, `frame`, and `frozen` run it first. |
-| `pnpm dev` | Starts the Vite dev server: the gallery at `/gallery.html`, the animal views at `/views.html`, the test page of one role at `/test#<species>-<instrument>` or `/test#bear-conductor` (design 7.1), and a demo at `/#demo=<id>`. |
+| `pnpm dev` | Starts the Vite dev server: the gallery at `/gallery.html`, the animal views at `/views.html`, the test page of one role at `/test#<species>-<instrument>` or `/test#bear-conductor`, with `&rest` for rest mode (design 7.1), and a demo at `/#demo=<id>`. |
 | `pnpm build` | Builds the site into `dist/` with the license file (design 7.3) and the gzipped presets and demos (design 7.2). A second pass (`vite build --mode test-page`) adds the test page (design 7.1). `PAWCHESTRA_ANALYTICS=1` adds Vercel Web Analytics (design 2.7). |
 | `pnpm size [--base <ref>]` | Prints the gzip size of the first download after `pnpm build`, and fails above 1 MB (design 7.2). |
 | `pnpm deploy:vercel [--preview]` | Builds the site with analytics, and deploys `dist/` to the Vercel project `pawchestra` (design 9.2). `--preview` also points `pawchestra-preview.vercel.app` to the deploy. Production only with the approval of the user. Code: `tools/deploy-vercel.sh`. |
