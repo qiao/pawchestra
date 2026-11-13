@@ -1,0 +1,259 @@
+{
+ "edits": [
+  {
+   "kind": "paw",
+   "after": true,
+   "length": 0.75,
+   "wide": 0.8,
+   "thick": 0.9,
+   "ramp": 0.025,
+   "width": [
+    0,
+    0,
+    1
+   ]
+  }
+ ],
+ "sourceTexture": "assets/models/bear/tripo-p2/bear.fbm/bear_basecolor.jpg",
+ "palm": [
+  0.129,
+  -0.99,
+  -0.058
+ ],
+ "ringEdges": 14,
+ "legTurnsIdentity": true,
+ "trunkOpen": 0,
+ "chair": {
+  "halfWidth": 0.02,
+  "front": 0.03,
+  "back": -0.06,
+  "note": "The bear has no chair: it stands on the podium in the pose of the source. The seat is level, and its top is the lowest point of the body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py): the crotch between the legs. The half width stays inside the inner sides of the legs (|x| from 0.025 at the crotch), so that no shin or foot lies over the seat."
+ },
+ "eyeBox": [
+  [
+   0.02,
+   0.86,
+   0.115
+  ],
+  [
+   0.07,
+   0.91,
+   0.15
+  ]
+ ],
+ "noseBox": [
+  [
+   -0.036,
+   0.835,
+   0.198
+  ],
+  [
+   0.036,
+   0.878,
+   0.23
+  ]
+ ],
+ "eyeBoxNote": "The eye box holds the loose left eyeball of the source (x 0.026 to 0.063, y 0.869 to 0.905, z 0.124 to 0.14), and the right eyeball mirrors it. The nose box holds the dark brown nose (sRGB about 80, 54, 36) at x -0.035 to 0.035, y 0.84 to 0.875, and z 0.20 to 0.226.",
+ "body": {
+  "crease": 180
+ },
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+ "metersPerUnit": 1.677114,
+ "metersPerUnitNote": "The scale of the app: the eye height of the standing bear (the middle of the eyeballs) is the eye height of the bear of d5d8ab2c3 (1.481 m), so that the layout and the camera framing do not move.",
+ "eyeSize": 0.2,
+ "jointsNote": "The joints of the source, measured on sections of the mesh: the arm axis at y 0.669 to 0.663 and z 0.01 to 0.106 (the arm points 27 degrees forward), the shoulder inside the arm root (the arm leaves the trunk at x 0.205), the elbow at x 0.265, the wrist at x 0.355 where the paw starts to widen, and the knuckles at x 0.42 where the digits part. The legs come from the sections of the feet and the shins: the crotch at y 0.175, the hip joint in the haunch at y 0.23, the knee at y 0.13, the ankle at y 0.06. The spine bones lie at about 0.35 of the depth from the back. The tail is a small bump of the body at y 0.26 to 0.34 behind the haunch.",
+ "rings": {
+  "arm": [],
+  "leg": []
+ },
+ "rows": {
+  "start": 0.165,
+  "reach": 0.085,
+  "control": [
+   [
+    0.165,
+    0.4,
+    0
+   ],
+   [
+    0.18,
+    0.25,
+    0
+   ],
+   [
+    0.195,
+    0.12,
+    0
+   ],
+   [
+    0.21,
+    0.04,
+    0
+   ],
+   [
+    0.22,
+    0,
+    0
+   ],
+   [
+    0.232,
+    0,
+    0
+   ],
+   [
+    0.245,
+    0,
+    0.25
+   ],
+   [
+    0.26,
+    0,
+    0.75
+   ],
+   [
+    0.275,
+    0,
+    0.75
+   ],
+   [
+    0.29,
+    0,
+    0.25
+   ],
+   [
+    0.303,
+    0,
+    0
+   ]
+  ],
+  "wrist": {
+   "start": -0.03,
+   "band": 0.004,
+   "count": 12
+  },
+  "knuckle": {
+   "start": -0.02,
+   "band": 0.0035,
+   "count": 12
+  }
+ },
+ "pawTurn": {
+  "L": -3,
+  "R": 2
+ },
+ "earPlane": {
+  "points": [
+   [
+    0.05,
+    0.958,
+    -0.01
+   ],
+   [
+    0.137,
+    0.925,
+    -0.01
+   ],
+   [
+    0.095,
+    0.942,
+    -0.06
+   ],
+   [
+    0.095,
+    0.942,
+    0.04
+   ]
+  ],
+  "band": 0.008,
+  "xmin": 0.002
+ },
+ "texture": {
+  "path": "assets/models/bear/tripo-hand/bear-color.webp"
+ },
+ "smooth": false,
+ "trunk": null,
+ "eyeVerts": [
+  30,
+  50
+ ],
+ "lids": {
+  "back": 135,
+  "psi": [
+   -36,
+   34
+  ],
+  "lam": [
+   -24,
+   36
+  ],
+  "steps": [
+   12,
+   12
+  ],
+  "radius": 1.07,
+  "strip": 1.03,
+  "angle": 110,
+  "srgb": [
+   159,
+   86,
+   32
+  ],
+  "uv": [
+   0.5,
+   0.5
+  ],
+  "density": 0.68,
+  "refit": true,
+  "rayReach": 0.3,
+  "lidClear": 0.003
+ },
+ "noseFur": true,
+ "holes": 4,
+ "foldRelax": {
+  "angle": 75,
+  "pawX": 0.36,
+  "footY": 0.06,
+  "rounds": 40,
+  "lam": 0.5,
+  "clip": 0.02
+ },
+ "rigFacts": {
+  "cueHeadLeft": 35,
+  "cueHeadRight": 30,
+  "cueLift": 12
+ },
+ "turnRings": [
+  0.3359,
+  0.3679
+ ],
+ "armLoopY": [
+  0.55,
+  0.8
+ ],
+ "turnFit": 0.03,
+ "throatRows": {
+  "y": [
+   0.77,
+   0.86
+  ],
+  "z": 0.0,
+  "share": 0.6
+ },
+ "lidLower": {
+  "angle": 5,
+  "psi": [
+   12,
+   18,
+   40,
+   60
+  ],
+  "reach": [
+   1.15,
+   1.6
+  ],
+  "lam": [
+   20,
+   35
+  ]
+ }
+}

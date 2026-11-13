@@ -1,0 +1,152 @@
+{
+  "source": "make_config.py sets this value from params.json.",
+  "sourceNote": "make_config.py sets this value from params.json.",
+  "name": "make_config.py sets this value from params.json.",
+  "weld": 1e-05,
+  "joints": null,
+  "palm": null,
+  "studio": {
+    "trunk": {
+      "open": 0,
+      "shares": {
+        "hips": 1,
+        "spine": 1,
+        "spine1": 0.75,
+        "chest": 0.5,
+        "neck": 0.25,
+        "head": 0
+      }
+    },
+    "trunkNote": "The trunk of the bind keeps the pose of the source (open 0: no recline, trunk_turn() of tools/blender/rig_mesh.py), because the bear stands on the podium.",
+    "bindArms": {
+      "upper_arm": [
+        0.813873,
+        -0.143043,
+        0.563161
+      ],
+      "forearm": [
+        0.316246,
+        0.757051,
+        0.571719
+      ]
+    },
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the bear of main (tools/mesh-rigs/bear.json at cbc8db5e4), so that the elbow axes and the zero of the roll of the upper arm stay.",
+    "straightArms": true,
+    "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
+    "bindSupination": {
+      "L": 0,
+      "R": 0
+    },
+    "bindSupinationNote": "The bind paws take no supination (paw_supination() of tools/blender/rig_mesh.py), so the bind forearms have no twist. On the Tripo rabbit, a bind supination twisted the bind forearm, and the crease angle then showed the diagonals of its quads (assets/models/rabbit/README.md, \"Arm twist\").",
+    "note": "legTurns gives the world turn of each left leg bone from the bind to the source. make_config.py sets it.",
+    "legTurns": {
+      "thigh": [
+        0.639295,
+        0.016461,
+        -0.085393,
+        0.764029
+      ],
+      "shin": [
+        0.078024,
+        0.009588,
+        0.045108,
+        0.995884
+      ],
+      "foot": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ],
+      "toes": [
+        0.0,
+        0.0,
+        0.0,
+        1.0
+      ]
+    }
+  },
+  "colors": {
+    "samples": 6,
+    "palette": 48,
+    "dark": 0.05,
+    "eyeShare": 0.34,
+    "eyeBox": [
+      [
+        0.006148,
+        0.832097,
+        0.115804
+      ],
+      [
+        0.091851,
+        0.913369,
+        0.179696
+      ]
+    ],
+    "noseBox": [
+      [
+        -0.0242,
+        0.80955,
+        0.2035
+      ],
+      [
+        0.0242,
+        0.84255,
+        0.242
+      ]
+    ],
+    "nose": [
+      0.31,
+      0.21,
+      0.14
+    ],
+    "tone": {
+      "chroma": 0.2,
+      "light": [
+        0.985,
+        0.995
+      ],
+      "keep": [],
+      "points": [
+        [
+          0.6,
+          0,
+          0,
+          0
+        ],
+        [
+          0.97,
+          0,
+          0,
+          0
+        ]
+      ],
+      "note": "No move. The hand route does not read the tone. The color map of the source replaces the face colors in the app."
+    },
+    "note": "Each face takes the mean sRGB color of the texture at a grid of samples. A face is dark when at least eyeShare of its samples are below dark. A dark face in the eye box is an eye, and a face in the nose box near the nose color is the nose. A palette of palette colors (k-means in Oklab) keeps the colors few.",
+    "eyeBoxNote": "make_config.py sets the eye box, the nose box, and this note from params.json."
+  },
+  "eyeShell": {
+    "lift": 0.002,
+    "points": 12,
+    "reach": 1,
+    "darkReach": 2,
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+  },
+  "chair": null,
+  "armSegments": {
+    "helper": 0.03,
+    "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies."
+  },
+  "jointsNote": "make_config.py sets this value from params.json.",
+  "body": null,
+  "bodyNote": "make_config.py sets this value from params.json.",
+  "eyeSize": null,
+  "eyeSizeNote": "make_config.py sets this value from params.json.",
+  "metersPerUnit": null,
+  "metersPerUnitNote": "make_config.py sets this value from params.json.",
+  "chairNote": "make_config.py sets this value from params.json.",
+  "texture": "make_config.py sets this value from params.json.",
+  "rollSplit": true,
+  "rollSplitNote": "The simple route splits the roll segments by place (roll_split() of tools/blender/simple_rig.py). The hand rig sets the same split in the exact rows of each arm ring (assets/models/bear/README.md, \"tripo-hand/bear.blend\")."
+}
