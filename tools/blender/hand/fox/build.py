@@ -96,7 +96,14 @@ def paw_size(body):
         return
     me = body.data
     S = studio_points(me)
-    T = ce.map_points(S, dict(P, edits=edits))
+    # Each edit gets all the edits of the params, so that the edit `paw` finds `armStretch` and
+    # scales about the stretched wrist joint of the config. With only the `after` edits, it
+    # scaled about the source wrist, 0.036 units back along the forearm: the forearm end became
+    # a narrow neck, and the wrist and the knuckles of the mesh lay 0.010 units before their
+    # joints.
+    T = S
+    for e in edits:
+        T = ce.EDITS[e['kind']](T, e, dict(P, _tail=None, _part=None))
     set_studio_points(me, T)
     move = np.linalg.norm(T - S, axis=1)
     for sign, side in ((1, 'L'), (-1, 'R')):
