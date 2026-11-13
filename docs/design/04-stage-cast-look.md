@@ -105,6 +105,9 @@ in a line at the back, as the Vienna Philharmonic seats them. The diagram shows 
 
 - Larger species sit farther back, so that a big animal hides no smaller animal. In the default
   view, a large species hides less than 10% of the head of each smaller animal.
+- The joint search of the seats reads the footprint, the eye height, and the mesh of each body
+  (4.5, lanes). A new body with the same footprint can thus move the seats of other rows, because
+  its eyes see other lanes and its head hides other sight lines.
 
 ## 4.3 Species
 
