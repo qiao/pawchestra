@@ -1309,11 +1309,11 @@ navigation menu at the top of the mockup is out of scope.
       (`src/models/props.ts`), and the close shots show them (4.6).
 - [ ] The mouse is a faceted body beside fur bodies in one frame. Check that a Tripo hand body of
       the mouse is in the body plan (4.3).
-- [ ] Fit the key shadow map to each close shot from the shot plan: a sphere around the subject
-      and the players between it and the light. Pose and draw only the players in that sphere or
-      the view. Now one map covers the whole stage (texel 11.8 mm, blur disc 11.8 cm on the high
-      tier), so a paw or a bow casts no shadow, and the shadow pass draws 65% of the triangles of
-      a close shot. Show the user a lineup (4.5, 9.7).
+- [ ] Show the user the key shadow fit of the solo and section shots
+      (`reports/2026-11-12-audit-render/t4-shadow/`). Outside the sphere a player gets no key
+      shadow, and the soft dark areas of the old wide blur are lit now (4.5).
+- [ ] Pose only the players in the view or in the key shadow sphere of a close shot: `poseAt()`
+      poses all players in each frame (`app/app.ts`) (9.7).
 - [ ] Test KTX2 body maps with the transcoder after the first frame. The high tier keeps the
       maps at full size: 386 MB of GPU memory in `boulanger-matin` (2.6).
 - [ ] Measure on a real phone which step of the automatic tier holds 30 fps: medium, medium at
