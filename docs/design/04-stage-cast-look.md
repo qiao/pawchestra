@@ -923,7 +923,9 @@ folds showed as dark triangles on the back and the cheeks. Its paws and elbow ax
 each part of each arm takes at most 45° in the moments of the bassoonist. Its arms are short, so
 it plays a smaller bassoon, and its hold turns both shoulders forward (`BEAVER_BASSOON`, 5.3).
 The bassoon is the largest at which both paws reach their grips with the boot joint in front of the
-round belly. The Tripo badger (`assets/models/badger/tripo-hand/`) is the body of the
+round belly. Its first arm row starts near the clavicle share that bone heat gives the armpit
+(`rows.control`), as on the polar bear. Reason: a first row of 0.4 that fell to 0 in 0.04 units
+folded the front of the right armpit at the rest of the bassoon into a dark slot. The Tripo badger (`assets/models/badger/tripo-hand/`) is the body of the
 percussionist, by the rules of the beaver. Its right eyeball is a loose part in an open socket,
 and the source joins its left eyeball to the rim of the socket, so a sphere fit finds the faces of
 that ball (`fused_ball()` of its build). Both eyes keep the paint of the source, with the finish
@@ -932,7 +934,11 @@ bands of the elbow is a ring of quads through one triangle, and one edge ring cu
 (`seed_rings()` of its build), with no paw turn. Its elbow helper share rises to 1 at the elbow
 joint and falls to 0 on each side, so that the bend share grows linearly. Reason: with rings 0.6
 arm radii apart and a helper share of 0.75 at the joint, the bend share jumped at the joint, and
-the bent elbow showed a faceted point with a dark notch. It has no chair, and its bind keeps the legs, the trunk, and the tail of the
+the bent elbow showed a faceted point with a dark notch. Its arm rows start near the bone heat
+clavicle share as on the beaver, and the trunk vertices of the back wall of each armpit give their
+arm shares to the clavicle (`back_rows()` of its build). Reason: when the elbow went back, those
+arm shares pulled the back of the armpit into a fold, and a dark slit showed behind the upper arm.
+It has no chair, and its bind keeps the legs, the trunk, and the tail of the
 source. Its standing crown matches the crown of the older badger (`metersPerUnit` of its chain),
 and its upper arms and forearms are 1.2 times longer than in the source (the point edit
 `armStretch`, as on the panda). Reason: at the H of the older badger, the body stood 13% lower
