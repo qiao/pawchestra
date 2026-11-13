@@ -1076,9 +1076,9 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   hanging paw points down, a little forward, and a little in (`restBaton`), as a conductor holds
   it before the start. The paw turns with no twist on its forearm. The elbow of a nearly
   straight hanging arm is ill defined, so the conductor gives it a fixed direction. The search of
-  the swing out to the side sees the body only along x, so the rest arm adds a small extra swing
+  the swing out to the side sees the body only along x, so the rest arm adds an extra swing
   (`restArm.extraOut`). Reason: with the swing of the search alone, both elbows go into the round
-  belly.
+  belly, and the full upper arms of the Tripo bear go into the sides of its chest.
 - **Bow** (`pose/end-bow.ts`, `END_BOW`). At the song end, the bear ends the concert as a real
   conductor does ([conductor technique](../reference/conductor-technique.md) 8). It holds the
   release in the silence, lowers the arms to the sides, and stands still. Then it turns on the
@@ -1153,8 +1153,9 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   silent seats does not show (5.5). A body with a high head and a long muzzle gives the facts
   `cueHeadLeft`, `cueHeadRight`, and `cueLift` (4.4, "Hand rig"): the head turns less to each
   side, and the left hand rises less at the cue point. The Tripo bear takes 35°, 30°, and 12°.
-  Reason: with the head turn of 50° and the hand 30° up, its right forearm went 3.3 cm into the
-  cheek in a turn to the right, and its left paw 5.6 cm into the head in a cue to the left.
+  Reason: with the head turn of 50° and the hand 30° up, the right forearm of an earlier Tripo bear
+  went 3.3 cm into the cheek in a turn to the right, and its left paw 5.6 cm into the head in a cue
+  to the left. With these facts, no paw and no forearm of the bear goes into its head.
 
   ```text
   time (s)    -1.1        -0.5      0           0.6         1.2
