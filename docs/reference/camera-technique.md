@@ -207,6 +207,16 @@ The app follows these facts:
   the frame.
 - **The 30° rule at an insert (sections 2 and 6).** Each cut into or out of an insert changes the
   size of the frame by `FILM_GRAMMAR.jumpSize`, or it turns the view by `jumpAngle`.
+- **A clear detail (sections 3 and 6).** An insert directs the eye to its detail, so the
+  camera frames the detail in the play pose of the player (`insertCover()`, `INSERT_FRAME`). The
+  objects in front of the detail, also the near arm and the shoulder of the player, cover at most
+  15% of the frame and leave the detail free. The blurred parts of the player cover at most a
+  fifth of the frame, less than the third of the back of a nearer person in a dirty shot.
+- **No cut through the face (section 3).** A close frame can cut the top of the head, and the eyes
+  set the frame. So an insert shows both eyes with a margin, or no part of the head
+  (`cutsFace()`). A wider frame of the same detail can hold the eyes, so the search tries it next.
+- **Fewer inserts (section 6).** A detail with no clear camera gives no insert, because a weak
+  frame interrupts the action with no new detail.
 
 The app does not follow these facts:
 
