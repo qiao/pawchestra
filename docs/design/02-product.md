@@ -431,8 +431,12 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   piece.
 - The focus order is the title, the bar, then the drawer.
 - When a focused play button of the first screen or a focused message goes away, the play button
-  of the bar gets the focus. When the drawer closes with the focus in it (Escape, a selection in
-  the sheet of a phone, or the change to Cinematic mode), the drawer button gets the focus.
+  of the bar gets the focus. When the drawer closes with the focus in it (Escape, or a selection in
+  the sheet of a phone), the drawer button gets the focus. The change to Cinematic mode gives the
+  focus to the drawer button only when the focus came into the drawer from the keyboard
+  (`closeDrawerForFilm()`). Else the focus goes, so that the bar hides, no tooltip stays on the
+  film, and Space pauses. The drawer records the kind of each focus when it comes, because
+  Chromium shows a focus from a click as a keyboard focus after the next key press.
 - A row of the music list that a click focused shows no focus ring, also after Space or an arrow
   key. A Tab into the list shows the ring.
 - In Free mode, the bar stays visible while a control of the bar has the keyboard focus

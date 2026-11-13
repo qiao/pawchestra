@@ -312,4 +312,23 @@ export class Ui {
       this.bar.focusDrawerButton();
     }
   }
+
+  /**
+   * Closes the drawer at the change to Cinematic mode (design 2.3, 2.8). The drawer button gets
+   * the focus only when the focus in the drawer came from the keyboard. A focus from a click goes
+   * away, so that the bar hides during play, no tooltip stays on the film, and Space plays and
+   * pauses.
+   */
+  closeDrawerForFilm(): void {
+    const focused = this.drawer.focused;
+    const keyboard = this.drawer.keyboardFocused;
+    const active = document.activeElement;
+    if (focused && !keyboard && active instanceof HTMLElement) {
+      active.blur();
+    }
+    this.drawer.setOpen(false);
+    if (keyboard) {
+      this.bar.focusDrawerButton();
+    }
+  }
 }

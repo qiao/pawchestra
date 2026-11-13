@@ -597,7 +597,7 @@ export class App {
   #changeCamera(event: CameraEvent): void {
     const mode = nextMode(this.#cameraMode, event);
     if (mode === 'cinematic' && this.#cameraMode === 'free') {
-      this.#ui.closeDrawer();
+      this.#ui.closeDrawerForFilm();
     }
     if (event === 'toggle') {
       this.#scene.blendNextModeChange();

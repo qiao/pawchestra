@@ -35,6 +35,12 @@ export class Drawer {
   #current: DrawerTab | null = null;
   /** True while the pointer is over the drawer. */
   #hovered = false;
+  /**
+   * True if the last focus that came into the drawer was a keyboard focus (`:focus-visible`).
+   * Chromium also shows a focus from a click as a keyboard focus after the next key press, so the
+   * drawer records the kind of the focus when it comes.
+   */
+  #keyboardFocus = false;
 
   /**
    * Creates the closed drawer with the drag handle, the close button, and no tabs.
@@ -62,6 +68,10 @@ export class Drawer {
     });
     this.element.addEventListener('pointerleave', () => {
       this.#hovered = false;
+    });
+    this.element.addEventListener('focusin', (event) => {
+      this.#keyboardFocus =
+        event.target instanceof Element && event.target.matches(':focus-visible');
     });
   }
 
@@ -132,6 +142,11 @@ export class Drawer {
    */
   get focusShown(): boolean {
     return this.element.querySelector(':focus-visible') !== null;
+  }
+
+  /** True while an element of the drawer has a focus that came from the keyboard. */
+  get keyboardFocused(): boolean {
+    return this.focused && this.#keyboardFocus;
   }
 
   /** True while the pointer is over the open drawer. */
