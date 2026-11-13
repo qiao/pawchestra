@@ -1060,7 +1060,7 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
 - **Bow** (`pose/end-bow.ts`, `END_BOW`). At the song end, the bear ends the concert as a real
   conductor does ([conductor technique](../reference/conductor-technique.md) 8). It holds the
   release in the silence, lowers the arms to the sides, and stands still. Then it turns on the
-  podium to the audience with small steps, bows from the waist with the eyes down, faces the
+  podium to the audience with steps, bows from the waist with the eyes down, faces the
   audience a moment, and turns back to the orchestra. The arms come down before the turn, so the
   bow does not need the hold of `transport.holdSec` (5.2). `endMotionAt()` gives the motion from
   the wall seconds after the stop at the song end (`Transport.endedAtSong`), so the pose keeps no
@@ -1072,31 +1072,57 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
           |release|arms down|still   |turn left|  bow   |  face  |turn back|  rest pose
   ```
 
-  - The turn is the turn of the root bone from the facing of the conductor to the audience at +z
-    of the layout (`ConductorLayer.audienceTurn`). The bear turns to its left, past the first
-    violins. The feet step in place in the turn (`steps`, `stepLift` in `H`, `plantFeet()`), so a
-    body of another species takes the same motion.
+  - The turn goes from the facing of the conductor to the audience at +z of the layout
+    (`ConductorLayer.audienceTurn`). The bear turns to its left, past the first violins.
+  - The bear turns with steps, as a person turns on the spot (`TURN_STEPS`, `stepTurnAt()`,
+    [conductor technique](../reference/conductor-technique.md) 8). The head turns first, the
+    weight moves over the right foot, and the feet step in turn: the left foot first, then the
+    right foot, then the left foot, and a small step of the right foot closes the feet. Each step
+    turns one foot at most `gap` past the other foot. A foot turns and moves on its circle around
+    the root only in the air (`swingSec`, `lift` in `H`). The planted foot keeps its place and its
+    turn, and the hips turn smoothly over it. The hips move toward the foot that carries the
+    weight (`weight`), and the knees bend (`knees`). The turn back takes the same steps with the
+    right foot first. Reason: with a turn of the root alone, the feet slid on circles over the
+    podium while they carried the weight.
+  - The legs solve from the stance (`stanceOffset()`, `stepFeet()`): each ankle at its place,
+    each foot flat with its turn, and each knee toward its toes. The root offset puts the hips
+    over the middle of the feet, and drops them so that no leg is longer than in the bind pose.
+    Outside the steps, the legs keep the solve of the hip move (`plantFeet()`). A body of another
+    species takes the same motion.
   - The bow faces away from the conductor stand. Reason: the bow to the orchestra bent the head
     and the baton toward the desk, and the stand checks of two demos failed.
   - The bow turns back to the orchestra. Reason: a conductor turns back to the players after the
     bow, and the rest pose after the bow is then the same as after each other pause.
   - A play during the bow turns the bear back from where it is (`transportEndMotion()`). Each
-    change after the pause at the song end eases the motion at the change back to the rest in
-    `turnSec`, and the feet step for the share of the turn. The arms lift only when the bear
-    nearly faces the orchestra (`armsTurn`). Reason: with no ease, a play during the bow turns the
-    bear to the orchestra and lifts the arms in one frame. A playing arm of a turned body reaches
-    across the body to the beat point.
+    change after the pause at the song end plans new steps from the motion at the change back to
+    the orchestra, in `returnSec`. A foot in the air at the change steps first, at once. The arms
+    lift only when the bear nearly faces the orchestra (`armsTurn`). Reason: with no steps, a play
+    during the bow turns the bear to the orchestra and lifts the arms in one frame. A playing arm
+    of a turned body reaches across the body to the beat point. `returnSec` is at most
+    `LIFT_FIT_SEC`, because `changeTransport()` cuts the transport before a play after that time.
   - The end card shows after `END_BOW_SEC` (2.8), because the card stands over the podium.
 
   ```typescript
   /** The motion of the conductor at the song end at one time (`pose/end-bow.ts`). */
   interface EndMotion {
     arms: number; // the share of the playing pose that the arms keep, 1 to 0
-    turn: number; // the turn of the whole body around +y, positive to the left
+    turn: number; // the turn of the hips (the root bone) around +y, positive to the left
+    headLead: number; // the turn of the head ahead of the hips
     bend: number; // the bend of the spine of the bow
+    footL: number; // the turn of each foot around the root
+    footR: number;
     stepL: number; // the lift of each foot in a step, 0 to 1
     stepR: number;
+    weight: number; // the hips from -1 (over the right foot) to 1 (over the left foot)
+    knees: number; // the share of the knee bend of the steps, 0 to 1
   }
+  ```
+
+  ```text
+  turn s  0     shiftSec      + pitchSec    + 2 pitchSec   + 3 pitchSec
+          |head,|  L up       |  R up       |  L up        |  R up     |
+          |weight on R        |  on L       |  on R        |  on L     | settle
+  feet    L 0 -> gap          R 0 -> 2 gap  L gap -> half  R -> half (half turn)
   ```
 - **Chamber group.** A chamber group has no conductor, so its leader gives the count-in with a
   breath and a nod, as in a string quartet (`leaderOf()`, `LEADER_NOD`).
