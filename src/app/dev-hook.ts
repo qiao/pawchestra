@@ -20,7 +20,8 @@ export interface DevHook {
   /** The instrument of each player of the current demo, in the order of `ScenePose.players`. */
   readonly instruments: readonly InstrumentId[];
   /**
-   * Gives the rotation of a bone of a player in the last frame.
+   * Gives the rotation of a bone of a player in the last frame. A player outside the view of the
+   * camera and of the key shadow keeps the pose of the last frame that needed it (design 9.7).
    *
    * @param player The index of the player in `ScenePose.players`.
    * @param bone The bone.

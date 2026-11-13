@@ -7,7 +7,7 @@ import type { PosePlan } from '../pose/plan.ts';
 import { createScenePose, poseAt } from '../pose/pose-at.ts';
 import type { ScenePoseBuffer } from '../pose/pose-at.ts';
 import type { SeatAudibility } from '../pose/types.ts';
-import type { PreparedLayout, StageScene } from '../scene/stage-scene.ts';
+import type { FramePoser, PreparedLayout, StageScene } from '../scene/stage-scene.ts';
 import type { Steps } from '../score/steps.ts';
 import { stageMix } from '../score/stage-mix.ts';
 import type { ChannelMix } from '../score/stage-mix.ts';
@@ -1195,11 +1195,13 @@ export class App {
    * Poses the players from the song time of the `Player`, updates the UI, and renders the scene
    * (design 5.1). Until the samples of the piece are ready, the song time is 0 and the players
    * keep the rest pose. In Cinematic mode, the camera of the shot of the song time shows (5.6).
+   * The scene poses only the players in the view of the camera or of the key shadow (9.7).
    */
   frame(): void {
     const wallTime = performance.now() / 1000;
     const piece = this.#piece;
     let shot: CameraPose | null = null;
+    let poser: FramePoser | null = null;
     if (piece) {
       // After a failure, the clock of the `Player` stays at the song time of the failure (6.8).
       const audio = this.#audio;
@@ -1209,7 +1211,8 @@ export class App {
       this.#state = followSongTime(this.#state, this.#songTime, piece.score.durationSec, wallTime);
       const transport = this.#state.transport;
       const { plan, audibility, poses } = piece;
-      this.#scene.pose(poseAt(plan, this.#songTime, wallTime, transport, audibility, poses));
+      const songTime = this.#songTime;
+      poser = (needed) => poseAt(plan, songTime, wallTime, transport, audibility, poses, needed);
       // The key light moves to the soloed seats (design 2.4, 4.5).
       this.#scene.solo(piece.flags);
       if (this.#cameraMode === 'cinematic') {
@@ -1229,7 +1232,7 @@ export class App {
     });
     // The sheet of a phone covers the first screen, so the stage does not need to clear it.
     const ring = this.#phone.matches && drawer.open ? null : this.#ui.firstScreen.ringBox;
-    this.#scene.render(shot, cover, ring);
+    this.#scene.render(shot, cover, ring, poser);
     this.#ui.showLetterbox(this.#scene.letterboxBar, this.#scene.letterboxSide);
     this.#showFrame();
     if (piece && !this.#audioStarted) {

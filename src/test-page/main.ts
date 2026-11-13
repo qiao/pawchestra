@@ -521,8 +521,10 @@ class TestPage {
     }
 
     const { plan, poses } = piece;
-    this.#stage.pose(poseAt(plan, songTime, wallTime, this.#state.transport, [], poses));
-    this.#stage.render(this.#view, PAGE_COVER, null);
+    const transport = this.#state.transport;
+    this.#stage.render(this.#view, PAGE_COVER, null, (needed) =>
+      poseAt(plan, songTime, wallTime, transport, [], poses, needed),
+    );
     this.#view = null;
     const shown = Math.min(Math.max(0, songTime), durationSec);
     if (!this.#dragging) {

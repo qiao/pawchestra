@@ -1,8 +1,10 @@
 import {
   BackSide,
+  Frustum,
   Group,
   Light,
   Line,
+  Matrix4,
   Mesh,
   PMREMGenerator,
   Points,
@@ -62,6 +64,7 @@ import {
   fitKeyShadow,
   createLights,
   keyLightPosition,
+  keyShadowView,
   setLightsTier,
 } from './lights.ts';
 import { createPoolUniforms, defaultAim, setPoolAim } from './light-pool.ts';
@@ -77,6 +80,8 @@ import {
   sharedGeometryOf,
 } from './player.ts';
 import type { PlayerSpot } from './player.ts';
+import { createPoseCull, markNeeded } from './pose-cull.ts';
+import type { PoseCull } from './pose-cull.ts';
 import { setBandViewHeight } from './harp-strings.ts';
 import { createSheetMesh } from './sheets.ts';
 import { PostPipeline, targetFormatOf } from './post.ts';
@@ -210,6 +215,32 @@ function* cullPlayersSteps(players: readonly SkinnedMesh[]): Steps<Map<SkinnedMe
   return culled;
 }
 
+/**
+ * Gives the poses of a frame for the players that it needs (`StageScene.render()`, design 9.7):
+ * `poseAt()` of the song time of the frame, with the flags of the needed players.
+ *
+ * @param needed A flag for each player, then one for the conductor: 1 when the frame needs it.
+ * @returns The poses. A pose with the flag 0 can keep the values of an older frame.
+ */
+export type FramePoser = (needed: Uint8Array) => ScenePose;
+
+/** The product of the projection matrix and the view matrix of a camera, written before each read. */
+const viewProjection = new Matrix4();
+
+/**
+ * Calculates the view of a camera for the cull of the poses (design 9.7). It updates the world
+ * matrix of the camera, as the renderer does before it draws, so the renderer gets the same view.
+ *
+ * @param camera The camera of the frame.
+ * @param out The view to write.
+ * @returns `out`.
+ */
+function cameraView(camera: PerspectiveCamera, out: Frustum): Frustum {
+  camera.updateMatrixWorld();
+  viewProjection.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+  return out.setFromProjectionMatrix(viewProjection, camera.coordinateSystem, camera.reversedDepth);
+}
+
 /** The flags of a seat that the solo light reads (design 2.4): `SeatFlags` of the app. */
 interface SoloFlag {
   /** True if the user soloed the seat. */
@@ -241,6 +272,8 @@ interface LayoutView {
   readonly players: readonly SkinnedMesh[];
   /** The bone spheres of each player mesh that a fitted sphere can cull, by mesh. */
   readonly culled: ReadonlyMap<SkinnedMesh, BoneSpheres>;
+  /** The spheres of the players, and the players that the frame poses (design 9.7). */
+  readonly poseCull: PoseCull;
   /** The hall around the stage. Its cutaway follows the camera. */
   readonly hall: Group;
   /** The light effects that write no depth, such as the visible beam (scene/post.ts). */
@@ -410,6 +443,10 @@ export class StageScene {
   readonly #postFormat: TargetFormat;
   /** The depth of the scene for the haze of the beam (design 4.5). */
   readonly #beamDepth = new BeamDepth();
+  /** The view of the camera of the frame for the cull of the poses, written in each frame. */
+  readonly #cameraView = new Frustum();
+  /** The views of the cull of the poses of the frame (design 9.7), written in each frame. */
+  readonly #cullViews: Frustum[] = [];
   #tier: QualityTier;
   readonly #reducedMotion: boolean;
   /** The pool of the stage lights (design 4.5), which the materials of the scene share. */
@@ -546,6 +583,8 @@ export class StageScene {
     const culled = yield* cullPlayersSteps(players);
     const playerGroup = new Group().add(...players);
     scene.add(playerGroup);
+    playerGroup.updateMatrixWorld();
+    const poseCull = createPoseCull(players, culled);
     // The camera gets the pointer events only in `show()`. A drag during the build thus moves
     // only the shown camera, and the new stage starts at its default view.
     const camera = new StageCamera(
@@ -591,6 +630,7 @@ export class StageScene {
         lights,
         players,
         culled,
+        poseCull,
         hall,
         effects: lightEffects(scene),
         depthParts: [stageGroup, props, playerGroup],
@@ -850,18 +890,6 @@ export class StageScene {
   }
 
   /**
-   * Copies the poses of a frame to the players of the current layout (design 5.1). With no
-   * layout, it does nothing.
-   *
-   * @param pose The poses from `poseAt()` with the plan of the current layout.
-   */
-  pose(pose: ScenePose): void {
-    if (this.#view) {
-      applyScenePose(this.#view.players, pose);
-    }
-  }
-
-  /**
    * Sets the solo flags of the seats (design 2.4, 4.5). The key light, its pool, and the visible
    * beam move to the players of the soloed seats in the next frames, and back when no seat is
    * soloed. The app gives the flags in each frame. A new list gives a new aim, and the same list
@@ -1090,13 +1118,24 @@ export class StageScene {
    * Cinematic mode, the scene shows in the letterbox, and the canvas is black around it (design
    * 2.5). No pass renders the scene under the bars.
    *
+   * When the camera and the key shadow of the frame are set, the frame poses only the players in
+   * their views ({@link FramePoser}, design 5.1, 9.7). The other players hide until a frame needs
+   * them again. A pose is a function of the song time, so such a player shows the correct pose.
+   *
    * @param shot The camera of the shot of the frame in Cinematic mode, or `null` in Free mode.
    *   Then the orbit controls move the camera (design 2.5).
    * @param cover The parts of the page over the canvas, which move the frame (design 2.8).
    * @param ring The box of the load ring of the play button of the first screen, in CSS pixels,
    *   or `null` while it does not show. The stage shrinks until it is clear of it.
+   * @param poser The poses of the frame, or `null` to keep the poses of the players. Then all
+   *   players show.
    */
-  render(shot: CameraPose | null, cover: FrameCover, ring: ScreenBox | null): void {
+  render(
+    shot: CameraPose | null,
+    cover: FrameCover,
+    ring: ScreenBox | null,
+    poser: FramePoser | null,
+  ): void {
     const view = this.#view;
     if (!view) {
       return;
@@ -1135,7 +1174,7 @@ export class StageScene {
     const beamGroup = view.lights.children.find((child) => child instanceof Group);
     const depthPass = beamGroup instanceof Group;
     if (depthPass) {
-      this.#holdPose(view);
+      this.#holdPose(view, poser);
       const hidden = [...view.effects, view.hall];
       this.#beamDepth.crop(postView.rect);
       this.#beamDepth.render(this.#renderer, view.scene, camera, hidden, this.#variants);
@@ -1153,7 +1192,7 @@ export class StageScene {
     const focus = shown.focus ? blendFocus(shown.focus, live, share) : live;
     this.#shown = { cinema, beam, light, spot, focus };
     if (!depthPass) {
-      this.#holdPose(view);
+      this.#holdPose(view, poser);
     }
     renderScenePass(this.#renderer.shadowMap, depthPass, () => {
       if (this.#post) {
@@ -1196,17 +1235,41 @@ export class StageScene {
   }
 
   /**
-   * Updates the world matrices and the bone matrices of a frame one time, before its first render
-   * (`holdSkeletons()`). The renders of the frame then update neither of them again.
+   * Poses the players that a frame needs, and updates the world matrices and the bone matrices of
+   * the frame one time, before its first render (`holdSkeletons()`). The renders of the frame then
+   * update neither of them again. The camera and the key shadow of the frame must be set.
    *
    * @param view The layout of the frame.
+   * @param poser The poses of the frame, or `null` to keep the poses. Then all players show.
    */
-  #holdPose(view: LayoutView): void {
+  #holdPose(view: LayoutView, poser: FramePoser | null): void {
+    const cull = view.poseCull;
+    const needed = cull.needed;
+    if (poser) {
+      const views = this.#cullViews;
+      views.length = 0;
+      views.push(cameraView(view.camera.camera, this.#cameraView));
+      const shadow = this.#renderer.shadowMap.enabled ? keyShadowView(view.lights) : null;
+      if (shadow) {
+        views.push(shadow);
+      }
+      markNeeded(cull, views);
+      applyScenePose(view.players, poser(needed), needed);
+    } else {
+      needed.fill(1);
+    }
+    for (let i = 0; i < view.players.length; i++) {
+      const mesh = view.players[i];
+      if (mesh) {
+        mesh.visible = needed[i] === 1;
+      }
+    }
+
     view.scene.updateMatrixWorld();
     view.scene.matrixWorldAutoUpdate = false;
-    holdSkeletons(view.players);
+    holdSkeletons(view.players, needed);
     for (const [mesh, spheres] of view.culled) {
-      if (mesh.boundingSphere) {
+      if (mesh.boundingSphere && mesh.visible) {
         fitPoseSphere(mesh, spheres, mesh.boundingSphere);
       }
     }
