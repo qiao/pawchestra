@@ -81,8 +81,8 @@ scripts are those of the Tripo beaver with the changes below. `make_config.py` w
 
 | Item | Value |
 |---|---|
-| Size | 382,386 bytes (each run writes other bytes) |
-| SHA-256 | `431fe7ee05cbdba3fa2afa10d694a57ef8beb80b035452dd51c2931f787d450f` |
+| Size | 381,834 bytes (each run writes other bytes) |
+| SHA-256 | `33323598e115b771a6b5a04f7c77cc543036871c13e94ac7835ac9081a082c83` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the badger faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `badger`: 3,645 vertices and 4,012 faces (3,139 quads and 873 triangles, 7,151 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the nose takes the slot `fur` and the color map. The 114 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/badger/tripo-hand/badger-color.webp`) |
 | Armature | `badger_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
