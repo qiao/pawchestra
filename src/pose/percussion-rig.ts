@@ -318,6 +318,12 @@ interface PercussionHold {
    */
   readonly ready: boolean;
   /**
+   * The share of the pitch between strikes (`MalletAcross.pitch`) that a ready hold keeps in the
+   * rest pose. 0 lays the head of each mallet on its target, as a real timpanist rests the mallets
+   * on a head. 1 keeps the heights between strikes. A hold with no ready pose does not read it.
+   */
+  readonly restPitch: number;
+  /**
    * The set position of the sticks or the mallets at rest, or `null`: then each closed paw of the
    * hanging arm keeps its mallet as in the bind pose, and with `ready` the paws do not rest.
    */
@@ -469,6 +475,7 @@ export const PERCUSSION_HOLDS = {
     across: { rest: -1.2, lift: 0.65, pitch: 0.3, peak: 4 },
     pitchR: 1,
     ready: true,
+    restPitch: 1,
     set: null,
     pair: true,
     gap: 0,
@@ -556,6 +563,7 @@ export const PERCUSSION_HOLDS = {
     across: null,
     pitchR: 1,
     ready: true,
+    restPitch: 1,
     set: null,
     pair: false,
     gap: 0,
@@ -621,6 +629,7 @@ export const PERCUSSION_HOLDS = {
     across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 5 },
     pitchR: 1,
     ready: false,
+    restPitch: 1,
     set: { raise: 0.04104, rise: [0.1, 0.22] },
     pair: false,
     gap: 0,
@@ -656,6 +665,7 @@ export const PERCUSSION_HOLDS = {
     across: null,
     pitchR: 1,
     ready: false,
+    restPitch: 1,
     set: null,
     pair: false,
     gap: 0,
@@ -691,6 +701,7 @@ export const PERCUSSION_HOLDS = {
     across: { rest: -0.6, lift: 0.3, pitch: null, peak: 1.35 },
     pitchR: 1,
     ready: true,
+    restPitch: 1,
     set: null,
     pair: false,
     gap: 0,
@@ -763,6 +774,7 @@ export const PERCUSSION_HOLDS = {
     // Both heads keep one height between strikes, because the paws do not pass each other.
     pitchR: 1,
     ready: false,
+    restPitch: 1,
     // At rest and in a long rest of the music, the mallets lie across the body in front of the
     // waist, side by side and facing opposite directions, as the sticks of the set position of a
     // drumline (percussion 6). No source gives the rest of a xylophonist. The left mallet turns
@@ -848,6 +860,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 5 },
   pitchR: 1,
   ready: false,
+  restPitch: 1,
   set: { raise: 0.246243, rise: [0.12, -0.12] },
   pair: false,
   gap: 0,

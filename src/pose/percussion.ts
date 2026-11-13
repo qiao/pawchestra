@@ -1392,6 +1392,10 @@ function poseHand(
   if (side.kind === 'mallet' && side.across && !fingers) {
     const rest = rig.hold.sizes.rest;
     let share = MathUtils.clamp(rest > 0 ? hand.height / rest : 0, 0, side.across.peak);
+    // A ready hold lowers the heads toward their targets in the rest pose (`restPitch`).
+    if (rig.hold.ready) {
+      share *= rig.hold.restPitch + (1 - rig.hold.restPitch) * weight;
+    }
     // At a damp, the grip goes to its place, and the wrist lifts the head of the mallet.
     homeShift.set(0, 0, 0);
     // At a muffle of the timpani, the paw keeps the roll of the mallet of its place before the
