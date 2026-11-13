@@ -311,8 +311,8 @@ interface PercussionHold {
   readonly ready: boolean;
   /**
    * The share of the pitch between strikes (`MalletAcross.pitch`) that a ready hold keeps in the
-   * rest pose. 0 lays the head of each mallet on its target, as a real timpanist rests the mallets
-   * on a head. 1 keeps the heights between strikes. A hold with no ready pose does not read it.
+   * rest pose. 0 puts the head of each mallet on its target, and 1 keeps the heights between
+   * strikes. A hold with no ready pose does not read it.
    */
   readonly restPitch: number;
   /**
@@ -466,8 +466,8 @@ export const PERCUSSION_HOLDS = {
     across: { rest: -1.2, lift: 0.65, pitch: 0.3, peak: 4 },
     pitchR: 1,
     ready: true,
-    // At rest, the felt balls lie on the heads (restPitch), as a real timpanist rests the mallets
-    // on a head (percussion 4), because the paws cannot hang beside the large kettles. With 0.5
+    // At rest, the felt balls lie on the heads (restPitch), because the paws cannot hang beside
+    // the large kettles. No source gives the rest of a timpanist. With 0.5
     // of the pitch, each ball touches its head (0.1 cm, hold-fit rest limit 1.5 cm), and each paw
     // grasps its mallet (wind-grip). With 0, the balls went 2.4 cm into the heads, and with 0.45,
     // the left claws stood 0.7 cm off the shaft.
