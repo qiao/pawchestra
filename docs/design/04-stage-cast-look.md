@@ -107,7 +107,10 @@ in a line at the back, as the Vienna Philharmonic seats them. The diagram shows 
   view, a large species hides less than 10% of the head of each smaller animal.
 - The joint search of the seats reads the footprint, the eye height, and the mesh of each body
   (4.5, lanes). A new body with the same footprint can thus move the seats of other rows, because
-  its eyes see other lanes and its head hides other sight lines.
+  its eyes see other lanes and its head hides other sight lines. A body that replaces the body of
+  a species thus keeps the eye height of the old body, as the Tripo mouse does (4.4, hand rig).
+  The form of its footprint can still move seats. For example, the tail of the Tripo mouse lies
+  straight back, and the tail of the old mouse curled to the side (`TODO.md`).
 
 ## 4.3 Species
 
@@ -915,7 +918,11 @@ ring and no paw turn. It has no chair, and its bind keeps the legs, the trunk, a
 source. Its standing crown matches the crown of the older badger (`metersPerUnit` of its chain),
 and its upper arms and forearms are 1.2 times longer than in the source (the point edit
 `armStretch`, as on the panda). Reason: at the H of the older badger, the body stood 13% lower
-and the short arms missed the bass drum, the small percussion, and the xylophone. The Tripo panda (`assets/models/panda/tripo-hand/`) is the body of the
+and the short arms missed the bass drum, the small percussion, and the xylophone. The Tripo mouse
+(`assets/models/mouse/tripo-hand/`) is the body of the oboist, by the rules of the beaver. Its
+standing eyes are at the height of the eyes of the older mouse (`metersPerUnit` of its chain).
+Reason: the seat search reads the eye height and the mesh of each body (4.2), and at the H of the
+older mouse its eyes and its large ears stood higher and moved players of 14 of 18 demos. The Tripo panda (`assets/models/panda/tripo-hand/`) is the body of the
 trombonist, by the same rules. Its eyeballs keep the paint and the size of the source, with the
 finish `varnish` and a blink lid. Its front paws are smaller than in the source (the point edit
 `paw`), as on the Tripo wolf. Reason: against its short arms, the paws of the source read too
