@@ -384,13 +384,18 @@ passes.
 - [ ] Cat violist: a light shard at the right elbow, a dark dot on the right forearm, and a
       stretched texture at the right elbow at rest (pose audit L9). The rest hold of the right arm
       did not change in the string round, so look at the chain of the cat in 2x crops.
-- [ ] Cat violist: with the viola of 0.85, the viola turns 69° off the short arc in one lift of
-      `bach-bwv1048` (40° with 0.925, `pnpm carry-check violist`), and the left arm gate folds 45
-      faces at rest (42 before, the curled rest paw). Look at the lift in 2x crops.
+- [ ] Cat violist: with the viola on its via (`carryVia`), the left forearm goes 2.0 cm (lift) and
+      2.2 cm (lowering) into the back of the viola near the rest, in 16% and 23% of the samples
+      (1.6 cm and 1.5 cm when the viola hung from the paw, limit 1.5 cm, `pnpm body-clip
+      violist`). An elbow out, (-1, -0.5, 0), keeps it at 1.2 cm, but the paw then twists past 180°
+      on its forearm in a lowering of `mozart-k525`. The left arm gate folds 43 faces at rest (the
+      curled rest paw).
 - [ ] Rabbit violinist: the left forearm goes 2.3 cm into the back of the violin in 80% of the
       play and 63% of the lowering (limit 1.4 cm, `pnpm body-clip violinist`). No place, elbow,
       tilt, gap, or turn of the violin changes it, and a violin of 0.8 lowers it only to 2.0 cm.
-      The paw reaches the fingerboard only from 0.64, near the upper bout.
+      A violin 0.03 H or 0.06 H higher on the shoulder, and a left elbow in under the violin,
+      (0.3, -1, -0.5), also keep 2.3 cm in 81%. The middle of the thick forearm (4 cm) lies under
+      the back of the violin. The paw reaches the fingerboard only from 0.64, near the upper bout.
 - [ ] Hippo bassist: the left forearm goes 2.9 cm into the contrabass in 50% of the play (limit
       2.3 cm). A higher left elbow, (-1, 0.3, 0), lowers it to 6%, but the left paw swing fails
       (77°, limit 70) and the folds grow from 29 to 42 (`pnpm arm-check bassist`).
