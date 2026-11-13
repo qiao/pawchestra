@@ -1100,11 +1100,12 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   the tips of its claws. The curl stays below the angle at which the knuckle crease of the Tripo
   bear folds.
 - **Baton line.** In the beat, the baton is a longer line of the forearm, a little in
-  ([conductor technique](../reference/conductor-technique.md) 7a). The baton points nearly
-  straight forward at beat 1 (`batonPivot`), the tip is far enough forward that the arm reaches
-  out (`beatPoint`), and the right elbow points out to the side (`poleR`), so the forearm points
-  forward and a little out. Reason: with the baton 20° in and the elbow down, the baton stood
-  about 50° off the forearm.
+  ([conductor technique](../reference/conductor-technique.md) 7a). The baton points a little in at
+  beat 1 (`batonPivot`), the tip is far enough forward that the arm reaches out (`beatPoint`),
+  and the right elbow points out to the side (`poleR`), so the forearm points forward and a
+  little out. Reason: with the baton 20° in and the elbow down, the baton stood about 50° off the
+  forearm. A baton that points straight forward touched the desk of the stand when the arms came
+  down after a final chord.
 - **Paws of the arm gate.** In the ready gesture the left palm faces in and down, as in the quiet
   place (`readyRoll`), so the left forearm does not twist from the one to the other. In the rest
   pose the arms hang relaxed beside the round belly, a little forward, with a small bend of the
