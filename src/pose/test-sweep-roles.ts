@@ -734,7 +734,13 @@ export const CONDUCTOR_SWEEP: RoleSweep = {
   sampleSets: (scene) => {
     const start = -countInAt(scene.plan.beats, 0).lengthSec;
     const play: Transport = { ...PLAYING, changedAtWall: 10 };
-    const ended: Transport = { ...PLAYING, playing: false, changedAtWall: 10, before: PLAYING };
+    const ended: Transport = {
+      ...PLAYING,
+      playing: false,
+      changedAtWall: 10,
+      before: PLAYING,
+      endedAtSong: true,
+    };
     const arms: SweepSample[] = [];
     for (let wall = 10; wall < 14; wall += 0.05) {
       arms.push([Math.min(0, start + wall - 10), wall, play]);

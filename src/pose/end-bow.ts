@@ -1,6 +1,7 @@
 import { MathUtils } from 'three';
 
 import { clamp01, smoothstep } from './rest.ts';
+import type { Transport } from './types.ts';
 
 /**
  * The end of a concert for the conductor (design 5.4, `conductor-technique.md` 8). After the
@@ -43,6 +44,12 @@ export const END_BOW = {
   steps: 4,
   /** The lift of a foot in a step, in head heights `H` of the body. */
   stepLift: 0.06,
+  /**
+   * The share of the turn to the audience below which the arms can lift: the arms lift only when
+   * the bear nearly faces the orchestra. A playing arm of a turned body reaches across the body
+   * to the beat point, and its paw swings fast.
+   */
+  armsTurn: 0.3,
 } as const;
 
 /** The motion of the conductor at the song end at one time. */
@@ -103,11 +110,38 @@ function stepsOf(progress: number, out: EndMotion): void {
 }
 
 /**
- * Calculates the motion of the conductor at the song end (design 5.4): a pure function of the
- * wall seconds after the stop at the song end.
+ * Gives the largest arms factor for a turn of the body (`END_BOW.armsTurn`).
  *
- * @param elapsed The wall seconds after the stop at the song end, or `NaN` when the song does
- *   not stand at its end.
+ * @param share The share of the turn to the audience, from 0 (to the orchestra) to 1.
+ * @returns The largest arms factor, from 0 to 1.
+ */
+function armsLimit(share: number): number {
+  return 1 - smoothstep(share / END_BOW.armsTurn);
+}
+
+/**
+ * Writes the motion of no song end: the arms up, no turn, no bend, and no step.
+ *
+ * @param out The motion to write.
+ * @returns `out`.
+ */
+function noEndMotion(out: EndMotion): EndMotion {
+  out.arms = 1;
+  out.turn = 0;
+  out.bend = 0;
+  out.stepL = 0;
+  out.stepR = 0;
+  return out;
+}
+
+/**
+ * Calculates the motion of the conductor at the song end (design 5.4): a pure function of the
+ * wall seconds after the stop at the song end. The arms factor comes back to 1 in the turn back.
+ * The transport lowers the arms of the conductor before that (`REST_TIMES.hold` and the lowering
+ * of `CONDUCTOR_MOTION` end before {@link BACK_START}), so this change does not show, and a play
+ * after the bow lifts the arms with the normal lift.
+ *
+ * @param elapsed The wall seconds after the stop at the song end.
  * @param audienceTurn The turn from the facing of the conductor to the audience, in radians,
  *   positive to the left (`ConductorLayer.audienceTurn`).
  * @param out The motion to write.
@@ -115,23 +149,65 @@ function stepsOf(progress: number, out: EndMotion): void {
  */
 export function endMotionAt(elapsed: number, audienceTurn: number, out: EndMotion): EndMotion {
   const b = END_BOW;
-  if (Number.isNaN(elapsed)) {
-    out.arms = 1;
-    out.turn = 0;
-    out.bend = 0;
-    out.stepL = 0;
-    out.stepR = 0;
-    return out;
-  }
-  out.arms = 1 - smoothstep((elapsed - b.silenceSec) / b.lowerSec);
-
   const there = clamp01((elapsed - TURN_START) / b.turnSec);
   const back = clamp01((elapsed - BACK_START) / b.turnSec);
+  const lowered = smoothstep((elapsed - b.silenceSec) / b.lowerSec);
+  const raised = back > 0 ? armsLimit(1 - smoothstep(back)) : 0;
+  out.arms = 1 - lowered * (1 - raised);
   out.turn = audienceTurn * (smoothstep(there) - smoothstep(back));
   stepsOf(back > 0 ? smoothstep(back) : smoothstep(there), out);
 
   const down = smoothstep((elapsed - BOW_START) / b.downSec);
   const up = smoothstep((elapsed - BOW_START - b.downSec - b.holdSec) / b.upSec);
   out.bend = b.angle * (down - up);
+  return out;
+}
+
+/**
+ * Calculates the motion of the conductor at the song end from the transport (design 5.4). The
+ * pause at the song end (`Transport.endedAtSong`) runs {@link endMotionAt}. A later play or pause
+ * starts from the motion at its change, and eases it back to no end motion in `END_BOW.turnSec`.
+ * Thus a play during the bow turns the bear back to the orchestra with no jump, and the feet step
+ * in this turn for its share of the full turn. The result is a pure function of the transport
+ * chain and the wall time. The fade ends before `changeTransport()` cuts a transport from the
+ * chain, because a cut needs at least `LIFT_FIT_SEC` after a play.
+ *
+ * @param transport The play state.
+ * @param wallTime The wall clock time, in seconds.
+ * @param audienceTurn The turn from the facing of the conductor to the audience, in radians,
+ *   positive to the left (`ConductorLayer.audienceTurn`).
+ * @param out The motion to write.
+ * @returns `out`.
+ */
+export function transportEndMotion(
+  transport: Transport,
+  wallTime: number,
+  audienceTurn: number,
+  out: EndMotion,
+): EndMotion {
+  const changed = transport.changedAtWall;
+  if (changed === null) {
+    return noEndMotion(out);
+  }
+  if (!transport.playing && transport.endedAtSong) {
+    return endMotionAt(wallTime - changed, audienceTurn, out);
+  }
+  if (!transport.before) {
+    return noEndMotion(out);
+  }
+
+  transportEndMotion(transport.before, changed, audienceTurn, out);
+  const back = smoothstep((wallTime - changed) / END_BOW.turnSec);
+  if (back <= 0) {
+    return out;
+  }
+  const { stepL, stepR } = out;
+  const share = audienceTurn === 0 ? 0 : Math.min(1, Math.abs(out.turn / audienceTurn));
+  stepsOf(back, out);
+  out.stepL = stepL * (1 - back) + share * out.stepL;
+  out.stepR = stepR * (1 - back) + share * out.stepR;
+  out.turn *= 1 - back;
+  out.bend *= 1 - back;
+  out.arms = Math.min(out.arms + (1 - out.arms) * back, armsLimit(share * (1 - back)));
   return out;
 }

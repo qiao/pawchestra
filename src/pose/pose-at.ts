@@ -6,7 +6,7 @@ import { DIGITS } from '../models/studio-format.ts';
 import { X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { poseBowed } from './bowed.ts';
-import { END_BOW, createEndMotion, endMotionAt } from './end-bow.ts';
+import { END_BOW, createEndMotion, transportEndMotion } from './end-bow.ts';
 import type { EndMotion } from './end-bow.ts';
 import { createIdleState, idleAt } from './idle.ts';
 import { poseConductor } from './conductor.ts';
@@ -495,8 +495,8 @@ interface FrameScratch {
   readonly countIn: CountIn;
   /** The song time of the frame, for the preparatory beat of a count-in after a pause. */
   readonly songTime: number;
-  /** The wall seconds since the pause at the song end, or `NaN` before the song end. */
-  readonly endElapsed: number;
+  /** The play state, for the motion of the conductor at the song end. */
+  readonly transport: Transport;
   /** The motion of the conductor at the song end (design 5.4). */
   readonly end: EndMotion;
   /**
@@ -759,8 +759,9 @@ function poseAnimal(
     }
     case 'conductor': {
       const { conductor, expression, chordPoint, end } = scratch;
-      // At the song end, the arms come down, and the bear turns to the audience and bows.
-      endMotionAt(scratch.endElapsed, note.audienceTurn, end);
+      // At the song end, the arms come down, and the bear turns to the audience and bows. A play
+      // during the bow turns the bear back from where it is.
+      transportEndMotion(scratch.transport, scratch.wallTime, note.audienceTurn, end);
       const arms = weight * end.arms;
       conductor.ready = readyAt(scratch.countIn, noteTime);
       batonAt(note.baton, noteTime, conductor.baton, conductor.ready);
@@ -946,10 +947,7 @@ export function poseAt(
     wallTime,
     countIn: transport.seekStart ? NO_COUNT_IN : countInAt(plan.beats, transport.startSec),
     songTime,
-    endElapsed:
-      !transport.playing && transport.changedAtWall !== null && songTime >= plan.endSec - 1e-3
-        ? wallTime - transport.changedAtWall
-        : Number.NaN,
+    transport,
     end: createEndMotion(),
     leaderNod: 0,
   };
