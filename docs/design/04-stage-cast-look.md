@@ -947,7 +947,10 @@ takes at most 45° in the moments of the harpist. The paws of the fox turn about
 forearms by whole ring steps, and the holds of
 the red fox and the tan fox (`FOX_HOLD`, `FOX_FLUTE`) give each part of each arm at most about 45°
 of roll or twist in the moments of both roles. Reason: one body plays the violin and the flute, and
-with the paws and the holds of the fox of main, a forearm twisted up to 168°. An arm that the mesh
+with the paws and the holds of the fox of main, a forearm twisted up to 168°. The turn takes each
+vertex that the edges join to the far ring of the turned band, and no vertex of the near ring.
+Reason: a cut by the place along the forearm also turned vertices of the slanted near ring, and
+they made fins and slits at the wrist. An arm that the mesh
 joins to the trunk needs a cut,
 so such a mesh takes the mesh rig ("Mesh rig").
 
