@@ -522,7 +522,10 @@ export of the open `.blend`, with the bind as its rest.
 
 Seventeen species have the hand rig of a Tripo P2 mesh (`assets/models/<s>/tripo-hand/<s>.blend`).
 A chain of `tools/blender/hand/<s>/` makes each one (`pnpm hand-chain <s>`). The
-rhino and the mannequin come from `rig-mesh`. Each paw of the polar bear
+rhino and the mannequin come from `rig-mesh`. The rhino source has a ledge around the neck and
+around the top of each thigh, and boxes of `smooth` in its config relax them before the weights.
+Reason: the ledges showed as hard step rings, and the shapes `legs_straight` of the standing rhino
+give the source form back, so a relax of the seated bind does not reach them. Each paw of the polar bear
 has one digit bone for each claw (`DIGIT_BONES`,
 `digit1` at the thumb side to `digit5`), a child of the fingers with its head at the base of its
 claw. Each claw spike follows its digit, and its base at the fur rim and a base that two claws
@@ -860,7 +863,9 @@ Its source has eyeballs, so the faces of each ball take the face attribute `eye`
 `varnish`, and a blink lid. It has no chair, as the monkey of main. Its bind has its own leg turns
 and a small trunk lean: the thighs hang straight down, the knees bend a little, and the shoulders
 stay over the hips. Reason: with the leg turns and the trunk lean of the monkey of main, the large
-head and the chest leaned far forward of the haunch. Its tail keeps
+head and the chest leaned far forward of the haunch. It relaxes the small folds of the source
+below the neck (`fold_relax()`, as on the beaver). Reason: the fur tufts along the back and the
+creases at the backs of the knees showed as dark spikes and dark creases. Its tail keeps
 the curl of the source and follows the root bone of the tail alone. Reason: a second tail bone bent
 the curl in the bind. The Tripo hippo (`assets/models/hippo/tripo-hand/`) follows the same rules
 for the contrabass. Its eyeballs and its two loose teeth stay. It stands in the pose of the
@@ -909,8 +914,12 @@ round belly. The Tripo badger (`assets/models/badger/tripo-hand/`) is the body o
 percussionist, by the rules of the beaver. Its right eyeball is a loose part in an open socket,
 and the source joins its left eyeball to the rim of the socket, so a sphere fit finds the faces of
 that ball (`fused_ball()` of its build). Both eyes keep the paint of the source, with the finish
-`varnish` and a blink lid. No arm band of the source is a clean quad ring, so the arms take no
-ring and no paw turn. It has no chair, and its bind keeps the legs, the trunk, and the tail of the
+`varnish` and a blink lid. No arm band of the source is a closed loop of quads. Each of the three
+bands of the elbow is a ring of quads through one triangle, and one edge ring cut halves each band
+(`seed_rings()` of its build), with no paw turn. Its elbow helper share rises to 1 at the elbow
+joint and falls to 0 on each side, so that the bend share grows linearly. Reason: with rings 0.6
+arm radii apart and a helper share of 0.75 at the joint, the bend share jumped at the joint, and
+the bent elbow showed a faceted point with a dark notch. It has no chair, and its bind keeps the legs, the trunk, and the tail of the
 source. Its standing crown matches the crown of the older badger (`metersPerUnit` of its chain),
 and its upper arms and forearms are 1.2 times longer than in the source (the point edit
 `armStretch`, as on the panda). Reason: at the H of the older badger, the body stood 13% lower
