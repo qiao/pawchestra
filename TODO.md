@@ -392,9 +392,10 @@ passes.
 - [ ] Hand chains: `turn_paws()` turns each vertex past the mean of the wrist loop along the
       forearm axis, so a slanted loop turns some of its own vertices with the paw and shears the
       quads before it into a stretched texture (fixed in the cat chain). The same cut turns loop
-      vertices of the bear (6 of 14 on each side), beaver (5 of 12), dog (2 of 13), fox (4 of 14),
-      hippo (7 of 18), monkey (1 of 8, right), panda (5 and 4 of 16), and wolf (4 of 11). Keep the
-      loop, as the cat chain does, and check each wrist in 2x crops.
+      vertices of the bear (6 of 14 on each side), beaver (5 of 12), dog (2 of 13), hippo (7 of
+      18), monkey (1 of 8, right), panda (5 and 4 of 16), and wolf (4 of 11). Keep the loop, as the
+      cat chain does, and check each wrist in 2x crops. The fox chain takes the turned part by the
+      edges past the far ring, so it turns no loop vertex (`assert not move[A].any()`).
 - [ ] Cat violist: with the viola on its via (`carryVia`), the left forearm goes 2.3 cm (lift) and
       2.1 cm (lowering) into the back of the viola near the rest, in 16% and 17% of the samples
       (1.6 cm and 1.5 cm when the viola hung from the paw, limit 1.5 cm, `pnpm body-clip
@@ -862,9 +863,11 @@ passes.
       hold-fit fox-violinist`). Images: `reports/2026-11-13-fox-move/`.
 - [ ] Tripo red fox violinist: the paws go up to 2.5 cm into the violin and the left forearm 2.0
       cm (`pnpm body-clip fox-red:violin`, limit 0.045 H), as on the fox before (2.3 cm).
-- [ ] Tripo red fox: `bowGrip` of `src/models/species.ts` is the grip of the paw of the fox of
-      62bf447f4. The bow sits in the new right paw in the close views. Measure the stick against
-      the middles of the new paw, and refit the grip if it misses.
+- [ ] Tripo tan fox flutist: with the longer paw, the right paw at rest and in the lift lies 73°
+      from its side of the flute (limit 60°), so it holds the flute in each sample and grasps it in
+      none (`pnpm wind-grip flutist`, 100% before). Fit the rest grip of `FOX_FLUTE`.
+- [ ] `pnpm wind-grip` has no row for the bow paw of the red fox. The fit of `bowGrip` used an
+      entry `fox-bow` (as `bassist`, with `sweep: 'violinist'`) that is not in git. Add it.
 - [ ] Tripo fox: in the last 4 of the 21 steps of the blink, 3 to 7 points of the upper inner
       corner of the left lid stand out of the head near the brow. The flat eye domes put the lid
       middles near the middle plane. Check the blink in the app.
