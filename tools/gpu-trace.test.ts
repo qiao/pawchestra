@@ -191,7 +191,7 @@ describe('webglFrameTimes', () => {
     expect(times[1]).toBeCloseTo(0.27 + 3, 6);
   });
 
-  it('counts a WebGL command buffer that reads the canvas, as the read of the title backdrop', () => {
+  it('counts a WebGL command buffer that reads the canvas', () => {
     const intervals = [
       ...firstBuffer(0, 'f1'),
       interval(1, 2, 'w1', 'Render Command 4', 'Fragment', CANVAS_WRITE),
@@ -330,7 +330,8 @@ function realTrace(): RealTrace {
 
 describe('webglFrames on a real trace', () => {
   it('gives each frame with its busy time, also at the known faults of the trace', () => {
-    // Frame 368 holds the read of the title backdrop and a blit of the display in one buffer.
+    // Frame 368 holds a read of the canvas and a blit of the display in one buffer. The trace
+    // comes from a build that read the frame behind the title (before 837bbdbe8).
     // Frame 572 has encoders with only the label "GPU Execution". Frame 579 starts at a clear
     // with no label, which writes the canvas surface of the clear of frame 571. Compositor
     // buffers run between the frames.

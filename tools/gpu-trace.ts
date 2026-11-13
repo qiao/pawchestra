@@ -197,7 +197,7 @@ export function busyMs(intervals: readonly GpuInterval[]): number {
 /**
  * Tells if the IOSurface accesses of a command buffer are all on the surfaces of the canvas. The
  * compositor of Chrome reads the tiles of the page and writes the surface of the window, which have
- * other sizes. WebGL draws into the canvas surfaces, and the read of the title backdrop reads one.
+ * other sizes. WebGL draws into the canvas surfaces, and a WebGL read of the canvas reads one.
  *
  * @param intervals The intervals of one command buffer.
  * @param canvas The width and the height of the drawing buffer of the canvas, in device pixels.
@@ -264,7 +264,7 @@ function holdsClear(intervals: readonly GpuInterval[]): boolean {
  * - Some clears have no label: 0.5% to 2% of the first command buffers have no encoder with the
  *   label `(Clear)`.
  * - A WebGL command buffer can hold surfaces of the display, such as a blit that writes a surface
- *   of 3456 × 2168 beside the read of the title backdrop.
+ *   of 3456 × 2168 beside a read of the canvas.
  * - Some encoders have only the label `GPU Execution`, with no command buffer label.
  * - A canvas surface counts only when a clear with a label writes it. Chrome turns through about
  *   five canvas surfaces, so a short cut of a trace needs a clear with a label for each one.
