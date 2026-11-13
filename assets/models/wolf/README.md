@@ -232,14 +232,15 @@ does not reach between the knees: the clarinet is shorter than the line from the
 The folds of the arms (`pnpm arm-check`, folds p95) go from 53 to 66 (left) and from 48 to 55
 (right), over the limit of 8 before and after (`TODO.md`).
 
-**Color map** (`tools/wolf-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and writes
-WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color: the fur, the brows, and the
-eye paint stay. The eyes keep the iris place of the source. In the play view of the app the gaze
+**Color map** (`tools/wolf-maps.py`). The tool scales the source to 2048 pixels (Lanczos), keeps
+0.7 of its detail finer than a blur of 2 texels (`DETAIL_SHARE`), and writes WebP quality 60,
+method 6 (Pillow 13.0.0). Reason: the full detail read as carved grooves in the hall light. The
+colors of the fur, the brows, and the eye paint stay. The eyes keep the iris place of the source. In the play view of the app the gaze
 reads as a look at the viewer, so no iris moves.
 
 **Normal map.** The same run writes `wolf-normal.webp` from the normal map of the FBX: each x, y
-tilt limited to 0.2 (5.15 % of the texels), a box scale to 1024 pixels, the tilts times 4 in red and
-green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
+tilt limited to 0.2 (5.15 % of the texels), a box scale to 1024 pixels, the tilts times 0.5
+(`TILT_SHARE`) and 4 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
 
 **Differences from the source.** The app light is warm and comes from above, so the gray fur reads
 lighter and warmer than in the even gray light of an FBX viewer, and the chin shades darker. The
@@ -251,5 +252,5 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 |---|---|---|
 | `tripo-hand/wolf.rig.glb` | 1,308,864 bytes | `6ecfa7db2db9f69d9c0b41dfcff853c769e9e70ac9564479118210f351cfe919` |
 | `tripo-hand/wolf.rig.json` | 15,687 bytes | `88ceab3e84fa4ee3650c6b3b99ec6f7b02ba498495fb2b4f6b3ed61516468508` |
-| `tripo-hand/wolf-color.webp` | 205,090 bytes, 2048 × 2048 | `eef1e480bcb8dd099b54c0793699999fa8ae82a835f7291e0284c6d538f67b83` |
-| `tripo-hand/wolf-normal.webp` | 121,396 bytes, 1024 × 1024 | `64f71fe8916ac5600d15d9c70caba053f3cfab412a892cc505796f5f14f6dc1d` |
+| `tripo-hand/wolf-color.webp` | 171,898 bytes, 2048 × 2048 | `bc6334af510185d4367b057c36ca289174cfc2936b3cfde64ab2b63a10215efa` |
+| `tripo-hand/wolf-normal.webp` | 62,414 bytes, 1024 × 1024 | `dd4896a3db92b8b187b31e4e9c118e5fbccbf1f9478fb43126727f8222beed59` |
