@@ -164,6 +164,11 @@ demo shows the same motion on each visit.
   player are `BODY_MOTION.scale` times the base angles, because the base angles move the head of
   a player in the default view by about 2 pixels. The cello and the contrabass keep the base
   angles, because a floor instrument does not lean with the body.
+- **Section variety.** Each player has a seeded posture (`PlayerPlan.posture`, `POSTURE_VARIETY`):
+  a head tilt, a head turn, a slouch of the spine, and an ear spread, so that the players of a
+  section do not look like copies. A wind player that plays keeps the head on the mouthpiece, and
+  a floor instrument takes no slouch, as with the nod (5.4). A hanging ear takes a part of the
+  spread (`OVERLAP.hanging`).
 - **Clips.** A clip of a person (4.4) gives a pose from the clip and the clip time alone
   (`clipPoseAt()`), so it keeps the rule of stateless poses. Only the gallery plays a clip now.
 - **Idle layer.** The idle layer uses the wall clock, so the animals stay alive while the music

@@ -1196,9 +1196,9 @@ scene of each demo has its seats and stage size with no overlap.
       2.2°, about 2 pixels in the default view. Show the user a lineup at 1.5, 2, and 3 times.
       Then give each player a level and trend track, as the conductor has: a lean into a
       crescendo, a chest turn with a long bow, a bell lift at a phrase peak (5.1).
-- [ ] Vary the players of a section: seeded head tilt (±3°), head turn (±4°), spine slouch (±2°),
-      and ear rest angle in `PlayerPlan`. Then show the user a lineup of a fur value step of ±5%.
-      Now four foxes of a section have one pose and one face (`PLAYER_OFFSETS`) (5.1).
+- [ ] Show the user a lineup of a seeded fur value step of ±5% for each player of a section, as one
+      uniform of each player mesh. The posture of each player already varies (`PlayerPlan.posture`),
+      and the four foxes of a section still have one face color (5.1).
 - [ ] Move the plate of the suspended cymbal to the `slide` bone, and tilt it with a decaying sine
       of the time since the strike. Now a crash does not move it (5.3).
 - [ ] Add a softness to `solveTwoBone()` (`src/pose/ik.ts`), default 0, so that the elbow comes

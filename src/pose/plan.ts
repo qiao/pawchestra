@@ -101,6 +101,54 @@ export interface PlayerSway {
   readonly pulsesPerSide: number;
 }
 
+/**
+ * The largest seeded differences of the posture of a player from its section (design 5.1), in
+ * radians, so that the players of a section do not look like copies.
+ */
+export const POSTURE_VARIETY = {
+  /** The side tilt of the head. */
+  tilt: 3 * MathUtils.DEG2RAD,
+  /** The turn of the head around y. */
+  turn: 4 * MathUtils.DEG2RAD,
+  /** The forward lean of the spine: a positive value slouches, and a negative value sits taller. */
+  slouch: 2 * MathUtils.DEG2RAD,
+  /** The spread of the ears at rest. */
+  ear: 8 * MathUtils.DEG2RAD,
+} as const;
+
+/** The seeded posture of one player (design 5.1), in radians: each value is within the range of {@link POSTURE_VARIETY}. */
+export interface PlayerPosture {
+  /** The side tilt of the head: a positive tilt turns the head to the left. */
+  readonly tilt: number;
+  /** The turn of the head around y. */
+  readonly turn: number;
+  /** The forward lean of the spine. */
+  readonly slouch: number;
+  /** The spread of the ears at rest: a positive spread turns each ear out. */
+  readonly ear: number;
+}
+
+/** The posture of the conductor: no seeded difference. */
+const PLAIN_POSTURE: PlayerPosture = { tilt: 0, turn: 0, slouch: 0, ear: 0 };
+
+/**
+ * Chooses the seeded posture of a player (design 5.1).
+ *
+ * @param seed The seed of the player.
+ * @returns The posture.
+ */
+function postureOfSeed(seed: number): PlayerPosture {
+  const s = mixHash(seed, 4);
+  const signed = (slot: number): number => 2 * hashUnit(s, slot) - 1;
+  const v = POSTURE_VARIETY;
+  return {
+    tilt: v.tilt * signed(0),
+    turn: v.turn * signed(1),
+    slouch: v.slouch * signed(2),
+    ear: v.ear * signed(3),
+  };
+}
+
 /** The sway of the conductor and of a player with no seeded sway: with the pulse, to the left. */
 const PLAIN_SWAY: PlayerSway = { sign: 1, lag: 0, pulsesPerSide: 1 };
 
@@ -251,6 +299,8 @@ export interface PlayerPlan {
   readonly passages: Passages;
   /** The seeded sign, lag, and pulse level of the sway of the beat layer. */
   readonly sway: PlayerSway;
+  /** The seeded head tilt, head turn, slouch, and ear spread of the player. */
+  readonly posture: PlayerPosture;
   /**
    * The planned looks at the conductor, or at the leader of a chamber group (`planLooks()`,
    * design 5.1): two song times for each, between which the head is on the target.
@@ -655,6 +705,7 @@ function* preparePlayerSteps(
     lookPitch,
     passages,
     sway: swayOfSeed(seed),
+    posture: postureOfSeed(seed),
     looks: planLooks(notes, beats, []),
     longRests,
     note,
@@ -804,6 +855,7 @@ function* prepareConductorSteps(inputs: ConductorInputs, seed: number): Steps<Pl
     lookPitch: 0,
     passages: buildPassages([], []),
     sway: PLAIN_SWAY,
+    posture: PLAIN_POSTURE,
     looks: new Float64Array(),
     longRests: new Float64Array(),
     note: {

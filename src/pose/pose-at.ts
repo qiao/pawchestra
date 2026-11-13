@@ -236,6 +236,11 @@ interface BodyAngles {
   /** The forward lean of the spine, in radians. */
   lean: number;
   /**
+   * The seeded slouch of the player, in radians, on top of {@link BodyAngles.lean}: 0 for a
+   * floor instrument, because a lean brings the head to the neck of the cello.
+   */
+  slouch: number;
+  /**
    * The part of the look at the conductor that the head turns. A wind player does not turn the
    * head from the mouthpiece while it plays.
    */
@@ -320,7 +325,9 @@ function writeBody(pose: WritablePose, player: PlayerPlan, scratch: FrameScratch
   setBoneRotation(
     r,
     BONES.spine,
-    turn.multiply(second.setFromAxisAngle(X_AXIS, -body.lean - body.nod - breath * m.breathSpine)),
+    turn.multiply(
+      second.setFromAxisAngle(X_AXIS, -body.lean - body.nod - body.slouch - breath * m.breathSpine),
+    ),
   );
   turn.setFromAxisAngle(Y_AXIS, body.twist + body.turn / 2);
   setBoneRotation(
@@ -334,10 +341,14 @@ function writeBody(pose: WritablePose, player: PlayerPlan, scratch: FrameScratch
   const { planned } = scratch;
   const look = planned.weight + idle.look * (1 - clamp01(planned.weight));
   const peek = MathUtils.clamp(player.lookYaw, -m.peek, m.peek) * planned.weight * body.peek;
-  const yaw = player.lookYaw * look * body.look + peek + body.headTurn;
+  // The seeded turn and tilt of the head follow the share of the look, so that a wind player keeps
+  // the mouthpiece on the lips.
+  const { posture } = player;
+  const yaw = (player.lookYaw * look + posture.turn) * body.look + peek + body.headTurn;
+  const roll = body.roll + posture.tilt * body.look;
   const pitch = player.lookPitch * look * body.look + body.lift + body.nodHead;
   for (const [bone, part] of HEAD_SHARES) {
-    turn.setFromAxisAngle(rollAxis, body.roll * part);
+    turn.setFromAxisAngle(rollAxis, roll * part);
     turn.multiply(second.setFromAxisAngle(yawAxis, yaw * part));
     setBoneRotation(r, bone, turn.multiply(second.setFromAxisAngle(X_AXIS, pitch * part)));
   }
@@ -357,7 +368,8 @@ function writeBody(pose: WritablePose, player: PlayerPlan, scratch: FrameScratch
   );
   const dragPitch = drag(player.lookPitch * (look - lookBefore) * body.look, o.ear, earMax);
   const dragRoll = drag(body.swayStep, o.ear, earMax);
-  const ear = idle.ear * player.earTwitch * m.ear;
+  const ear =
+    idle.ear * player.earTwitch * m.ear + posture.ear * (player.earTwitch === 0 ? o.hanging : 1);
   for (const [bone, twitch] of [
     [BONES.earL, ear],
     [BONES.earR, -ear],
@@ -494,6 +506,7 @@ function poseAnimal(
   body.swayStep =
     note.family === 'conductor' ? 0 : body.sway - swayOf(plan, player, lagged, weight);
   body.lean = 0;
+  body.slouch = 0;
   body.look = 1;
   body.peek = 0;
   plannedLookAt(player.looks, noteTime, scratch.planned);
@@ -504,6 +517,7 @@ function poseAnimal(
   body.turn = 0;
   body.headTurn = 0;
   const floor = FLOOR_INSTRUMENTS.has(player.instrument);
+  body.slouch = floor ? 0 : player.posture.slouch;
   body.nod = floor ? 0 : scratch.leaderNod;
   body.nodHead = 0;
   body.roll = 0;
@@ -848,6 +862,7 @@ export function poseAt(
       sway: 0,
       swayStep: 0,
       lean: 0,
+      slouch: 0,
       look: 1,
       peek: 0,
       lift: 0,
