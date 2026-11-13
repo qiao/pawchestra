@@ -313,10 +313,16 @@ The rest of each family:
   read as bent. The rest grip of a carried instrument lies in the reach of the left arm, because
   the instrument hangs from the solved paw from the first frame of a move: a grip out of reach
   makes the instrument jump into the paw. Thus the red fox stands the violin near the hip, and
-  rests the bow upright beside the right thigh at the reach of its short arm. Its bow tip turns to
-  the left below the snout in a move (`FOX_HOLD.restBow.via`), so that the bow does not cross the
-  snout. The grip also moves out and to the front in the move, and the elbows keep a bend
-  ("Bent elbows in the moves").
+  rests the bow upright beside the right thigh at the reach of its short arm. Its rest grip also
+  lies well inside the reach, with the elbow bent and a little out from the side and the forearm
+  about level. The paw holds the neck from the outer side, with the palm to the neck and the
+  wrist nearly straight, and the top plate turns a little to the right, so that the paw twists
+  less on its forearm (`FOX_HOLD.rest`, `restPoleL`, `restYawL`, `restPawTurnL`). Reason: a
+  violinist keeps the back of the left hand in line with the elbow (strings 1.9). With the grip at
+  the end of the reach, the arm locked straight down to the neck, and the paw bent about 60° off
+  the forearm over the neck. Its bow tip turns to the left below the snout in a move
+  (`FOX_HOLD.restBow.via`), so that the bow does not cross the snout. The grip also moves out and to the front in the move, and
+  the elbows keep a bend ("Bent elbows in the moves").
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
   the right knee with the tip up, as a cellist does. Its grip lies low and out, and both elbows
   point out, so that the round upper arms stay off the chest (5.3, "Free round arms"). The hippo

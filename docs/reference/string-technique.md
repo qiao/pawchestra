@@ -557,6 +557,9 @@ The app follows these facts:
   a little off it, so that the thick wrist stays out of the viola.
   The red fox stands its violin near the hip, so that its short left arm reaches the rest grip,
   and holds the bow upright beside the right thigh with the upper arm near the side (`FOX_HOLD`).
+  Its left elbow bends near the side, the forearm is about level, and the paw holds the neck from
+  the outer side with the palm to the neck, so that the back of the paw stays in line with the
+  forearm, as the back of the hand of a player stays in line with the elbow (1.9, [68]).
 - **The long rest (2.9).** In a rest of at least `LONG_REST.minSec` of the bowed family
   (`src/pose/long-rests.ts`), the violin goes upright onto the lap [75], and a cellist keeps the
   cello and rests the bow. The viola and the contrabass keep the playing pose
@@ -610,7 +613,9 @@ The app does not follow these facts:
   (`studioPawTwist()`), so that the skin of the forearm does not turn over. No source gives this
   turn.
 - **The top plate at rest (2.9).** No source gives its side in the seated rest. The top plate of
-  the violin faces the front. The top plate of the viola faces the front and a little to the left,
+  the violin faces the front. The red fox turns it a little to the right, so that its left paw
+  holds the neck with a straight wrist and little twist on the forearm. The top plate of the viola
+  faces the front and a little to the left,
   because with the top to the front the bow paw of the cat turns too fast in a lowering. The bow
   paw rests low at the front of the lap or the lower belly, with the elbow hanging and a straight
   wrist.
