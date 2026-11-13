@@ -935,8 +935,8 @@ eye opening was about 0.18 of the head width in the play view, above the limit o
 the other bodies. Its scale (`metersPerUnit` of its config) puts its seated crown, with no ears,
 at the seated crown of the Tripo wolf, and its ears rise above the ears of the wolf. Reason: with
 the standing shoulders of the old deer, the slim fawn was the smallest body of the orchestra. Its
-head is small, so a scale that keeps H of the old deer made it 1.6 times taller. The stool and
-the harp grow with the body (4.6), and the palm offsets of the harp hold are in `H` (5.3). Its
+head is small, so a scale that keeps H of the old deer made it 1.6 times taller. The stool grows
+with the body (4.6), and the palm offsets of the harp hold are in `H` (5.3). Its
 upper arms and forearms are 1.3 times longer than in the source, as on the Tripo hippo, and the
 hooves keep their size. Reason: with shorter arms, the hooves reached fewer of their places on
 the harp strings, and the harp stood so near the chest that the soundbox went into it.
@@ -1825,7 +1825,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | --- | --- |
 | Violin, viola | An arched body with f-holes, a scroll, a bridge, four strings, a chin rest, a shoulder rest, and a bow. Under the chin on the left shoulder. The shared violin hold places the violin on the left collarbone from the body (5.3). The cat plays a small viola near the neck. |
 | Cello, contrabass | The violin form with an end pin of a thin steel rod and a round rubber tip (`celloPinOf()`, `endPinLength()`, `END_PIN`). The cello leans back between the knees, at a place from the body (5.3). The contrabass has sloped shoulders and machine heads, and stands upright at the left side of the standing hippo, in front of its belly, at a place from the body (5.3). The hippo plays a smaller contrabass (`bassScale`) on a short end pin (`BASS_END_PIN`), so that the upper bout stands below the left shoulder and the left arm passes over it. |
-| Harp | The base on the floor with the pedals at the hooves, and the soundbox on the right shoulder. The deer plays a smaller harp (`harpScale`), upright, diagonal, near the stool, and to the right of its chest (`HARP_PLACE`): the largest harp at which the neck of the harp stays off its chin, with the base as near as its arms need to reach the strings, and the soundbox off the chest. The harp grows by the same factor as the body of the deer (4.4), so the fit stays. |
+| Harp | The base on the floor with the pedals at the hooves, and the top of the soundbox at the right side of the chest, below the right shoulder. The deer plays a smaller harp (`harpScale`), upright, diagonal, near the stool, and to the right of its chest (`HARP_PLACE`), with the base as near as its arms need to reach the strings, and the soundbox off the chest. Reason for the size: on a larger harp, the treble strings lie near the right shoulder, so the right elbow folds back around the top of the soundbox. Reason for the place: the chest of the deer stands far in front of its shoulder joints, so a soundbox on the shoulder puts the strings out of the reach of its arms. |
 | Piano | Larger than a real grand piano (`PIANO_SCALE`), on longer legs (`PIANO_LIFT`), so the forearms of the polar bear are almost level with the keys. The keys stand in front of its belly (`PIANO_FRONT_H`). |
 | Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). The mouse plays a smaller oboe (`oboeScale`), and its shoulders turn forward, so that the short arms of its source reach the grips (5.3). A recast flute or clarinet takes the size rule of the winds. |
 | Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body, with the coil in front of the belly (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. A smaller trombone keeps the footprint of the trombone of the app, so that no seat moves. |
@@ -1926,8 +1926,9 @@ pedal harp (`docs/reference/harp-technique.md`):
   the neck near the crown, and the head of a harpist does not rest on the harp.
 - **Soundbox.** A round back of five staves and a flat spruce soundboard, wide and deep at the
   base and narrow and shallow at the top (`SOUNDBOX`). The strings start in a center strip of the
-  soundboard, and the middle stave of the back has four holes. Reason for the narrow top: it rests
-  at the right shoulder of the player, and a wider and deeper top went into the chest of the deer.
+  soundboard, and the middle stave of the back has four holes. Reason for the narrow top: it stands
+  at the right side of the chest of the player, and a wider and deeper top went into the chest of the
+  deer.
 - **Base.** A bevelled pedestal with seven brass pedals in a fan at the end of the player: D, C,
   and B at the left, and E, F, G, and A at the right, as the harpist sees them (`HARP_PEDALS`).
   Each pedal is one part, in the order of `HARP_PEDALS.order`, so that a pose can move it. A pedal
