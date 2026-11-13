@@ -1487,7 +1487,10 @@ edges of the triangles, so such a line breaks into dashes that move with the cam
   key and a kicker on the shade side of the subject (`scene/shot-light.ts`, 5.6). Room haze gives
   the back rows an aerial depth (`ROOM_HAZE`). A solo turns the key light, the pool, and the beams
   to the soloed players (`soloAim()`, 2.4). A captured cube of the lit hall gives the reflections
-  (`captureEnvironmentSteps()`).
+  (`captureEnvironmentSteps()`). Its diffuse light also lights each fold of a body that no lamp
+  reaches: the neck below the head, the arm roots, the haunch, and the inner sides of the legs.
+  With no environment light, each such fold is a black band, and the contact shade changes it
+  little. Thus the gallery captures its lit floor too (7.1).
 - **Tone.** AgX tone mapping, because ACES moved the dark wood to red. Its exposure (`STAGE_TONE`)
   keeps the lit floor and the white fur below the shoulder of the curve, so the stage does not
   look over-exposed. With reduced motion, the noise, the motes, and the grain stand still (2.5).

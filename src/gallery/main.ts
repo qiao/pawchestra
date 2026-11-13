@@ -2,15 +2,19 @@ import './style.css';
 
 import {
   Color,
+  CubeCamera,
   DirectionalLight,
   Group,
+  HalfFloatType,
   MathUtils,
   Mesh,
   MeshStandardMaterial,
+  PMREMGenerator,
   PerspectiveCamera,
   PlaneGeometry,
   Scene,
   Vector3,
+  WebGLCubeRenderTarget,
 } from 'three';
 import type { SkinnedMesh } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -33,6 +37,12 @@ import type { PlayerClip } from '../pose/retarget.ts';
 import type { RestMotion } from '../pose/rest.ts';
 import type { AnimalPose, ScenePose } from '../pose/types.ts';
 import { bodyMapsSettled } from '../scene/body-texture.ts';
+import {
+  CAPTURE,
+  ENVIRONMENT,
+  ENVIRONMENT_BLUR,
+  buildEnvironmentScene,
+} from '../scene/environment.ts';
 import { createMaterials } from '../scene/geometry.ts';
 import { createLights } from '../scene/lights.ts';
 import {
@@ -268,6 +278,46 @@ scene.add(floor);
 // keep the blur radius of the high tier, so the role views show the shadows of the stage.
 const lights = createLights(floorSide, 'high', null, { beam: false, backRows: false });
 scene.add(lights);
+
+/**
+ * Gives the gallery the environment light of the stage (design 4.5, 7.1). The room environment of
+ * the reflections comes first. Then a cube captures the lit floor in that room from the height of
+ * `CAPTURE`, with no model, as the stage captures its hall and its lit floor with no player. The
+ * diffuse light of the capture reaches each fold that the key light and the fill light miss: the
+ * neck below the head, the arm roots, the haunch, and the inner sides of the legs. With no
+ * environment, each such fold is a black band, which the app does not show.
+ */
+function captureEnvironment(): void {
+  const generator = new PMREMGenerator(renderer);
+  const room = generator.fromScene(buildEnvironmentScene(), ENVIRONMENT_BLUR);
+  const cube = new WebGLCubeRenderTarget(CAPTURE.size, { type: HalfFloatType });
+  const cubeCamera = new CubeCamera(0.05, 500, cube);
+  cubeCamera.position.set(0, CAPTURE.height, 0);
+  cubeCamera.updateMatrixWorld();
+
+  for (const model of models) {
+    model.object.visible = false;
+  }
+  scene.environment = room.texture;
+  scene.environmentIntensity = ENVIRONMENT.intensity;
+  scene.background = room.texture;
+  scene.backgroundIntensity = ENVIRONMENT.intensity;
+  const saved = renderer.getRenderTarget();
+  cubeCamera.update(renderer, scene);
+  renderer.setRenderTarget(saved);
+  scene.background = null;
+  for (const model of models) {
+    model.object.visible = true;
+  }
+
+  scene.environment = generator.fromCubemap(cube.texture).texture;
+  scene.environmentIntensity = CAPTURE.intensity;
+  cube.dispose();
+  room.dispose();
+  generator.dispose();
+}
+
+captureEnvironment();
 
 const camera = new PerspectiveCamera(GALLERY_FOV_DEG, 1, 0.1, 10 * floorSide);
 // The query `fill` (an illuminance in lux) adds a light from the camera along its view, so that

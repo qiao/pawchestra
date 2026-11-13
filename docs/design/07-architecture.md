@@ -77,6 +77,13 @@ show the shadows of the app. The camera looks down at `GALLERY_ELEVATION_DEG`, s
 front of a row grows with the height of the next row (`GAP`, `LABEL_DEPTH`). The pianist faces
 +x, as on the stage, so that the camera sees it beside the piano.
 
+The gallery captures its lit floor in the room environment as its environment light
+(`captureEnvironment()` of `src/gallery/main.ts`), with the values of the stage (`ENVIRONMENT`,
+`CAPTURE`, 4.5). The diffuse light of the capture reaches each fold of a body that the key light
+and the fill light miss, so a fold shows the soft shade of the app. With no environment, each
+such fold is a black band. The gallery has no hall, no back-row lights, and no post effects, so
+a frame of the app (`pnpm close-views play --at <species>`) is the proof of a fault of the light.
+
 | Query | Effect |
 |---|---|
 | `page=species`, `page=instruments` | The species with their instruments, or each instrument alone. |
