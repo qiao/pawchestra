@@ -86,7 +86,7 @@ const CHAIR_ROOM = 0.5;
 const EDGE_MARGIN = 0.3;
 
 /** The smallest stage side (design 4.5, stage origin). */
-const SMALLEST_STAGE = 5;
+export const SMALLEST_STAGE = 5;
 
 /**
  * The place of the piano case center from the podium center: 2.0 m to the left and 0.8 m to the
