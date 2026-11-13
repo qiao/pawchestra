@@ -794,7 +794,7 @@ async function checkDrawer(c: Checker, page: Page, phone: boolean): Promise<void
   await c.press(['Enter']);
   const unmuted = await c.attribute('button[aria-label="Mute Cellos"]', 'aria-pressed');
   c.record(
-    'Seat toggles M and S',
+    'Seat toggles Mute and Solo',
     'Tab, Space (Mute Cellos), Tab, Enter x2 (Solo Oboes), Shift+Tab, Enter',
     `mute ${cellos} (row dim: ${dim}), solo ${solo}, mute again ${unmuted}`,
     cellos === 'true' && dim === true && solo === 'true' && unmuted === 'false',

@@ -20,14 +20,14 @@ interface SeatRow {
   readonly item: HTMLLIElement;
   /** The dot in the fur color, which grows and glows while the seat plays. */
   readonly dot: HTMLSpanElement;
-  /** The button "M". */
+  /** The button "Mute". */
   readonly mute: HTMLButtonElement;
-  /** The button "S". */
+  /** The button "Solo". */
   readonly solo: HTMLButtonElement;
 }
 
 /**
- * Creates a toggle button of a seat row: "M" (mute) or "S" (solo).
+ * Creates a toggle button of a seat row: "Mute" or "Solo".
  *
  * @param text The text of the button.
  * @param label The `aria-label`, for example "Mute Violins 1".
@@ -45,7 +45,7 @@ function createToggle(text: string, label: string, onClick: () => void): HTMLBut
 /**
  * The seat list of the drawer (design 2.3, 2.8): one row for each seat, with a dot in the fur
  * color of the species, the seat name, the animals, the source line for a screen reader, and the
- * toggle buttons "M" and "S". A silent seat shows dim text. The tab "Seats" of the drawer holds it.
+ * toggle buttons "Mute" and "Solo". A silent seat shows dim text. The tab "Seats" of the drawer holds it.
  */
 export class SeatList {
   /** The list of the rows. */
@@ -61,7 +61,7 @@ export class SeatList {
    * Creates the list with no rows.
    *
    * @param onFlag The action of a click on a mute or a solo button.
-   * @param tooltips The tooltips of the page. The buttons "M" and "S" show their labels in them.
+   * @param tooltips The tooltips of the page. The buttons "Mute" and "Solo" show their labels in them.
    * @param keepFocus Gives the focus to an element near the list, when a new piece removes the
    *   row with the focus.
    */
@@ -100,10 +100,10 @@ export class SeatList {
         createElement('small', '', row.animals),
         createElement('small', 'source', row.source),
       );
-      const mute = createToggle('M', `Mute ${row.name}`, () => {
+      const mute = createToggle('Mute', `Mute ${row.name}`, () => {
         this.#onFlag(seatIndex, 'muted');
       });
-      const solo = createToggle('S', `Solo ${row.name}`, () => {
+      const solo = createToggle('Solo', `Solo ${row.name}`, () => {
         this.#onFlag(seatIndex, 'soloed');
       });
       for (const toggle of [mute, solo]) {

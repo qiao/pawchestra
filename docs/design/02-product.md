@@ -378,9 +378,9 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
     page" ("From this device" on a touch screen). It stands below the demo list, because it also
     selects a piece. It does not say "Upload", because the file stays on the device.
   - **Seats**: a row with a dot in the fur color, the seat name, the animal line, and the toggle
-    buttons "M" and "S" ("Mute {name}", "Solo {name}"). Only a screen reader reads the source line.
-    The dot is small and faint while its seat is silent, and full with a soft glow while it plays
-    (`seatLevels()`). A dark fur gets a lighter glow that keeps 3:1 (`ringColor()`).
+    buttons "Mute" and "Solo" ("Mute {name}", "Solo {name}"). Only a screen reader reads the source
+    line. The dot is small and faint while its seat is silent, and full with a soft glow while it
+    plays (`seatLevels()`). A dark fur gets a lighter glow that keeps 3:1 (`ringColor()`).
   - **Settings**: "Section size" (Auto, One per part, Full), "Quality" (Auto, High, Medium, Low),
     and "Frame rate" (Auto, 60 fps, 30 fps). "Auto" names its current value, such as "Auto
     (Full)". `SETTING_HELP` gives the help lines. A counter beside "Frame rate" shows the drawn
