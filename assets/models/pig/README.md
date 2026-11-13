@@ -130,10 +130,16 @@ left side):
 The weights, in the rest pose:
 
 1. Automatic Weights, then Limit Total 4 and Normalize All, on a copy of the mesh with no tail.
-2. Arm rows: each vertex of a side with |x| from 0.13, within 0.075 units of the line of the rest
-   arm, takes one exact row (`sa.set_weight_row()`): a clavicle share from 0.4 at x 0.13 to 0 at x
-   0.17, an elbow helper share that grows from 0 at x 0.205 to 1 at the elbow joint (x 0.24) and
-   falls to 0 at x 0.275, and the rest on the 4 roll segments.
+2. Arm rows: each vertex of a side with |x| from 0.13, within 0.085 units of the line of the rest
+   arm (0.075 on the hoof, `handReach`), takes one exact row (`sa.set_weight_row()`): a clavicle
+   share from 0.4 at x 0.13 to 0 at x 0.17, an elbow helper share that grows from 0 at x 0.205 to
+   1 at the elbow joint (x 0.24) and falls to 0 at x 0.275, and the rest on the 4 roll segments.
+   With a reach of 0.075, the vertices under each arm root at rest z 0.52 kept the bone heat rows.
+   Two neighbors 0.01 units apart at the front of the left armpit had trunk shares of 0.44 and 0,
+   and their faces (4453 and 4454 of the export) folded in each sample of `pnpm fold-probe
+   hornist`. With 0.085, the fold samples of the arm roots fall from 67,998 to 24,787 (face 4454
+   folds in 73% of the play and in no rest), and the upper arms go 1.3 cm into the body in place
+   of 2.4 cm (`pnpm hold-fit hornist`). A reach of 0.095 folded more faces of the upper arms.
 3. Wrist rows: the bend share of the hoof grows in 12 equal steps of 0.003 from 0.03 units before
    the head of `hand_<side>`. Knuckle rows: the toes share grows in 12 equal steps of 0.0025 from
    0.015 units before the head of `fingers_<side>`. The rig has no digit bones.

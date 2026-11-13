@@ -894,7 +894,9 @@ gave the belly thigh shares up to the arms and none from there, so the seated bi
 belly back under the chest, and a pale flat panel with a hard corner showed in front of each upper
 arm. The key `bind_belly` of its build relaxes the lower belly into the thigh tops (`belly` of the
 params). Reason: with the belly rows, the round belly hung over the thigh tops, and a black wedge
-of shadow showed in the lap. The Tripo
+of shadow showed in the lap. Its arm rows reach the vertices under each arm root (`rows.reach`
+of the params). Reason: the bone heat rows there gave two neighbors at the front of the left
+armpit trunk shares of 0.44 and 0, and their faces folded in each sample. The Tripo
 penguin (`assets/models/penguin/tripo-hand/`) is the body of the singer, by the same rules. Its
 eyeballs stay, with the finish `varnish` and a blink lid. The flat flippers are its arms: each
 flipper takes edge-ring rings at the shoulder, the elbow, and the wrist, and the paw bones take the

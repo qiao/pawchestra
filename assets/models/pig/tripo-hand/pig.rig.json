@@ -1,5 +1,5 @@
 {
- "sha256": "88c5f7a269365ffa3d7e69255cfbe380db52e444ad062cdae81a08e1fe48b78d",
+ "sha256": "1f47e5f60bd79dcc111ef5369ed49317c21ff632840dbbc0b89e21bfa00bec87",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -29,8 +29,8 @@
     0.359554,
     -0.052314
    ],
-   "vertices": 292,
-   "weights": "d098ec7c721012e2"
+   "vertices": 291,
+   "weights": "da6966b9c5857ad5"
   },
   "spine1": {
    "head": [
@@ -38,8 +38,8 @@
     0.44964,
     -0.049211
    ],
-   "vertices": 175,
-   "weights": "2498c4e784caa1fa"
+   "vertices": 170,
+   "weights": "341408a90bc3d23d"
   },
   "chest": {
    "head": [
@@ -65,8 +65,8 @@
     0.669754,
     -0.036793
    ],
-   "vertices": 1704,
-   "weights": "3c6b3d692cb9d362"
+   "vertices": 1703,
+   "weights": "6a632fc19763a097"
   },
   "ear_L": {
    "head": [
@@ -93,7 +93,7 @@
     -0.026373
    ],
    "vertices": 213,
-   "weights": "70e30c675a539b0c"
+   "weights": "b8226df97ccfecce"
   },
   "upper_arm_L": {
    "head": [
@@ -147,7 +147,7 @@
     -0.026373
    ],
    "vertices": 200,
-   "weights": "6576601b8368b879"
+   "weights": "9696644be6d3ca33"
   },
   "upper_arm_R": {
    "head": [
@@ -290,8 +290,8 @@
     0.607083,
     -0.010342
    ],
-   "vertices": 96,
-   "weights": "973970935de4a71e"
+   "vertices": 97,
+   "weights": "b5f592c34bafec80"
   },
   "upper_arm_seg1_L": {
    "head": [
@@ -299,8 +299,8 @@
     0.603149,
     0.005145
    ],
-   "vertices": 81,
-   "weights": "6622da2c8e6557ef"
+   "vertices": 78,
+   "weights": "437dc9b85ea2fe22"
   },
   "upper_arm_seg2_L": {
    "head": [
@@ -308,8 +308,8 @@
     0.599215,
     0.020633
    ],
-   "vertices": 43,
-   "weights": "9d3634d6dce0b01a"
+   "vertices": 34,
+   "weights": "59a69e198fde2eb9"
   },
   "upper_arm_seg3_L": {
    "head": [
@@ -380,8 +380,8 @@
     0.607083,
     -0.010342
    ],
-   "vertices": 94,
-   "weights": "9087ffb0da27db5a"
+   "vertices": 95,
+   "weights": "fbf9fa5c45529a1e"
   },
   "upper_arm_seg1_R": {
    "head": [
@@ -389,8 +389,8 @@
     0.603149,
     0.005145
    ],
-   "vertices": 75,
-   "weights": "9857e8b759d95991"
+   "vertices": 74,
+   "weights": "1d6763742e5f4bc2"
   },
   "upper_arm_seg2_R": {
    "head": [
@@ -398,8 +398,8 @@
     0.599215,
     0.020633
    ],
-   "vertices": 45,
-   "weights": "aebee97db52a9dea"
+   "vertices": 35,
+   "weights": "aa711c7183195ddf"
   },
   "upper_arm_seg3_R": {
    "head": [
