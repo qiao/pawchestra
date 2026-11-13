@@ -1507,7 +1507,9 @@ shows the main shot at its time, with no focus pull.
   and the 30° rule at both cuts wins. A detail with no such camera gives no insert, because a weak
   insert is worse than none. The seeded angles snap to the steps of the search, the planner keeps
   the results of the stage tests for each point, and a refusal of the play pose for each detail
-  and camera. Thus the plan time stays near the time with no pose.
+  and camera. A detail with `poseTries` such refusals and no insert gives no more inserts. The
+  cover test reads the end of the push-in, where the objects in front look largest. These limits
+  keep the plan time low, because each test of the play pose reads the posed mesh.
 - **Floor.** An insert keeps `INSERT_FLOOR` from each point of a body in its frame, lower than
   `ANIMAL_FLOOR`, because its frame holds the paws and the instrument. Each head in its frame
   still keeps `ANIMAL_FLOOR`, because the faces show the facets and the seams from near.
