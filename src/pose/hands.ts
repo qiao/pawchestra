@@ -318,8 +318,10 @@ export const HANDS_HOLDS = {
   // fawn stays erect (`lean` 0): with a lean of 3°, its muzzle touched the neck of the harp
   // (`pnpm pose-depth harpist --gaps`), and erect, the gap is at least 2.3 cm. The pluck points
   // lie at 0.37 of each string (`PLUCK.share`), so the bass strings are plucked low. The left
-  // palm lies 0.30 m above the pluck point, nearer to the shoulder, 16 cm left of the strings, and
-  // 2.6 cm toward the player. On the harp of the scale 0.85, with the palm 56° down, the fingers of
+  // palm lies 0.29 m above the pluck point, nearer to the shoulder, 19 cm left of the strings, and
+  // 2.6 cm toward the player. On the harp of 0.975 in front of the chest, with the palm 16 cm left
+  // of the strings and 0.30 m above, the left fingers went up to 1.3 cm through the strings, and
+  // with this palm 0 cm. On the harp of the scale 0.85, with the palm 56° down, the fingers of
   // the left paw went up to 3.0 cm through the strings with the palm 14 cm left of them, 1.8 cm
   // with 16 cm (p95 0 cm), and 0.6 cm with 17 cm, where the left elbow bent to 74° (p5) against 76°
   // (`scratch/dh/evalc.ts` of the round 2026-11-13). With the palm 45° down and 9 cm left of the
@@ -360,7 +362,7 @@ export const HANDS_HOLDS = {
   harp: {
     action: 'pluck',
     keyPoint: harpStringPosition,
-    palmL: [-0.55, 1.05, 0.090569],
+    palmL: [-0.67, 1.01, 0.090569],
     palmR: [0.409, 0.24, 0.18],
     // The highest strings of the left hand lie near the chest of the Tripo fawn, and the palm 0.30 m
     // above their pluck points stands near the height of the shoulder. From C3 to D4, the left palm
@@ -409,7 +411,11 @@ export const HANDS_HOLDS = {
     // before a performance (`docs/reference/piano-technique.md`, section 8). The arms of the Tripo fawn
     // are short: the shoulder is 0.33 m above the top of the thigh, and the arm reaches 0.25 m. The
     // palms thus lie on the front of the belly where it meets the thighs, 0.48 H above the thigh
-    // at 0.4 of the way to the knee, 0.5 H forward, and 0.04 H in. The wrist is 0.227 m from the
+    // at 0.4 of the way to the knee, 0.5 H forward, and 0.04 H in. On the harp of 0.975 in front
+    // of the chest, the left hoof rests 0.16 H out, and the right hoof 0.8 H forward: with the left
+    // hoof 0.04 H in, the left fingers went 2.2 cm into the soundbox at rest and in 5 % of the
+    // samples, and with the right hoof 0.5 H forward, the right paw went 1.8 cm into it in 5.3 %
+    // (`scratch/dh/evalc.ts` of the round 2026-11-13). The wrist is 0.227 m from the
     // shoulder (0.91 of the reach), and the elbows bend to 122°. With the old places, 0.35 H out
     // and 0.5 H above the knee, the wrists lay 0.32 m from the shoulder: the arms locked straight
     // (179.7°), and the elbows snapped where the lift left the reach limit. The palms face back
@@ -418,20 +424,22 @@ export const HANDS_HOLDS = {
     // and the right forearm 2.5 cm (`pnpm pose-depth harpist`). The right elbow points down and
     // forward (z -0.6), so that the right arm lies in front of the soundbox: with z 0.6, the right
     // upper arm went 1.6 cm into the harp at rest, and with z -0.6 0.8 cm (`pnpm hold-fit
-    // harpist`), and the right forearm no longer goes 2.2 cm into the soundbox. The right palm
+    // harpist`), and the right forearm no longer goes 2.2 cm into the soundbox. On the harp of
+    // 0.975, the right elbow points further forward ([0.1, -1, -1.4]): with [0.4, -1, -0.6], the
+    // right upper arm passed 1.4 cm into the neck of the harp in the lift. The right palm
     // turns a little to the right (x -0.4), so that the right forearm of the Tripo fawn twists at
     // most 45° from the bind.
     restL: {
-      lap: { along: 0.4, offset: [-0.04, 0.48, -0.5] },
+      lap: { along: 0.4, offset: [-0.16, 0.48, -0.5] },
       palm: [0, -0.5, 1],
       fingers: [0.2, -1, -0.5],
       pole: [-0.4, -1, 0.6],
     },
     restR: {
-      lap: { along: 0.4, offset: [0.04, 0.48, -0.5] },
+      lap: { along: 0.4, offset: [0.04, 0.48, -0.8] },
       palm: [-0.4, -0.5, 1],
       fingers: [-0.2, -1, -0.5],
-      pole: [0.4, -1, -0.6],
+      pole: [0.1, -1, -1.4],
     },
   },
 } as const satisfies Readonly<Record<HandsInstrument, HandsHold>>;
