@@ -248,6 +248,11 @@ export interface ConductorLayer {
   readonly cues: CueTrack;
   readonly left: LeftHandTrack;
   readonly expression: ExpressionTrack;
+  /**
+   * The turn from the facing of the conductor to the audience at +z, in radians, positive to the
+   * left: the turn of the bow at the song end ({@link audienceTurnOf}).
+   */
+  readonly audienceTurn: number;
 }
 
 /**
@@ -867,8 +872,22 @@ function* prepareConductorSteps(inputs: ConductorInputs, seed: number): Steps<Pl
       cues,
       left,
       expression,
+      audienceTurn: audienceTurnOf(place.facing),
     },
   };
+}
+
+/**
+ * Gives the turn of the conductor from its facing to the audience (design 5.4). The audience sits
+ * at +z, so a facing of 0 (to -z, the orchestra) gives a half turn. The bear turns to its left,
+ * past the first violins and the leader of the orchestra, also in a half turn.
+ *
+ * @param facing The facing of the conductor, in radians around y: 0 faces -z.
+ * @returns The turn, in radians, from above -pi to pi, positive to the left.
+ */
+function audienceTurnOf(facing: number): number {
+  const turn = MathUtils.euclideanModulo(Math.PI - facing + Math.PI, 2 * Math.PI) - Math.PI;
+  return turn <= -Math.PI + 1e-9 ? Math.PI : turn;
 }
 
 /**
