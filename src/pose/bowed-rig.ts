@@ -1488,8 +1488,12 @@ const DOG_HOLD = {
  * (`stopEnd`).
  *
  * In the rest pose, the contrabass stays at its playing place, and the left paw holds the neck at
- * 0.6 of the fingerboard (`restPlace`). The right arm hangs at the side of the belly with the bow
- * tip down and a little forward. In the lift and the lowering, the tip turns through the front.
+ * 0.3 of the fingerboard (`restPlace`), above the upper bout, as the fingers of a bassist hold the
+ * neck and the forearm stays free of the body (`docs/reference/string-technique.md`, section
+ * 1.9). At 0.6, where the neck meets the upper bout, the left claws went 4.4 cm into the bass at
+ * rest and up to 4.7 cm in the lift and the lowering (limit 2.3, `pnpm body-clip bassist`), and at
+ * 0.4, 2.8 cm. The right arm hangs at the side of the belly with the bow tip down and a little
+ * forward. In the lift and the lowering, the tip turns through the front.
  *
  * In pizzicato, the right paw comes up from the side, right of the strings (`pluckSide`), and
  * the bow tip points down and forward (`pizzicatoTip`): with the tip down, the bow went 17.6 cm
@@ -1515,7 +1519,7 @@ const HIPPO_HOLD = {
   frogHair: 0.12,
   tiltL: 35 * MathUtils.DEG2RAD,
   gapL: 0.029859,
-  restPlace: 0.6,
+  restPlace: 0.3,
   poleL: [-1, -0.3, 0],
   elbowPerString: 2 * MathUtils.DEG2RAD,
   poleR: [1, -0.7, 0.2],
