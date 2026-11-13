@@ -1232,10 +1232,6 @@ Done when: the pose tests pass, and the pose and frame targets pass.
 - [ ] Make `pnpm keyboard` pass again. At 1440 × 900 the check "Tooltips of the speed menu and the
       volume slider" fails, and `checkHiddenBarTap` stops at a timeout, because the UI has no
       `.collapse` element now. Thus the run never reaches its last checks.
-- [ ] Give the piece to the system with Media Session: the title, the composer, `share.jpg`, and
-      the actions `play`, `pause`, and `seekto`. Hold a screen Wake Lock during play, release it
-      at a pause and at the end, and request it again on `visibilitychange`. `src/` has neither,
-      and a phone locks its screen during `beethoven-5-4` (9:24) (2.4).
 - [ ] After the key C closes the drawer, give the focus to the drawer button only if the focus in
       the drawer was a keyboard focus. Else remove the focus. Now the focus ring and the tooltip
       "Open the drawer" stay on the film, the bar does not hide, and Space opens the drawer in
