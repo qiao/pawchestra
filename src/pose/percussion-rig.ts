@@ -696,7 +696,7 @@ export const PERCUSSION_HOLDS = {
     offsetL: [0, 0, 0.02],
     offsetR: [0, 0, -0.02],
     // The elbows point down, a little out, and back. With the homes out from the shoulders, the
-    // median upper arm stands 31° (left) and 37° (right) out from the side of the body in the
+    // median upper arm stands 28° (left) and 32° (right) out from the side of the body in the
     // play, and at most 63° and 58°. With the right elbow at [2, -1, 0.3], the right upper arm
     // stood up to 70° out. With the right elbow at [0.6, -1, 0.6], the right mallet missed a bar
     // by 4.5 mm.
