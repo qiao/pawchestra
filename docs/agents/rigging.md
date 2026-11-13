@@ -22,7 +22,7 @@ model folder gives the files of each step.
 | dog | Hand rig of the beagle. | `cellist` |
 | panda | Hand rig, arms 1.2 times longer. Stands as a soloist. | `trombonist` |
 | hippo | Hand rig, arms 1.2 times longer. Stands at the contrabass. | `bassist` |
-| mouse | Hand rig, a long tail on the floor, a smaller oboe. No chair: it stands on the legs of its source. | `oboist` |
+| mouse | Hand rig at the eye height of the older mouse, a long tail on the floor, a smaller oboe. No chair: it stands on the legs of its source. | `oboist` |
 | elephant | Hand rig. Stands at the timpani. | `timpanist` |
 | beaver | Hand rig. No chair: it stands on its short legs. | `bassoonist` |
 | pig | Hand rig. Stands as a soloist. | `hornist` |
