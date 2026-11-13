@@ -39,6 +39,7 @@ import type { DigitTrack } from './piano-digits.ts';
 import { handTracksSteps, handsRig } from './hands.ts';
 import type { HandsRig } from './hands.ts';
 import { idleParams } from './idle.ts';
+import { LONG_REST, findLongRests } from './long-rests.ts';
 import type { IdleParams } from './idle.ts';
 import { noteLoudness } from './loudness.ts';
 import { buildPassages } from './passages.ts';
@@ -208,6 +209,11 @@ export interface PlayerPlan {
   readonly lookPitch: number;
   /** The spans in which the player plays, for the sway of the beat layer. */
   readonly passages: Passages;
+  /**
+   * The long rests in which the player lowers its instruments (`findLongRests()`, design 5.2),
+   * four song times for each. It is empty for a family that keeps the playing pose in a rest.
+   */
+  readonly longRests: Float64Array;
   /** The note data and the rig of the motion family of the player. */
   readonly note: NoteLayer;
 }
@@ -284,6 +290,11 @@ interface PlayerInputs {
   readonly seatSeed: number;
   /** The sustain pedal of the seat (`sustainPedals()`). The pedal stays up by default. */
   readonly pedal?: PedalTrack;
+  /**
+   * The song end, for the long rest after the last note (design 5.2). With no value, the player
+   * keeps its instruments up after its last note.
+   */
+  readonly endSec?: number;
 }
 
 /** The inputs of the plan of the conductor (design 5.4). */
@@ -578,6 +589,11 @@ function* preparePlayerSteps(
     beats,
     inputs.pedal ?? NO_PEDAL,
   );
+  const restSec = LONG_REST.minSec[note.family];
+  const longRests =
+    restSec === undefined
+      ? new Float64Array()
+      : findLongRests(notes, beats, inputs.endSec ?? Infinity, restSec, motion);
   return {
     seatIndex: place.cast.seatIndex,
     instrument: place.cast.instrument,
@@ -591,6 +607,7 @@ function* preparePlayerSteps(
     lookYaw,
     lookPitch,
     passages,
+    longRests,
     note,
   };
 }
@@ -737,6 +754,7 @@ function* prepareConductorSteps(inputs: ConductorInputs, seed: number): Steps<Pl
     lookYaw: 0,
     lookPitch: 0,
     passages: buildPassages([], []),
+    longRests: new Float64Array(),
     note: {
       family: 'conductor',
       rig,
@@ -914,6 +932,7 @@ export function* preparePosesSteps(
         lookTarget: looks[index] ?? layout.podium,
         seatSeed: seatSeedOf(seed, cast.seatIndex),
         pedal: pedals[cast.seatIndex] ?? NO_PEDAL,
+        endSec: score.durationSec,
       },
       mixHash(seed, index),
       rigs,
