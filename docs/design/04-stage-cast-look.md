@@ -108,11 +108,12 @@ in a line at the back, as the Vienna Philharmonic seats them. The diagram shows 
 - The joint search of the seats reads the footprint, the eye height, and the mesh of each body
   (4.5, lanes). A new body with the same footprint can thus move the seats of other rows, because
   its eyes see other lanes and its head hides other sight lines. A body that replaces the body of
-  a species thus keeps the eye height of the old body, as the Tripo mouse does (4.4, hand rig).
-  The form of its footprint and of its head can still move seats. For example, the tail of the
-  Tripo mouse lies straight back, and the tail of the old mouse curled to the side. The whiskers
-  of the fourth Tripo rabbit make its head box wider, and its ears hide other sight lines
-  (`TODO.md`).
+  a species thus keeps the eye height of the old body, as the Tripo mouse and the Tripo fox do
+  (4.4, hand rig). The form of its footprint and its mesh can still move seats. For example, the
+  tail of the Tripo mouse lies straight back, and the tail of the old mouse curled to the side.
+  The whiskers of the fourth Tripo rabbit make its head box wider, and its ears hide other sight
+  lines. The trunk of the Tripo fox is deeper than that of the older fox, so its chair is deeper,
+  and its head and trunk hide other sight lines (`TODO.md`).
 
 ## 4.3 Species
 
@@ -797,22 +798,21 @@ tail on the back. Reason: with rows from the bone heat, the root of the tail cou
 deeper, and the tail went into the seat.
 A hand rig of the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is the body of the red fox and the
 tan fox. It follows the route of the Tripo wolf (below): the colors and the eye paint of its source,
-the crease angle 180°, and only a scale to H. Reason: the look target of this body is its source
-FBX. Its source is the Tripo mesh with new front paws (`tools/blender/fox_paws.py`): each paw of
-three long digits goes past the wrist ring, and a palm with a pad and four short digits close
-together takes its place, in quad faces with the UVs of the dark paw fur. Reason: the three thick
-digits spread as a hand, and the paw was about two thirds of the shoulder distance long. The new
-paw is about 1.3 wrist diameters wide, as the paw of the wolf. Its middle two digits are the
-longest, the inner digit is shorter, and the outer digit is the shortest, as on a real fore paw.
-Reason: a paw 1.5 wrist diameters wide with four digits of near equal length read as a large hand.
-It keeps the
-eyeballs of its mesh, because the map paints a full eye on each, with a light in each pupil. So the
-eyes take the finish `varnish` and no eye light, and the irises keep the place of the source. Its
-eyeballs and sockets are a little smaller and deeper than in the source, and the upper lids turn
-down a little. Reason: at the source size, the eye openings read too wide for the head
-(`assets/models/fox/README.md`, "Eyes"). A larger step made the eyes read sleepy. Its legs keep
-the length of the source, and its feet stay flat in the bind. Reason: a higher seat by a heel turn changes the sight pass of
-the layout (4.5) and moves most players of the demos. The Tripo polar bear
+the crease angle 180°, and a scale to the eye height of the older fox (4.2). Reason: the look target
+of this body is its source FBX. Its point edits serve only the rig and the holds
+(`assets/models/fox/README.md`). The left paw moves in to the length of the mirror of the right
+arm (`armEven`), because the left forearm of the source has one longer quad band. The upper arms
+and the forearms are 1.25 times longer (`armStretch`). Reason: the source arm reached 0.82 H from
+the shoulder joint to the palm, and both flute grips lay out of reach. It now reaches 1.0 H, as
+the older fox. The fore paw past the wrist is smaller (the edit `paw`), about 1.3 wrist diameters
+wide, as the paw of the wolf, and its middle two digits stay the longest. Reason: the source paw
+was 1.9 wrist diameters wide. The legs and the right ear of the source are no mirrors of the left
+ones, so they take joints of their own. Its eyes are the flat eye domes of the mesh, because the
+map paints a full eye on each, with a light in each pupil. So the eyes take the finish `varnish`
+and no eye light. Each dome lies on its own sphere (`ballSphere`), and each blink lid turns 60°
+about the deep middle of that sphere and covers only the eye opening. Reason: the app turns a lid
+about the middle of the sphere of its eyeball, and a lid of the usual size and turn left the head.
+Its legs keep the length of the source, and its feet stay flat in the bind. The Tripo polar bear
 (`assets/models/polar-bear/tripo-hand/`) keeps the eyeballs of its source, and its irises take the
 middle of the opening in the view of the play of the pianist (`gaze_targets()` of
 `tools/polar-bear-maps.py`), its painted light gives the `varnish` finish and no eye light, and
