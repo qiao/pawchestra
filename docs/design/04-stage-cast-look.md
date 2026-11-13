@@ -525,7 +525,12 @@ A chain of `tools/blender/hand/<s>/` makes each one (`pnpm hand-chain <s>`). The
 rhino and the mannequin come from `rig-mesh`. The rhino source has a ledge around the neck and
 around the top of each thigh, and boxes of `smooth` in its config relax them before the weights.
 Reason: the ledges showed as hard step rings, and the shapes `legs_straight` of the standing rhino
-give the source form back, so a relax of the seated bind does not reach them. Each paw of the polar bear
+give the source form back, so a relax of the seated bind does not reach them. In the arm rows of
+each hand chain, the elbow helper share rises from 0 to 1 at the elbow joint and falls to 0 on
+each side (`rows.control` of its params), so that the bend share grows linearly over the elbow.
+Reason: a helper share of 0.75 at the joint put 0.25 of each row on the upper arm before the joint
+and on the forearm after it, so the bend share jumped from 0.375 to 0.625 at the joint, and the
+bent elbow showed a crease and a point. Each paw of the polar bear
 has one digit bone for each claw (`DIGIT_BONES`,
 `digit1` at the thumb side to `digit5`), a child of the fingers with its head at the base of its
 claw. Each claw spike follows its digit, and its base at the fur rim and a base that two claws
@@ -883,7 +888,11 @@ further forward (`PIG_HORN`, 5.3). Its arm loops stop at poles, so no ring takes
 hoof turns by whole steps of the one closed wrist ring, and a bridge of new quads joins the ring
 again (`turn_hooves()` of its build). Each elbow axis also turns. Each part of each arm then takes
 at most 45° in the moments of the hornist. Its face takes the head bone alone above the chin,
-because the bone heat of the hanging head gave the snout shares of the shoulders. The Tripo
+because the bone heat of the hanging head gave the snout shares of the shoulders. The thigh
+shares of its belly fall to 0 below the arms (`belly_rows()` of its build). Reason: the bone heat
+gave the belly thigh shares up to the arms and none from there, so the seated bind pulled the
+belly back under the chest, and a pale flat panel with a hard corner showed in front of each upper
+arm. The Tripo
 penguin (`assets/models/penguin/tripo-hand/`) is the body of the singer, by the same rules. Its
 eyeballs stay, with the finish `varnish` and a blink lid. The flat flippers are its arms: each
 flipper takes edge-ring rings at the shoulder, the elbow, and the wrist, and the paw bones take the
