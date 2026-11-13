@@ -158,10 +158,20 @@ The weights, in the rest pose:
    ledge: a pale flat panel with a hard corner in front of each upper arm in the seated play and
    rest (the right side in the hall view), and not in the stand. With the rows, the pull falls
    evenly from 0.10 units at z 0.32 to 0.008 units at z 0.47, and the belly is round under the
-   chest. The belly now hangs a little over the thigh tops, with a shadow line in the lap in the
-   front view.
+   chest. The belly then hangs a little over the thigh tops, and the key `bind_belly` below
+   relaxes the lap.
 
-**Smooth surface.** No relax and no region colors. The crease angle 180 gives each corner the mean
+**Lap.** The key `bind_belly` (`belly_key()`, `belly` of the params: rest z 0.20 to 0.36, 8
+rounds) relaxes the posed bind of the lower belly along the normals, as on the fox: each round
+moves each vertex halfway along its normal toward the middle of its neighbors above and below
+(49 vertices, bind z 0.25 to 0.38, largest move 0.026 units). With the belly rows alone, the round
+belly hung over the thigh tops, and a black wedge of shadow showed in the lap in the front view.
+The relax turns the lower belly edge into the thigh tops: the near-black pixels of the lap box of
+the front view fall from 14,138 to 9,336 in the play. The fur of the lower belly then shows in the
+crotch. A later start of the belly rows (z 0.34 to 0.42) only moved the step of the belly up
+toward the chest, where the panel was, and a relax from z 0.24 moved too few vertices.
+
+**Smooth surface.** No relax of the source and no region colors. The crease angle 180 gives each corner the mean
 normal of the faces at its vertex, as the smooth shading of an FBX viewer.
 
 **Mouth.** The snout disc stands far in front of the lips, so the body gives the height of its
@@ -235,7 +245,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/pig.rig.glb` | 1,009,104 bytes | `4a126f44c43447143fd1d00a06a56928aba93f42ac17a0dfe6db000b84e2251a` |
-| `tripo-hand/pig.rig.json` | 16,377 bytes | `41b63b08c5e4888a863c610fef115dd63fba82ca33a0db489a1bc06cb7a0013e` |
+| `tripo-hand/pig.rig.glb` | 1,009,100 bytes | `88c5f7a269365ffa3d7e69255cfbe380db52e444ad062cdae81a08e1fe48b78d` |
+| `tripo-hand/pig.rig.json` | 16,377 bytes | `e5f0ec65fe6fe6ab1556ba839571141b9cd84b123e980e6e28b06574c5238ad6` |
 | `tripo-hand/pig-color.webp` | 54,072 bytes, 2048 × 2048 | `7e93b90c62901e98e717ea958be65306951c6bc7f8ea7ec50fa9f91cc97af295` |
 | `tripo-hand/pig-normal.webp` | 16,518 bytes, 1024 × 1024 | `1f67a4b13f0fcdb7950acf73470ee5d796e7d0a8487acd0a78fa044198b7065b` |

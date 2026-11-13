@@ -1,5 +1,5 @@
 {
- "sha256": "4a126f44c43447143fd1d00a06a56928aba93f42ac17a0dfe6db000b84e2251a",
+ "sha256": "88c5f7a269365ffa3d7e69255cfbe380db52e444ad062cdae81a08e1fe48b78d",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -468,8 +468,8 @@
  "shapes": {
   "arm_down_L": 0.007914,
   "arm_down_R": 0.007872,
-  "legs_straight_L": 0.074606,
-  "legs_straight_R": 0.074647
+  "legs_straight_L": 0.089145,
+  "legs_straight_R": 0.089173
  },
  "extras": {
   "seat": {
