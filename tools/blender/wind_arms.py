@@ -1,10 +1,9 @@
-"""Replays the Blender session that rebuilds the arms of the mouse oboist and the wolf clarinetist.
+"""Replays the Blender session that rebuilds the arms of the mouse oboist.
 
 The rebuild uses loop edges, retopology, and extra bones to fix the arm and wrist twist. The
-session uses the steps of `violin_arms.py` on the mouse and the wolf, in the live Blender through
-MCP, with an image after each step. This script repeats them in the same order with the settings
-of each animal (`ANIMALS`). The steps are the steps of `violin_arms.py`, with four changes (marked
-*):
+session uses the steps of `violin_arms.py` on the mouse, in the live Blender through MCP, with an
+image after each step. This script repeats them in the same order with the settings of each
+animal (`ANIMALS`). The steps are the steps of `violin_arms.py`, with four changes (marked *):
 
 1. Import the mesh and Merge by Distance.
 2. Replace the faces of each arm from the shoulder line to the wrist with a quad tube, wrap it onto
@@ -23,10 +22,10 @@ of each animal (`ANIMALS`). The steps are the steps of `violin_arms.py`, with fo
 6. Write the weights for `paintedWeights` of the config (`<animal>-weights.json`).
    * Each point is in the units of the rig config (`config_points()`).
 
-The wolf config scales the source (`proportions`) and softens the brow (`soften`) in
-`load_mesh()` of `rig_mesh.py`, and its joints are in the units of the scaled source. The session
-works in the units of the source: `source_units()` gives the arm joints there, and
-`step_weights()` writes each point in the units of the scaled source, as `rig_mesh.py` reads it.
+A config can scale the source (`proportions`) in `load_mesh()` of `rig_mesh.py`. Then its
+joints are in the units of the scaled source. The session works in the units of the source:
+`source_units()` gives the arm joints there, and `step_weights()` writes each point in the units
+of the scaled source, as `rig_mesh.py` reads it.
 
 Run it in a terminal from the root of the tree:
 
@@ -83,23 +82,6 @@ ANIMALS = {
                   'side': {'x': 0.115, 'y': (0.3, 0.545), 'repeat': 4},
                   'elbow': {'radius': 0.05, 'repeat': 16},
                   'pit': {'x': (0.08, 0.13), 'y': (0.5, 0.6), 'front': 0.05, 'repeat': 10}},
-    },
-    'wolf': {
-        'config': 'tools/mesh-rigs/wolf.json',
-        'source': 'assets/models/wolf/wolf.glb',
-        'folder': 'assets/models/wolf',
-        'factor': 1.178,
-        'slim': (1.0, 1.0),
-        'cut': {'shoulder': 0.3, 'tilt': 20.0, 'wrist': 0.1},
-        'zone': {'x': 0.06, 'radius': 0.08},
-        'gap': 0.016,
-        'wristGap': 0.0085,
-        'upper': (0.45, 0.6, 0.75),
-        'fore': 6,
-        'texture': 512,
-        'faces': 600,
-        'paint': {'trunk': {'x': 0.07, 'y': (0.35, 0.56)}, 'root': {'x': (0.06, 0.12),
-                                                                    'y': (0.52, 0.66)}},
     },
 }
 
