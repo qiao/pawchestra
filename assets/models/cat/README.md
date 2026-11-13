@@ -102,9 +102,13 @@ left side, y the height, in the source):
   knee joint is at y 0.165.
 - **Paws turned.** Each vertex past the arm loop at x 0.284 turns rigidly about the rest forearm
   axis by whole ring steps of 30 degrees: 30 degrees on the left (1 step) and 90 degrees on the
-  right (3 steps), 403 and 404 vertices. New quads join the two loops with the step offset, and
+  right (3 steps), 398 and 399 vertices. New quads join the two loops with the step offset, and
   the far loop takes the form of the loop before the turn (a fade to 0 at 0.02 units). The new
-  quads keep the UVs of the old band. The paws keep their form ("Arm twist").
+  quads keep the UVs of the old band. The paws keep their form ("Arm twist"). The loop at x 0.284
+  does not turn. It is slanted (0.080 to 0.094 units along the forearm axis), so 5 of its 12
+  vertices lie past its mean. When they turned with the paw, the quads before the loop sheared by
+  up to 3 ring steps. The right wrist then showed a stretched texture and a light shard at rest:
+  11 faces had UV scale ratios of 4.4 to 10.3, against about 1.1 on the faces around them.
 - **Eye size.** The edit `eyes` scales each eyeball and its socket by 0.90 about the middle of
   the ball, (±0.04606, 0.82771, 0.14292). Each ball scales as one piece. Each other point within
   0.037 of the middle scales fully, the share falls by a smoothstep to 0 at 0.059, and also to 0
@@ -338,8 +342,8 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/cat.rig.glb` | 1,192,172 bytes | `fc215186e42efd4f0b46ed2a2ba557e777dd3840a1c79c3a43c7057a62183f83` |
-| `tripo-hand/cat.rig.json` | 18,465 bytes | `daaa2291d90336331c5c0c51aa265f861fa1e74b22c560e7d9f412c68ac6efa9` |
+| `tripo-hand/cat.rig.glb` | 1,191,172 bytes | `b6e8e249e93674b9723f7c49a864d7362ceafb9087783681ce1617690849d382` |
+| `tripo-hand/cat.rig.json` | 18,465 bytes | `d5539dce92cc348cb7725fe5c0b576faae75a7b78d9456a2a2aac1e3b6d3225e` |
 | `tripo-hand/cat-color.webp` | 312,842 bytes, 2048 × 2048 | `cb365d40c472fdd23f5874fd8e5336b7f76fbf7ebfaf4ff0ab1ad76179a11b2a` |
 | `tripo-hand/cat-normal.webp` | 129,298 bytes, 1024 × 1024 | `039d58a13f55967f5152f30696548c0ed672d1186bf8c0d3f8f8279730ccf4f6` |
 
