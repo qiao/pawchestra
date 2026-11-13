@@ -539,7 +539,9 @@ export const PERCUSSION_HOLDS = {
     },
     curl: GRIP_CURL,
     strikeRoll: true,
-    keepPaw: false,
+    // The right paw keeps the turn of the hand, so that the curled claws close on the beater
+    // (`BASS_DRUM.malletTilt`).
+    keepPaw: true,
   },
   // The sticks leave the front of the fists (SNARE_DRUM.malletTilt) and point from homes 0.4 H out
   // from the shoulders, so that they make a V at a strike and slant down, as the matched grip of a

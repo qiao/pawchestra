@@ -261,14 +261,14 @@ export const BASS_DRUM = {
   turn: 0,
   /**
    * The angle of the beater below the level in the bind pose, toward the fingers of the hanging
-   * paw, in radians: the shaft runs 38° from the fingers and leaves the fist at the side of the
-   * thumb, in the grip of the legato stroke of the snare drum
-   * (`docs/reference/percussion-technique.md` 5). At 1.0, the shaft left the fist 59° to 61° from
-   * the thumb side, at the limit of the grasp of `pnpm wind-grip`. At 0.85, the paw twisted up to
-   * 33° in the lowering, 12° more than with the beater of `main`.
+   * paw, in radians ({@link PAW_TILT}): the shaft leaves the fist at the side of the thumb, in the
+   * grip of the legato stroke of the snare drum (`docs/reference/percussion-technique.md` 5). The
+   * curled claws close on it in each sample of `pnpm wind-grip bass-drummer`, and the paw twists
+   * 3° on the forearm in the play. At 0.9, the shaft ran 52° from the fingers, the claw tips stood
+   * 2.3 cm off it, and the paw twisted 31°.
    */
   // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
-  malletTilt: 0.9 as number,
+  malletTilt: PAW_TILT,
   /** The grip of each mallet in the closed paw ({@link PAW_SPOT}). */
   malletSpot: PAW_SPOT,
   /**
