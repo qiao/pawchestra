@@ -227,15 +227,6 @@ title lines of the default demo, so the browser paints them with the first paint
 scripts run. `Title` keeps the header and its text nodes, because a new or a moved node paints
 its text again as a later LCP candidate.
 
-The font file of the title (2.8) is not in the first download. The first paint
-shows the title in the local fallback face. The app names Fraunces only where the audio code
-loads (`Title.loadFont()` in `#startAudio()`), after the first frame of the first built piece.
-The request thus ends after the paint of the LCP element, adds nothing to the simulated LCP, and
-does not compete with the build of the first piece. The fallback face has the width and the line metrics of Fraunces, so the swap moves
-no text and adds no layout shift. Chrome counts a text node as an LCP candidate only at its first
-paint, so the swap makes no later LCP. The file is in `public/`, so the build copies it with its
-name, and `pnpm size` does not count it.
-
 The plugin `INDEX_VALUES` of `vite.config.ts` writes the URL and the title lines from
 `DEFAULT_DEMO` into the placeholders of `index.html`, so that the page and the app cannot differ.
 
@@ -302,7 +293,7 @@ holds Three.js (MIT), spessasynth_core (Apache-2.0), stb-vorbis (Apache-2.0), th
 `@vercel/analytics` of the deploy build (MIT, 2.7), and the three sources of the SoundFont (6.2):
 GeneralUser GS (GeneralUser GS License v2.0), VSCO 2 CE (CC0 1.0), and VCSL (CC0 1.0). It also
 holds the two hall impulse responses (CC BY 4.0, 6.8), the GitHub mark (MIT, Primer Octicons,
-2.8), and the font Fraunces of the wordmark and the title (SIL Open Font License 1.1, 2.8).
+2.8), and the font Fraunces of the wordmark (SIL Open Font License 1.1, 2.8).
 
 `tools/licenses.ts` writes the file after the Vite build, and the plugin `DEV_LICENSES` of
 `vite.config.ts` serves the same text on the dev server. The script fails when a package in

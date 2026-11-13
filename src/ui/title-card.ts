@@ -2,7 +2,7 @@ import { createElement, setText } from './dom.ts';
 
 /**
  * The title card of Cinematic mode (design 2.8): the composer in spaced capitals, a short gold
- * rule, and the piece title in Fraunces, in the lower part of the frame at the song start, as
+ * rule, and the piece title in the serif, in the lower part of the frame at the song start, as
  * the main title of a film. A screen reader skips it, because the live region of the title reads
  * the same piece. It takes no pointer.
  */

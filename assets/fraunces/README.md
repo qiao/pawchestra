@@ -1,16 +1,11 @@
-# Fraunces
+# Fraunces wordmark
 
-The brand font Fraunces shows in three places (design 2.8):
+The logo shows the name "Pawchestra" in the font Fraunces, as one SVG path (design 2.8).
+`WORDMARK_PATH` in `src/ui/icons.ts` and the load state of `index.html` hold the path. The app loads no font file.
 
-- The logo shows the name "Pawchestra" as one SVG path. `WORDMARK_PATH` in `src/ui/icons.ts` and
-  the load state of `index.html` hold the path.
-- The piece title, the title card, and the end card use the font file
-  `public/fonts/fraunces-title.woff2`, a static subset of the source. It loads after the first
-  frame (design 7.2).
-- The headline of the share image (design 7.4). `pnpm share-image` reads the source file.
-
-`fraunces.ttf` in this folder is the source file with no change. No page of the site loads it, and
-the build does not copy it.
+`fraunces.ttf` in this folder is the source file with no change. Only `pnpm share-image` reads it,
+to draw the headline of the share image (design 7.4). No page of the site loads it, and the build
+does not copy it.
 
 | Item | Value |
 |---|---|
@@ -33,34 +28,6 @@ the build does not copy it.
    em. The view box goes from the left side to the right side of the ink, and from the top of the
    "h" to the bottom of the "p" and the "y". Thus each name gets the same height.
 
-The SVG keeps the glyph outlines and no font data.
-
-## How the title font was made
-
-`tools/title-font.py` writes `public/fonts/fraunces-title.woff2` from `fraunces.ttf`. Its head
-comment gives the command with the pinned versions of fontTools and Brotli. Each run gives the
-same bytes.
-
-1. The script stops when the SHA-256 of `fraunces.ttf` differs from the value of the table above.
-2. The instancer of fontTools pins the four axes at `wght=600,SOFT=100,WONK=0,opsz=72`. The
-   instance has no wonky letters, so the titles read easily. The names of the instance come from
-   the table `STAT`, such as "Fraunces 72pt SuperSoft SemiBold NonWonky".
-3. The subsetter keeps Basic Latin, Latin-1 Supplement, Latin Extended-A, and the punctuation and
-   the symbols of `UNICODES` in the script, with the kerning and the ligatures. It removes the
-   hinting.
-4. The name table keeps the copyright and the license with its URL (name IDs 0 and 13 to 14).
-
-Fraunces has no flat sign (♭) and no sharp sign (♯). A title with one of them takes that glyph
-from the fallback face of `src/ui/ui.css`.
-
-`--fallback <font file>` also prints the descriptors of the fallback face for a local font:
-`size-adjust` from the mean advance of the demo titles, and the line metrics of Fraunces in the
-units of the adjusted fallback. The values of `src/ui/ui.css` come from Georgia Bold of macOS
-(`/System/Library/Fonts/Supplemental/Georgia Bold.ttf`).
-
-## License
-
-The site holds a changed version of the Font Software: the static subset. The OFL permits this,
-because the font has no Reserved Font Name. The file keeps the copyright and the license in its
-name table, and the license file of the site (design 7.3) holds the full license text. The
-repository holds the source in `fraunces.ttf`, with `LICENSE.txt` beside it.
+The SVG keeps the glyph outlines and no font data, so the app does not hold the Font Software.
+The license file of the app still credits the font. The repository holds the Font Software in
+`fraunces.ttf`, with `LICENSE.txt` beside it, as the license requires.
