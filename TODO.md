@@ -398,9 +398,21 @@ passes.
       the back of the violin. The paw reaches the fingerboard only from 0.64, near the upper bout.
 - [ ] Hippo bassist: the left forearm goes 2.9 cm into the contrabass in 50% of the play (limit
       2.3 cm). A higher left elbow, (-1, 0.3, 0), lowers it to 6%, but the left paw swing fails
-      (77°, limit 70) and the folds grow from 29 to 42 (`pnpm arm-check bassist`).
+      (77°, limit 70) and the folds grow from 29 to 42 (`pnpm arm-check bassist`). An elbow further
+      back, (-1, -0.3, 0.3) to (-1, -0.1, 1), lowers it to 26% to 4%, and a bass 0.03 H further
+      from the belly (`fit.gap` 0.25) to 31%, but each change moves the paw swing from 68° to 70°
+      to 75° and the folds from 29 to 32 to 41. Each move to the left (`fit.side`) or lean to the
+      left (`fit.left`) puts the upper arm into the bass. A fix needs a limit of the paw swing in
+      the pose, or a smaller bass.
+- [ ] Hippo bassist: the scroll stands in front of the left cheek in the left view (pose audit
+      N10). The head does not go into the bass (`pnpm body-clip bassist`). A bass 1.5 cm to the
+      left (`fit.side` -0.33) moves the scroll down and away a little, but the left forearm then
+      goes into the bass in 34% of the play in place of 21% (with the elbow back). Try a shorter
+      end pin (`BASS_END_PIN`) with the forearm limit of the item above.
 - [ ] Hippo bassist: at rest, the right arm still lies along the round belly in the right view
-      (2.9 cm in the belly, `pnpm hold-fit bassist --sets rest`). Try a rest bow in front of the
+      (2.9 cm in the belly, `pnpm hold-fit bassist --sets rest`). A rest elbow out, (1, -0.7, 0),
+      and a grip 1.3 H out lift the arm off the belly in the front view, but the arm stands out as
+      a wing, and the right view still shows it along the belly. Try a rest bow in front of the
       belly in a look round.
 - [ ] Bind paws: the bind paws of most configs start pronated, so the cellist, the bassist, and the
       oboist twist the left paw near 170°. Try `studio.bindSupination`.
