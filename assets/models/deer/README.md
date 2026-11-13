@@ -132,8 +132,8 @@ The weights, in the rest pose:
    no eyeball.
 2. Arm rows: each vertex of a side with |x| from 0.095, within 0.05 units of the line of the rest
    arm (0.06 units past the wrist), takes one exact row (`sa.set_weight_row()`): a clavicle share
-   from 0.4 at x 0.095 to 0 at x 0.13, an elbow helper share of 0.25, 0.75, 0.75, and 0.25 at x
-   0.14, 0.158, 0.192, and 0.21, and the rest on the 4 roll segments. These x are places of the
+   from 0.4 at x 0.095 to 0 at x 0.13, an elbow helper share that grows from 0 at x 0.13 to 1 at the elbow joint (x 0.175) and
+   falls to 0 at x 0.22, and the rest on the 4 roll segments. These x are places of the
    source: a vertex of the stretched arm takes the row of its place before the stretch. With the
    helper rows at x 0.155 to 0.195, the right elbow folded 16 faces (folds p95 of
    `pnpm arm-check harpist`, limit 8), and now 8.
@@ -331,7 +331,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/deer.rig.glb` | 1,245,312 bytes | `c497b1ccec832b908640df1802c1bf45e36d320290b597d84ffdb1702b9469f0` |
-| `tripo-hand/deer.rig.json` | 19,351 bytes | `9053ccd978036ffbd175020ea83950d092fc4334619cc3a507b9478db5eb6c11` |
+| `tripo-hand/deer.rig.glb` | 1,245,312 bytes | `383a07faaa39a382da9d7ae21b374258d5c00837a3a7e0a1fe0cdd4804b93614` |
+| `tripo-hand/deer.rig.json` | 19,351 bytes | `e650b8a9e13588b3bc581239299484c0e03964d0a9567bfbb35ee309e1c863d1` |
 | `tripo-hand/deer-color.webp` | 133,838 bytes, 2048 × 2048 | `9f40f146e7a1f5ea11a8139d90682db82a8ace321451b96b30200236b9cb6876` |
 | `tripo-hand/deer-normal.webp` | 75,080 bytes, 1024 × 1024 | `3607beb00dcf3ec1e5d061d975efd4a221ef12dc63c378ab6e7058439928e538` |
