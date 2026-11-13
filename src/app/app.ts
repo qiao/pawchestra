@@ -24,6 +24,7 @@ import { motionEvent, nextMode } from './camera-mode.ts';
 import type { CameraEvent, CameraMode } from './camera-mode.ts';
 import type { Speed } from './bar-rules.ts';
 import { DEMOS, PERF_60, demoHash, demoUrl, isDemoId } from './demos.ts';
+import { endCardView, nextDemo } from './end-card.ts';
 import type { StageFile } from './demos.ts';
 import { FILE_ERROR_TEXTS, fileTitle, readScoreFile } from './file-rules.ts';
 import { keyAction, keySeekPoint, keyVolume } from './keys.ts';
@@ -288,6 +289,12 @@ export class App {
    * `null`. It stays in memory only, so the page stores no file (2.7).
    */
   #ownFile: File | null = null;
+  /**
+   * The state of the countdown of the end card (design 2.8): `idle` before the song end,
+   * `running` at the end, `stopped` after a tap or a key, and `done` after it started the next
+   * demo.
+   */
+  #countdown: 'idle' | 'running' | 'stopped' | 'done' = 'idle';
   /** True after the first drag or pinch of the view in the session: the drag hint goes (2.8). */
   #dragged = false;
   /** The camera of the shot of the last frame, which `cameraAt()` writes. */
@@ -361,6 +368,9 @@ export class App {
           this.#ui.closeSheetAfterSelection();
           this.#selectDemo(id);
         },
+        onNextDemo: () => {
+          this.#playNextDemo();
+        },
         onSelectFile: () => {
           this.#ui.closeSheetAfterSelection();
           this.#selectOwnFile();
@@ -406,8 +416,12 @@ export class App {
       this.#activeAt = performance.now() / 1000;
     };
     window.addEventListener('pointermove', active);
-    window.addEventListener('pointerdown', active);
+    window.addEventListener('pointerdown', () => {
+      active();
+      this.#stopCountdown();
+    });
     window.addEventListener('keydown', (event) => {
+      this.#stopCountdown();
       this.#pressKey(event);
     });
     // Safari on iOS zooms the page on a pinch in spite of `touch-action` of the root. Its own
@@ -818,6 +832,53 @@ export class App {
       .catch(reportError);
   }
 
+  /** Stops the countdown of the end card at a tap or a key, so that the next demo waits (2.8). */
+  #stopCountdown(): void {
+    if (this.#countdown === 'running') {
+      this.#countdown = 'stopped';
+    }
+  }
+
+  /**
+   * Starts the demo after the current demo (design 2.8): "Next" of the end card, or the end of its
+   * countdown. A file of the user has no next demo.
+   */
+  #playNextDemo(): void {
+    const file = this.#piece?.file;
+    if (file === undefined || file === null || !isDemoId(file)) {
+      return;
+    }
+    this.#countdown = 'done';
+    this.#selectDemo(nextDemo(file));
+  }
+
+  /**
+   * Shows the end card of a frame and runs its countdown (design 2.8).
+   *
+   * @param piece The current piece.
+   * @param ended True while the piece stands at its end after a play.
+   * @param wallTime The wall time of the frame, in seconds.
+   */
+  #followEnd(piece: Piece, ended: boolean, wallTime: number): void {
+    const endedAt = this.#state.transport.changedAtWall ?? wallTime;
+    const view = endCardView({
+      ended,
+      sinceEndSec: wallTime - endedAt,
+      still: this.#scene.reducedMotion,
+    });
+    if (!ended) {
+      this.#countdown = 'idle';
+    } else if (this.#countdown === 'idle') {
+      this.#countdown = 'running';
+    }
+    const hasNext = piece.file !== null && isDemoId(piece.file);
+    const counting = hasNext && this.#countdown === 'running';
+    this.#ui.endCard.show(view, counting);
+    if (counting && view.countShare >= 1) {
+      this.#playNextDemo();
+    }
+  }
+
   /**
    * Selects the last file of the user again: a click on its row in the demo list (design 2.8). A
    * click on the row of the file that shows only plays it, as a click on the current demo does.
@@ -953,6 +1014,8 @@ export class App {
     this.#changeCamera('new-piece');
     const demo = piece.file !== null && isDemoId(piece.file) ? piece.file : null;
     this.#showTitle(piece.title, piece.file !== null);
+    const next = demo === null ? null : DEMOS[nextDemo(demo)].title;
+    this.#ui.endCard.setPiece(piece.title.title, piece.title.composer, next);
     this.#ui.demoList.show(piece.file === null ? 'file' : demo);
     this.#ui.credits.show(demo);
     this.#showSeats(piece);
@@ -1229,6 +1292,7 @@ export class App {
     ui.showDragHint(
       !cinematic &&
         !this.#dragged &&
+        !ended &&
         piece !== null &&
         piece.played &&
         shown.bar &&
@@ -1243,6 +1307,9 @@ export class App {
         still: this.#scene.reducedMotion,
       }),
     );
+    if (piece) {
+      this.#followEnd(piece, ended, wallTime);
+    }
     ui.bar.update({
       playLabel: ended ? 'Play again' : playLabel(status),
       pieceShown: piece !== null,

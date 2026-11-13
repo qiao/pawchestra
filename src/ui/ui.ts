@@ -15,6 +15,7 @@ import { DemoList } from './demo-list.ts';
 import { createButton, createElement } from './dom.ts';
 import { Drawer } from './drawer.ts';
 import { DropOverlay } from './drop-overlay.ts';
+import { EndCard } from './end-card.ts';
 import { FilePicker } from './file-picker.ts';
 import { FirstScreen } from './first-screen.ts';
 import { MessageBox } from './message-box.ts';
@@ -41,6 +42,8 @@ interface UiActions extends BarActions {
   readonly onSelectDemo: (id: DemoId) => void;
   /** A click on the row of the last file of the user. */
   readonly onSelectFile: () => void;
+  /** A click on "Next: {title}" of the end card. */
+  readonly onNextDemo: () => void;
   /** A file that the user selected with the file button or dropped on the page. */
   readonly onFile: (file: File) => void;
   /** A click on the mute or the solo button of a seat. */
@@ -70,6 +73,8 @@ export class Ui {
   readonly title: Title;
   /** The title card of Cinematic mode at the song start (design 2.8). */
   readonly titleCard = new TitleCard();
+  /** The end card at the song end (design 2.8). */
+  readonly endCard: EndCard;
   readonly firstScreen: FirstScreen;
   readonly bar: Bar;
   readonly message: MessageBox;
@@ -125,6 +130,7 @@ export class Ui {
       this.bar.focusDrawerButton();
     });
     this.bar = new Bar(actions, volume, canFullScreen, this.tooltips);
+    this.endCard = new EndCard({ onPlayAgain: actions.onPlay, onNext: actions.onNextDemo });
     this.firstScreen = new FirstScreen(
       actions.onFirstPlay,
       () => {
@@ -194,6 +200,7 @@ export class Ui {
     parent.append(
       this.titleCard.element,
       this.#dragHint,
+      this.endCard.element,
       this.firstScreen.element,
       this.bar.element,
       this.message.element,

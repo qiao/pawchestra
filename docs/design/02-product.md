@@ -306,13 +306,22 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
   it shows and hides with no fade. A soft shade keeps 4.5:1 over the stage. A screen reader skips
   it (`aria-hidden`), because the live region of the title reads the piece. Free mode has no card,
   because the title shows there.
+- **End card**: at the song end, after the bow of the conductor, the card shows the composer,
+  the piece title, "Play again", and "Next: {title}" with a ring that counts down 10 s
+  (`END_CARD` of `app/end-card.ts`). At the end of the count, the next demo of `DEMO_IDS`
+  starts, and the last demo goes back to the first. A tap or a key stops the count, and the ring
+  goes. The end of a performance is the moment of the next choice, and a stop with no next step
+  ended the session. The opacity is a function of the song end and the time since the transport
+  stopped there (`endCardView()`), as `titleCardLevel()` is of the song time, so a seek back or a
+  play hides it. A file of the user has no next demo, so its card shows only "Play again". The
+  card shows in both modes, with no fade with reduced motion.
 - **Bar**: "Cinematic camera" is pressed in Cinematic mode. At the song end, play becomes "Play
-  again" (6.5), and the bar offers no next demo. The seek bar seeks only when the samples are
-  ready (`app/seek.ts`). The volume gain is the square of the position (6.8). The drawer button
-  says "Open the drawer" or "Close the drawer", and the full screen button "Full screen" or "Exit
-  full screen". Each control stays inside the bar at each width. From 900 px, the controls stand
-  in the groups of the mockup. From 700 px to 899 px, the groups do not fit, so the controls stand
-  closer. The volume slider shrinks to half its width before a control leaves the bar.
+  again" (6.5), and the end card offers the next demo. The seek bar seeks only when the samples are
+  ready (`app/seek.ts`). The volume gain is the square of the position (6.8). The drawer button says
+  "Open the drawer" or "Close the drawer", and the full screen button "Full screen" or "Exit full
+  screen". Each control stays inside the bar at each width. From 900 px, the controls stand in the
+  groups of the mockup. From 700 px to 899 px, the groups do not fit, so the controls stand closer.
+  The volume slider shrinks to half its width before a control leaves the bar.
 - **First screen**: a round play button below the front edge of the stage, so that it does not
   cover the orchestra. In Free mode, the camera frame shrinks until the stage is clear of it
   (`clearFirstScreen()`). Cinematic mode keeps its full frame (2.5). A ring shows the load
@@ -448,6 +457,7 @@ instant with reduced motion. Each text keeps the contrast 4.5:1 of WCAG AA over 
 | Settings, the button that copies or shares the link of the page | Copy link |
 | Over the stage in Free mode, until the first drag | Drag to look around |
 | Demo list, the row of the last file of the user | Your file: {title} |
+| End card, the two buttons | Play again / Next: {title} |
 | Status after the link is in the clipboard | The link is copied. |
 | Status after the browser did not copy the link | The link did not copy. Copy it from the address bar. |
 | Seat row, the mute button and the solo button | Mute / Only this |

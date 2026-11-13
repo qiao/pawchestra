@@ -398,6 +398,109 @@ body:has(.camera[aria-pressed='true']) .title .github {
   text-wrap: balance;
 }
 
+/* The end card (design 2.8) in the middle of the frame, with the type of the title card. Its
+   opacity is a function of the time since the song end (`endCardView()` of app/end-card.ts), so it
+   needs no transition. Beside the open drawer of a wide window, it stands in the free area. */
+.end-card {
+  position: fixed;
+  left: calc(var(--letterbox-side, 0px) + 24px);
+  right: calc(var(--letterbox-side, 0px) + 24px);
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+  text-shadow: 0 1px 3px #000;
+  opacity: var(--card-level, 0);
+}
+
+.end-card[hidden] {
+  display: none;
+}
+
+.end-card::before {
+  content: '';
+  position: absolute;
+  inset: -36px 16%;
+  z-index: -1;
+  border-radius: 999px;
+  background: var(--title-shade);
+  filter: blur(28px);
+}
+
+.end-card p {
+  margin: 0;
+  max-width: 900px;
+}
+
+.end-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.end-buttons button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--target);
+  padding: 0 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  text-shadow: none;
+}
+
+.end-again {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.end-again:hover {
+  background: var(--accent-strong);
+}
+
+.end-next {
+  max-width: min(420px, calc(100vw - 48px));
+  background: var(--bg-overlay);
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+
+.end-next-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.end-ring {
+  flex: none;
+  transform: rotate(-90deg);
+}
+
+.end-ring circle {
+  fill: none;
+  stroke-width: 2;
+}
+
+.end-ring .track {
+  stroke: var(--track);
+}
+
+.end-ring .done {
+  stroke: var(--accent);
+}
+
+@media (min-width: 700px) {
+  body:not(:has(.camera[aria-pressed='true'])):has(.drawer:not([hidden])) .end-card {
+    right: 364px;
+  }
+}
+
 /* A window in portrait has a low frame and a high top bar (2.3). There the card stands in the top
    bar, just above the frame, so that it covers no part of the low frame. */
 @media (orientation: portrait) {
