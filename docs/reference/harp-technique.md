@@ -126,27 +126,25 @@ hold `HANDS_HOLDS.harp` of `src/pose/hands.ts`.
 
 The app follows these facts:
 
-- **The size (section 1).** The deer plays a harp of 0.85 of the concert harp of the app
-  (`SpeciesParams.harpScale`), 1.11 m high, as a smaller harp of a child. On a larger harp, the
-  treble strings lay so near the right shoulder that the right elbow folded back around the top of
-  the soundbox. Its base stands on the floor, so the pedals lie at the hooves. A larger harp also
-  brings its neck to the chin of the deer. The crown and the neck near it stand lower than on a
+- **The size (section 1).** The deer plays a harp of 0.975 of the concert harp of the app
+  (`SpeciesParams.harpScale`), 1.27 m high. Its base stands on the floor, so the pedals lie at the
+  hooves. The crown and the neck near it stand lower than on a
   concert harp (`HARP.column`), so the muzzle of the deer stays at least 5.5 cm above the neck,
   as the head does not rest on the harp (section 2).
-- **The place (section 2).** The base stands in front of the deer, a little to the right of the
-  middle, and the top of the soundbox stands at the right side of the chest, below the right
-  shoulder. The harp is diagonal to the deer, with the column at the front left
-  (`HARP_PLACE.turn`).
+- **The place (section 2).** The base stands in front of the chest of the deer, a little to the
+  left of the middle, and the top of the soundbox rests against the chest, in front of and below
+  the right shoulder, near the place where a harpist rests it on the shoulder. The harp is
+  diagonal to the deer, with the column at the front left (`HARP_PLACE.turn`).
 - **The knees (section 2).** The harp stands between the knees. The left hoof rests to the left of
   the base, behind the foot of the soundbox, with the knee out and forward (`LEG_RESTS` of
-  `src/pose/harp-feet.ts`).
+  `src/pose/harp-feet.ts`). A hoof presses each pedal at its end (`HARP_PEDALS.foot`).
 - **The trunk (section 2).** The spine stays erect (`HANDS_HOLDS.harp.lean`). A lean forward
   brings the long muzzle to the neck of the harp.
 - **The registers (section 3).** The left hand plays the bass strings from the left side, and the
   right hand the treble strings from the right side (`faceL`, `faceR`).
-- **The elbows (section 4).** The elbows point out and down (`poleL`, `poleR`). The right arm hangs
-  outside the top of the soundbox and reaches the strings from the right side, and no arm goes
-  through the plane of the strings.
+- **The elbows (section 4).** The left elbow points out and down (`poleL`). The right elbow rises
+  out and up (`poleR`), so that the right arm passes outside the top of the soundbox and reaches
+  the strings from the right side. No arm goes through the plane of the strings.
 - **The wrists (section 4).** The left palm faces the strings and down (`faceL`), so that the
   left wrist bends only a little, as the wrists of a harpist go a little down. A palm
   square to the strings bends the left wrist of the short arm far back, because the left forearm
@@ -184,19 +182,20 @@ The app follows these facts:
 
 The app does not follow these facts:
 
-- **The shoulder (section 2).** The top of the soundbox stands at the right side of the chest,
-  below the right shoulder, and the harp stands to the right of the chest. The chest of the deer
-  stands about 17 cm in front of its shoulder joints, so with the soundbox on the shoulder, the
-  strings lay 15 to 19 cm further forward, out of the reach of its arms of 36 cm (derived from the
-  body of the deer). The top of the soundbox and the end of the neck are slim (`SOUNDBOX`, `NECK`),
-  so the right upper arm only touches them: it goes at most 1.2 cm into them.
+- **The shoulder (section 2).** The top of the soundbox rests against the chest, about 6 cm below
+  the right shoulder joint, and not on the shoulder. The chest of the deer stands about 17 cm in
+  front of its shoulder joints, so with the soundbox on the shoulder, the strings lay 15 to 19 cm
+  further forward, out of the reach of its arms (derived from the body of the deer). The chest
+  touches the neck and the top of the soundbox: it goes up to 1.5 cm into the neck in 2 % of the
+  play (`pnpm body-clip harpist`).
 - **The tilt (section 2).** The harp stands upright (`HARP_PLACE.tilt`). The soundbox of the
   model leans toward the player, and a tilt back puts the left paw of the deer into its body.
-- **The reach (section 3).** The arms of the deer are short, also at 1.3 times the arms of the
-  source mesh, so the base stands near the stool, and the left hand plays only up to D4. A harpist reaches the column with the stretched left arm,
+- **The reach (section 3).** The arms of the deer are short, also at 1.5 times the arms of the
+  source mesh (42 cm), so the base stands near the stool, and the left hand plays only up to D4. A harpist reaches the column with the stretched left arm,
   and the left hand plays up to about C5.
-- **The level forearms (section 4).** The forearms rise from the elbow to the wrist, because the
-  elbows of the short arms hang below the strings.
+- **The level forearms (section 4).** The left forearm rises from the elbow to the wrist, because
+  the left elbow hangs below the strings. The right forearm falls from the raised elbow to the
+  wrist.
 - **The level hands (section 3).** The left palm is higher on the strings than the right palm
   (`palmL`, `palmR`). The short left arm reaches the low pluck points of the bass strings only
   with the palm far above them, so the fingers of the left paw do not touch the bass strings at
@@ -204,7 +203,7 @@ The app does not follow these facts:
   strings, lower, and toward the column (`highL`).
 - **The size of the swing (section 5).** The band shows the real swing times
   `STRING_SWING.strength`, and a denser blur (`STRING_SWING.density`), because a swing of a few
-  millimeters on the small harp of the deer does not show in a stage shot.
+  millimeters on the harp of the deer does not show in a stage shot.
 - **The decay of each axis (section 5).** One time constant decays the whole ellipse. A real
   string loses the swing at a right angle to the soundboard faster. No source gives the treble
   decay, so the treble time constant is an estimate.
