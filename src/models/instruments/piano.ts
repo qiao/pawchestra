@@ -1049,6 +1049,67 @@ function legProfile(height: number): ProfilePoint[] {
 }
 
 /**
+ * Gives the turn of the music desk of the grand piano: it leans back around its bottom front
+ * edge, which stands on the rail ({@link PIANO_FRONT}).
+ *
+ * @returns The turn.
+ */
+function deskLean(): Quaternion {
+  return new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -PIANO_FRONT.desk.lean);
+}
+
+/**
+ * Gives a point on the music desk of the grand piano, in the axes of the piano before
+ * {@link PIANO_SCALE}.
+ *
+ * @param x The distance to the right of the middle of the desk.
+ * @param up The distance up the desk from its bottom front edge.
+ * @param out The distance out of the front face of the desk, toward the player.
+ * @returns The point.
+ */
+function onDesk(x: number, up: number, out: number): Vec3 {
+  const edge = new Vector3(0, PIANO.caseTop, PIANO_FRONT.deskFront);
+  return toVec3(new Vector3(x, up, out).applyQuaternion(deskLean()).add(edge));
+}
+
+/**
+ * Gives the corners of the sheet music on the desk of the grand piano, in the axes of the piano
+ * before {@link PIANO_SCALE}: the lower left, the lower right, the upper right, and the upper left,
+ * as the player sees them.
+ *
+ * @param out The distance out of the front face of the desk, toward the player.
+ * @returns The four corners.
+ */
+function sheetCorners(out: number): [Vec3, Vec3, Vec3, Vec3] {
+  const { ledge, sheet } = PIANO_FRONT;
+  const [x0, x1] = [-sheet.width / 2, sheet.width / 2];
+  const top = ledge.height + sheet.height;
+  return [
+    onDesk(x0, ledge.height, out),
+    onDesk(x1, ledge.height, out),
+    onDesk(x1, top, out),
+    onDesk(x0, top, out),
+  ];
+}
+
+/**
+ * Gives the corners of the sheet music on the desk of the grand piano (design 4.5, 4.6), in the
+ * axes of its piece, as {@link sheetCorners} gives them, with {@link PIANO_SCALE}. The scene
+ * prints music on them (`buildSheets()` of `models/stage.ts`).
+ *
+ * @returns The four corners.
+ */
+export function pianoSheetCorners(): [Vec3, Vec3, Vec3, Vec3] {
+  const scaled = (point: Vec3): Vec3 => [
+    point[0] * PIANO_SCALE,
+    point[1] * PIANO_SCALE,
+    point[2] * PIANO_SCALE,
+  ];
+  const [a, b, c, d] = sheetCorners(0);
+  return [scaled(a), scaled(b), scaled(c), scaled(d)];
+}
+
+/**
  * Adds the front of the case ({@link PIANO_FRONT}): the key bed, the key slip, the cheek blocks,
  * the fallboard, the rail of the desk, the desk with its ledge, and the sheet music.
  *
@@ -1106,12 +1167,8 @@ function addFront(piece: PieceBuilder): void {
     transform([0, p.caseTop - rail.height / 2, rail.z]),
     'polish',
   );
-  // The desk turns back around its bottom front edge, which stands on the rail.
   const desk = f.desk;
-  const lean = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -desk.lean);
-  const edge = new Vector3(0, p.caseTop, f.deskFront);
-  const onDesk = (x: number, up: number, out: number): Vec3 =>
-    toVec3(new Vector3(x, up, out).applyQuaternion(lean).add(edge));
+  const lean = deskLean();
   // The sheet lies in the face of the desk, in a frame of the desk, so no face of the desk lies
   // under it. A sheet on the face of the desk flashed through it in the far views.
   const ledge = f.ledge;
@@ -1124,12 +1181,12 @@ function addFront(piece: PieceBuilder): void {
   // The sheet is one face to the player, and the back of the desk behind it is one face to the
   // audience. The sides of the frame close the edges between them.
   const sheetFace = (out: number, toward: Vec3): number[] => {
-    const [x0, x1] = [-sheet.width / 2, sheet.width / 2];
+    const [lowerLeft, lowerRight, upperRight, upperLeft] = sheetCorners(out);
     return quadToward(
-      onDesk(x0, ledge.height, out),
-      onDesk(x1, ledge.height, out),
-      onDesk(x1, sheetTop, out),
-      onDesk(x0, sheetTop, out),
+      lowerLeft,
+      lowerRight,
+      upperRight,
+      upperLeft,
       toVec3(new Vector3(...toward).applyQuaternion(lean)),
     );
   };
