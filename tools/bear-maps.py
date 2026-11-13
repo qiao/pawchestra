@@ -37,7 +37,7 @@ NORMAL_GAIN = 4
 LIGHTNESS = 0.87
 #: The texels of the eyeballs and this many texels around them keep their colors.
 EYE_MARGIN = 4
-#: The fur strands that the maps add (`strands()`), with the values of tools/badger-maps.py. The
+#: The fur strands that the maps add (`strands()`), with the soft values of tools/badger-maps.py. The
 #: maps of the Tripo bear source are smooth (assets/models/bear/README.md, "Maps"), so its fur
 #: shows few strands in the app. The strands follow the direction of the faint strokes of the source maps, and they have
 #: the scale of the strands of the other maps (a wavelength of 8 to 10 texels at 1024 pixels
@@ -50,15 +50,15 @@ STRANDS = {
     #: The sigma in texels at SIZE of the blur of the noise: the width of a strand.
     'width_sigma': 1.4,
     #: The half length in texels at SIZE of a strand, and the step of its samples.
-    'half_length': 22.0,
+    'half_length': 11.0,
     'step': 1.0,
     #: The sigma in texels at SIZE of the blur that the height of the strands loses (a high pass).
     'high_pass_sigma': 10.0,
     #: The root mean square of the x, y tilt of the strands in the normal map.
-    'tilt': 0.06,
+    'tilt': 0.03,
     #: The luma factor of the strands in the color map, for each standard deviation of the height:
     #: a strand crest is lighter, and a groove darker.
-    'luma': 0.16,
+    'luma': 0.08,
     #: The largest height of a strand, in standard deviations.
     'clip': 2.5,
 }
