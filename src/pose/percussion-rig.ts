@@ -696,7 +696,10 @@ export const PERCUSSION_HOLDS = {
     // Both heads keep one height between strikes, because the paws do not pass each other.
     pitchR: 1,
     ready: false,
-    set: null,
+    // At rest and in a long rest of the music, the mallets lie level across the body in front of
+    // the waist, as the snare sticks of the set position. No source gives the rest of a
+    // xylophonist. With no set position, the hanging paws held the mallets up at about 60°.
+    set: { raise: 0.04104, rise: [0.1, 0.22] },
     pair: false,
     // A later strike on one bar or a near bar stays in one hand, so that a mallet does not strike
     // under the head of the other mallet, which rests over its bar. With 1 cm, the mallets touch

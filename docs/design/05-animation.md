@@ -347,7 +347,9 @@ The rest of each family:
   lowering.
 - **Percussion.** A ready player keeps its mallets over the instrument (`PercussionHold.ready`),
   because a lift from hanging arms sweeps them through the body or the kettles. The snare sticks
-  rest level across the waist, as a snare drummer between entries (`PercussionHold.set`). A hold
+  rest level across the waist, as a snare drummer between entries (`PercussionHold.set`). The
+  mallets of the suspended cymbal and of the xylophone rest in the same way. Reason: no source
+  gives their rest, and the hanging paws of the badger held the xylophone mallets up. A hold
   with a set position and no ready pose also takes it in a long rest of the music (`setRests()`,
   `SET_MOTION`): before the first note, in a rest of at least 6 beats, and after the last note.
   The sticks go down in the beat after the last strike, and lift from 2 beats to 1 beat before
