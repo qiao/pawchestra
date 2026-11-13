@@ -459,6 +459,7 @@ describe('the rest pose of the bowed strings (design 5.2, 5.5)', () => {
       before: null,
       startSec: 0,
       seekStart: false,
+      endedAtSong: false,
       holdSec: 3,
       leadSec: Number.POSITIVE_INFINITY,
     };

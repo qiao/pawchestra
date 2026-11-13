@@ -47,6 +47,7 @@ const FROM_START: Transport = {
   before: null,
   startSec: 0,
   seekStart: false,
+  endedAtSong: false,
   holdSec: 3,
   leadSec: Infinity,
 };

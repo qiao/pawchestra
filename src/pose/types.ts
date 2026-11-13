@@ -110,6 +110,12 @@ export interface Transport {
    */
   readonly seekStart: boolean;
   /**
+   * True for the pause at the song end: the processor stopped there after a play (design 5.4,
+   * 6.5). The conductor bows after it. A seek while paused keeps the transport, so the bow
+   * continues. False for each other transport.
+   */
+  readonly endedAtSong: boolean;
+  /**
    * The time in seconds that the instruments stay up after a pause: `REST_TIMES.hold` (3 s), or
    * 0 after a pause in the count-in. Then the animals lower their instruments with no hold (5.2).
    */

@@ -124,6 +124,7 @@ describe('poseAt (design 5.1)', () => {
       before: PLAYING,
       startSec: 0,
       seekStart: false,
+      endedAtSong: false,
       holdSec: 3,
       leadSec: Number.POSITIVE_INFINITY,
     };
@@ -490,6 +491,7 @@ function changed(
     before,
     startSec,
     seekStart: false,
+    endedAtSong: false,
     holdSec,
     leadSec: playing ? leadSec : before.leadSec,
   };

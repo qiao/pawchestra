@@ -9,6 +9,7 @@ export const NOT_STARTED: Transport = {
   before: null,
   startSec: 0,
   seekStart: false,
+  endedAtSong: false,
   holdSec: REST_TIMES.hold,
   leadSec: Number.POSITIVE_INFINITY,
 };
@@ -63,6 +64,7 @@ export function changeTransport(
       before,
       startSec: songTime,
       seekStart: false,
+      endedAtSong: false,
       holdSec: REST_TIMES.hold,
       leadSec,
     };
@@ -73,6 +75,7 @@ export function changeTransport(
     before,
     startSec: transport.startSec,
     seekStart: transport.seekStart,
+    endedAtSong: false,
     holdSec: songTime <= transport.startSec ? 0 : REST_TIMES.hold,
     leadSec: transport.leadSec,
   };
@@ -149,8 +152,9 @@ export function setPlaying(
 /**
  * Gives the play state after a frame reads the song time of the `Player` (design 6.5). The
  * processor pauses at the song length, so the transport pauses when the song time reaches it.
- * After a play, the check waits until the song time reads less than the song length: a play at
- * the end restarts the song at 0, but the old anchor gives the end time for a few frames.
+ * This pause sets `Transport.endedAtSong`. After a play, the check waits until the song time
+ * reads less than the song length: a play at the end restarts the song at 0, but the old anchor
+ * gives the end time for a few frames.
  *
  * @param state The play state before the frame.
  * @param songTime The song time of `Player.now()`, in seconds.
@@ -173,10 +177,9 @@ export function followSongTime(
   if (state.endPending) {
     return state;
   }
-  return {
-    transport: changeTransport(state.transport, false, wallTime, songTime),
-    endPending: false,
-  };
+  // The transport records the stop at the song end, so the conductor bows (design 5.4).
+  const stopped = changeTransport(state.transport, false, wallTime, songTime);
+  return { transport: { ...stopped, endedAtSong: true }, endPending: false };
 }
 
 /** A play of the user: the new play state and the count-in that the `Player` plays first. */

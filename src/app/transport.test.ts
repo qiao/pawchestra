@@ -42,6 +42,7 @@ describe('changeTransport (design 5.1, 5.2)', () => {
       before: NOT_STARTED,
       startSec: 0,
       seekStart: false,
+      endedAtSong: false,
       holdSec: 3,
       leadSec: 1.5,
     });
@@ -52,6 +53,7 @@ describe('changeTransport (design 5.1, 5.2)', () => {
       before: played,
       startSec: 0,
       seekStart: false,
+      endedAtSong: false,
       holdSec: 3,
       leadSec: 1.5,
     });
@@ -159,6 +161,7 @@ describe('followSongTime (design 6.5)', () => {
       changedAtWall: 11.9,
       startSec: 0,
       seekStart: false,
+      endedAtSong: false,
       holdSec: 3,
     });
   });
