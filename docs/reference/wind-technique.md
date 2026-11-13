@@ -363,6 +363,11 @@ These facts hold for each wind player:
   curl as one block (`WindHold.gripCurl`, `WIND_BODY.keyCurl`).
 - **The lift (1.7, 2.2).** The winds lift first in the count-in (`REST_MOTION` of
   `src/pose/rest.ts`). No source gives the time.
+- **The long rest (2.3).** In a rest of at least `LONG_REST.minSec` (`src/pose/long-rests.ts`),
+  each wind player lowers the instrument to its rest pose, and lifts it again so that the lift
+  ends at least one beat before the entry. The oboe does not lie across the legs: each wind keeps
+  the rest place of its hold. No source gives the shortest rest in which a player lowers the
+  instrument, so the app uses a rest of a few bars.
 
 ### 4.1 The trombone of the panda
 

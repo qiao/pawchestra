@@ -502,7 +502,7 @@ function weightsAt(
   wall: number,
   seats: readonly (SeatAudibility | undefined)[] = [],
 ): number[] {
-  return players.map((p) => playerWeight(p, transport, seats[p.seatIndex], wall));
+  return players.map((p) => playerWeight(p, transport, seats[p.seatIndex], wall, 0));
 }
 
 /** The scene of the Boulanger demo, the default demo, built one time for the tests. */

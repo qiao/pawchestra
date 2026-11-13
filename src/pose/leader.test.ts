@@ -133,8 +133,8 @@ describe('a chamber group in the pose (design 4.2, 5.4)', () => {
     }
     // The rest rules of 5.2 still hold: the instruments are down before the first play, and up
     // at the downbeat.
-    expect(playerWeight(leader, NOT_STARTED, undefined, 5)).toBe(0);
-    const weight = playerWeight(leader, FROM_START, undefined, count.lengthSec);
+    expect(playerWeight(leader, NOT_STARTED, undefined, 5, 0)).toBe(0);
+    const weight = playerWeight(leader, FROM_START, undefined, count.lengthSec, 0);
     expect(weight).toBeGreaterThan(0.9);
     // A forward lean is a negative turn around x.
     expect(nodTurn(QUARTET, 'spine', 0)).toBeCloseTo(-LEADER_NOD.nod * weight, 2);

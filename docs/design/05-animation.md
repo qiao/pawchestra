@@ -202,6 +202,13 @@ count-in (5.4, 6.5), and lower them when the hold of `transport.holdSec` after a
   `transport.before` (`changeTransport()` of `app/transport.ts`).
 - **Count-in.** The slowest lift ends before the downbeat. A shorter count-in scales all lifts by
   one factor (`liftScale()`). A pause in the count-in lowers the instruments at once.
+- **Long rests.** A player lowers its instruments in a long rest of its own part, as a real wind
+  player does (winds 4). `playerWeight()` multiplies a third height from the song time
+  (`longRestHeight()` of `pose/long-rests.ts`), so a seek gives the same pose. A rest of at least
+  `LONG_REST.minSec` of its family counts, also before the first note and after the last note.
+  The instrument stays up for `LONG_REST.holdSec`, then goes down with the seeded lowering of the
+  player and its ripple. The lift ends at least `LONG_REST.liftEndBeats` before the entry, and the
+  principal of a seat lifts first. The rest pose is the pose of a muted seat (5.5).
 - **No wrist flip.** A paw does not turn past 180° on its forearm in a move, because the twist
   bone (`TWIST_SHARE` of `models/studio-rig.ts`) then turns over in one frame. The arm gate checks
   each move (`probeMoves()` of `tools/arm-check.ts`). The carried left paw of a violin or a viola

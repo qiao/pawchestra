@@ -31,6 +31,7 @@ import { createHandState, handStateAt } from './hand-notes.ts';
 import { poseHands, sideLeanAt } from './hands.ts';
 import type { HandsState } from './hands.ts';
 import { gestureSize } from './loudness.ts';
+import { longRestHeight } from './long-rests.ts';
 import { activityAt } from './passages.ts';
 import { pedalLevelAt, posePedalFoot } from './pedal.ts';
 import { digitBendsAt } from './piano-digits.ts';
@@ -669,12 +670,13 @@ function poseAnimal(
 /**
  * Calculates the weight of the playing pose of one player (design 5.2, 5.5): 0 is the rest pose,
  * and 1 is the playing pose. The player lifts and lowers its instruments with its seeded rest
- * motion, for the transport and for the audibility of its seat.
+ * motion, for the transport, for the audibility of its seat, and for its long rests in the music.
  *
  * @param player The plan of the player.
  * @param transport The play state.
  * @param seat The audibility of the seat of the player, or `undefined` for a seat that sounds.
  * @param wallTime The wall clock time, in seconds.
+ * @param noteTime The song time of the note layer of the player, for its long rests.
  * @returns The weight, in [0, 1].
  */
 export function playerWeight(
@@ -682,9 +684,14 @@ export function playerWeight(
   transport: Transport,
   seat: SeatAudibility | undefined,
   wallTime: number,
+  noteTime: number,
 ): number {
   const { motion } = player;
-  return transportHeight(motion, transport, wallTime) * seatHeight(motion, seat, wallTime);
+  return (
+    transportHeight(motion, transport, wallTime) *
+    seatHeight(motion, seat, wallTime) *
+    longRestHeight(player.longRests, motion, noteTime)
+  );
 }
 
 /**
@@ -780,10 +787,11 @@ export function poseAt(
       continue;
     }
     idleAt(player.idle, wallTime, scratch.idle);
-    const weight = playerWeight(player, transport, audibility[player.seatIndex], wallTime);
+    const own = noteTime - player.timeOffset;
+    const weight = playerWeight(player, transport, audibility[player.seatIndex], wallTime, own);
     // The leader of a chamber group gives the count-in with a breath and a nod (design 5.4).
     scratch.leaderNod = i === plan.leader ? leaderNodAt(scratch.countIn, songTime) * weight : 0;
-    poseAnimal(plan, player, noteTime - player.timeOffset, weight, scratch, pose);
+    poseAnimal(plan, player, own, weight, scratch, pose);
   }
   scratch.leaderNod = 0;
   const { conductor } = plan;
