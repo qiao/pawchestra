@@ -469,6 +469,8 @@ function placePart(body: StageBody, part: BodyPart): void {
  * @param target The point that the camera looks at.
  * @param fov The vertical field of view, in degrees.
  * @param aspect The width of the frame divided by its height.
+ * @param floor The smallest distance, in meters: {@link ANIMAL_FLOOR}, or the floor of a detail
+ *   insert (`INSERT_FLOOR`).
  * @returns True if an animal in the frame is too near.
  */
 export function animalTooNear(
@@ -477,14 +479,15 @@ export function animalTooNear(
   target: Vec3,
   fov: number,
   aspect: number,
+  floor = ANIMAL_FLOOR,
 ): boolean {
   const [cx, cy, cz] = camera;
-  const floor2 = ANIMAL_FLOOR * ANIMAL_FLOOR;
+  const floor2 = floor * floor;
   let a: CameraAxes | null = null;
   const tanV = Math.tan(((fov / 2) * Math.PI) / 180);
   const tanH = tanV * aspect;
   for (const body of bodies) {
-    const reach = ANIMAL_FLOOR + body.radius;
+    const reach = floor + body.radius;
     const bx = body.center[0] - cx;
     const by = body.center[1] - cy;
     const bz = body.center[2] - cz;
@@ -497,7 +500,7 @@ export function animalTooNear(
       const px = part.center[0] - cx;
       const py = part.center[1] - cy;
       const pz = part.center[2] - cz;
-      if (px * px + py * py + pz * pz >= (ANIMAL_FLOOR + r) ** 2) {
+      if (px * px + py * py + pz * pz >= (floor + r) ** 2) {
         continue;
       }
       a ??= cameraAxes(camera, target);

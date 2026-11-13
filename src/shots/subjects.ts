@@ -282,7 +282,7 @@ const KEYBOARD_VIEW = {
  * @param facing The facing, in radians around y. 0 faces -z.
  * @returns The azimuth, in radians from +z to +x.
  */
-function frontOf(facing: number): number {
+export function frontOf(facing: number): number {
   return azimuthOf(-Math.sin(facing), -Math.cos(facing));
 }
 
@@ -294,7 +294,7 @@ function frontOf(facing: number): number {
  * @param place The place of the model.
  * @returns The point on the stage.
  */
-function onStage(point: Vec3, place: Pick<PlayerPlace, 'position' | 'facing'>): Vec3 {
+export function onStage(point: Vec3, place: Pick<PlayerPlace, 'position' | 'facing'>): Vec3 {
   const cos = Math.cos(place.facing);
   const sin = Math.sin(place.facing);
   return [
