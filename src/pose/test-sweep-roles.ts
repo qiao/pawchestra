@@ -106,6 +106,8 @@ const BODY_LOOPS = 2;
  *   tail), and the edges of the 2 lids.
  * - The pig: 7 open loops, the cuts to the two upper arms, 3 small open loops of the Tripo pig at
  *   the roots of the ears, and the edges of the 2 lids.
+ * - The rhino: 6 open loops, the cuts to the two upper arms, the open rims of the 2 eyeballs of the
+ *   Tripo rhino, and the edges of the 2 lids.
  * - The rabbit: 19 open loops, the cuts to the two upper arms, 15 open loops of the fourth Tripo
  *   rabbit (the 8 whisker strips, the open backs of the 2 eyeballs, 2 slits at the nose and the
  *   mouth, and 3 small holes of 4 edges at the right flank, the top of the head, and the root of
@@ -129,6 +131,7 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
   ['assets/models/pig/tripo-hand/pig.rig.glb', 7],
   ['assets/models/panda/tripo-hand/panda.rig.glb', 6],
   ['assets/models/rabbit/tripo-hand/rabbit.rig.glb', 19],
+  ['assets/models/rhino/tripo-hand/rhino.rig.glb', 6],
   ['assets/models/wolf/tripo-hand/wolf.rig.glb', 5],
 ]);
 
@@ -142,13 +145,6 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
 function bodyLoops(posed: PosedSkeleton, loops: number): number {
   return TRIPO_BODY_LOOPS.get(posed.model.studio.body.source) ?? loops;
 }
-
-/**
- * The open loops of {@link BODY_BONES} of the rhino mesh in a T-pose: the roots of the two upper
- * arms, and one small loop of two edges (3.8 cm) at the head, where faces meet that follow other
- * bones most.
- */
-const RHINO_BODY_LOOPS = 3;
 
 /** The parts of the two arms that move in the sweep of a role. */
 const ARM_PARTS: readonly SweepPart[] = [
@@ -228,17 +224,6 @@ function* playSamples(scene: TestScene): Generator<SweepSample> {
  */
 function bodySurface(posed: PosedSkeleton): ClosedSurface {
   return closedPart(posed, BODY_BONES, bodyLoops(posed, BODY_LOOPS));
-}
-
-/**
- * The closed surface of the body of the rhino mesh: {@link BODY_BONES} with a cap on each open
- * loop ({@link RHINO_BODY_LOOPS}).
- *
- * @param posed The posed skeleton.
- * @returns The surface.
- */
-function rhinoBodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, RHINO_BODY_LOOPS);
 }
 
 /** The seat of each player model, found one time for each model. */
@@ -1885,7 +1870,7 @@ const TUBIST_SWEEP: RoleSweep = {
   ...TROMBONIST_SWEEP,
   role: 'tubist',
   obstacles: [
-    { name: 'body', surface: rhinoBodySurface },
+    { name: 'body', surface: bodySurface },
     { name: 'tuba', surface: instrumentSurface },
   ],
   accepted: ['play', 'lift', 'rest', 'lower'].map((samples) => ({
