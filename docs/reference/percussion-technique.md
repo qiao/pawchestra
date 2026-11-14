@@ -258,6 +258,13 @@ The app follows these facts:
   mallet at once after the attack [40], and waits at its top (`STRIKE_MOTION.legatoSec`). After a
   longer rest, the head lifts one beat before the note, at most 1 s before it
   (`STRIKE_MOTION.leadSec`), as a drumline goes to the playing position before an entrance [37].
+- **The roll and the fast run (section 4).** A note within 0.25 s of the strike before it takes
+  the paw that did not strike last, so a roll and a fast run are single strokes from paw to paw
+  [53] (`sideHands()`, `STRIKE_MOTION.sideAlternateSec`). The two paws strike at most 12 times
+  each second, about the 10.7 strokes of a real roll (`STRIKE_MOTION.rollSec`, `thinRolls()`).
+- **One grip (section 1).** Each paw keeps one roll of its mallet, which comes from the arm of a
+  body that only leans (`steadyRoll()`), so the sway of the body does not turn the paw around the
+  shaft.
 - **The muffle (section 4).** After a note with a rest of at least 0.5 s after it, the paw that
   struck the note lays the end of the closed paw lightly on its head, for at most 0.3 s, and goes
   back before the next note, as a real player muffles at a rest [56] (`FingersDamp`). The spine
@@ -290,10 +297,10 @@ The app does not follow these facts:
   put them into the kettles. At a strike, the shaft slopes 24° to 26° down, a little more than the 10° to
   25° of a real player. Each paw keeps the roll that has no side bend at the strike
   (`PercussionHold.strikeRoll`), so the shaft stays in the paw.
-- **The roll (section 4).** A roll on one kettle stays in one hand, because each hand plays only
-  the front kettle on its side (`PercussionHold.pair`). The hand strikes on some notes of the roll,
-  at most 6 times each second (`STRIKE_MOTION.handRollSec`, `thinRolls()`), the rate of one hand
-  in a real roll.
+- **The kettle of a roll (section 4).** A real roll plays with both mallets on one head. Each paw
+  plays only the front kettle on its side (`PercussionHold.pair`), so the second paw of a roll or
+  a fast run strikes the other front kettle, and the sound plays the pitch of the note. A slower
+  note takes the kettle of its pitch.
 - **The playing spot (section 4).** Each mallet strikes farther in from the near rim
   (`PercussionHold.rim`), because the short arms hold the paws above the near rims. Each hand
   plays only the front kettle on its side (`PercussionHold.pair`), so the two mallets never strike
@@ -336,9 +343,9 @@ The app follows these facts:
   hanging arms do. At rest, the sticks lie across the body in front of the waist, 3° and 8° from level,
   with the tips 3.5 cm and 6.8 cm above the head and about 1 cm in from the near rim, as the set
   position of a drumline [37] (`PercussionHold.set`). The two heights keep the sticks 3 cm apart. The sticks also go there in a long rest of the
-  music, of at least 6 beats: one beat after the last strike, and back from 2 beats to 1 beat
-  before the next strike, as the set position of a drumline [37] (`SET_MOTION`). The mallets of
-  the suspended cymbal do the same.
+  music, of at least 6 beats after the last strike or the end of its damp: down in one beat, and
+  back from 2 beats to 1 beat before the next strike, as the set position of a drumline [37]
+  (`SET_MOTION`). The mallets of the suspended cymbal do the same.
   A deep recast body sets the drum higher and further forward (`PercussionHold.fit`): the head
   toward the height below its elbows [17], and the near rim in front of its belly, so that its
   paws stay in front of the body.
@@ -353,7 +360,8 @@ The app follows these facts:
   least 0.5 s after it, the paw that did not strike goes to the near rim and lies on the edge
   with its claws over the plate, and the spine leans 9° over the cymbal, as a player stops the
   ring of a short note
-  [15] [20] [22] (`EdgeDamp`).
+  [15] [20] [22] (`EdgeDamp`). The paw moves to the rim at most at 1.2 m/s (`EdgeDamp.speed`), in
+  about 0.15 s. No source gives the speed.
 - **The tambourine (section 8).** A run of tambourine notes with a rest of at least 2.7 s
   before it and after it is held in the left paw by its frame, in front of the chest, and the
   right paw strikes the head with the palm to the head (`TAMBOURINE_HOLD`). A soft note strikes
@@ -369,8 +377,10 @@ The app follows these facts:
   line with its raised forearm, with no turn around it, and the triangle keeps its hang below
   the claws (`trianglePaw()`). A single note strikes the side
   across from the open corner [63]. Before a louder note, the beater turns further back
-  (`MalletAcross.peak`). A roll moves the beater fast between the two sides of the closed lower
-  corner, from inside [25] [63] (`TRIANGLE_ROLL`, `triangleRolls()`).
+  (`MalletAcross.peak`), and it turns to the triangle through the whole down stroke
+  (`StrikeSizes.lift`). After a soft note, it goes back no faster than it came
+  (`STRIKE_MOTION.reboundMaxSec`). A roll moves the beater fast between the two sides of the
+  closed lower corner, from inside [25] [63] (`TRIANGLE_ROLL`, `triangleRolls()`).
 - **The xylophone (section 9).** The body moves from side to side behind the notes with the feet
   in place (`PercussionHold.side`), and the head turns back so the eyes stay level. A fast strike
   takes the other paw, and a strike that would cross the paws takes a double stroke [35]
