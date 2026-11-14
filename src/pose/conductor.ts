@@ -196,14 +196,22 @@ interface LeftHandPlace {
  */
 export const LEFT_HAND_PLACES = {
   /**
-   * The quiet hand: raised and ready above the left shoulder, beside the head from behind, as in
-   * `mockup.png` and `scene.png` (02, 05), and a little lower than the paw of the ready gesture.
-   * A hand that hangs at the side moves too little. In front of the left of the chest, the hand
-   * seems to hold the head.
+   * The quiet hand: low in front of the left side of the lower chest, with a relaxed bend of the
+   * elbow (about 60°), as the left hand of a real conductor rests between its gestures
+   * (`conductor-technique.md`, section 1). The fingers point forward and a little in and down.
+   * With the wrist 0.28 H above the shoulder joint, the paw stood above the chin, and from the
+   * stage camera at the height of the ears.
    */
-  quiet: { wrist: [-0.5, 0.28, -0.81], fingers: [0.2, -0.1, -1], curl: 25 * MathUtils.DEG2RAD },
-  /** The mirror of the beat in a loud passage: the wrist at beat 1, above the shoulder. */
-  mirror: { wrist: [-0.5, 0.41, -0.72], fingers: [0.1, 0, -1], curl: 15 * MathUtils.DEG2RAD },
+  quiet: {
+    wrist: [-0.52, -0.4, -0.62],
+    fingers: [0.25, -0.15, -1],
+    curl: 25 * MathUtils.DEG2RAD,
+  },
+  /**
+   * The mirror of the beat in a loud passage: the wrist at the mirror point of the right wrist at
+   * beat 1 ({@link CONDUCTOR_HOLD.beatPoint}), so that the two paws beat in one plane.
+   */
+  mirror: { wrist: [-0.53, -0.41, -0.62], fingers: [0.1, 0, -1], curl: 15 * MathUtils.DEG2RAD },
   /** The raised hand of a crescendo, open, with the palm up. */
   swell: {
     wrist: [-0.44, 0.88, -0.78],
@@ -213,15 +221,17 @@ export const LEFT_HAND_PLACES = {
   },
   /**
    * The lowered hand of a diminuendo and of a soft passage, open with the palm down, forward and
-   * out at the left at the height of the shoulder. The fingers point forward and a little out and
-   * down, near the line of the forearm. With the fingers 31° down and the wrist less forward
-   * (-0.59, 0.06, -0.78), the paw bent 53° on the forearm, and the left forearm stretched 0.42 of
-   * the upper arm (p95 of the arm gate, limit 0.35). With the wrist 0.06 H further in, the left
-   * upper arm went 1.6 cm into the shoulder in a turn to the right (limit 1.5 cm).
+   * out at the left, at the chest, 0.25 H below the shoulder joint. A palm at the height of the
+   * shoulder rose from the low quiet place in a diminuendo. The fingers point forward and a
+   * little out and down, near the line of the forearm. With the fingers 31° down and the wrist
+   * less forward (-0.59, 0.06, -0.78), the paw bent 53° on the forearm, and the left forearm
+   * stretched 0.42 of the upper arm (p95 of the arm gate, limit 0.35). With the wrist 0.06 H
+   * further in, the left upper arm went 1.6 cm into the shoulder in a turn to the right (limit
+   * 1.5 cm).
    */
   fade: {
-    wrist: [-0.56, 0, -0.84],
-    fingers: [-0.3, -0.1, -1],
+    wrist: [-0.54, -0.25, -0.78],
+    fingers: [-0.3, -0.25, -1],
     curl: 5 * MathUtils.DEG2RAD,
     palm: 'down',
   },
