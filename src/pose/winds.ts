@@ -677,9 +677,14 @@ export const WIND_HOLDS = {
  * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes 39°
  * or less in each moment of the flutist and the violinist, so that the skin does not twist into a
  * thin neck. The right paw points a part of the way up past the back of the flute (`aimSide`
- * -0.45), and the right elbow points a little further out in the play, (1.2, -1.4, -0.3). The
- * right paw then bends 67° on its forearm (paw swing p95, limit 70°), and its finger tips touch the
- * flute in each play sample. With -0.8, the paw bent 103°, and the finger tips stood 0.7 cm off the
+ * -0.3), and the right elbow points out and a little down in the play, (1.2, -0.4, -0.3), as the
+ * right elbow of a flutist stays out from the side. The palm then lies behind the flute, and three
+ * digits curl over its top onto the keys, as the right hand of a real flutist. The paw bends 38° on
+ * its forearm (paw swing, median of `pnpm hold-fit flutist`) and twists 78°. With -0.45 and the
+ * elbow (1.2, -1.4, -0.3), the paw bent 61° and twisted 51°, the wrist stood up about 80° from the
+ * level forearm, and the flute lay between one digit over it and three digits under it. The
+ * palm now turns about 70° from the axis of the flute, so `pnpm wind-grip flutist` counts no
+ * grasp of the right paw (74% before), while the digits lie on the keys. With -0.8, the paw bent 103°, and the finger tips stood 0.7 cm off the
  * flute in 69 % of the play samples. With -0.4, the palm turned 57° from the flute, and 5 % of the
  * samples lost the grasp. An elbow further out bends the paw less, but twists the forearm more.
  * The fingers curl 90° and 85° around the flute (`gripCurl`):
@@ -703,7 +708,7 @@ const FOX_FLUTE = {
   lipShift: [0, -0.1, 0.125],
   play: fluteTurn(FOX_HEAD_TURN - FOX_FLUTE_BACK, 8),
   poleL: [-1, -1, -0.3],
-  poleR: [1.2, -1.4, -0.3],
+  poleR: [1.2, -0.4, -0.3],
   rest: holdTurn(0, -15, fluteTurn(0, 80, [0, 0, -1])),
   restShift: [0.62, -0.5, 0.32],
   restPoleL: [-0.5, -1, 0.6],
@@ -722,7 +727,7 @@ const FOX_FLUTE = {
   },
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
-  aimSide: [0.5, -0.45],
+  aimSide: [0.5, -0.3],
   gripShiftL: [-0.04, 0, 0.08],
   gripShiftR: [0, 0, -0.14],
   restGripShiftR: [-0.376, 0, -0.067],
