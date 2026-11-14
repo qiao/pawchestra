@@ -1333,18 +1333,20 @@ export const BOWED_HOLDS = {
  * of the thigh only nearly straight: a grip at 0.7 of the way puts the elbow at 180°. A level bow
  * runs forward past the knees, and a real violist rests as a violinist.
  *
- * In the lift and the lowering, the viola hangs from the left paw, and the paw turns with it, as
- * on the rabbit (`carryLift()` of `pose/bowed.ts`). The elbow mixes the rest elbow and the play
- * elbow (`liftPoleL` null), and the wrist moves 0.1 H up in the middle (`liftReach`). The rest
- * place lies in front of the chest, so the path of the paw to the play is short: the elbow opens
- * from 85° at rest to 93° in the middle of the lift and 134° in the play, and the paw twists from
- * -70° through 0° to 61° on its forearm, at 174°/s at most (689°/s with the viola beside the
- * thigh, `pnpm arm-check violist`). The viola turns 25° off the short arc at most
- * (`pnpm carry-check violist`). With the wrist 0.35 H up and 0.19 H to the front, the left arm
- * went straight to the front in the middle of the move, with the viola at its end. With the viola
- * on a via with the scroll up and to the left and the strings to the front (`carryVia`), it turns
- * 4° off the short arc, but the paw twists past 180° on its forearm in the lift with each lift
- * elbow, and the skin turns over. In the middle, the bow tip points to the left, to the front,
+ * In the lift and the lowering, the viola leads on a via with the scroll up and to the left and
+ * the strings to the front (`carryVia`), and the left paw follows it (`carryLift()` of
+ * `pose/bowed.ts`). The scroll stays up, and the body swings in and up to the jaw: the viola turns
+ * 5° off the short arc of 160° at most (`pnpm carry-check violist`). In the middle, the left elbow
+ * goes up and in, (0.9, 1, 0.5) (`liftPoleL`), and the wrist moves 0.1 H up (`liftReach`). Thus
+ * the paw twists from -59° through 0° to 80° on its forearm, the anatomical way. The upper arm
+ * twists 65° in the lift (`pnpm arm-check violist`), and goes 3.5 cm into the body in the lift and
+ * the lowering (`pnpm hold-fit violist`). With the viola hung from the paw (no via), the paw in
+ * front of the chest holds the neck along a nearly upright forearm, and the supination of the
+ * forearm swings the scroll in toward the chest and around through the front: the long arc. With
+ * the via and the elbow mixed from the rest elbow to the play elbow (`liftPoleL` null), the paw
+ * twists past 180° on its forearm, and with (0.6, 1, 0.5), the twist jumps by 105° in 0.07 s. With
+ * the wrist 0.35 H up and 0.19 H to the front, the left arm went straight to the front in the
+ * middle of the move, with the viola at its end. In the middle, the bow tip points to the left, to the front,
  * and a little down, (-0.8, -0.2, -0.6), with the hair back and down, (0, -0.5, 1), and the grip
  * moves 0.5 H out,
  * 0.3 H up, and 0.15 H to the front (`restBow.via`), so that the stick comes to the strings from
@@ -1387,11 +1389,12 @@ export const BOWED_HOLDS = {
  * middle of the viola, so a tilt bends the wrist toward the palm: about 25° with this tilt, and
  * about 40° with 25° (`mozart-k525`). In the fifth position, the paw tilts 30° with `highTilt`.
  *
- * In the rest pose, the top plate of the viola faces the front and 53° to the left, toward the
+ * In the rest pose, the top plate of the viola faces the front and 30° to the left, toward the
  * audience, as the bridge of a resting violin faces out (`docs/reference/string-technique.md`,
- * section 2.9). Thus the back of the viola does not face the audience. With 30° to the left, the
- * hanging viola turns 58° off the short arc in a move, and with 60°, the bow paw twists 139° on
- * its forearm in the middle of the lift (52° with this side).
+ * section 2.9). Thus the back of the viola does not face the audience. With 53° to the left, the
+ * turn from the rest to the play comes near 180° (173° to 180°), so the short arc is not clear,
+ * and in some moves the viola took the other way. With 60°, the bow paw twists 139° on its
+ * forearm in the middle of the lift.
  *
  * The arms of the hand rig of the Tripo P2 cat (design 4.4, "Hand rig") take each turn of the paw
  * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes at most
@@ -1434,7 +1437,7 @@ const CAT_HOLD = {
   restPlace: 0.55,
   rest: {
     axis: [0, 1, -0.22],
-    top: [-0.8, 0, -0.6],
+    top: [-0.5, 0, -0.87],
     lap: { along: 0.7, offset: [-0.02, -0.02, 0] },
   },
   liftReach: [0, 0.1, 0],
@@ -1442,7 +1445,8 @@ const CAT_HOLD = {
   restPawTurnL: 42 * MathUtils.DEG2RAD,
   restYawL: 45 * MathUtils.DEG2RAD,
   restGapL: 0.02,
-  liftPoleL: null,
+  liftPoleL: [0.9, 1, 0.5],
+  carryVia: { axis: [-0.6, 0.8, -0.05], top: [0.1, 0.1, -1] },
   restBow: {
     lap: { along: 0.6, offset: [0.3, 0.3, -0.2] },
     tip: [0.15, 1, -0.45],
