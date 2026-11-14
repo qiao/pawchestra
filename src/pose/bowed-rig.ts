@@ -1698,14 +1698,12 @@ const HIPPO_HOLD = {
  * its neck, and the right paw holds the bow up with a fist around the frog. The left upper arm hangs 35°
  * forward and the left elbow bends 80° (`restArms`), so that the elbow stays near the side: with
  * the 49° and 63° of the first hold of this body, the arm reached forward and held the violin up
- * in front of the chest. The left paw holds the neck at 0.35 of the fingerboard (`restPlace`), so
- * that the lower end of the violin stands about 2 cm above the lap of the fourth Tripo rabbit: at
- * 0.5, it stood 4.7 cm above it, and at 0.3, 1.0 cm, but in the lowering the violin went 4.5 cm
- * into the body (3.7 cm at 0.4, `pnpm hold-fit violinist`). The palm lies
- * 1.5 cm off the fingerboard (`restGapL`), so that the violin stands nearer to the lap (1.4 cm
- * above it with 5 mm). The paw turns 90° in the plane of its palm (`restPawTurnL`), so that the
- * left forearm twists 32° at rest and the paw bends 64° on it: with 100°, the bend was 73°, over
- * the 70° of the arm gate, and with 80°, the twist was 48°.
+ * in front of the chest. The left paw holds the neck at 0.25 of the fingerboard (`restPlace`),
+ * with the palm 1.5 cm off the fingerboard (`restGapL`), and turns 45° in the plane of its palm
+ * around its contact with the strings (`restPawTurnL`). The paw then stays 1 cm off the nut, the
+ * wrist stays above the upper bout, and the paw bends 23° on its forearm. At 0.35 with a turn of
+ * 90°, the wrist lay beside the upper bout: the left forearm went 2.0 cm into the violin at rest,
+ * and the violin 1.4 cm into the chest (`pnpm body-clip violinist`, limit 1.4 cm).
  *
  * The right upper arm swings 10° forward and the elbow bends 50° (`restArms`), so that the paw
  * rests at the top of the right thigh near the hip, with the elbow near the side. The paw holds the
@@ -1755,14 +1753,14 @@ const RABBIT_HOLD = {
   reachL: 25 * MathUtils.DEG2RAD,
   slant: -10 * MathUtils.DEG2RAD,
   rest: { ...SHOULDER_HOLD.rest, axis: [0, 1, 0] },
-  restPlace: 0.35,
+  restPlace: 0.25,
   restArms: {
     L: { forward: 35 * MathUtils.DEG2RAD, bend: 80 * MathUtils.DEG2RAD },
     R: { forward: 10 * MathUtils.DEG2RAD, bend: 50 * MathUtils.DEG2RAD },
   },
   poleL: [0, -1, -0.5],
   restPoleL: [-1, -0.9, -0.2],
-  restPawTurnL: 90 * MathUtils.DEG2RAD,
+  restPawTurnL: 45 * MathUtils.DEG2RAD,
   restGapL: 0.050251,
   liftReach: [0, 0.3, -0.15],
   liftPoleL: [-1, -1.2, 0],
