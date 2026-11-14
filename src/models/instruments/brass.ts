@@ -203,8 +203,8 @@ function bell(
 }
 
 /**
- * Adds a piston valve that stands along y: the casing with its caps, the stem, and the finger
- * button with a pearl top, as on a trumpet or a tuba.
+ * Adds a piston valve that stands along y: the brass casing with its caps of nickel silver, the
+ * stem, and the finger button with a pearl top, as on a trumpet or a tuba.
  *
  * @param piece The piece.
  * @param at The middle of the top of the casing.
@@ -214,19 +214,36 @@ function bell(
  */
 function piston(piece: PieceBuilder, at: Vec3, radius: number, height: number, stem: number): void {
   const [x, y, z] = at;
-  turned(
-    piece,
-    [x, y - height, z],
-    [0, 1, 0],
+  // The bottom cap and the top cap are nickel silver, and the casing between them is brass. The
+  // bands share their rings, so the valve is one closed solid.
+  const bands: readonly (readonly [readonly ProfilePoint[], Rgb])[] = [
     [
-      [radius * 0.6, -radius * 0.5],
-      [radius, 0],
-      [radius * 1.05, height],
-      [radius * 0.3, height],
+      [
+        [0, -radius * 0.5],
+        [radius * 0.6, -radius * 0.5],
+        [radius, 0],
+      ],
+      TRIM,
     ],
-    TUBE_SEGMENTS,
-    METAL,
-  );
+    [
+      [
+        [radius, 0],
+        [radius * 1.05, height],
+      ],
+      METAL,
+    ],
+    [
+      [
+        [radius * 1.05, height],
+        [radius * 0.3, height],
+        [0, height],
+      ],
+      TRIM,
+    ],
+  ];
+  for (const [profile, color] of bands) {
+    piece.add(latheBand(profile, TUBE_SEGMENTS), color, transform([x, y - height, z]), 'metal');
+  }
   piece.rod([x, y, z], [x, y + stem * 0.6, z], radius * 0.22, ROD_SEGMENTS, TRIM, 'metal');
   turned(
     piece,
