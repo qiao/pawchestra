@@ -1297,7 +1297,8 @@ when no light value can match the lit pixels of the reference.
   plate, light steel strings, and copper bass strings in its open case (`PIANO_INSIDE`). The harp is varnished maple with a
   lighter soundboard, gilded parts, and red C strings and dark blue F strings. The timpani are a
   deep red-brown copper in a black frame with chrome lugs (`kettle`), because a lighter copper read
-  as a peach plastic in the hall light. The drums are a red lacquered wood with chrome or wood
+  as a peach plastic in the hall light. The heads of the timpani and the drums are a warm cream
+  (`drumHead`), because a white head clipped to white. The drums are a red lacquered wood with chrome or wood
   hoops, the cymbals are bronze with darker lathe rings, and the xylophone is rosewood over
   aluminum tubes.
 

@@ -136,7 +136,11 @@ export const INSTRUMENT_COLORS = {
    */
   kettle: srgb('#96502a'),
   drumShell: srgb('#8a2f2a'),
-  drumHead: srgb('#efe9dc'),
+  /**
+   * The heads of the timpani and the drums: the warm cream of a calfskin or a coated head. With the
+   * white `#efe9dc`, the heads clipped to white in the hall light.
+   */
+  drumHead: srgb('#d4c4a6'),
   hardware: srgb('#1e1a16'),
   stick: srgb('#cdb27a'),
   xylophoneBars: srgb('#b07a45'),
