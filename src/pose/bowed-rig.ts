@@ -1695,6 +1695,11 @@ const HIPPO_HOLD = {
  * further out to the left took the violin less deep into the head at the start of the lowering,
  * but it left the short arc by up to 57°.
  *
+ * The bow slants 10° in the plane of the strings (`slant`), with the tip toward the scroll, so
+ * that the short bow arm reaches 0.17 m of the hair of 0.46 m: with the 5° of the shoulder hold,
+ * it reaches 0.14 m. With 15°, it reaches 0.20 m, but the stick goes up to 2.0 cm into the fur of
+ * the left cheek in the play of `mozart-k525` (1.4 cm with 5° and with 10°).
+ *
  * In the play, the left paw lies 0.03 H off the strings along the normal of its palm (`gapL`), so
  * that the thick paw keeps out of the neck and the upper bout: with the grip on the strings, the
  * left paw went 1.9 cm into the violin in 79% of the play, and with this gap, 1.5 cm in 6%
@@ -1705,6 +1710,7 @@ const RABBIT_HOLD = {
   playShift: [-0.054, -0.06, 0.185],
   playTurn: violinTurn(-20, 5, 25),
   reachL: 25 * MathUtils.DEG2RAD,
+  slant: -10 * MathUtils.DEG2RAD,
   rest: { ...SHOULDER_HOLD.rest, axis: [0, 1, 0] },
   restPlace: 0.35,
   restArms: {
