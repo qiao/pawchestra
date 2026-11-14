@@ -152,7 +152,10 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
   pattern smaller and lower (`softSize`, `softDrop`). The body leans toward the players, the head
   goes down, and the knees bend (`softLean`, `softHead`, `softCrouch`), as the smaller body of
   section 6. The app keeps the beat below the chin, except at a climax (section 1). At beat 1,
-  the right wrist is at the chest, a little below the shoulder joint (`CONDUCTOR_HOLD.beatPoint`).
+  the right wrist is in front of the chest, below the shoulder joint, with a bent elbow
+  (`CONDUCTOR_HOLD.beatPoint`). The median of the play is at about the shoulder joint, and the
+  largest loud beats reach about the chin. The elbows hang down and out, a little away from the
+  body (`poleL`, `poleR`).
 - **The baton in the paw (section 7a).** The butt lies in the heel of the palm (`BATON_GRIP` of
   `models/instruments/baton.ts`), and the stick leaves the paw through the palm under the curled
   claws, turned toward the thumb (`STICK_TO_THUMB`, `STICK_TO_PALM`), so that the closed paw
@@ -165,13 +168,17 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
   bear paw holds the baton at an angle to the paw, and a baton nearer to straight forward touched
   the desk of the stand after a final chord, so the app does not reach a straight line.
 - **The rest pose.** Before the start and after the bow, the arms hang relaxed beside the body,
-  and the baton hangs down beside the leg, about 27° forward of the vertical
+  and the baton hangs down beside the leg, about 17° forward of the vertical
   (`CONDUCTOR_HOLD.restBaton`), as the closed hand of section 7a hangs with the arm (derived).
-  No source of section 9 gives the rest place. The baton does not hang straight down, because
-  the right wrist then turns too fast at the start of the lift.
+  No source of section 9 gives the rest place. The paw turns with no twist on its forearm, so the
+  baton does not reach the vertical. In the lift, the paw turns early toward the paw of the beat
+  (`LIFT_HAND_EASE`), so that the tip points forward and then forward and up, as the baton
+  continues the line of the forearm of section 7a (derived).
 - **The left hand (section 2).** The left hand rises open in a crescendo and comes down open in a
   diminuendo (`LEFT_HAND_PLACES`, `conductor-left.ts`), and it mirrors the beat in a loud
-  passage, outside of the torso (`MIRROR_IN`). In a soft passage, it takes the lowered open palm
+  passage, outside of the torso (`MIRROR_IN`), in the plane of the right hand. Between its
+  gestures, it rests low at the left of the lower chest (`LEFT_HAND_PLACES.quiet`), so that the
+  gestures stay below the chin (section 1, derived). In a soft passage, it takes the lowered open palm
   (`softPalm`). The paw turns its palm up in a crescendo, on a held chord, and at a climax, and
   down in a diminuendo and a soft passage (`LEFT_HAND_PLACES`, `palm`), as the palms of section 2.
   The paw twists on its forearm for this turn (`PALM_TWIST`), as the forearm of a conductor
