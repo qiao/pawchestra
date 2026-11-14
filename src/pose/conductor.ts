@@ -31,18 +31,19 @@ import type { PlantedLegs } from './side-move.ts';
 export const CONDUCTOR_HOLD = {
   /**
    * The point of the tip of the baton at beat 1 of each pattern, from the right shoulder joint.
-   * With the pivot, it puts the wrist of beat 1 about 0.4 H below the shoulder joint, 0.6 H
-   * forward, and 0.5 H out: in front of the lower chest, the ictus of a real conductor
-   * (`conductor-technique.md`, section 1). The arcs and the loud passages then move the wrist up
-   * to about the shoulder joint (median of the play), and the largest loud beats to about the
-   * chin, 0.5 H above the shoulder joint. With the tip 0.71 H higher and 0.41 H further forward,
-   * the wrist of beat 1 was 0.24 H above the shoulder joint, the median of the play was at the
-   * chin, and from the stage camera the two paws stood at the height of the ears. That tip was
-   * also 0.12 H further out, and the arm was straight at beat 1. The tip stays about 0.1 m above
-   * the top edge of the desk of the conductor stand. The tip is in front of the shoulder, so that
-   * the baton points in.
+   * With the pivot, it puts the wrist of beat 1 about 0.3 H below the shoulder joint, 0.6 H
+   * forward, and 0.5 H out: in front of the chest, near the ictus of a real conductor at the
+   * lower chest (`conductor-technique.md`, section 1). The arcs and the loud passages then move
+   * the wrist up to about the shoulder joint (median of the play), and the largest loud beats to
+   * about the chin, 0.5 H above the shoulder joint. With the tip 0.61 H higher and 0.41 H further
+   * forward, the wrist of beat 1 was 0.24 H above the shoulder joint, the median of the play was
+   * at the chin, and from the stage camera the two paws stood at the height of the ears. That tip
+   * was also 0.12 H further out, and the arm was straight at beat 1. The tip is about 0.13 m above
+   * the top edge of the desk of the conductor stand: with the tip 0.1 H lower, the baton came
+   * within 2 cm of the box of the desk in 0.25% of the samples of the play, the lift, and
+   * the bow, in a cue to the left (`beethoven-8-4` 139 s). The tip is in front of the shoulder, so that the baton points in.
    */
-  beatPoint: [0.23, -0.025, -2.02],
+  beatPoint: [0.23, 0.075, -2.02],
   /**
    * The baton points from this place to its tip, from the right shoulder joint: forward, up 18°,
    * and 12° inward at beat 1, as a conductor points it at the players. The forearm points a
@@ -54,7 +55,7 @@ export const CONDUCTOR_HOLD = {
    * from the tip, about twice as far as the wrist, so that the wrist follows about half of the
    * motion of the tip in the beat plane, and the arm beats with the baton.
    */
-  batonPivot: [0.83, -0.93, 0.76],
+  batonPivot: [0.83, -0.83, 0.76],
   /**
    * The left elbow points down and out to the side, so that it hangs a little away from the body
    * below the shoulder, as the elbow of a real conductor. With the elbow more out than down
