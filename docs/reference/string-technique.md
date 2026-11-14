@@ -403,8 +403,8 @@ and at the highest rates the wrist and the elbow move in phase [56 (abstract)].
 Each species plays with a `BowedHold` of `src/pose/bowed-rig.ts` (`DOG_HOLD`, `HIPPO_HOLD`, and
 the others). The left hand and the strokes come from `src/pose/fingering.ts` and
 `src/pose/strokes.ts`, and the pose from `poseBowed()` of `src/pose/bowed.ts`. The paws of the
-meshes have one finger bone and a thumb with no bone, so the app shows no single fingers and no
-thumb on the neck.
+meshes have one finger bone for the whole digit block and a thumb with no bone, so the app shows
+no single fingers and no thumb on the neck.
 
 ### 3.1 The left hand
 
@@ -427,6 +427,11 @@ The app follows these facts:
   each player, and wider in a high position and in a loud note (`LEFT_HAND.vibrato`,
   `vibratoRate()`, `vibratoWidth()`). The whole hand moves, as a forearm vibrato. No source gives
   the contrabass, so it takes the lower end of the measured rates.
+- **The hand on the neck (1.9).** `stopHandAt()` puts the palm beside the neck on the side of the
+  high strings, free of the edge of the fingerboard (`BowedHold.gapL`), as the open space of a
+  real hand. The finger block curls over the fingerboard, and its pads lie on the strings from
+  above (`stopCurl()`). On the cello and the contrabass, the forearm comes from behind the neck,
+  and the wrist is nearly straight. The paw keeps off the pegbox (`BowedHold.stopStart`).
 - **The left elbow for each string (1.8).** `leftElbow()` turns the left elbow toward the body for
   the lower strings of the violin and the viola, and up for the lower strings of the cello and the
   contrabass (`BowedHold.elbowPerString`). It turns a little further in the high positions
@@ -483,19 +488,18 @@ The app does not follow these facts:
 - **The start of the tilt (1.5).** The tilt starts one position earlier than a real hand, because
   the left forearm of the cat touches the upper bout from the third position. Only the cat tilts,
   and its wrist bends more than the straight wrist of a real player.
-- **The hand on the neck (1.9).** `stopHandAt()` puts the paw below the neck on the side of the
-  high strings, with the palm toward the low strings, and tilts it over the neck
-  (`BowedHold.tiltL`), so that the fingers come down on the strings from above. The cat tilts
-  less than the chin hold, so that its wrist stays on the side of the back of the viola, as the
-  wrist of a real player stays under the neck. With a larger tilt, its wrist came over the plane
-  of the top plate, and its forearm went through the upper bout.
+- **The straight wrist (1.9).** On the violin and the viola, the paw turns only a part of the
+  way onto the line of the forearm (`BowedHold.turnL`), so the wrist keeps a bend to the side in
+  the low positions. One block of digits lies flat on the strings only with its knuckles along
+  the neck, and a full turn rolls it onto its edge. The palm faces the low strings and tilts a
+  little over the neck (`BowedHold.tiltL`), and the wrist stays on the side of the back of the
+  instrument. The thumb has no bone, so no thumb lies on the neck.
 - **The thick wrist (1.9).** The thick wrist end of the left forearm of some bodies touches the
   upper bout of the violin in the play (`TODO.md`). The forearm of a real player keeps free of the
   body of the instrument, and the back of the hand is in a straight line with the elbow in the
   low positions [68]. The short arm of the cat reached the fingerboard only near the upper bout,
-  so the cat plays the largest viola with which its forearm keeps out of the upper bout. The paw
-  of the rabbit lies off the strings in the play (`BowedHold.gapL`), and its forearm still touches
-  the back of the violin.
+  so the cat plays the largest viola with which its forearm keeps out of the upper bout. The
+  forearm of the rabbit still touches the back of the violin.
 - **The left upper arm (1.10).** The left upper arm turns further out to the side than the arm of
   a violin student (`BowedHold.poleL`). With the elbow further in, the left paw twists too far on
   its forearm.
@@ -720,10 +724,11 @@ The app does not follow these facts:
 - **The left elbow height (1.8).** The left upper arm of the Tripo beagle is about level in the
   play (from 1° up to 5° down), and a cellist holds it about 45° down [33]. The shared hold keeps
   its nearly level elbow (`CELLO_HOLD.poleL`).
-- **The left hand (1.9).** The left paw tilts further over the neck from the bass side
-  (`BowedHold.tiltL`), so that the thick paw keeps off the fingerboard. A paw that is thicker
-  than the paw of the dog lies further off the neck by the difference (`BowedHold.girthFit`), so
-  that it does not go into the neck. No claw presses a string.
+- **The left hand (1.9).** The palm of the round paw is deeper than the finger block is long, so
+  the pads of the palm press the edge of the fingerboard, and the digits reach only the strings
+  near the palm (`BOWED_HANDS.padSpan`). A real hand keeps the palm free of the neck. A paw that
+  is thicker than the paw of the dog keeps its palm further off the edge by the difference
+  (`BowedHold.girthFit`). No claw presses a string.
 - **The left hand at rest (2.7).** No source gives the rest of an orchestral cellist. The left
   paw of the shared hold holds the neck near the nut (`BowedHold.restPlace`), so that the forearm
   keeps off the upper bout, as the fingers of a player hold the neck and the forearm stays free
@@ -772,13 +777,12 @@ The app does not follow these facts:
   louder note keeps this place, because the arm reaches less hair nearer to the bridge.
 - **The string planes (2.2).** The string planes are 4° apart, and the real angle is about 25°
   [42]. With a larger angle, the arm reaches less hair on the two outer strings.
-- **The left hand (2.8).** The thick left paw tilts over the neck, so that the left arm keeps off
-  the body. The paw lies a little off the strings along the normal of its palm
-  (`BowedHold.gapL`), so that the thick wrist stays off the back of the neck, as the wrist of a
-  real bassist does. The paw has no single fingers, so no finger presses a string.
-- **The positions (2.8).** The short left arm does not reach the nut. Thus the left paw stops the
-  strings only from the middle of the fingerboard to `BowedHold.stopEnd`, and the notes take
-  places lower on the neck.
+- **The left hand (2.8).** The palm of the thick left paw presses the edge of the fingerboard,
+  as on the dog (3.3). The paw has no single fingers, so no finger presses a string.
+- **The positions (2.8).** The wide left paw keeps off the machine heads, and the short left arm
+  does not reach the high positions. Thus the left paw stops the strings only from
+  `BowedHold.stopStart` to the reached part of the fingerboard (`BowedRig.stopRange`), and the
+  notes take places in that part.
 - **The trunk.** The trunk leans a little forward, and both shoulders turn forward
   (`BowedHold.reach`, `BowedHold.reachL`), so that the short arms reach the strings in front of
   the round belly. The right shoulder turns far forward, which folds more faces of the right arm
