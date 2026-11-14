@@ -1716,6 +1716,10 @@ negative angles are on the left. A seat at the angle `a` and the radius `r` is a
     fewest blocked players, then the fewest players with no sight of the left paw, then the
     smallest moves (`sightCost()`). Among blocked places, it takes the place with the least
     hidden. Neighbors keep their packed arcs, and the outer players keep the edges of the spread.
+    Two neighbors of one seat stay together as a section (`seatBonds()`): their arc stays at
+    most `SPREAD_LIMITS.maxArc`, or their packed arc or their arc after the spread when one of
+    these is longer. Reason: with no limit, the search moved the inner one of two horns to the
+    gap of the conductor, 2.9 m from its partner at the edge of the spread.
     The strings keep the gap of the conductor: the back desks of row 1 stay at least as far from
     0° as the inner first desks. When the angles of the search do not fit, the search runs again
     and skips each angle at which a player or its own stand does not fit (`fitsAt()`). From row
@@ -1726,7 +1730,7 @@ negative angles are on the left. A seat at the angle `a` and the radius `r` is a
     back desk player stays blocked, a greedy search moves runs of row 0 players next to it (the
     player alone, with one neighbor, or with all players to the inside or to the outside) by 1°
     steps (`FRONT_MOVES`), and keeps the move with the lowest cost of row 1. A move keeps the
-    packed arcs, the gap of the conductor of the spread row 0, the stage, the gaps to the other items, and the
+    packed arcs, the arcs of the seats (`seatBonds()`), the gap of the conductor of the spread row 0, the stage, the gaps to the other items, and the
     sight of row 0 past the soloists. Real back desks also sit behind the gaps of the desks in
     front.
   - **Open gap.** On a small stage, one side of row 1 can have no free arc, for

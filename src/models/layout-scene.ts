@@ -1835,9 +1835,9 @@ interface SightMemo {
  * {@link CONDUCTOR_SIGHT}.nudge off its spread angle, in steps of `nudgeStep`. A search over each
  * side of the row, from its inner player to its outer player, picks the angles with the fewest
  * blocked players, then the fewest players with no sight of the left paw, then the smallest
- * moves. Neighbors keep their packed arcs, the strings keep the gap of the conductor, and the
- * outer player does not pass its spread angle, because the spread took the room to the stage
- * edge. The inner player of a split row stays at its spread angle or farther out, or with
+ * moves. Neighbors keep their packed arcs, two neighbors of one seat stay together
+ * ({@link seatBonds}), the strings keep the gap of the conductor, and the outer player does not
+ * pass its spread angle, because the spread took the room to the stage edge. The inner player of a split row stays at its spread angle or farther out, or with
  * `inner` at that angle from 0° or farther out. With `view`, a hidden head costs as much as a
  * hidden conductor.
  *
@@ -1846,7 +1846,7 @@ interface SightMemo {
  * @returns The steps, which return the angle of each player.
  */
 function* sightSweepSteps(search: RowSearch, fit = false): Steps<number[]> {
-  const { row, arcs, blockers, view, inner: innerLimit, memo } = search;
+  const { row, arcs, bonds, blockers, view, inner: innerLimit, memo } = search;
   const { targets } = search.pass;
   const { members, radius, angles } = row;
   const next = [...angles];
@@ -1867,16 +1867,21 @@ function* sightSweepSteps(search: RowSearch, fit = false): Steps<number[]> {
   const right = angles.flatMap((a, i) => (a >= 0 ? [i] : []));
   const left = angles.flatMap((a, i) => (a < 0 ? [i] : [])).toReversed();
   const between = left[0] !== undefined ? (arcs[left[0]] ?? 0) : 0;
+  const bond = left[0] !== undefined ? (bonds[left[0]] ?? Infinity) : Infinity;
   // The right side goes first. A centered row keeps the packed arc between its two inner
-  // players, and the strings keep the gap of the conductor.
+  // players, and the strings keep the gap of the conductor. Two inner players of one seat also
+  // keep their bond: the right player from the spread angle of the left player, and then the
+  // left player from the right player.
   for (const side of [1, -1] as const) {
     const order = side > 0 ? right : left;
     const other = (side > 0 ? left : right)[0];
     let limit = angles[order[0] ?? 0] ?? 0;
+    let farthest = side * Infinity;
     if (row.split && innerLimit !== null) {
       limit = side * Math.min(side * limit, innerLimit);
     } else if (!row.split && other !== undefined) {
       limit = (next[other] ?? 0) + side * between;
+      farthest = (next[other] ?? 0) + side * bond;
     }
     // The candidates of each player, from the inner player out: the angle and its cost.
     const options: SweepOption[][] = [];
@@ -1889,6 +1894,7 @@ function* sightSweepSteps(search: RowSearch, fit = false): Steps<number[]> {
         const out = side * angle;
         if (
           out < side * limit - 1e-12 ||
+          (k === 0 && out > side * farthest + 1e-9) ||
           Math.abs(angle) > SPREAD_LIMITS.maxAngle + 1e-9 ||
           (k === order.length - 1 && out > side * base + 1e-12) ||
           (fit && !fitsAt(members[i], angle, search))
@@ -1899,13 +1905,15 @@ function* sightSweepSteps(search: RowSearch, fit = false): Steps<number[]> {
       }
       options.push(own);
     }
-    // The packed arc from each player to its inner neighbor.
-    const gaps = order.map((i, k) => {
+    // The packed arc and the largest arc from each player to its inner neighbor.
+    const pair = (k: number): number | undefined => {
       const inner = order[k - 1];
-      return inner === undefined ? 0 : (arcs[side > 0 ? inner : i] ?? 0);
-    });
+      return inner === undefined ? undefined : side > 0 ? inner : order[k];
+    };
+    const gaps = order.map((_, k) => arcs[pair(k) ?? -1] ?? 0);
+    const widest = order.map((_, k) => bonds[pair(k) ?? -1] ?? Infinity);
     // With no path, the side keeps its spread angles.
-    cheapestPath(options, gaps, side).forEach((at, k) => {
+    cheapestPath(options, gaps, widest, side).forEach((at, k) => {
       const i = order[k];
       const option = options[k]?.[at];
       if (i !== undefined && option) {
@@ -1958,11 +1966,14 @@ interface SweepOption {
 
 /**
  * Finds the path of the lowest total cost through the candidates of the players of one side of a
- * row, from the inner player out. Two neighbors on a path keep their packed arc.
+ * row, from the inner player out. Two neighbors on a path keep their packed arc, and two
+ * neighbors of one seat keep their bond ({@link seatBonds}).
  *
  * @param options The candidates of each player, from the inner player out.
  * @param gaps The packed arc from each player to its inner neighbor, in radians: 0 for the inner
  *   player.
+ * @param widest The largest arc from each player to its inner neighbor, in radians: `Infinity`
+ *   for no limit.
  * @param side 1 for the right side, -1 for the left side.
  * @returns The index of the chosen candidate of each player, from the inner player out, or -1
  *   for each player with no path.
@@ -1970,6 +1981,7 @@ interface SweepOption {
 function cheapestPath(
   options: readonly (readonly SweepOption[])[],
   gaps: readonly number[],
+  widest: readonly number[],
   side: 1 | -1,
 ): number[] {
   // The best total cost of each candidate with the players inside it, and the candidate of the
@@ -1979,6 +1991,7 @@ function cheapestPath(
   for (const [k, own] of options.entries()) {
     const before = options[k - 1];
     const arc = gaps[k] ?? 0;
+    const most = widest[k] ?? Infinity;
     totals.push([]);
     links.push([]);
     for (const option of own) {
@@ -1986,7 +1999,8 @@ function cheapestPath(
       let link = -1;
       before?.forEach((previous, j) => {
         const total = totals[k - 1]?.[j] ?? Infinity;
-        if (side * (option.angle - previous.angle) >= arc - 1e-9 && total < best) {
+        const apart = side * (option.angle - previous.angle);
+        if (apart >= arc - 1e-9 && apart <= most + 1e-9 && total < best) {
           best = total;
           link = j;
         }
@@ -2105,6 +2119,28 @@ function packedArcs(row: FittedRow): number[] {
   });
 }
 
+/**
+ * Calculates the largest arc from each player of a row to its right neighbor in the sight pass
+ * (design 4.5, seat geometry). Two neighbors of one seat sit together as a section: their arc
+ * stays at most {@link SPREAD_LIMITS}.maxArc, or their packed arc or their arc in the row when
+ * one of these is longer. Without this limit, the pass moved one of two horns 2.9 m from its
+ * partner. Other neighbors have no limit.
+ *
+ * @param row The row.
+ * @param arcs The packed arc from each player to its right neighbor, in radians.
+ * @returns The largest arcs, in radians, with `Infinity` for no limit.
+ */
+function seatBonds(row: FittedRow, arcs: readonly number[]): number[] {
+  return row.members.map((member, i) => {
+    const right = row.members[i + 1];
+    if (right?.cast.seatIndex !== member.cast.seatIndex) {
+      return Infinity;
+    }
+    const arc = (row.angles[i + 1] ?? 0) - (row.angles[i] ?? 0);
+    return Math.max(SPREAD_LIMITS.maxArc / row.radius, arcs[i] ?? 0, arc);
+  });
+}
+
 /** The inputs of the sight pass that stay the same for each row ({@link sightRowsSteps}). */
 interface SightPass {
   /** The rows after the spread, from the front. */
@@ -2138,6 +2174,8 @@ interface RowSearch {
   readonly blockers: SightBlockers;
   /** The packed arc from each player to its right neighbor, in radians ({@link packedArcs}). */
   readonly arcs: readonly number[];
+  /** The largest arc from each player to its right neighbor, in radians ({@link seatBonds}). */
+  readonly bonds: readonly number[];
   /** The stage side when the row keeps the view of the audience ({@link AUDIENCE}), or `null`. */
   readonly view: number | null;
   /**
@@ -2167,12 +2205,14 @@ function rowSearchOf(
   memo: SightMemo | null,
 ): RowSearch {
   const front = done.find((d) => d.row === 0);
+  const arcs = packedArcs(row);
   return {
     pass,
     row,
     clearance: clearanceOf(pass.fixed, pass.soloPianos, done, pass.rows.slice(n + 1)),
     blockers: blockersOf(pass.soloists, done),
-    arcs: packedArcs(row),
+    arcs,
+    bonds: seatBonds(row, arcs),
     view: row.row >= AUDIENCE.firstRow ? pass.stage.side : null,
     inner:
       row.row === BACK_DESK_ROW && front ? Math.min(...front.angles.map((a) => Math.abs(a))) : null,
@@ -2393,8 +2433,8 @@ function frontMemo(
  * fits into a gap only when the gap is a little larger. A greedy search tries the runs of
  * {@link frontRuns}. Each run moves by 1° steps up to {@link FRONT_MOVES}.shift, and the move with
  * the lowest cost of row 1 wins, for up to {@link FRONT_MOVES}.rounds rounds. A move keeps the
- * packed arcs, the packed gap of the conductor, the stage, the gaps to the other items, and the
- * sight of row 0 past the soloists.
+ * packed arcs, the arcs of the seats ({@link seatBonds}), the packed gap of the conductor, the
+ * stage, the gaps to the other items, and the sight of row 0 past the soloists.
  *
  * @param pass The inputs of the pass.
  * @param front Row 0 after its sight pass.
@@ -2414,6 +2454,7 @@ function* moveFrontSteps(
 ): Steps<{ front: FittedRow; back: RowSight }> {
   const packedFront = pass.packed.find((r) => r.row === front.row);
   const arcs = packedArcs(front);
+  const bonds = seatBonds(front, arcs);
   const clearance = clearanceOf(pass.fixed, pass.soloPianos, [], pass.rows.slice(at + 1));
   const blindBefore = frontBlind(pass, front, front.placement);
   // The inner first desks keep the gap of the conductor of the spread row on each side.
@@ -2444,7 +2485,9 @@ function* moveFrontSteps(
             Math.sign(a) === Math.sign(angles[i] ?? 0) &&
             Math.abs(a) >= Math.abs(packedFront?.angles[i] ?? 0) - 1e-9 &&
             Math.abs(a) >= (a < 0 ? gaps.left : gaps.right) - 1e-9 &&
-            (i === next.length - 1 || (next[i + 1] ?? 0) - a >= (arcs[i] ?? 0) - 1e-9),
+            (i === next.length - 1 ||
+              ((next[i + 1] ?? 0) - a >= (arcs[i] ?? 0) - 1e-9 &&
+                (next[i + 1] ?? 0) - a <= (bonds[i] ?? Infinity) + 1e-9)),
         );
         if (!valid) {
           continue;
