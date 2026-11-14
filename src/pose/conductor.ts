@@ -6,7 +6,7 @@ import { BATON_ALONG, BATON_TOP } from '../models/instruments/baton.ts';
 import { placePoint } from '../models/instruments/hold.ts';
 import { toVec3 } from '../models/tuples.ts';
 import type { Vec3 } from '../models/tuples.ts';
-import { NO_TURN, X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
+import { X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { mixPole, mixRotation } from './blend.ts';
 import type { BatonState } from './conductor-notes.ts';
 import type { CueState } from './cues.ts';
@@ -81,15 +81,6 @@ export const CONDUCTOR_HOLD = {
    * each sample of the play and at rest (`pnpm hold-fit conductor`).
    */
   batonCurl: 50 * MathUtils.DEG2RAD,
-  /**
-   * In the lift and in the lowering of the arms (5.2), the baton turns toward this direction: out
-   * to the right side and a little down, as a loose wrist lets it fall. Thus its tip leaves the desk
-   * of the conductor stand at the side before it comes down. With a straight lowering, the tip
-   * comes 0.006 m near the desk when the arms come down after the song end. With the baton 25° up
-   * and the direction (0.8, -0.6, 0), the right paw turns 4,653°/s at the start of a lowering. The
-   * turn keeps no twist of the paw on its forearm.
-   */
-  liftBaton: [1, -0.3, 0],
   /**
    * In the rest pose (5.2), the baton of the hanging right paw turns toward this direction, in the
    * model axes: down, in, and a little back. The turn keeps no twist of the paw on its forearm, so
@@ -324,11 +315,6 @@ export interface ConductorRig {
   readonly beatUp: Vec3;
   /** The head height `H` of the bear: the unit of the places of the hands. */
   readonly headHeight: number;
-  /**
-   * The unit direction of the baton in the middle of a lift or a lowering of the arms
-   * ({@link CONDUCTOR_HOLD.liftBaton}).
-   */
-  readonly liftBaton: Vec3;
   /** The unit direction of the baton in the rest pose ({@link CONDUCTOR_HOLD.restBaton}). */
   readonly restBaton: Vec3;
   /** The unit direction of the left hand in the ready gesture: up and a little outward. */
@@ -395,7 +381,6 @@ export function conductorRig(model: PlayerModel): ConductorRig {
     beatRight: toVec3(beatRight),
     beatUp: toVec3(beatUp),
     headHeight: h,
-    liftBaton: toVec3(new Vector3(...CONDUCTOR_HOLD.liftBaton).normalize()),
     restBaton: toVec3(new Vector3(...CONDUCTOR_HOLD.restBaton).normalize()),
     readyDirection: [
       -Math.sin(CONDUCTOR_HOLD.readyOut) * Math.cos(CONDUCTOR_HOLD.readyLift),
@@ -436,6 +421,18 @@ export interface ConductorState {
   shift: number;
 }
 
+/**
+ * The power of the ease of the turn of the right paw in the lift and in the lowering of the arms
+ * (design 5.2, 5.4). The paw turns from the hanging paw to the paw of the beat by
+ * `1 - (1 - weight) ** LIFT_HAND_EASE`, so that the baton comes up early: its tip points forward
+ * and level at about a third of the lift, and forward and up from the middle, as a real conductor
+ * raises the baton. The tip stays out at the right of the desk of the conductor stand while it
+ * passes the height of the desk. With a plain mix (1), the baton pointed 24° down at the middle.
+ * The swing of the earlier lift turned the tip down and in, across the front of the belly, and
+ * turned the right paw up to 1,677°/s at the start of a lift (`pnpm arm-check conductor`).
+ */
+const LIFT_HAND_EASE = 3;
+
 const right = createFrame();
 const left = createFrame();
 /**
@@ -472,8 +469,6 @@ const place = new Vector3();
 const fingers = new Vector3();
 const toPlace = new Vector3();
 
-/** The direction of the baton in the middle of a lift or a lowering. Each call writes it first. */
-const liftBaton = new Vector3();
 /** The direction of the baton in the rest pose. Each call writes it first. */
 const restBaton = new Vector3();
 const bodyTurn = new Quaternion();
@@ -626,14 +621,7 @@ export function poseConductor(
     restBaton.fromArray(rig.restBaton).applyQuaternion(hangFrame.rotation);
     restHand.multiply(swingOf(restHand, along, restBaton));
   }
-  mixRotation(restHand, hand, weight, hand);
-  if (weight > 0 && weight < 1) {
-    // The turn is at its full size in the middle of the motion. The tip leaves the width of the
-    // desk early, while the hand is still high.
-    along.set(0, 0, -1).applyQuaternion(hand);
-    swingOf(hand, along, liftBaton.fromArray(rig.liftBaton));
-    hand.multiply(mixRotation(NO_TURN, liftTurn, Math.sin(Math.PI * weight), liftTurn));
-  }
+  mixRotation(restHand, hand, 1 - (1 - weight) ** LIFT_HAND_EASE, hand);
   writeArm(
     {
       arm: rig.right,
