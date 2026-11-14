@@ -2,7 +2,7 @@ import type { InstrumentId } from '../models/instruments/types.ts';
 import type { PlayerNote } from '../score/types.ts';
 import { beatLengthAt } from './count-in.ts';
 import type { MotionFamily } from './family.ts';
-import { LIFT_FIT_SEC, easeMove } from './rest.ts';
+import { easeMove } from './rest.ts';
 import type { RestMotion } from './rest.ts';
 
 /** The rules of the long rests ({@link LONG_REST}). */
@@ -61,14 +61,14 @@ export function findLongRests(
   minSec: number,
   motion: RestMotion,
 ): Float64Array {
-  const { lift, lower } = motion;
+  const { lift, lower, fitSec } = motion;
   const lowerAt = (end: number): [number, number] => {
     const start = end + LONG_REST.holdSec + lower.delaySec;
     return [start, start + lower.durationSec];
   };
   const liftAt = (entry: number): [number, number] => {
     const start =
-      entry - LONG_REST.liftEndBeats * beatLengthAt(beats, entry) - LIFT_FIT_SEC + lift.delaySec;
+      entry - LONG_REST.liftEndBeats * beatLengthAt(beats, entry) - fitSec + lift.delaySec;
     return [start, start + lift.durationSec];
   };
   const first = notes[0];
