@@ -95,6 +95,8 @@ of the source.
   finger [1]. The closed hand then rises, with the wrist curved in [1].
 - When one hand plays alone, the other hand rests lightly on the edge of the soundboard, or gets
   ready for the next passage [1].
+- In a rest from the playing position, the shoulders drop and the arms hang loose at the sides
+  [25].
 
 **The swing of the string.**
 
@@ -209,13 +211,13 @@ The app does not follow these facts:
   decay, so the treble time constant is an estimate.
 - **The lowest strings (section 5).** The band shows the whole envelope also below G1, where a
   real film frame sees only a part of the swing.
-- **The rest (section 5).** In the rest pose, the hooves rest on the lap with the elbows bent
-  about 122° (`restL`, `restR`), as a pianist rests the hands on the lap before a performance
-  (`piano-technique.md`, section 8). The short arms of the deer do not reach the thighs, so the
-  hooves lie on the front of the belly where it meets the thighs. The right elbow points forward,
-  so the right arm lies in front of the soundbox (`restR.pole`). The sources give the rest of
-  one hand on the edge of the soundboard only while the other hand plays. With each hand on a
-  string, the rest pose looked the same as the play.
+- **The rest (section 5).** In the rest pose, the arms hang at the sides, and each hoof touches
+  the outer side of its thigh (`restL`, `restR`). The elbows bend about 129° and point back, and
+  each wrist bends about 11° from the line of the forearm. A harpist can also rest the hands on
+  the thighs. The deep belly of the deer covers the tops of its thighs, and its knees lie about
+  57 cm from the shoulders, out of the reach of the arms. The sources give the rest of one hand
+  on the edge of the soundboard only while the other hand plays. With each hand on a string, the
+  rest pose looked the same as the play.
 - **The fingers (section 7.1).** The deer paw is a fist: a free thumb and three fingers joined into
   the palm. Thus fingers 2 to 4 close as one group, after the last of their plucks in a group.
 
@@ -408,7 +410,7 @@ The app does not follow these facts:
 ## 8. Sources
 
 Sources 1 to 7 opened on 2026-10-25, and sources 8 to 24 on 2026-11-06, except the search
-summary 18.
+summary 18. Source 25 is a search summary of 2026-11-13: the page did not open (HTTP 404).
 
 1. L. Lawrence, "Method for the Harp: Fundamental Exercises with Illustrations and Technical
    Explanations", Schirmer's Scholastic Series vol. 209, G. Schirmer, 1929 (an introduction to
@@ -460,3 +462,6 @@ summary 18.
 24. J.-L. Le Carrou, F. Gautier, and R. Badeau, "Sympathetic String Modes in the Concert Harp",
     Acta Acustica united with Acustica 95, 744-752, 2009, Table II and section 4.
     https://www.lam.jussieu.fr/Membres/LeCarrou/Articles/A3_LeCarrou_SympatheticStringModes.pdf
+25. A. Robertson (harpist), "5 tips to help you relax your shoulders when playing harp", 2022
+    (a search summary only).
+    https://ailierobertson.squarespace.com/harp-tips-blog/2022/1/11/5-tips-to-help-you-relax-your-shoulders-when-playing-harp
