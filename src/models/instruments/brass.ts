@@ -844,7 +844,9 @@ function horn(): BrassBuild {
       METAL,
     );
   }
-  // The valve slides rise from the valves on the far side of the loops.
+  // The valve slides rise from the valves on the far side of the loops. Both legs of a slide leave
+  // the casing 6 mm from its axis, inside the casing. With one leg 12 mm from the axis, its end
+  // stood 0.3 cm out of the casing.
   for (let i = 1; i < 4; i++) {
     const x = f.valves[0] + f.valveStep[0] * (i - 1.5);
     const y = f.valves[1] + f.valveStep[1] * (i - 1.5);
@@ -855,8 +857,8 @@ function horn(): BrassBuild {
         [
           at(x - 0.006, y, -0.012),
           at(x - 0.006, y + reach, -0.012),
-          at(x + 0.012, y + reach, -0.012),
-          at(x + 0.012, y, -0.012),
+          at(x + 0.006, y + reach, -0.012),
+          at(x + 0.006, y, -0.012),
         ],
         0.008,
         1,
