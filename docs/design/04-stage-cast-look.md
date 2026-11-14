@@ -2119,8 +2119,10 @@ A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded
   joints, a thumb rest at the back, and a wide bell that turns in at the rim.
 - **Bassoon.** A dark red stained maple (`bassoonStain`): the boot joint as an oval around both
   bores with the silver cap of its U-tube, the wing joint, the long joint, and the bell joint, with
-  silver rings, key rods, and cups. The silver bocal bends over and turns into the reed, a blade
-  of cane bound with thread. The reed lies near the long joint (`BASSOON_REED`), so that the long
+  silver rings, key rods, and cups. The silver bocal rises from the wing joint in an S curve and ends
+  in a straight part that comes into the mouth from the front left (`BOCAL_END`), with the reed, a
+  blade of cane bound with thread. Reason: with a short straight part and a thin tube, the bocal
+  read as a vertical wire that ended at the front teeth. The reed lies near the long joint (`BASSOON_REED`), so that the long
   joint passes beside the long muzzle of the beaver. The beaver turns the left side of the bassoon
   forward (`BEAVER_PLAY_TURN`), so that from the front left the long joint crosses the muzzle in
   front of the eye, in place of the cheek next to the eye.

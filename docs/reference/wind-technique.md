@@ -516,8 +516,8 @@ The app follows these facts:
 - **The bassoon (3, `BEAVER_BASSOON`).** The bassoon lies diagonal from the right hip up past the
   left shoulder, with the bell above the head (`BEAVER_PLAY`, `bassoonParts()`). The left paw is
   high on the wing joint, and the right paw low on the boot joint. The bocal is near the level at
-  the reed, and the reed goes into the mouth between the lips, behind the big front teeth
-  (`lipShift`).
+  the reed, and its end comes from the front left, so that the reed goes into the mouth between
+  the lips beside the big front teeth (`lipShift`, `BOCAL_END`).
   The reed lies near the long joint (`BASSOON_REED`), so that the long joint passes beside the
   head, and the left side of the bassoon turns forward (`BEAVER_PLAY_TURN`), so that the bell
   rises at the left of the line of sight, in front of the eye. The elbows stay a little away from the body (`poleL`, `poleR`), so that the round

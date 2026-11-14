@@ -1049,12 +1049,15 @@ const BEAVER_REST = holdTurn(0, 20);
  * (`aimSide`), the fingers curl over its front (`gripCurl`), and the thumbs point up the bassoon,
  * so that both paws grasp it in each sample (`pnpm wind-grip bassoonist`).
  *
- * The big front teeth hang in front of the lower lip, so the reed sits 0.2 H lower and 0.28 H
- * further back than the mouth of the bind pose (`lipShift`): behind the teeth at the height of
- * their roots, between the lips, as the reed of a real bassoonist goes straight into the mouth
- * (`docs/reference/wind-technique.md` 3). The bocal then rises beside the right tooth into the
- * mouth, and the reed goes 1.4 cm into the head. With 0.25 H lower and 0.24 H back, the reed
- * ended at the lower tips of the teeth.
+ * The big front teeth hang in front of the lower lip, so the reed tip sits 0.2 H lower, 0.15 H
+ * further back, and 0.06 H further left than the mouth of the bind pose (`lipShift`): at the
+ * height of the tooth roots, between the lips at the left of the left tooth, as the reed of a
+ * real bassoonist goes straight into the mouth (`docs/reference/wind-technique.md` 3). The end of
+ * the bocal comes from the front left (`BOCAL_END` of `models/instruments/woodwinds.ts`), so it
+ * stays beside the teeth, and the thread of the reed shows at the lips. The reed of the drawing
+ * moves by the opposite step (`BASSOON_REED`), so the tube and the grips keep their place in the
+ * play. With the reed tip 0.28 H back on the middle line, the reed lay behind the teeth, and the
+ * bocal read as a short vertical wire that ended at the front tooth.
  *
  * The right fingers curl 120° around the boot joint, and the left fingers 110° around the wing
  * joint. With 100°, the left paw grasped in no rest sample.
@@ -1063,7 +1066,7 @@ const BEAVER_BASSOON = {
   ...WIND_HOLDS.bassoon,
   reach: BEAVER_SHOULDER_TURN.right * MathUtils.DEG2RAD,
   reachL: BEAVER_SHOULDER_TURN.left * MathUtils.DEG2RAD,
-  lipShift: [0, -0.2, 0.28],
+  lipShift: [-0.06, -0.2, 0.15],
   play: BEAVER_PLAY,
   rest: BEAVER_REST,
   restShift: [-0.3, -0.1, -0.2],

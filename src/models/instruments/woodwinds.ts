@@ -29,12 +29,16 @@ export const WOODWINDS = {
 
 /**
  * The tip of the bassoon reed in the axes of its drawing: the bottom of the boot is at the origin,
- * and the tube runs along +y. The reed lies 0.07 m behind the long joint, toward the player. The
+ * and the tube runs along +y. The reed lies 0.035 m behind the long joint, toward the player. The
  * long muzzle of the beaver puts its mouth far in front of its eyes, so with the reed 0.155 m
  * behind the tube, the long joint stood in front of the face, and from the front left it crossed
- * the left eye.
+ * the left eye. The reed tip lies about 6.3 cm nearer to the tube than at (0.16, 0.7, 0.07), back
+ * along the end of the bocal (`BOCAL_END`), and the reed of the beaver moves by the same step
+ * (`lipShift` of `BEAVER_BASSOON` in `pose/winds.ts`). So the tube and the grips stay in their
+ * place in the play, and the reed goes between the lips beside the front teeth, in place of 4 cm
+ * further back behind them.
  */
-const BASSOON_REED: Vec3 = [0.16, 0.7, 0.07];
+const BASSOON_REED: Vec3 = [0.117, 0.73, 0.035];
 
 /**
  * The tip of the bassoon reed in the axes of the space of the bassoon (`bassoonSpace()`): the reed
@@ -473,42 +477,48 @@ function bassoonParts(piece: PieceBuilder): void {
       metal,
     );
   }
-  // The bocal rises from the wing joint, bends over, and turns into the reed. The tube of a
-  // player leans, so the end of the bocal brings the reed to the mouth at a nearly level angle,
-  // as on a real bassoon (`docs/reference/wind-technique.md` 3), with the turn of the beaver
-  // (`BEAVER_PLAY` of `pose/winds.ts`). With the top at 0.78, the end pointed 15.7° down into the
-  // mouth.
+  // The bocal rises from the wing joint, bends over toward the mouth, and ends in a straight part
+  // along `BOCAL_END` that holds the reed: the S curve of a real bocal. With a straight part of
+  // 1.6 cm, the bocal of the small bassoon of the beaver read as a short vertical wire that ended
+  // at the front teeth, and with a radius of 4.2 mm to 2.6 mm, as a thin wire.
+  const [ex, ey, ez] = BOCAL_END;
+  const back = (distance: number): Vec3 => [-ex * distance, -ey * distance, -ez * distance];
   tubeAlong(
     piece,
     rounded(
-      [
-        at([0, 0.62, wing]),
-        at([0, 0.665, wing]),
-        at([0.08, 0.74, (wing + reed[2] - 0.047) / 2]),
-        at([0.16, 0.7, reed[2] - 0.047]),
-        at([0.16, 0.7, reed[2] - 0.031]),
-      ],
+      [at([0, 0.62, wing]), at([0, 0.68, wing]), at([0.03, 0.76, 0.02]), back(0.08), back(0.031)],
       0.025,
-      1,
+      2,
     ),
-    [0.0042, 0.0038, 0.0035, 0.0032, 0.003, 0.0028, 0.0027, 0.0026],
-    ROD_SEGMENTS,
+    [0.009, 0.0085, 0.008, 0.0075, 0.007, 0.0066, 0.0063, 0.006],
+    TUBE_SEGMENTS,
     metal,
   );
   // The reed: the thread around its tube, and the blade of cane up to the tip at the origin.
-  piece.rod(
-    at([0.16, 0.7, reed[2] - 0.031]),
-    at([0.16, 0.7, reed[2] - 0.019]),
-    0.0042,
-    TUBE_SEGMENTS,
-    INSTRUMENT_COLORS.reedThread,
-  );
+  piece.rod(back(0.031), back(0.019), 0.0065, TUBE_SEGMENTS, INSTRUMENT_COLORS.reedThread);
   piece.add(
-    box(0.009, 0.0022, 0.02),
+    box(0.014, 0.003, 0.02),
     INSTRUMENT_COLORS.reed,
-    transform(at([0.16, 0.7, reed[2] - 0.01])),
+    transform(
+      back(0.01),
+      toQuat(new Quaternion().setFromUnitVectors(new Vector3(0, 0, 1), new Vector3(...BOCAL_END))),
+    ),
   );
 }
+
+/**
+ * The direction of the straight end of the bassoon bocal and of the reed, in the axes of the
+ * drawing of `bassoonParts()`: the end of a real bocal brings the reed to the mouth at a nearly
+ * level angle, straight into the mouth (`docs/reference/wind-technique.md` 3). With the play turn
+ * of the beaver (`BEAVER_PLAY` of `pose/winds.ts`), the reed then points 14° to the right of
+ * straight back into the mouth, and 6° down, in the axes of the head. So the bocal comes from the
+ * front left and stays beside the big front teeth. With the end along +z, the reed pointed 31° to
+ * the left, and the bocal crossed in front of the teeth.
+ */
+const BOCAL_END: Vec3 = (() => {
+  const v = new Vector3(0.549, -0.45, 0.705).normalize();
+  return [v.x, v.y, v.z];
+})();
 
 /**
  * The outline of the boot joint of the bassoon in the x-z plane: an oval around the bores of the
