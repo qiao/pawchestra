@@ -1114,6 +1114,10 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Bowed strings (5.3): the change between the bow and pizzicato moves the bow paw up to 19 cm
       in one frame (red fox `boulanger-matin` 175.50 s, cat 33.97 s), and the dog cellist paw
       jumps 13 cm in a pluck at 87.15 s.
+- [ ] Rabbit violinist (5.2): in the lift, the violin of the rabbit moves in a path with two kinks
+      at the height weights 0.47 and 0.70 (`boulanger-matin` 146.37 s and 146.58 s). The speed of
+      the instrument bone changes from 1.9 m/s to 0.2 m/s and back in one frame of 1/240 s, and
+      the left wrist stays smooth. Find the step in the carry (`carryLift()` of `pose/bowed.ts`).
 - [ ] Dog cellist: the scroll of the cello touches the left ear (pose audit 3, row 15). Move the
       cello, and keep the reached bow hair (0.22 m of 0.46 m, `bowRangeOf()`).
 - [ ] Dog cellist: the bow plays only the upper half of the hair (0.215 m to 0.433 m). A right
