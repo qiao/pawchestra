@@ -1411,8 +1411,12 @@ const CAT_HOLD = {
  * - The bow elbow points further out in the play, (1.5, -1, -0.3) at the frog and
  *   (1.5, -0.5, -0.5) at the tip: with the elbow of {@link CELLO_HOLD}, the right upper arm goes
  *   2.1 cm into the chest. With 2 in place of 1.5, it goes 0.9 cm in, but the bow paw turns 21° from
- *   its accepted grip. The right shoulder turns 28° forward (`reach`), so that the bow paw reaches
- *   the strings of the cello in front of the chest: with 20°, it missed them by up to 1.2 cm.
+ *   its accepted grip. The right shoulder turns 36° forward (`reach`), so that the bow paw plays
+ *   0.22 m of the hair, from 0.215 m to the tip end (`bowRangeOf()`), and the paw moves away from
+ *   the strings and back in a stroke, as the hand of a cellist does. With 28°, it played 0.17 m,
+ *   and with 20°, it missed the strings by up to 1.2 cm. With 40°, face 1889 of the right
+ *   shoulder folds in 27% of the play (`pnpm hold-fit cellist`), and a lean of the trunk of 10°
+ *   puts the left forearm 2.1 cm into the neck of the cello in place of 1.8 cm.
  * - In pizzicato, the right paw plucks 0.25 m right of the strings (`pluckSide`), with the elbow
  *   out and a little down, (2.5, -0.5, -0.3): with the pluck of {@link CELLO_HOLD}, the right upper
  *   arm goes 3.0 cm into the chest.
@@ -1456,7 +1460,7 @@ const CAT_HOLD = {
 const DOG_HOLD = {
   ...CELLO_HOLD,
   lean: 9 * MathUtils.DEG2RAD,
-  reach: 28 * MathUtils.DEG2RAD,
+  reach: 36 * MathUtils.DEG2RAD,
   poleR: [1.5, -1, -0.3],
   poleTipR: [1.5, -0.5, -0.5],
   polePizzicato: [2.5, -0.5, -0.3],
