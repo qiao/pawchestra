@@ -62,8 +62,7 @@ Three routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each 
 ("Models") gives the chain in a diagram.
 
 - **Mesh rig.** `arm_rebuild.py` or `<a>_arms.py` rebuilds the arms, and `pnpm rig-mesh` rigs
-  the rhino and the mannequin. A mesh whose arms join the trunk takes this
-  route.
+  the mannequin. A mesh whose arms join the trunk takes this route.
 - **Simple route.** `simple_rig.py` writes the `.blend` of a hand rig from a clean quad mesh with
   the arms apart (design 4.4). The skill `pawchestra-body` runs it in a candidate tree.
 - **Hand rig.** A person or an agent makes the `.blend` in Blender, and `pnpm rig-export` exports

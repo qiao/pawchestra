@@ -1,5 +1,5 @@
-"""Gives the steps of the arm rebuild of a T-pose mesh, which `rhino_tpose_arms.py` runs with
-the settings of the rhino.
+"""Gives the steps of the arm rebuild of a T-pose mesh, which `rhino_tpose_arms.py` at 8e42c4eaa
+ran with the settings of the old rhino.
 
 The steps are the steps of `wind_arms.py`, with these changes:
 

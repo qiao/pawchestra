@@ -286,10 +286,8 @@ describe('sizeReach (design 4.6)', () => {
     // At the size of the rule, the scroll lies in the palm of the current arm.
     expect(fit?.reach).toBeCloseTo(report.arm, 6);
     expect(fit?.factor).toBeCloseTo(1, 6);
-    // The arm of the app comes from the rig within 1% (pnpm rig-mesh --check).
-    const rig = report.rig;
-    expect(rig?.file).toBe('tools/mesh-rigs/rhino.json');
-    expect(Math.abs((fit?.rigFactor ?? 0) / (rig?.armFactor ?? 1) - 1)).toBeLessThan(0.02);
+    // The rhino has a hand rig, so no mesh rig config gives an arm factor.
+    expect(report.rig).toBeNull();
     // The player rebuilt at each scale keeps its tail end, so the check agrees within 1 mm.
     for (const size of report.sizes) {
       expect(Math.abs(size.rebuilt - size.reach)).toBeLessThan(0.001);

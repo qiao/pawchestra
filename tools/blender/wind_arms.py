@@ -3,9 +3,9 @@
 The rebuild uses loop edges, retopology, and extra bones to fix the arm and wrist twist. The
 session used the steps of `violin_arms.py` on the old mouse oboist, in the live Blender through
 MCP, with an image after each step. This module repeats them in the same order with the settings
-of an animal (`ANIMALS`). `bear_arms.py` and `rhino_tpose_arms.py` build their sessions on these
-steps, and `rhino_tpose_arms.py` puts the settings of the rhino into `ANIMALS`. The steps are the
-steps of `violin_arms.py`, with four changes (marked *):
+of an animal (`ANIMALS`). `bear_arms.py` builds its session on these steps, and
+`rhino_tpose_arms.py` at 8e42c4eaa put the settings of the old rhino into `ANIMALS`. The steps are
+the steps of `violin_arms.py`, with four changes (marked *):
 
 1. Import the mesh and Merge by Distance.
 2. Replace the faces of each arm from the shoulder line to the wrist with a quad tube, wrap it onto
