@@ -472,8 +472,10 @@ export const ACCEPTED_GRIPS: ReadonlyMap<string, Readonly<Record<Side, number>>>
   // The paws of the woodwinds of the tan fox face its tube (faceTube of pose/winds.ts). The left
   // paw holds the flute from its front, with its fingers over the top, and the right paw lies
   // behind the flute with its fingers over the top, on the hand rig of the Tripo fox, from
-  // accepted 2x paw crops.
-  ['flutist', { L: -98, R: -169 }],
+  // accepted 2x paw crops. The right paw points up with its palm to the audience, as a flutist
+  // turns the right palm away from the body, from the 2x paw crops of 2026-11-14. The right grip
+  // of -169 had the palm up under the flute.
+  ['flutist', { L: -98, R: 4 }],
   // The Tripo monkey with the head bowed and the right paw over the valves, palm down, from
   // accepted 2x paw crops.
   ['trumpeter', { L: -43, R: 5 }],
