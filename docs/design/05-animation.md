@@ -311,7 +311,8 @@ The rest of each family:
   hung from the paw beside the hip, with its lower end below the top of the thigh, and the left
   arm went straight to the front in the middle of each move. The rest grip of a carried instrument lies in the reach of the left arm, because
   the instrument hangs from the solved paw from the first frame of a move: a grip out of reach
-  makes the instrument jump into the paw. Thus the red fox stands the violin near the hip, and
+  makes the instrument jump into the paw. Thus the red fox stands the violin on the top of the
+  thigh at about half of the way to the knee, and
   rests the bow upright beside the right thigh at the reach of its short arm. Its rest grip also
   lies well inside the reach, with the elbow bent and a little out from the side and the forearm
   about level. The paw holds the neck from the outer side, with the palm to the neck and the

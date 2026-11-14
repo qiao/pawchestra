@@ -558,7 +558,8 @@ The app follows these facts:
   top of the left thigh, leaned a little forward, so that its short arm holds the neck in front of
   the chest with the elbow bent near the side (`CAT_HOLD.rest`), and closes its paw around the
   neck, a little off it, so that the thick wrist stays out of the viola.
-  The red fox stands its violin near the hip, so that its short left arm reaches the rest grip,
+  The red fox stands its violin on the top of the thigh at about half of the way to the knee, so
+  that its short left arm reaches the rest grip,
   and holds the bow upright beside the right thigh with the upper arm near the side (`FOX_HOLD`).
   Its left elbow bends near the side, the forearm is about level, and the paw holds the neck from
   the outer side with the palm to the neck, so that the back of the paw stays in line with the

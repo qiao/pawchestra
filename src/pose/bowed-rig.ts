@@ -826,11 +826,13 @@ const SHOULDER_HOLD = {
  * and a little out, (0.3, 0.5, 1): with the tip of the chin hold, (0.3, 1, 0.4), the bent wrist of
  * the plucking paw moves the middle of the paw 2.1 cm from the stick, and with this tip 1.2 cm.
  *
- * The rest pose is the upright rest of the rabbit: the violin stands on the left thigh at 0.45 of
- * the way to the knee, 0.1 H out and 0.05 H forward, near the hip, with its lower end 1.8 cm over
- * the thigh, and its top plate turns a little to the right, (0.3, 0, -1) (`rest`). Thus the rest
- * grip lies well inside the reach of the short left arm: the elbow bends 74°, and the forearm is
- * about level. With the violin at 0.6 of the way, 0.14 H down, and 0.2 H forward, the rest grip
+ * The rest pose is the upright rest of the rabbit: the violin stands on the top of the left thigh
+ * at 0.55 of the way to the knee, on the line of the thigh, 0.02 H down and 0.05 H forward, with
+ * its lower end 0.2 cm in the skin of the thigh, and its top plate turns a little to the right,
+ * (0.3, 0, -1) (`rest`). Thus the rest grip lies inside the reach of the short left arm: the elbow
+ * opens to 115°, and the forearm is about level. At 0.45 of the way and 0.1 H out, the violin
+ * hung from the paw beside the hip, with its lower end 3.3 cm over the outer side of the thigh.
+ * With the violin at 0.6 of the way, 0.14 H down, and 0.2 H forward, the rest grip
  * was at the end of the reach: the arm locked straight down to the neck, and the paw bent 58° off
  * the forearm over the neck. A violin higher on the thigh, with a level forearm, stood 7.5 cm over
  * the thigh, and with the top plate to the front, the paw twisted 99° on its forearm at rest (43°
@@ -952,7 +954,7 @@ const FOX_HOLD = {
   restPoleR: [0.5, -1, -0.2],
   restPoleL: [-0.75, -1, 0.5],
   restPlace: 0.37,
-  rest: { ...LAP_VIOLIN, top: [0.3, 0, -1], lap: { along: 0.45, offset: [-0.1, 0, -0.05] } },
+  rest: { ...LAP_VIOLIN, top: [0.3, 0, -1], lap: { along: 0.55, offset: [0, -0.02, -0.05] } },
   liftReach: [-0.1, 0.22, -0.15],
   moveReach: 0.9,
   restPawTurnL: 10 * MathUtils.DEG2RAD,
