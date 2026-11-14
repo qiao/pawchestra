@@ -1,0 +1,223 @@
+{
+ "edits": [],
+ "sourceTexture": "assets/models/rhino/tripo-p2/rhino.fbm/rhino_basecolor.jpg",
+ "palm": [
+  0.417,
+  -0.909,
+  -0.015
+ ],
+ "ringEdges": 19,
+ "legTurns": [
+  106.1,
+  20.3,
+  -2.1
+ ],
+ "tailBind": null,
+ "tailBindNote": "The tail bones keep the directions of the source in the bind: the short tail hangs down from the rump.",
+ "chair": {
+  "halfWidth": 0.2,
+  "front": -0.17,
+  "back": -0.27,
+  "note": "The rhino stands in the app (the tuba player stands, soloist of ANIMALS), so no player sits on this seat. The bind keeps the legs of the source, so the seat lies under the back of the haunch, behind the heels (the export refuses a shin or a foot over the seat). The seat is level, and its top is the lowest point of the body over the seat, with no shin, foot, or tail (seat_masks() of tools/blender/rig_mesh.py)."
+ },
+ "eyeBox": [
+  [
+   0.04,
+   0.76,
+   0.08
+  ],
+  [
+   0.095,
+   0.825,
+   0.13
+  ]
+ ],
+ "noseBox": [
+  [
+   -0.09,
+   0.7,
+   0.24
+  ],
+  [
+   0.09,
+   0.78,
+   0.3
+  ]
+ ],
+ "eyeBoxNote": "The eye box holds the eyeball of each side: a loose dome of 43 vertices, open at its rim (|x| 0.051 to 0.081, y 0.771 to 0.813, z 0.089 to 0.120 in the source, a sphere of radius 0.0208 about (0.062, 0.792, 0.100)). The map paints the iris and the pupil on each dome. The nose box holds the two nostrils at the front of the muzzle under the horn; the map paints them, so they take no gloss (noGloss).",
+ "body": {
+  "crease": 180
+ },
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+ "metersPerUnit": 1.611,
+ "metersPerUnitNote": "The scale of the app: the eyes of the standing rhino are 1.275 m above the floor, as on the rhino of rhino.rig.glb at 8e42c4eaa, so that the seat search of each demo keeps its seats. The fact height of the armature is the shoulder joints at this scale.",
+ "eyeSize": 0.255007,
+ "jointsNote": "The places are the places of the source, in the studio units and axes: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed rings of 19 vertices from x 0.239 to x 0.342, axis y 0.567 to 0.559 and z -0.073 to -0.051, radius about 0.067): the shoulder joint at x 0.14, 0.035 units inside the side of the trunk, the elbow at x 0.25, at the middle from the shoulder to the wrist, the wrist at x 0.355, where the paw widens, the knuckles at x 0.405, and the tip at x 0.451. Leg (sections from y 0 to 0.16, the middle at x 0.105, z -0.07): the hip joint at (0.115, 0.23, -0.045) in the haunch, the knee at y 0.13, the ankle at y 0.05, the ball of the foot at z 0, and the toe tips at z 0.045. The thigh slopes 16 degrees back, so that the roll of its bone stays well defined. Trunk: the spine bones lie at about 0.35 of the depth from the back. The chin is at y 0.63. Ears: the root at (0.085, 0.885, -0.015), the tips at (0.11, 1.0, 0.008). Tail: a loose part of the source that hangs from (0, 0.325, -0.25) down to (0, 0.135, -0.262). The palm is the true palm of the source: the mean normal of the paw faces that face down (x from 0.36) is (0.417, -0.909, -0.015).",
+ "rings": {
+  "arm": [
+   [
+    0.2387,
+    0.2612,
+    2
+   ],
+   [
+    0.2612,
+    0.2819,
+    1
+   ],
+   [
+    0.2819,
+    0.3041,
+    1
+   ],
+   [
+    0.3041,
+    0.3255,
+    1
+   ],
+   [
+    0.3255,
+    0.3416,
+    1
+   ]
+  ],
+  "leg": []
+ },
+ "rows": {
+  "start": 0.14,
+  "reach": 0.1,
+  "reachByX": [
+   [
+    0.14,
+    0.1
+   ],
+   [
+    0.19,
+    0.1
+   ],
+   [
+    0.23,
+    0.092
+   ],
+   [
+    0.27,
+    0.088
+   ],
+   [
+    0.31,
+    0.086
+   ],
+   [
+    0.46,
+    0.086
+   ]
+  ],
+  "control": [
+   [
+    0.14,
+    0.4,
+    0
+   ],
+   [
+    0.15,
+    0.25,
+    0
+   ],
+   [
+    0.16,
+    0.12,
+    0
+   ],
+   [
+    0.17,
+    0.04,
+    0
+   ],
+   [
+    0.18,
+    0,
+    0
+   ],
+   [
+    0.215,
+    0,
+    0
+   ],
+   [
+    0.25,
+    0,
+    1.0
+   ],
+   [
+    0.285,
+    0,
+    0
+   ]
+  ],
+  "wrist": {
+   "start": -0.04,
+   "band": 0.004,
+   "count": 12
+  },
+  "knuckle": {
+   "start": -0.02,
+   "band": 0.0035,
+   "count": 12
+  }
+ },
+ "tailRows": {
+  "rowRoot": [
+   -0.005,
+   0.015
+  ],
+  "bend": 0.015
+ },
+ "texture": {
+  "path": "assets/models/rhino/tripo-hand/rhino-color.webp"
+ },
+ "smooth": false,
+ "dropSmall": 0,
+ "pawTurn": {
+  "L": 0,
+  "R": 0
+ },
+ "turnRings": [
+  0.3255,
+  0.3416
+ ],
+ "turnFit": 0.02,
+ "lids": {
+  "back": 135,
+  "psi": [
+   -55,
+   65
+  ],
+  "lam": [
+   -65,
+   70
+  ],
+  "steps": [
+   12,
+   12
+  ],
+  "radius": 1.12,
+  "strip": 1.035,
+  "angle": 105,
+  "srgb": [
+   110,
+   93,
+   80
+  ],
+  "uv": [
+   0.946,
+   0.8624
+  ],
+  "density": 0.25
+ },
+ "noGloss": true,
+ "tailFlood": null,
+ "hingeTurn": {
+  "L": 0.0,
+  "R": 0.0
+ }
+}
