@@ -299,7 +299,11 @@ The rest of each family:
 - **Violin and viola.** A seated player rests as a seated violinist (strings 2.9): the instrument
   upright on the left thigh, the neck through the closed left paw, and the bow upright at the
   right side (`restHandAt()`, `UPRIGHT_BOW`). In a move, the instrument turns with the left paw as
-  one rigid object (`carryLift()`), and the bow tip turns through the front (`BowVia`). The
+  one rigid object (`carryLift()`), and the bow tip turns through the front (`BowVia`). Each value
+  of the grip (the place on the neck, the curl, the tilt, the turn, and the gap) goes from the
+  rest grip to the grip of the play (5.3, "Left paw on the neck"), so that the neck stays between
+  the palm and the finger block on the way. Reason: with a mix of the two paw places, the paw
+  went into the neck in the middle of the move. The
   instrument turns the short way from the rest to the play: the scroll stays up, and the body
   swings in and up to the jaw. The elbow in the middle of the move (`BowedHold.liftPoleL`) sets
   the way, because the paw supinates on the arm, and the frame of the arm turns with the elbow. An
@@ -556,6 +560,31 @@ The rest of each family:
   A large shift takes a least time for its length (`LEFT_HAND.shiftSecPerPlace`), and in fast
   notes it starts in an earlier note of the old position. Reason: in the second half of one fast
   note, a large shift turned the left forearm by up to 89° in one frame.
+- **Left paw on the neck.** The palm of the left paw stands beside the neck on the side of the
+  high strings, and the finger block curls over the fingerboard and lies with its pads on the
+  strings (`stopHandAt()`), as a player keeps an open space at the palm and presses the strings
+  from above (strings 1.9). The grip measures each body. The pads of the palm and of the block lie
+  a depth off their bones (`pawPads()`, `BowedRig.padsL`), and the fingerboard has a half width
+  (`BowedRig.boardHalf`). The contact with the strings lies on the pads of the block, at the
+  distance from the knuckles that keeps the pads of the palm the gap of the hold off the edge of
+  the fingerboard (`BowedHold.gapL`, `restGapL`), in a part of the block (`BOWED_HANDS.padSpan`).
+  The block curls 90° less the tilt of the hand (`tiltL`), plus the dip of the hold (`dipL`,
+  `stopCurl()`). The pose gives the paw its turn in the plane of its palm (`BowedHold.turnL`,
+  `pawTurnL`, design 4.4), and the paw turns around its contact with the strings. Reason: one
+  `fingers` bone moves the whole digit block. With the middle of the block on the strings and the
+  turn of the retarget around the wrist, the paw lay along the neck, the fingerboard and the nut
+  went through the fist, and no digit lay over the strings.
+- **Turn and tilt of the left paw.** On the violin and the viola, the forearm comes from the side
+  of the bridge, so the paw turns a part of the way toward it and tilts a little over the neck
+  (`CHIN_HOLD`). The wrist then bends less, and the knuckles stay near the line of the neck. On
+  the cello and the contrabass, the forearm comes from behind the neck, so the paw has no turn
+  and a small tilt (`FLOOR_HOLD`), and the wrist is nearly straight. Reason: a full turn onto the
+  line of the forearm rolls the block onto its edge on the strings, and a large tilt bends the
+  wrist toward the palm.
+- **Left paw off the pegbox.** The left paw stops the strings from a start of the hold
+  (`BowedHold.stopStart`, `stopRangeOf()`), and holds the neck at rest further from the nut
+  (`restPlace`). Reason: the paw of the dog and of the hippo is wider than the distance from the
+  first position to the pegs, so the pegs went through the back of the paw.
 - The bow changes direction on each note, and short notes in one beat join into one slur
   (`slurSizes()`), because the MIDI files have no slurs. Pizzicato plucks the string, and tremolo
   makes short fast strokes (`BOW_MOTION`).
@@ -661,15 +690,15 @@ The rest of each family:
   (`violinTurn()`), so that the instrument lies about level and tilts only a little down to the
   right (strings 1.10). Reason: with the 50° of the chin hold, the instrument read as upright on
   the chest, and the bow at the frog stood up across the face.
-- **Thick wrist on a floor neck.** The left paw of a floor instrument puts the middle of its finger
-  block on the strings. The rebuilt round wrist of the hippo then goes into the back of the neck,
-  so its paw lies a little off the strings along the normal of its palm (`BowedHold.gapL`), as a
-  real bassist keeps the wrist off the neck (strings 2.8). Reason: a larger tilt of the paw over
-  the neck alone turns the paw past the accepted grip of the role.
+- **Thick paw on a floor neck.** The pads of the round paws of the dog and of the hippo are
+  deeper than the finger block is long, so the contact lies at the end of its part of the block
+  (`BOWED_HANDS.padSpan`), and the pads of the palm press the edge of the fingerboard. Reason:
+  with the contact nearer to the finger tips, the digits stayed beside the strings.
 - **Grip clearance from the girth.** The shared cello hold takes the gap of the left paw from the
   body (`BowedHold.girthFit`, `GIRTH_FIT`). It keeps the girth of the left paw of its accepted
-  player, and a thicker paw lies further off the neck by the difference (`pawGirth()`, added to
-  `gapL`), in the play, at rest, and in the moves. Thus the paw keeps the free gap of the accepted
+  player, and a thicker paw keeps its palm further off the edge of the fingerboard by the
+  difference (`pawGirth()`, added to `gapL`), in the play, at rest, and in the moves. Thus the paw
+  keeps the free gap of the accepted
   player. A thinner paw keeps the gap of the hold, and the own holds have no rule. Reason: a real
   player holds the neck with the fingers and keeps the forearm free of the body of the instrument
   (strings 1.9), and the gap of the hold fits a thin paw. The shared violin hold has no gap rule,
@@ -693,9 +722,8 @@ The rest of each family:
   reaches the fingerboard far enough from the upper bout (`violaScale`). Reason: the short left
   arm of the cat runs nearly straight from the shoulder to the neck, and it reached the
   fingerboard only near the upper bout. With the wrist over the plane of the top plate, its
-  forearm went through the upper bout in each sample of the play and of the rest. The thick paw
-  of the rabbit lies off the strings in the play (`RABBIT_HOLD.gapL`). Its forearm still touches
-  the back of the violin (`TODO.md`).
+  forearm went through the upper bout in each sample of the play and of the rest. The forearm of
+  the rabbit still touches the back of the violin (`TODO.md`).
 - **Bow clear of a wide head.** The stick of the bow keeps off the head over the whole stroke. The
   head of the cat is wider than its shoulders, so the cat holds the tail end of the viola on the
   left collarbone, left of the middle line (`CAT_HOLD.playShift`), and its bow slants in the plane
