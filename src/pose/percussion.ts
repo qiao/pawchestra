@@ -850,8 +850,15 @@ const offset = new Vector3();
 const wristBind = new Vector3();
 const grip = new Vector3();
 const homeShift = new Vector3();
-/** The mallet head of a paw before its muffle. */
-const unmuffled = new Vector3();
+/** The chest and a shoulder of the body that only leans ({@link steadyRoll}). */
+const steadyChest = createFrame();
+const steadyShoulder = createFrame();
+const steadyPole = new Vector3();
+const steadyHead = new Vector3();
+/** The head of a mallet at the damp of its paw. */
+const dampHead = new Vector3();
+/** No move of the home of a mallet. Nothing writes it. */
+const NO_SHIFT = new Vector3();
 const tablePole = new Vector3();
 const playPole = new Vector3();
 const nowPole = new Vector3();
@@ -979,7 +986,9 @@ function holdTurn(
  * nearer to the shaft than the shaft to the fingers in the bind pose, no turn removes the side
  * bend, and the function takes the turn with the least side bend. Near the line of the shaft, the
  * roll fades out ({@link GRIP_FADE}). The paw keeps the roll through the stroke, because a roll
- * for each moment of the stroke turns the paws up to 79° in 0.01 s.
+ * for each moment of the stroke turns the paws up to 79° in 0.01 s. A small move of the forearm
+ * can change the roll by 20° where the two turns meet, so a mallet across the forearm takes the
+ * roll of the body that only leans ({@link steadyRoll}).
  *
  * @param side The hand with a mallet.
  * @param direction The unit direction of the mallet at the strike, from the grip to the head.
@@ -1003,8 +1012,7 @@ function gripRoll(
   const a = armForearm.dot(rollSide);
   const b = armForearm.dot(rollUp);
   const radius = Math.hypot(a, b);
-  // The axis of the mallet in the axes of the hand.
-  shaftInHand.set(1, 0, 0).applyQuaternion(inverse.fromArray(side.inverse).invert());
+  shaftOf(side, shaftInHand);
   if (radius < 1e-8) {
     return out.identity();
   }
@@ -1024,6 +1032,17 @@ function gripRoll(
 }
 
 const GRIP_FADE = [30 * MathUtils.DEG2RAD, 10 * MathUtils.DEG2RAD] as const;
+
+/**
+ * Gives the axis of a mallet in the axes of its hand, from the grip to the head.
+ *
+ * @param side The hand with a mallet.
+ * @param out Gets the unit axis.
+ * @returns `out`.
+ */
+function shaftOf(side: Extract<PercussionSide, { kind: 'mallet' }>, out: Vector3): Vector3 {
+  return out.set(1, 0, 0).applyQuaternion(inverse.fromArray(side.inverse).invert());
+}
 
 /**
  * Turns the strike direction of a mallet up, so that its grip is at most the height of
@@ -1069,8 +1088,8 @@ function limitRise(direction: Vector3, side: Extract<PercussionSide, { kind: 'ma
  * @param pole The direction to which the elbow points, in the model axes.
  * @param shift The move of the home of the mallet, in meters: the move of the paw at a damp that
  *   keeps the direction of the mallet (`DampHand.keep`).
- * @param held The roll of the mallet in the paw ({@link gripRoll}), in radians, or `null` for the
- *   roll of the posed forearm.
+ * @param held The roll of the mallet in the paw ({@link steadyRoll}), in radians, or `null` for
+ *   the roll that has no side bend on the forearm of this arm at the strike ({@link gripRoll}).
  * @returns The roll of the mallet in the paw, in radians: 0 for a paw with no bend rule.
  */
 function acrossHand(
@@ -1102,12 +1121,9 @@ function acrossHand(
     holdTurn(side, forearm, share, turn, along);
     // A paw with a bend rule holds the mallet with no side bend on the forearm at the strike, and
     // keeps that roll of the mallet in the paw through the stroke.
-    if (side.strikeRoll) {
+    if (side.strikeRoll && held === null) {
       holdTurn(side, forearm, 0, strikeTurn, strikeDirection);
       gripRoll(side, strikeDirection, forearm, rollTurn.copy(strikeTurn));
-      if (held !== null) {
-        rollTurn.setFromAxisAngle(shaftInHand, held);
-      }
       roll =
         2 *
         Math.atan2(
@@ -1115,12 +1131,51 @@ function acrossHand(
           rollTurn.w,
         );
       turn.multiply(rollTurn);
+    } else if (side.strikeRoll && held !== null) {
+      roll = held;
+      turn.multiply(rollTurn.setFromAxisAngle(shaftOf(side, shaftInHand), held));
     }
     point.copy(grip).addScaledVector(along, side.length);
     offset.fromArray(side.head).sub(wristBind.fromArray(arm.bind.wrist)).applyQuaternion(turn);
     wrist.copy(point).sub(offset);
   }
   return roll;
+}
+
+/**
+ * Gives the roll of a mallet across the forearm in its paw for a target (design 5.3): the roll
+ * that has no side bend at the strike ({@link gripRoll}) on the arm of the body that only leans
+ * over the instrument (`PercussionRig.steadyChest`). The sway, the breath, and the damp of the
+ * body thus do not turn the paw around the shaft, as a real player keeps one grip. The roll of
+ * the posed arm changed by up to 20° in one frame, because the forearm of the elephant stands
+ * where the two turns of {@link gripRoll} meet. The function writes the module vectors of
+ * {@link acrossHand}.
+ *
+ * @param rig The points of the player.
+ * @param side The hand with a mallet across the forearm and a bend rule.
+ * @param target The target of the mallet head. The function does not change it.
+ * @param pole The direction to which the elbow points, in the axes of the chest.
+ * @returns The roll, in radians.
+ */
+function steadyRoll(
+  rig: PercussionRig,
+  side: Extract<PercussionSide, { kind: 'mallet' }>,
+  target: Vector3,
+  pole: Vec3,
+): number {
+  steadyChest.position.fromArray(rig.steadyChest.position);
+  steadyChest.rotation.fromArray(rig.steadyChest.rotation);
+  poseShoulder(side.arm, steadyChest, rig.chestBind, NO_TURN, steadyShoulder);
+  steadyPole.fromArray(pole).applyQuaternion(steadyChest.rotation);
+  return acrossHand(
+    side,
+    steadyHead.copy(target),
+    0,
+    steadyShoulder.position,
+    steadyPole,
+    NO_SHIFT,
+    null,
+  );
 }
 
 /**
@@ -1392,21 +1447,10 @@ function poseHand(
     }
     // At a damp, the grip goes to its place, and the wrist lifts the head of the mallet.
     homeShift.set(0, 0, 0);
-    // At a muffle of the timpani, the paw keeps the roll of the mallet of its place before the
-    // muffle. The roll of the posed forearm fades out near the line of the shaft (`GRIP_FADE`),
-    // and on the way to the muffle it turned a paw 22° in 1/30 s.
-    let held: number | null = null;
-    if (damped?.kind === 'grip' && damped.keep && muffle > 0) {
-      held = acrossHand(
-        side,
-        unmuffled.copy(head),
-        share,
-        shoulder.position,
-        turnedPole,
-        homeShift,
-        null,
-      );
-    }
+    // The paw keeps the roll of the mallet of its target on the steady arm, also at a muffle of
+    // the timpani. The roll of the posed forearm turned a paw 22° in 1/30 s on the way to the
+    // muffle, and up to 20° in one frame of a stroke.
+    let held = side.strikeRoll ? steadyRoll(rig, side, head, pole) : null;
     if (damped?.kind === 'grip' && muffle > 0) {
       grip.fromArray(damped.grip);
       if (damped.keep) {
@@ -1416,7 +1460,13 @@ function poseHand(
         head.add(homeShift);
       } else {
         along.copy(grip).sub(offset.fromArray(side.home)).normalize();
-        head.lerp(grip.addScaledVector(along, side.length), muffle);
+        dampHead.copy(grip).addScaledVector(along, side.length);
+        // The roll goes to the roll of the place of the damp, the shorter way around the shaft.
+        if (held !== null) {
+          const change = steadyRoll(rig, side, dampHead, pole) - held;
+          held += Math.atan2(Math.sin(change), Math.cos(change)) * muffle;
+        }
+        head.lerp(dampHead, muffle);
       }
       share += (damped.share - share) * muffle;
     }
