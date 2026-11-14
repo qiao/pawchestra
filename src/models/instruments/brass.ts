@@ -244,19 +244,7 @@ function piston(piece: PieceBuilder, at: Vec3, radius: number, height: number, s
   for (const [profile, color] of bands) {
     piece.add(latheBand(profile, TUBE_SEGMENTS), color, transform([x, y - height, z]), 'metal');
   }
-  // The stem stands on the top cap and ends in the button, so its ends need no caps.
-  piece.add(
-    latheBand(
-      [
-        [radius * 0.22, 0],
-        [radius * 0.22, stem * 0.6],
-      ],
-      ROD_SEGMENTS,
-    ),
-    TRIM,
-    transform([x, y, z]),
-    'metal',
-  );
+  piece.rod([x, y, z], [x, y + stem * 0.6, z], radius * 0.22, ROD_SEGMENTS, TRIM, 'metal');
   turned(
     piece,
     [x, y + stem * 0.6, z],
