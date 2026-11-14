@@ -22,6 +22,7 @@ OUT = os.path.join(ROOT, 'scratch', 'hand', os.path.basename(HERE))
 os.makedirs(OUT, exist_ok=True)
 sys.path.insert(0, os.path.join(ROOT, 'tools', 'blender'))
 sys.path.insert(0, HERE)
+import band_faces as bf  # noqa: E402
 import redits as ce  # noqa: E402
 import rimport  # noqa: E402
 import rings  # noqa: E402
@@ -1349,6 +1350,18 @@ def band_uvs(body):
                 d = S[v] - mid
                 uv[l].uv = (center + density * np.array([d @ a, d @ b])).tolist()
         log(f'band UVs: {len(band)} faces about UV {rule["uv"]} at {density:.3f} UV for each unit')
+    fade = P.get('bandFade')
+    if fade:
+        # The band faces keep the UVs of the old band, and tools/bear-maps.py paints them as a
+        # fade from the forearm fur to the turned paw fur (tools/band_fade.py).
+        count = bf.write_bands(
+            me,
+            flags,
+            studio_points(me),
+            lambda side: ce.paw_axis(CONFIG['joints'], side),
+            os.path.join(ROOT, fade['path']),
+        )
+        log(f'band fade: {count} faces to {fade["path"]}')
     me.attributes.remove(me.attributes['band'])
 
 

@@ -40,7 +40,8 @@ entry of the bear in `tools/studio-body.ts` points to `tripo-hand/bear.rig.glb`.
 | `tripo-hand/bear.blend` | Made from `tripo-p2/bear.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain bear` |
 | `tripo-hand/bear.rig.glb` | Export of `tripo-hand/bear.blend`. License as the FBX file | `pnpm rig-export bear --blend assets/models/bear/tripo-hand/bear.blend --out assets/models/bear/tripo-hand/bear.rig.glb` |
 | `tripo-hand/bear.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/bear-color.webp`, `tripo-hand/bear-normal.webp` | Web copies of the color map and the normal map of the FBX, with fur strands ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/bear-maps.py`, after the chain (the tool reads the eyes of the rig file) |
+| `tripo-hand/bear-bands.json` | The band faces of the paw turns, for the band fade of the maps (`tools/blender/band_faces.py`) | `pnpm hand-chain bear` |
+| `tripo-hand/bear-color.webp`, `tripo-hand/bear-normal.webp` | Web copies of the color map and the normal map of the FBX, with fur strands and the band fade ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/bear-maps.py`, after the chain (the tool reads the eyes of the rig file and the band faces) |
 
 ### tripo-p2/bear.fbx
 
@@ -118,6 +119,13 @@ left side):
   with the paw, the quads before the loop sheared into a pinched, kinked wrist with a fan of
   stretched fur: 5 faces on the left and 6 on the right had UV scale ratios of 2.6 to 4.2, against
   about 1.15 on the faces around them.
+- **Band fade.** The 28 new quads keep the UVs of the old band, and the chain writes them to
+  `tripo-hand/bear-bands.json` (`bandFade` of the params). Both maps paint their texels as a fade
+  from the forearm fur at the loop at x 0.336 to the turned paw fur at the loop at x 0.368
+  (`tools/band_fade.py`). Reason: the paw turned with its UVs, so the paw showed the fur of
+  another side of the map, and a ring line with a step of tone showed around each forearm, as
+  the cuff of a glove. A planar patch of one clean fur piece (`bandPatch`) showed the same piece
+  on each quad and a line at both loops.
 - **Surface.** `sa.add_surface(bear, 'bear', <base color>, eye_fans=False,
   config=<bear-tripo.json>)`. The 51 gloss faces of the nose box go back to the slot `fur`
   (`nose_trim()`), so that the nose takes the color map with its painted nostrils.
@@ -195,8 +203,8 @@ y 0.42 to 0.62 of the frame), the median Oklab L, C, and h of the back fur:
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `bear-color.webp` | 165,330 bytes, 2048 × 2048, WebP quality 60 | `2264dca584d6b958d1cd3f90acb5a7c313f6a473f676c8de8dce96d11d896c4b` |
-| `bear-normal.webp` | 150,232 bytes, 1024 × 1024 | `0648815290a80c2deb5ad847df8d2541c11a0dd3e3c7a09f428317d44e7740c7` |
+| `bear-color.webp` | 164,666 bytes, 2048 × 2048, WebP quality 60 | `48bc19712a07a4a6dcb28373c81935962eeeadc268a565644c08a6dbe233df90` |
+| `bear-normal.webp` | 148,536 bytes, 1024 × 1024 | `c1593f59f6c5c1cf7ad8ff50ed5965a17942092c9dae008ada59ae293db789ee` |
 
 ### Export
 

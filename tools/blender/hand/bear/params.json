@@ -216,6 +216,9 @@
   0.8
  ],
  "turnFit": 0.03,
+ "bandFade": {
+  "path": "assets/models/bear/tripo-hand/bear-bands.json"
+ },
  "throatRows": {
   "y": [
    0.77,

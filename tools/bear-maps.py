@@ -3,7 +3,9 @@
 # pixels with fur strands (STRANDS): each color takes a small luma step along the strands, and the
 # hue stays. Then each texel takes the Oklab lightness LIGHTNESS times its lightness. The eye paint stays as the FBX shows it, and the eyeballs keep their colors. The
 # normal map adds the slope of the same strands to the tilts of the source. The output depends
-# only on the input files, the eyes of the rig file, and cwebp 1.5.0.
+# only on the input files, the eyes of the rig file, the band faces of the chain (BANDS), and
+# cwebp 1.5.0. Both maps paint the band faces of the turned paws as a fade from the forearm fur to
+# the paw fur (tools/band_fade.py).
 #
 # Usage: uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/bear-maps.py
 import os
@@ -15,6 +17,7 @@ import numpy as np
 from PIL import Image
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import band_fade  # noqa: E402
 import gaze_shift  # noqa: E402
 
 SOURCE = 'assets/models/bear/tripo-p2/bear.fbm/bear_basecolor.jpg'
@@ -22,6 +25,8 @@ NORMAL_SOURCE = 'assets/models/bear/tripo-p2/bear.fbm/bear_normal.jpg'
 RIG = 'assets/models/bear/tripo-hand/bear.rig.glb'
 COLOR_OUT = 'assets/models/bear/tripo-hand/bear-color.webp'
 NORMAL_OUT = 'assets/models/bear/tripo-hand/bear-normal.webp'
+#: The band faces of the paw turns, from the build of the chain (`bandFade` of its params).
+BANDS = 'assets/models/bear/tripo-hand/bear-bands.json'
 SIZE = 2048
 NORMAL_SIZE = 1024
 QUALITY = 60
@@ -183,7 +188,7 @@ def strand_tilts(height):
     return t * (STRANDS['tilt'] / np.sqrt((t ** 2).sum(-1).mean()))
 
 
-def normal_map(extra=None):
+def normal_map(extra=None, bands=()):
     """Writes the normal map of the fur: each x, y tilt of the source limited to the length
     NORMAL_LIMIT, a box scale to NORMAL_SIZE, then the tilts times NORMAL_GAIN in red and green,
     255 in blue (the shader does not read it), and cwebp -q 60 -sharp_yuv -m 6. The limit comes
@@ -200,6 +205,7 @@ def normal_map(extra=None):
         length = np.linalg.norm(small, axis=-1)
         over2 = length > NORMAL_LIMIT
         small[over2] *= (NORMAL_LIMIT / length[over2])[:, None]
+    small, _ = band_fade.fade_bands(small, bands)
     v = np.clip(small * NORMAL_GAIN, -1, 1)
     rgb = np.zeros((NORMAL_SIZE, NORMAL_SIZE, 3), np.uint8)
     rgb[..., :2] = np.round((v + 1) / 2 * 255).astype(np.uint8)
@@ -219,11 +225,15 @@ def main():
     rig = gaze_shift.read_rig(RIG)
     height = strands(image)
     image = strand_color(image, height, rig)
+    bands = band_fade.read_bands(BANDS)
+    faded, count = band_fade.fade_bands(np.asarray(image).astype(np.float64), bands)
+    image = Image.fromarray(np.round(faded).astype(np.uint8))
+    print(f'band fade: {len(bands)} band faces, {count} texels at {SIZE}')
     if 'color' in which:
         image.save(COLOR_OUT, 'WEBP', quality=QUALITY, method=6)
         print(f'{COLOR_OUT}: {SIZE} x {SIZE}, {os.path.getsize(COLOR_OUT)} bytes')
     if 'normal' in which:
-        normal_map(strand_tilts(height))
+        normal_map(strand_tilts(height), bands)
 
 
 if __name__ == '__main__':
