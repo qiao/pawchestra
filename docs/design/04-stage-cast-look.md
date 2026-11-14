@@ -2080,7 +2080,9 @@ grips keep their places, so the holds and the strikes do not change with the det
   ring, three legs with casters, and a balanced action pedal at the side of the player.
 - **Drums.** One builder makes the shell, the heads, the hoops, the lugs, and the tension rods of
   each drum (`addDrum()`). The bass drum has wood hoops and 12 lugs, as a Yamaha CB-7036
-  (`BASS_DRUM_LOOK`), and lies on the rubber pads of two black A frames with casters. The snare
+  (`BASS_DRUM_LOOK`), and lies on the rubber pads of two black A frames with casters. It has more
+  faces around its axis than the snare drum, because its large round head showed its corners. The
+  snare
   drum has triple flanged chrome hoops and 10 lugs, as a Ludwig Supraphonic (`SNARE_DRUM_LOOK`),
   a strainer, snare wires under the bottom head, and a basket stand. Both shells have one
   lacquer, as a matched set. Each hoop rises a few millimeters over its head, so that a stick or a

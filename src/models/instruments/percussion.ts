@@ -803,11 +803,13 @@ function malletPair(m: MalletHold, right: MalletHold = m): readonly [HandTool, H
   return [mallet('malletL', m), mallet('malletR', right)];
 }
 
-/** The faces around the axis of a drum, its hoops, and the tambourine. */
+/** The faces around the axis of the snare drum, its hoops, and the tambourine. */
 const DRUM_SEGMENTS = 16;
 
 /** The look of a drum around its shell and its heads, in meters (design 4.6). */
 interface DrumLook {
+  /** The faces around the axis of the shell, the hoops, and the heads. */
+  readonly segments: number;
   /** The color of the shell. */
   readonly shell: Rgb;
   /** The finish of the shell. */
@@ -913,7 +915,7 @@ function addDrum(
     ],
   ];
   for (const [profile, color, finish] of steps) {
-    piece.add(latheBand(profile, DRUM_SEGMENTS), color, at, finish);
+    piece.add(latheBand(profile, look.segments), color, at, finish);
   }
   const [lugWidth, lugLength, lugDepth] = lugs.size;
   const rodLength = depth - 2 * hoop.down;
@@ -1265,9 +1267,11 @@ function tripodSpace(piece: PartSink, base: Vec3, top: Vec3, spread: number): vo
 
 /**
  * The look of the bass drum (design 4.6), as a Yamaha CB-7036 concert bass drum: a lacquered
- * shell, wood hoops, and 12 chrome lugs.
+ * shell, wood hoops, and 12 chrome lugs. The shell has 20 faces around its axis, because its large
+ * round head showed the corners of 16 faces in the close shots.
  */
 const BASS_DRUM_LOOK: DrumLook = {
+  segments: 20,
   shell: INSTRUMENT_COLORS.drumShell,
   shellFinish: 'varnish',
   hoop: {
@@ -1417,6 +1421,7 @@ export function buildBassDrum(): InstrumentModel {
  * the lacquer of the bass drum, as a matched concert set.
  */
 const SNARE_DRUM_LOOK: DrumLook = {
+  segments: DRUM_SEGMENTS,
   shell: INSTRUMENT_COLORS.drumShell,
   shellFinish: 'varnish',
   hoop: {
