@@ -476,9 +476,13 @@ passes.
       ring B keep UV scale ratios of 2.2 to 4.1 (about 1.2 around them). The join of the paw
       turned by 3 steps and the `turnFit` fade stretch them. Check them in 2x crops, and try a
       longer fade.
-- [ ] Cat violist: in the lift and the lowering, the left forearm goes 2.4 cm into the back of
-      the viola (limit 1.5 cm, `pnpm hold-fit violist --sets rest,lift,lower`). The left arm gate
-      folds 43 faces at rest (the curled rest paw).
+- [ ] Cat violist: in the lift and the lowering, the upper arms go 3.5 cm into the body (limit
+      1.5 cm, `pnpm hold-fit violist --sets rest,lift,lower`). The left arm gate folds 42 faces at
+      rest (the curled rest paw), and the left upper arm twists 65° in the lift (limit 55) with
+      the via that keeps the scroll up.
+- [ ] `pnpm carry-check`: its detour does not see a move the long way when the turn is near 180°.
+      The cat viola swung its scroll in toward the chest with a detour of only 36° of 173°. Add
+      the gap from the short arc and the inward lean of the scroll.
 - [ ] Rabbit violinist: the left forearm goes 2.3 cm into the back of the violin in 80% of the
       play and 63% of the lowering (limit 1.4 cm, `pnpm body-clip violinist`). No place, elbow,
       tilt, gap, or turn of the violin changes it, and a violin of 0.8 lowers it only to 2.0 cm.
