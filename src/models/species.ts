@@ -439,7 +439,7 @@ export const SPECIES = {
    * seat of the studio body, in H. Its arms are short for its big head: the mouth is 0.21 m in front
    * of the right shoulder joint. So the upper arms and the forearms of the mesh are 1.2 times those
    * of the source, and the arm reaches 0.488 m in place of 0.417 m. It plays the trombone of the
-   * app, 0.49 of its seated height, at which the right arm reaches 0.135 m of the slide travel
+   * app, 0.49 of its seated height, at which the right arm reaches 0.125 m of the slide travel
    * (`pnpm hold-reach panda --instrument trombone`). With a smaller trombone of 0.75, the trombone
    * read as a toy.
    */

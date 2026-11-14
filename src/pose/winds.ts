@@ -735,10 +735,10 @@ const FOX_FLUTE = {
  * head and belly: the mouth is 0.21 m in front of the right shoulder joint and 0.25 m above it. The
  * upper arms and the forearms of the mesh are 1.2 times those of the source
  * (`assets/models/panda/README.md`), so that the arm reaches 0.488 m in place of 0.417 m. On the
- * trombone of the app, the right arm then reaches 0.11 m of the slide travel with the slide 35°
- * below the level, and 0.135 m at 40° (`pnpm hold-reach panda --instrument trombone`). With the
- * arms of the source, it reached 0.03 m at 35°. With the slide 20° to the right, the bell stood at
- * the right knee.
+ * trombone of the app, the right arm then reaches 0.125 m of the slide travel with the slide 40°
+ * below the level (`pnpm hold-reach panda --instrument trombone`), and 0.095 m at 35°. With the
+ * arms of the source, it reached 0.03 m at 35°, with the paw beside the slide. With the slide 20°
+ * to the right, the bell stood at the right knee.
  *
  * A chest that leans forward or turns in the far positions adds no reach: the head and the
  * mouthpiece follow the chest, so the shoulder and the slide move together.
@@ -789,14 +789,16 @@ const PANDA_PLAY_TURN = toQuat(
  * trombone, the left forearm went 2.5 cm into the head, and on the trombone of the app, with the
  * grip 0.02 H away from the mouthpiece, the left paw went 1.6 cm into the chin. With 0.07 H toward
  * the tubes, the middle of the paw lay on the axis of the tubes and the finger tips stood 3 cm off
- * them. The right paw holds the low part of the brace from the right side of the panda, with its
+ * them. The right paw closes around the slide brace from the right side of the panda, with its
  * palm to the left and its thumb up the brace, as a real trombonist puts the thumb on the top of
- * the brace and the fingers below it (`docs/reference/wind-technique.md` 1.1). Its grip moves 0.2 H
- * down the brace and 0.05 H toward the panda (`gripShiftR`), and the fingers curl 120° around the
- * brace. In the first position, the right paw then holds the brace below and in front of the left
- * paw, with a gap between them: with the grip 0.15 H down, the paws touched. With 0.25 H down, the
- * right paw grasped the brace in no sample, and with a grip along the slide toward the mouthpiece,
- * the middle of the paw lies 8 cm from the brace. Both paws grasp their tubes in each sample
+ * the brace and the fingers below it, with two fingers beneath the lower slide tube
+ * (`docs/reference/wind-technique.md` 1.1). Its grip moves 0.11 H down the brace, to 2 cm below
+ * the lower slide tube, and 0.02 H away from the brace (`gripShiftR`), and the fingers curl 120°.
+ * The brace and the two slide tubes then go through the closed paw, so that the paw holds the
+ * slide at its brace in each position and at rest. With the grip 0.2 H down the brace and 0.05 H
+ * away from it, the paw was a fist below and beside the slide, and the slide tubes passed in
+ * front of its knuckles. In the first position, the right paw lies below and in front of the left
+ * paw, and the two paws touch. Both paws grasp their tubes in each sample
  * (`pnpm wind-grip trombonist`). The paw points 0.8 of the way along the slide (`aimSide`). Both
  * paws keep the aim and the roll of the play at rest (`restAim`).
  *
@@ -811,8 +813,8 @@ const PANDA_PLAY_TURN = toQuat(
  * The middle of the right paw lies at the right side of the brace, so the right arm reaches a small
  * part of the slide travel of 0.55 m. A real seventh position is 0.57 m from the first position
  * (`docs/reference/wind-technique.md` 1.2), so the slide positions map into the reached travel
- * ({@link reachedShare}): the slide moves 4.1 cm in the second position, 10.1 cm in the fourth,
- * and 13.5 cm in the seventh.
+ * ({@link reachedShare}): the slide moves 3.8 cm in the second position, 9.4 cm in the fourth,
+ * and 12.5 cm in the seventh.
  *
  * The mouthpiece rim rests on the lips, as the rim of a real trombonist
  * (`docs/reference/wind-technique.md` 1.1): it moves 0.057 H down and 0.065 H back from the mouth
@@ -846,7 +848,7 @@ const PANDA_TROMBONE = {
   aimAcross: 1,
   aimSide: [0.8, 0.8],
   gripShiftL: [0.05, 0.02, 0],
-  gripShiftR: [0.2, -0.05, 0],
+  gripShiftR: [0.11, -0.02, 0],
   reach: 70 * MathUtils.DEG2RAD,
   restGripShiftL: [0, 0.04, -0.01],
   restAim: 1,
