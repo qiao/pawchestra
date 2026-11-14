@@ -435,6 +435,15 @@ export interface ConductorState {
  */
 const LIFT_HAND_EASE = 3;
 
+/**
+ * The part of the forward lean of the expression that the beat plane follows (design 5.4). The
+ * tip of the baton is about 0.75 m in front of the spine, so a lean of 10° moved it 13 cm down,
+ * and with the beat at the lower chest the baton came onto the desk of the conductor stand in a
+ * soft passage (`beethoven-8-4` 694 s). The paw at the lower chest stays far below the head, so it
+ * needs no full lean to keep clear of the muzzle.
+ */
+const BATON_LEAN = 0.4;
+
 const right = createFrame();
 const left = createFrame();
 /**
@@ -486,15 +495,21 @@ const bodySway = new Quaternion();
  * @param rig The points of the conductor.
  * @param point The point to move in place.
  * @param state The motion at the song time.
+ * @param leanShare The part of the lean that the point follows.
  * @returns `point`.
  */
-function followBody(rig: ConductorRig, point: Vector3, state: ConductorState): Vector3 {
+function followBody(
+  rig: ConductorRig,
+  point: Vector3,
+  state: ConductorState,
+  leanShare = 1,
+): Vector3 {
   if (state.lean === 0 && state.sway === 0 && state.drop === 0 && state.shift === 0) {
     return point;
   }
   const [x, y, z] = rig.spineBind;
   bodyTurn.setFromAxisAngle(Z_AXIS, state.sway);
-  bodyTurn.multiply(bodySway.setFromAxisAngle(X_AXIS, -state.lean));
+  bodyTurn.multiply(bodySway.setFromAxisAngle(X_AXIS, -state.lean * leanShare));
   point.x -= x;
   point.y -= y;
   point.z -= z;
@@ -541,7 +556,7 @@ function batonPoint(rig: ConductorRig, state: ConductorState, out: Vector3): Vec
     .fromArray(rig.beatPoint)
     .addScaledVector(offset.fromArray(rig.beatRight), lifted.x)
     .addScaledVector(offset.fromArray(rig.beatUp), lifted.y);
-  return turnWithTorso(rig, followBody(rig, out, state), state.cue.torsoYaw);
+  return turnWithTorso(rig, followBody(rig, out, state, BATON_LEAN), state.cue.torsoYaw);
 }
 
 /**
@@ -611,7 +626,7 @@ export function poseConductor(
   lifted.x = state.baton.x;
   lifted.y = state.baton.y + cue.batonLift;
   batonPoint(rig, state, tip);
-  turnWithTorso(rig, followBody(rig, pivot.fromArray(rig.pivot), state), cue.torsoYaw);
+  turnWithTorso(rig, followBody(rig, pivot.fromArray(rig.pivot), state, BATON_LEAN), cue.torsoYaw);
   batonHand(rig, tip, pivot);
   levelOf(right, frames.root);
   hangingWrist(rig.hangR, hangFrame, hanging);
