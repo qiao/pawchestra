@@ -24,6 +24,7 @@ import type { Bounds } from '../src/models/bounds.ts';
 import type { PlayerPlace, SceneLayout } from '../src/models/layout.ts';
 import { layoutScene } from '../src/models/layout-scene.ts';
 import { ModelCache } from '../src/models/model-cache.ts';
+import type { BoneName } from '../src/models/rig.ts';
 import { SPECIES, SPECIES_IDS, isSpeciesId } from '../src/models/species.ts';
 import type { SpeciesId } from '../src/models/species.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
@@ -5154,7 +5155,10 @@ async function playViews(args: PlayArgs, site: TreeSite): Promise<CommitRender> 
 /** The first argument that only checks the command line: the tool then builds and renders nothing. */
 const CHECK_FLAG = '--check';
 
-/** The command line of one mode of the tool that renders images: a role, a lineup, or a view. */
+/**
+ * The command line of one mode of the tool that renders images: a role, a lineup, a view, play
+ * frames, or the body parts of roles.
+ */
 type SingleMode =
   | {
       /** The close view of a role. */
@@ -5179,6 +5183,12 @@ type SingleMode =
       readonly kind: 'play';
       /** The command line of the mode. */
       readonly args: PlayArgs;
+    }
+  | {
+      /** Close-ups of the body parts of roles. */
+      readonly kind: 'parts';
+      /** The command line of the mode. */
+      readonly args: PartsArgs;
     };
 
 /** The command line of the mode `batch`: single modes that share one build of each tree. */
@@ -5440,18 +5450,706 @@ function auditArgs(args: readonly string[]): BatchArgs | null {
   return { parts, out, url, base };
 }
 
+/** A body part of the mode `parts`. */
+type BodyPartName = 'arm-L' | 'arm-R' | 'paw-L' | 'paw-R' | 'seat' | 'ankle-L' | 'ankle-R';
+
+/** One view of a body part: the turn and the height of the camera around the part. */
+interface PartViewAngle extends CloseViewAngle {
+  /** The angle of the camera above the part, in degrees. A negative angle looks from below. */
+  readonly elevation: number;
+  /**
+   * True to cut away all that is nearer to the camera than the part (the gallery query `cut`),
+   * such as the trunk between the camera and a paw in front of the chest.
+   */
+  readonly cut?: true;
+}
+
+/**
+ * A body part of the mode `parts`: the camera of each view looks at the middle of the part in its
+ * pose, and the frame holds the mesh on its bones (the gallery query `part`, design 7.1). Thus a
+ * part needs no point for a role or a moment, and it fills its cell on each species.
+ */
+interface BodyPart {
+  /** The name of the part in the file names and the labels. */
+  readonly name: BodyPartName;
+  /** The bones of the player whose mesh the frame must hold, such as the hand and the fingers. */
+  readonly bones: readonly BoneName[];
+  /** The margin around the mesh on the bones, as a share of the radius of the part. */
+  readonly margin: number;
+  /** The views around the part. */
+  readonly views: readonly PartViewAngle[];
+}
+
+/**
+ * Gives the parts of one side of the body:
+ *
+ * - The arm: the arm root, the armpit, the upper arm, the elbow, the forearm, and the wrist, from
+ *   the front, the outer side, the back, and 30° to the outer side of the back, each at the
+ *   elevations 20° and 40°. A dent of an arm root shows from behind and above.
+ * - The paw: the wrist, the palm, the digits, and the thing that the paw holds, from the front, the
+ *   outer side, the back, and above at 60°. Two more views look from the sides that the body, the
+ *   seat, or the instrument hides: below at 45°, which shows a palm that faces down, and the inner
+ *   side. These two views cut away all that is nearer to the camera than the paw (`-cut`), so a
+ *   cut body or prop in them is no fault of the mesh. The back has no cut, because a cut removes
+ *   the forearm of an arm that points forward, and the open wrist then hides the paw.
+ * - The ankle: the shin end, the ankle, and the foot on the floor, from the front, the outer side,
+ *   and the back, at the elevation 10°.
+ *
+ * @param side The side.
+ * @returns The arm, the paw, and the ankle of the side.
+ */
+function sideParts(side: 'L' | 'R'): [arm: BodyPart, paw: BodyPart, ankle: BodyPart] {
+  const outer = side === 'R' ? 90 : -90;
+  const behind = side === 'R' ? 150 : -150;
+  const around = (elevation: number): PartViewAngle[] => [
+    { name: `front-e${elevation}`, azimuth: 0, elevation },
+    { name: `side-e${elevation}`, azimuth: outer, elevation },
+    { name: `back-e${elevation}`, azimuth: 180, elevation },
+  ];
+  const armViews = [20, 40].flatMap((elevation): PartViewAngle[] =>
+    around(elevation).concat({ name: `az${behind}-e${elevation}`, azimuth: behind, elevation }),
+  );
+  return [
+    {
+      name: `arm-${side}`,
+      bones: [`upperArm${side}`, `forearm${side}`, `hand${side}`],
+      margin: 0.2,
+      views: armViews,
+    },
+    {
+      name: `paw-${side}`,
+      bones: [`hand${side}`, `fingers${side}`],
+      margin: 0.25,
+      views: [
+        ...around(20),
+        { name: 'above-e60', azimuth: 0, elevation: 60 },
+        { name: 'under-cut', azimuth: 0, elevation: -45, cut: true },
+        { name: 'inner-cut', azimuth: -outer, elevation: 20, cut: true },
+      ],
+    },
+    {
+      name: `ankle-${side}`,
+      bones: [`foot${side}`],
+      margin: 0.3,
+      views: around(10),
+    },
+  ];
+}
+
+/**
+ * The body parts of the mode `parts`, in the order of the usage text: each arm, each paw, the seat,
+ * and each ankle ({@link sideParts}). The seat is the haunch, the tail root, and the thighs on the
+ * seat prop, or of a player who stands, from the back and both sides, and low from 30° to each
+ * side of the back.
+ */
+const BODY_PARTS: readonly BodyPart[] = ((): BodyPart[] => {
+  const [armL, pawL, ankleL] = sideParts('L');
+  const [armR, pawR, ankleR] = sideParts('R');
+  const seat: BodyPart = {
+    name: 'seat',
+    bones: ['hips', 'thighL', 'thighR', 'tail1'],
+    margin: 0.1,
+    views: [
+      { name: 'back-e20', azimuth: 180, elevation: 20 },
+      { name: 'left-e20', azimuth: -90, elevation: 20 },
+      { name: 'right-e20', azimuth: 90, elevation: 20 },
+      { name: 'az150-e10', azimuth: 150, elevation: 10 },
+      { name: 'az-150-e10', azimuth: -150, elevation: 10 },
+    ],
+  };
+  return [armL, armR, pawL, pawR, seat, ankleL, ankleR];
+})();
+
+/** The size of one cell of the mode `parts`, in CSS pixels: the page renders each cell at it. */
+const PART_CELL: CellSize = { width: 720, height: 720 };
+
+/**
+ * The size of a cell in a sheet of the mode `parts`, in CSS pixels: half of {@link PART_CELL}, so
+ * that a sheet of eight views stays a small file. The cell files keep the full size.
+ */
+const PART_SHEET_CELL: CellSize = { width: 360, height: 360 };
+
+/**
+ * The fixed wall clock time of the poses of the mode `parts` (the gallery query `wall`), in
+ * seconds: the idle motion stops, so the cells of the commit and of the working tree show the
+ * same instant, and a second run gives the same cells.
+ */
+const PART_WALL_SEC = 10;
+
+/** The number of gallery pages that the mode `parts` renders at the same time, one role each. */
+const PART_PAGES = 6;
+
+/**
+ * The bones whose posed heads choose the second play moment of a role ({@link farPlayMoment}):
+ * each elbow and each wrist.
+ */
+const ARM_BONES: readonly BoneName[] = ['forearmL', 'handL', 'forearmR', 'handR'];
+
+/** The command line of the mode `parts`. */
+interface PartsArgs {
+  /** The roles, in their order. */
+  readonly roles: readonly CloseRole[];
+  /** The body parts, in their order. */
+  readonly parts: readonly BodyPart[];
+  /**
+   * The names of the moments of `--moments`, or `null` for the moments of
+   * {@link defaultPartMoments}. A role renders each moment of the list that it has.
+   */
+  readonly moments: readonly string[] | null;
+  /** The output directory. */
+  readonly out: string;
+  /** The URL of a running site of the working tree, or `null` for the built site. */
+  readonly url: string | null;
+  /** The commit, the branch, or the tag to compare with the working tree, or `null`. */
+  readonly base: string | null;
+}
+
+/**
+ * Reads the command line of the mode `parts`: `parts <dir> [--roles <role,...>] [--parts
+ * <part,...>] [--moments <moment,...>] [--url <url>] [--base <ref>]`. With no `--roles`, it takes
+ * each role, and with no `--parts`, each part of {@link BODY_PARTS}. A name of `--moments` is a
+ * moment of a role, or a share of a move such as `lift30` ({@link roleMoment}).
+ *
+ * @param args The arguments after the script.
+ * @returns The command line, or `null` when the first argument is not `parts`.
+ * @throws Error that lists the correct names, for an unknown role or part, and an error for a
+ *   moment that no role of the command line has, a wrong option, a name that comes two times, or
+ *   a missing word.
+ */
+function partsArgs(args: readonly string[]): PartsArgs | null {
+  if (args[0] !== 'parts') {
+    return null;
+  }
+  const line = modeLine(args.slice(1), ['--roles', '--parts', '--moments', '--url', '--base']);
+  const [out, ...extra] = line.words;
+  if (!out || extra.length > 0) {
+    throw new Error(
+      'The mode parts takes one output directory, such as: parts scratch/parts --roles violinist,oboist --parts paw-L,paw-R',
+    );
+  }
+  const one = (name: string): string | null => line.options.get(name)?.[0] ?? null;
+  const roleItems = CLOSE_ROLES.map((name) => ({ name }));
+  const roles = onceEach(one('--roles')?.split(',') ?? CLOSE_ROLES, 'role').map(
+    (name) => namedItem(name, roleItems, 'role').name,
+  );
+  const parts = onceEach(
+    one('--parts')?.split(',') ?? BODY_PARTS.map((part) => part.name),
+    'part',
+  ).map((name) => namedItem(name, BODY_PARTS, 'part'));
+  const moments = one('--moments')?.split(',') ?? null;
+  for (const name of onceEach(moments ?? [], 'moment')) {
+    if (!roles.some((role) => momentOf(ROLE_VIEWS[role], name))) {
+      const names = [
+        ...new Set(roles.flatMap((role) => ROLE_VIEWS[role].moments.map((moment) => moment.name))),
+      ];
+      throw new Error(
+        `No role of the command line has the moment "${name}". The moments are: ${names.join(', ')}, and lift<n> or lower<n> for a role with a lift.`,
+      );
+    }
+  }
+  return { roles, parts, moments, out, url: one('--url'), base: one('--base') };
+}
+
+/**
+ * Finds a moment of a role by its name, as {@link roleMoment} does.
+ *
+ * @param role The close view of the role.
+ * @param name The name of the moment.
+ * @returns The moment, or `null` when the role does not have it.
+ */
+function momentOf(role: RoleViews, name: string): CloseMoment | null {
+  try {
+    return roleMoment(role, name);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Tells if a moment is a play moment: the player plays a note or waits between two notes on its
+ * seat, with no rest, no move of the instrument, and no stand.
+ *
+ * @param moment The moment.
+ * @returns True for a play moment.
+ */
+function isPlayMoment(moment: CloseMoment): boolean {
+  return !moment.rest && !moment.move && !moment.stand;
+}
+
+/**
+ * Gives the moments of a role in the mode `parts` with no `--moments`: the first play moment, the
+ * play moment whose arms differ most from it ({@link farPlayMoment}), the rest pose, and, where
+ * the role has them, the middle of the lift and the standing soloist.
+ *
+ * @param role The close view of the role.
+ * @param far The play moment whose arms differ most from the first, or `null` for a role with one
+ *   play moment.
+ * @returns The moments, in their order.
+ */
+function defaultPartMoments(role: RoleViews, far: CloseMoment | null): CloseMoment[] {
+  const first = role.moments.find(isPlayMoment);
+  const rest = role.moments.find((moment) => moment.rest);
+  const lift = role.moments.find((moment) => moment.move?.kind === 'lift');
+  const stand = role.moments.find((moment) => moment.stand);
+  return [first, far, rest, lift, stand].flatMap((moment) => moment ?? []);
+}
+
+/**
+ * Gives the query of the gallery page of one cell of the mode `parts`: the animal of the role
+ * alone, at the transport of the moment, with the camera of the view on the bones of the part.
+ *
+ * @param role The close view of the role.
+ * @param moment The moment.
+ * @param part The body part.
+ * @param view The view.
+ * @returns The query, with no `?`.
+ */
+function partQuery(
+  role: RoleViews,
+  moment: CloseMoment,
+  part: Pick<BodyPart, 'bones' | 'margin'>,
+  view: PartViewAngle,
+): string {
+  const query = new URLSearchParams({
+    page: 'species',
+    only: role.instrument ?? role.species,
+    part: part.bones.join(','),
+    margin: String(part.margin),
+    azimuth: String(view.azimuth),
+    elevation: String(view.elevation),
+    wall: String(PART_WALL_SEC),
+    fill: String(fillLux),
+  });
+  if (view.cut) {
+    query.set('cut', '');
+  }
+  if (moment.rest) {
+    query.set('rest', '');
+  }
+  if (moment.stand) {
+    query.set('stand', '');
+  }
+  if (moment.move) {
+    query.set(moment.move.kind, String(moment.move.share));
+  }
+  return query.toString();
+}
+
+/** The id of the hidden image of the page background on a page of the mode `parts`. */
+const PART_BACKDROP_ID = 'part-backdrop';
+
+/** One cell of the mode `parts`, as the gallery page shows it. */
+interface ShownPart {
+  /**
+   * The numbers of the attribute `data-part` of the canvas: the middle and the radius of the ball
+   * of the part, then the posed head of each bone of the part, in meters.
+   */
+  readonly numbers: readonly number[];
+  /** The PNG image of the cell, or `null` when the caller takes no image. */
+  readonly image: Buffer | null;
+}
+
+/**
+ * Shows one cell of the mode `parts` on an open gallery page, with no load: the page takes the
+ * query of the cell and reads it again (the event `popstate`, design 7.1), the slider goes to the
+ * time of the moment, and two frames pass, so that the canvas shows the pose and the camera of the
+ * cell. The image is the canvas of the second frame over the page background
+ * ({@link PART_BACKDROP_ID}), read in the page in the frame callback after the render of the
+ * gallery, while the canvas still holds the frame. A screenshot of the page gives the same
+ * pixels, but it took about 105 ms for each cell, and the pages of one browser took their
+ * screenshots in turn.
+ *
+ * @param page The gallery page of the role ({@link openPartPage}).
+ * @param query The query of the cell ({@link partQuery}).
+ * @param time The time of the slider, in seconds.
+ * @param shot True to take the image of the cell.
+ * @returns The numbers of the part, and the image.
+ * @throws Error if the page shows no part, as a gallery with no query `part` does, or if it
+ *   gives no image.
+ */
+async function showPart(
+  page: Page,
+  query: string,
+  time: number,
+  shot: boolean,
+): Promise<ShownPart> {
+  const shown = await page.evaluate(
+    ({ search, at, take, backdropId }) => {
+      history.replaceState(null, '', `${location.pathname}?${search}`);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      const slider = document.querySelector('#time');
+      if (slider instanceof HTMLInputElement) {
+        slider.value = String(at);
+        slider.dispatchEvent(new Event('input'));
+      }
+      return new Promise<{ part: string; image: string }>((done) => {
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => {
+            const gallery = document.querySelector('#gallery');
+            const backdrop = document.getElementById(backdropId);
+            let image = '';
+            if (
+              take &&
+              gallery instanceof HTMLCanvasElement &&
+              backdrop instanceof HTMLImageElement
+            ) {
+              const cell = document.createElement('canvas');
+              cell.width = gallery.width;
+              cell.height = gallery.height;
+              const context = cell.getContext('2d');
+              context?.drawImage(backdrop, 0, 0, cell.width, cell.height);
+              context?.drawImage(gallery, 0, 0);
+              image = cell.toDataURL('image/png');
+            }
+            const part = gallery instanceof HTMLElement ? (gallery.dataset['part'] ?? '') : '';
+            done({ part, image });
+          }),
+        );
+      });
+    },
+    { search: query, at: time, take: shot, backdropId: PART_BACKDROP_ID },
+  );
+  if (shown.part === '') {
+    throw new Error(
+      `The gallery page shows no body part for the query "${query}". The page needs the query part of the gallery of this tree.`,
+    );
+  }
+  if (shot && shown.image === '') {
+    throw new Error(`The gallery page gives no image for the query "${query}".`);
+  }
+  return {
+    numbers: shown.part.split(' ').map(Number),
+    image: shot ? Buffer.from(shown.image.slice(shown.image.indexOf(',') + 1), 'base64') : null,
+  };
+}
+
+/**
+ * Opens the gallery page of a role for the cells of the mode `parts`, with the test notes of the
+ * role and with no panel and no labels. One screenshot with no canvas gives the page background,
+ * which the page keeps as a hidden image for the image of each cell ({@link showPart}).
+ *
+ * @param browser The browser.
+ * @param base The URL of the site.
+ * @param role The close view of the role.
+ * @param query The query of the first cell of the page ({@link partQuery}). The query `stand` of
+ *   the page holds for each later cell, because the page builds its models one time.
+ * @returns The page.
+ */
+async function openPartPage(
+  browser: Browser,
+  base: string,
+  role: RoleViews,
+  query: string,
+): Promise<Page> {
+  const path = `/gallery.html?${query}`;
+  const page = await openShot(browser, new URL(path.slice(1), base).href, {
+    file: '',
+    path,
+    ...PART_CELL,
+    ready: 'canvas[data-ready="species"]',
+  });
+  await page.addStyleTag({ content: '#controls, #labels { display: none; }' });
+  const canvas = page.locator('#gallery');
+  await canvas.evaluate((gallery: HTMLElement) => {
+    gallery.style.visibility = 'hidden';
+  });
+  const backdrop = await page.screenshot({ type: 'png' });
+  await canvas.evaluate((gallery: HTMLElement) => {
+    gallery.style.visibility = '';
+  });
+  await page.evaluate(
+    async ({ notes, source, backdropId }) => {
+      const image = new Image();
+      image.src = source;
+      await image.decode();
+      image.id = backdropId;
+      image.hidden = true;
+      document.body.append(image);
+      const input = document.querySelector('#notes');
+      if (notes !== null && input instanceof HTMLTextAreaElement) {
+        input.value = notes;
+        input.dispatchEvent(new Event('input'));
+      }
+    },
+    {
+      notes: role.notes,
+      source: `data:image/png;base64,${backdrop.toString('base64')}`,
+      backdropId: PART_BACKDROP_ID,
+    },
+  );
+  return page;
+}
+
+/**
+ * Finds the play moment of a role whose arms differ most from the first play moment: the largest
+ * sum of the distances of the posed heads of {@link ARM_BONES} between the two moments. Thus the
+ * second play moment of {@link defaultPartMoments} is the tip of a bow, the far end of a keyboard,
+ * or the far reach of a slide, with no list of names.
+ *
+ * @param page The gallery page of the role on its seat.
+ * @param role The close view of the role.
+ * @returns The moment, or `null` for a role with one play moment.
+ */
+async function farPlayMoment(page: Page, role: RoleViews): Promise<CloseMoment | null> {
+  const part = { bones: ARM_BONES, margin: 0 };
+  const view: PartViewAngle = { name: 'front', azimuth: 0, elevation: 20 };
+  const heads: number[][] = [];
+  const plays = role.moments.filter(isPlayMoment);
+  for (const moment of plays) {
+    const query = partQuery(role, moment, part, view);
+    const { numbers } = await showPart(page, query, moment.time, false);
+    // The heads come after the middle and the radius of the ball.
+    heads.push(numbers.slice(4));
+  }
+
+  const [first] = heads;
+  let far: CloseMoment | null = null;
+  let most = 0;
+  for (const [i, moment] of plays.entries()) {
+    const own = heads[i] ?? [];
+    let sum = 0;
+    for (let k = 0; k + 2 < own.length; k += 3) {
+      sum += Math.hypot(
+        (own[k] ?? 0) - (first?.[k] ?? 0),
+        (own[k + 1] ?? 0) - (first?.[k + 1] ?? 0),
+        (own[k + 2] ?? 0) - (first?.[k + 2] ?? 0),
+      );
+    }
+    if (i > 0 && sum > most) {
+      most = sum;
+      far = moment;
+    }
+  }
+  return far;
+}
+
+/**
+ * Gives the path of one cell of the mode `parts`:
+ * `<dir>/<role>/<part>/<role>-<moment>-<part>-<view>.png`, with `base-` before the moment for a
+ * cell of the commit of `--base`.
+ *
+ * @param out The output directory.
+ * @param role The role.
+ * @param tree `base-` for the commit, or an empty text for the working tree.
+ * @param moment The name of the moment.
+ * @param part The name of the part.
+ * @param view The name of the view.
+ * @returns The path.
+ */
+function partCellPath(
+  out: string,
+  role: CloseRole,
+  tree: '' | 'base-',
+  moment: string,
+  part: BodyPartName,
+  view: string,
+): string {
+  return join(out, role, part, `${role}-${tree}${moment}-${part}-${view}.png`);
+}
+
+/**
+ * Renders the cells of one role of the mode `parts`, and writes each cell as a PNG file
+ * ({@link partCellPath}). One page shows each moment on the seat, and a second page each moment
+ * of the standing soloist, because the gallery builds a standing body at its load. The parts and
+ * the views of a page change with no load ({@link showPart}).
+ *
+ * @param browser The browser.
+ * @param base The URL of the site.
+ * @param args The command line.
+ * @param name The role.
+ * @param tree `base-` for the commit, or an empty text for the working tree.
+ * @param chosen The moments that the working tree chose, for the commit, or `null` to choose
+ *   them: the moments of `--moments` that the role has, or {@link defaultPartMoments}.
+ * @returns The moments, in their order.
+ */
+async function rolePartCells(
+  browser: Browser,
+  base: string,
+  args: PartsArgs,
+  name: CloseRole,
+  tree: '' | 'base-',
+  chosen: readonly CloseMoment[] | null,
+): Promise<readonly CloseMoment[]> {
+  const role = ROLE_VIEWS[name];
+  const [firstPart] = args.parts;
+  const [firstView] = firstPart?.views ?? [];
+  const firstPlay = role.moments.find(isPlayMoment) ?? role.moments[0];
+  if (!firstPart || !firstView || !firstPlay) {
+    throw new Error(`The role ${name} has no part, no view, or no moment.`);
+  }
+  for (const part of args.parts) {
+    await mkdir(join(args.out, name, part.name), { recursive: true });
+  }
+
+  let moments = chosen ?? args.moments?.flatMap((moment) => momentOf(role, moment) ?? []) ?? null;
+  for (const stand of [false, true]) {
+    if (moments && !moments.some((moment) => Boolean(moment.stand) === stand)) {
+      continue;
+    }
+    const opened = stand ? { ...firstPlay, stand } : firstPlay;
+    const page = await openPartPage(
+      browser,
+      base,
+      role,
+      partQuery(role, opened, firstPart, firstView),
+    );
+    try {
+      moments ??= defaultPartMoments(role, await farPlayMoment(page, role));
+      for (const moment of moments) {
+        if (Boolean(moment.stand) !== stand) {
+          continue;
+        }
+        for (const part of args.parts) {
+          for (const view of part.views) {
+            const query = partQuery(role, moment, part, view);
+            const { image } = await showPart(page, query, moment.time, true);
+            if (image) {
+              const file = partCellPath(args.out, name, tree, moment.name, part.name, view.name);
+              await writeFile(file, image);
+            }
+          }
+        }
+      }
+    } finally {
+      await page.close();
+    }
+  }
+  return moments ?? [];
+}
+
+/**
+ * Writes the sheets of one role of the mode `parts` from its cell files: one sheet for each part,
+ * as `<dir>/<role>-<part>.png`, with a row for each moment and a column for each view, at the
+ * cell size {@link PART_SHEET_CELL}. Each label gives the role, the moment, the part, and the
+ * view. With a commit, the row of the commit (`base`) comes above the row of the working tree
+ * (`round`) at each moment.
+ *
+ * @param browser The browser.
+ * @param args The command line.
+ * @param role The role.
+ * @param moments The moments of the role.
+ * @param withBase True when the commit of `--base` has its cells.
+ */
+async function writePartSheets(
+  browser: Browser,
+  args: PartsArgs,
+  role: CloseRole,
+  moments: readonly CloseMoment[],
+  withBase: boolean,
+): Promise<void> {
+  if (moments.length === 0) {
+    console.log(`The role ${role} has no moment of --moments, so it gets no sheet.`);
+    return;
+  }
+  const trees = withBase ? (['base-', ''] as const) : ([''] as const);
+  for (const part of args.parts) {
+    const files: string[] = [];
+    const labels: string[] = [];
+    for (const moment of moments) {
+      for (const tree of trees) {
+        for (const view of part.views) {
+          const label = `${role}, ${moment.name}, ${part.name}, ${view.name}`;
+          files.push(partCellPath(args.out, role, tree, moment.name, part.name, view.name));
+          labels.push(withBase ? `${tree === '' ? 'round' : 'base'}: ${label}` : label);
+        }
+      }
+    }
+    const cells = await Promise.all(files.map((file) => readFile(file)));
+    const sheet = await grid(browser, cells, labels, part.views.length, PART_SHEET_CELL);
+    const file = join(args.out, `${role}-${part.name}.png`);
+    await writeFile(file, sheet);
+    console.log(file);
+  }
+}
+
+/**
+ * Runs a task for each item of a list, with at most a number of tasks at the same time.
+ *
+ * @param items The items.
+ * @param size The largest number of tasks at the same time.
+ * @param run The task of an item.
+ * @returns The result of each item, in the order of the items.
+ */
+async function inPool<T, R>(
+  items: readonly T[],
+  size: number,
+  run: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results = new Map<number, R>();
+  let next = 0;
+  const worker = async (): Promise<void> => {
+    while (next < items.length) {
+      const index = next;
+      next += 1;
+      const item = items[index];
+      if (item !== undefined) {
+        results.set(index, await run(item));
+      }
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(size, items.length) }, worker));
+  return items.flatMap((_, index) => results.get(index) ?? []);
+}
+
+/**
+ * Renders the mode `parts`: the close-ups of the body parts of each role, so that an audit or a
+ * fix round can check each arm, each paw with its palm, the haunch on the seat, and each ankle.
+ * Each cell is a file ({@link partCellPath}), and each role and part gets one sheet
+ * ({@link writePartSheets}). {@link PART_PAGES} roles render at the same time. With `--base`, the
+ * renders of the commit take the moments of the working tree, and each sheet shows the commit
+ * above the working tree. The build of the commit takes the gallery of the working tree when the
+ * two galleries differ, so that an older commit gets the query `part` ({@link modeRender}).
+ *
+ * @param args The command line.
+ * @param site The site of the working tree.
+ * @returns The renders of the commit.
+ */
+async function partsViews(args: PartsArgs, site: TreeSite): Promise<CommitRender> {
+  const { browser } = site;
+  const start = performance.now();
+  const cells = (moments: readonly CloseMoment[]): number =>
+    moments.length * args.parts.reduce((sum, part) => sum + part.views.length, 0);
+  const done = (count: number, tree: string): void => {
+    const seconds = ((performance.now() - start) / 1000).toFixed(0);
+    console.log(
+      `The mode parts wrote ${count} cells of ${args.roles.length} roles of ${tree} in ${seconds} s.`,
+    );
+  };
+  const rendered = await inPool(args.roles, PART_PAGES, async (role) => {
+    const moments = await rolePartCells(browser, site.base, args, role, '', null);
+    if (args.base === null) {
+      await writePartSheets(browser, args, role, moments, false);
+    }
+    return { role, moments };
+  });
+  const count = rendered.reduce((sum, { moments }) => sum + cells(moments), 0);
+  done(count, 'the working tree');
+
+  return async (other, label) => {
+    await inPool(rendered, PART_PAGES, async ({ role, moments }) => {
+      await rolePartCells(browser, other, args, role, 'base-', moments);
+      await writePartSheets(browser, args, role, moments, true);
+    });
+    done(2 * count, `the working tree and ${label}`);
+  };
+}
+
 /**
  * Reads the command line of one mode of the tool, or of a batch of modes.
  *
  * @param args The arguments after the script, with no {@link CHECK_FLAG}.
  * @returns The mode, or `null` when no mode matches.
- * @throws Error that lists the correct names, for a wrong value of the mode `species`, `play`, or
- *   `batch`.
+ * @throws Error that lists the correct names, for a wrong value of the mode `species`, `play`,
+ *   `batch`, `audit`, or `parts`.
  */
 function closeModeArgs(args: readonly string[]): CloseMode | null {
   const batch = batchArgs(args) ?? auditArgs(args);
   if (batch) {
     return { kind: 'batch', args: batch };
+  }
+  const parts = partsArgs(args);
+  if (parts) {
+    return { kind: 'parts', args: parts };
   }
   const species = speciesArgs(args);
   if (species) {
@@ -5472,7 +6170,7 @@ function closeModeArgs(args: readonly string[]): CloseMode | null {
 /**
  * Gives the renders of a mode. The lineup takes the gallery of the working tree into the build of
  * the commit, so that an older gallery gets the camera code of the query `distance`. A role with
- * `--probe` takes it for the query `probe`.
+ * `--probe` takes it for the query `probe`, and the mode `parts` for the query `part`.
  *
  * @param mode The command line of the mode.
  * @returns The renders of the mode.
@@ -5499,6 +6197,12 @@ function modeRender(mode: SingleMode): ModeRender {
         plugins: playPluginKinds(mode.args),
         tree: (site) =>
           mode.args.strip ? stripViews(mode.args, site) : playViews(mode.args, site),
+      };
+    case 'parts':
+      return {
+        overlay: ['src/gallery'],
+        plugins: [],
+        tree: (site) => partsViews(mode.args, site),
       };
   }
 }
@@ -5611,6 +6315,7 @@ const USAGE = [
   `       pnpm close-views play <output directory> [--demo <id> | --midi <path>] [--time <s>]... [--strip <from>:<step>:<count>] [--camera <${PLAY_CAMERAS.map((camera) => camera.name).join('|')}|<dx>,<dy>,<wheel>|<JSON>>]... [--camera-file <json>] [--cinematic] [--shot <seat|species>] [--at <seat|species> [--azimuth <deg>]... [--zoom <z>] [--elevation <deg>]] [--url <url>] [--base <ref>] [--set <changes>]... [--size <w>x<h>] [--recast <role>@<species>]`,
   '       pnpm close-views batch <output directory> [--species <species,...> [--moments <play|rest|lift<p>|lower<p>,...>] [--views <view,...>] [--zoom <n>]... [--elevation <deg>] [--lineup]] [--role <role | <role>@<species>>]... [--camera <camera>]... [--demo <id>] [--time <s>] [--url <url>] [--base <ref>]',
   '       pnpm close-views audit <output directory> [--roles <role,...>] [--url <url>] [--base <ref>]',
+  `       pnpm close-views parts <output directory> [--roles <role,...>] [--parts <${BODY_PARTS.map((part) => part.name).join('|')},...>] [--moments <moment,...>] [--url <url>] [--base <ref>]`,
 ].join('\n');
 
 /**
@@ -5620,7 +6325,9 @@ const USAGE = [
  * species at named views: `node tools/close-views.ts species <species,...> <dir>`
  * ({@link speciesViews}), or play frames of a demo: `node tools/close-views.ts play <dir>`
  * ({@link playViews}), or a batch of these modes: `node tools/close-views.ts batch <dir>`
- * ({@link batchArgs}), which builds and serves each tree one time for all its parts. It writes
+ * ({@link batchArgs}), which builds and serves each tree one time for all its parts, or the
+ * close-ups of the body parts of roles: `node tools/close-views.ts parts <dir>`
+ * ({@link partsViews}). It writes
  * the animal of the role at each moment from each view into `<dir>`, and the grid of all cells as
  * `<role>-views.png` and `<role>-views.webp`. `--zoom` and `--elevation` change the camera of the
  * role for each view, `--scale` the size of each cell, and `--probe` renders one grid for each
