@@ -490,9 +490,10 @@ The app follows these facts:
   right palm faces the valve tops and the paw points a part of the way across them, as the monkey
   holds them (`faceTube`, `aimSide`, design 5.3). With the roll of the shoulder, the right paw of
   a recast body stood up behind the valves, with its finger tips up.
-- **The oboe (2.3, `MOUSE_OBOE`).** The oboe hangs 30° from the vertical (`hanging()` of
-  `src/models/instruments/woodwinds.ts`). The reed goes between the lips at the front of the long
-  muzzle, on the middle line (`lipShift`), and the head stays up. The left paw holds the upper
+- **The oboe (2.3, `MOUSE_OBOE`).** The head bows 15° in the play, and the oboe turns with it to
+  about 15° from the vertical (`MOUSE_OBOE_FIT`). The reed goes between the lips at the front of
+  the long muzzle, on the middle line (`lipShift`), and the reed and the top of the upper joint
+  show above the left paw. The left paw holds the upper
   joint at its tone holes, and the right paw the lower joint at its tone holes, above the bell
   (`gripShiftL`, `gripShiftR`), as the fingers of a real oboist close the holes. The digits curl
   over the front of the tube (`gripCurl`). The upper arms hang a little below the shoulders, with
@@ -587,12 +588,14 @@ The app does not follow these facts:
   (`SpeciesParams.oboeScale`), in place of longer arms. No source gives the size of a smaller
   oboe. At 0.55 of the size, the right paw reaches the holes of the lower joint with 0.2 cm to
   spare, with a straight arm.
-- **The oboe angle (2.3).** The oboe hangs 30° from the vertical, nearer to the body than 40° to
-  45°. The long muzzle puts the reed 11 cm in front of the right shoulder joint, so at 40° the
-  right paw does not reach its grip, and at 35° the right arm is straight.
-- **The oboe hands (2.3).** The paws reach forward at the height of the shoulders, because the big
+- **The oboe angle (2.3).** The oboe hangs about 15° from the vertical, nearer to the body than 40°
+  to 45°. The long muzzle puts the reed 11 cm in front of the right shoulder joint. With the bowed
+  head and the oboe at 33° or 45° from the vertical, the right paw missed its grip by 1.0 cm or
+  3.1 cm. A real oboist keeps the head up [32] [34], and the mouse bows it 15°, so that the paws
+  hold the oboe below the shoulders.
+- **The oboe hands (2.3).** The paws reach forward a little below the shoulders, because the big
   head of the mouse puts the reed high above the shoulder joints and the long muzzle puts it 11
-  cm in front of them. The right elbow bends about 28° and the left about 49°. The digit block of
+  cm in front of them. The digit block of
   each paw has one bone and the thumb has none, so the digits close together, and the thumb lies
   along the tube in place of under the thumb rest.
 - **The oboe rest (2.3).** The mouse stands, with no lap for the oboe. Thus the oboe stands

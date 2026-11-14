@@ -734,10 +734,15 @@ The rest of each family:
   (`MOUSE_OBOE`, `gripShiftL`, `gripShiftR`, `gripCurl`). The reed goes between the lips at the
   front of the muzzle, on the middle line (`lipShift`). Reason: a real oboist puts the reed at
   the middle of the lips and the fingers on the holes (winds 2.3), and the reed under the muzzle
-  further back read as the corner of the mouth. The oboe hangs 30° from the vertical, the angle
-  of the shared oboe. Reason: a real oboist holds it 40° to 45° from the body, but the reed at
-  the front of the long muzzle puts the grips of a larger angle out of the reach of the short
-  arms. Both shoulder bones turn forward, the right more than the left (`reach`, `reachL`), as
+  further back read as the corner of the mouth. The left grip lies low enough on the upper joint
+  that the reed and the top of the joint show between the lips and the paw. The head bows 15° in
+  the play by the rule of the far mouth (`MOUSE_OBOE_FIT`), and the oboe turns with the head,
+  about 15° from the vertical. Reason: a real oboist bows the head a little to the reed, and the
+  paws then hold the oboe below the shoulders with the elbows down. With the head up, the arms
+  pointed straight forward at the height of the shoulders. A real oboist holds the oboe 40° to
+  45° from the body, but the reed at the front of the long muzzle puts the grips of a larger
+  angle out of the reach of the short arms. At rest, the left elbow points down and a little out
+  and forward (`restPoleL`). Reason: an elbow further out showed as a cone. Both shoulder bones turn forward, the right more than the left (`reach`, `reachL`), as
   the shoulder blades of a real player slide forward. Reason: the arms of the Tripo mouse keep
   the length of its source, and with square shoulders the paws missed their grips by 2.7 cm and
   5.2 cm. The mouse plays a smaller oboe (`oboeScale`, 4.6), the largest size at which the right
