@@ -578,6 +578,12 @@ The app does not follow these facts:
 - **The hair near the frog (2.5).** Some holds play no hair near the frog
   (`BowedHold.frogHair`): there, the forearm of the dog and the hippo crosses the rim, and the bow
   paw of the rabbit comes to its jaw.
+- **The part of the bow (2.5).** A player uses the whole bow in a legato [50]. Each animal plays
+  only the part of the hair that its bow arm reaches on all strings with a bent elbow
+  (`bowRangeOf()`): the dog 0.22 m of 0.46 m, and the hippo 0.15 m of 0.39 m. A whole bow of a
+  long note takes 0.8 of this part (`BOW_MOTION.length`). The search uses the hand of the pose
+  for a hold whose hand turns on the stick, so that the strokes and the arm agree, and the probe
+  tools warn about an arm that reaches less than 0.1 m (`tools/bow-warning.ts`).
 - **The bow elbow (2.3).** No source gives the direction of the right elbow at the frog. Each hold
   keeps the elbow near the level of the bow (`BowedHold.poleR`, and `poleTipR` at the tip). A
   lower elbow turns the broad side of the flat upper arm of the rabbit to the front, and puts the
@@ -660,6 +666,10 @@ The app follows these facts:
   bow elbow points out in the play, as a stroke starts open at the shoulder [85], and both elbows
   point out at rest, so that the upper arms stay off the chest. In pizzicato, the paw plucks
   further right of the strings than in `CELLO_HOLD`, with the elbow out.
+- **The bow stroke (2.2, 2.4).** The elbow makes the motion of the bow along its length [47]. The
+  right shoulder of the dog turns forward (`DOG_HOLD.reach`), so that the paw plays 0.22 m of the
+  hair, from the middle to the tip end, and the elbow opens and closes in a stroke. The cello
+  détaché and legato notes of [50] take about 13 cm to 14 cm (2.4).
 - **The left elbow of the dog (1.8).** The left elbow points out to the side and a little down
   (`DOG_HOLD.poleL`), so that the forearm rises from the elbow to the neck. The elbow is lower on
   the A string and goes up a little for each lower string [33] (`elbowPerString`). It goes up
@@ -705,6 +715,11 @@ The app does not follow these facts:
 - **The bow at rest (2.7).** The short arm does not reach the knee, so the grip is above the
   thigh, in front of the body, and the tip leans out and forward. No source gives the rest of an
   orchestral cellist.
+- **The bow in the lift.** No source gives the path of the bow from the rest to the strings. The
+  tip turns from up to the left on a short arc above the strings (`LAP_CELLO_BOW.via`), and the
+  grip moves out, away from the cello.
+- **The part of the bow (2.5).** The dog plays no hair of the lower half of the bow: there, its
+  short arm does not reach the strings with a bent elbow.
 
 ### 3.4 The standing contrabass player and the rest
 
@@ -719,7 +734,10 @@ The app follows these facts:
   thigh. The place comes from the body (`BowedHold.fit`).
 - **The left arm (2.8).** The upper bout stands below the left shoulder, so that the left arm
   passes over the shoulder of the bass to the neck.
-- **The turn (2.8).** The top plate turns a little to the right (`HIPPO_HOLD.fit`).
+- **The turn (2.8).** The top plate turns to the right (`HIPPO_HOLD.fit`), as a bassist turns the
+  bass to the right [69]. The turn brings the frog side of the bow nearer to the bow arm, so that
+  the short arm plays 0.15 m of the hair, and the paw moves away from the strings and back in a
+  stroke.
 - **The pizzicato (2.8).** The right paw comes up from the side and plucks right of the strings
   (`BowedHold.pluckSide`). No source gives the place of the bow in the hand in pizzicato. The bow
   tip points down and forward (`BowedHold.pizzicatoTip`), so that the bow stays out of the belly.
@@ -733,7 +751,10 @@ The app does not follow these facts:
   strings, as on a player with the nut near the eyebrows. On the large head of the hippo, it then
   stands below the eyes.
 - **The sounding point (2.4).** The bow plays near the end of the fingerboard
-  (`BowedHold.soundingPoint`), so that the bow arm keeps its height over the round belly.
+  (`BowedHold.soundingPoint`), so that the bow arm keeps its height over the round belly. A
+  louder note keeps this place, because the arm reaches less hair nearer to the bridge.
+- **The string planes (2.2).** The string planes are 4° apart, and the real angle is about 25°
+  [42]. With a larger angle, the arm reaches less hair on the two outer strings.
 - **The left hand (2.8).** The thick left paw tilts over the neck, so that the left arm keeps off
   the body. The paw lies a little off the strings along the normal of its palm
   (`BowedHold.gapL`), so that the thick wrist stays off the back of the neck, as the wrist of a
@@ -743,9 +764,11 @@ The app does not follow these facts:
   places lower on the neck.
 - **The trunk.** The trunk leans a little forward, and both shoulders turn forward
   (`BowedHold.reach`, `BowedHold.reachL`), so that the short arms reach the strings in front of
-  the round belly.
+  the round belly. The right shoulder turns far forward, which folds more faces of the right arm
+  than a smaller turn.
 - **The hair near the frog (2.5).** The bow arm reaches only a part of the hair over the round
-  belly. Thus the hippo plays no hair near the frog (`BowedHold.frogHair` and the reach).
+  belly. Thus the hippo plays no hair of the lower half of the bow (`BowedHold.frogHair` and the
+  reach).
 - **The bow hand (2.1).** `rollToward()` rolls the paw around the stick, so that the back of the
   paw points to the elbow, and `BowedHold.farSideR` keeps the roll at one end of its range on the
   low strings. The paw bends about 25° off the forearm in the plane of its palm
@@ -757,7 +780,8 @@ The app does not follow these facts:
   playing place, and the left paw holds the neck above the upper bout with the elbow out, as the
   fingers of a player hold the neck and the forearm stays free of the body (1.9). The right arm
   hangs out from the side of the round belly with the bow tip down and a little forward
-  (`HIPPO_HOLD.restBow`), so that it does not lie on the belly.
+  (`HIPPO_HOLD.restBow`), so that it does not lie on the belly. In the lift, the tip turns the
+  short way to the strings, down, to the left, and to the front (`HIPPO_HOLD.restBow.via`).
 
 ## 4. Sources
 
