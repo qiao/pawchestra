@@ -205,6 +205,11 @@ passes.
       the digit rows in the panda chain.
 - [ ] Panda trombonist: at rest, the left paw on the hand brace touches the right paw (paws gap
       0.0 cm, 0.3 cm before). Check the two paws at rest in a 2x crop.
+- [ ] Conductor bear face (4.4, 4.5): from the front the face looks stern. The upper lids cover
+      the top of the irises, the eyes turn in, and the mouth line is flat
+      (`reports/2026-11-13-pose-audit-3/conductor/crops/rest-front-face.png`). No pose rule changes
+      the face. Show the user a lineup with higher lids and raised mouth corners
+      (`tools/blender/hand/bear/`), then apply the chosen step.
 - [ ] Conductor bear: in the steps of the end turn, the hips turn up to about 45° from the
       planted foot (`TURN_STEPS`, 5.4). Check the skin of the hips and the thighs in 2x crops.
 - [ ] Conductor bear: at rest, the right arm folds 5 faces (p95, limit 8) against 1 before the
@@ -573,6 +578,11 @@ passes.
       75 blocked and 23 hidden.
 - [ ] Tripo elephant: its seat height is 0.489 m (0.288 m on the old elephant), the back of the
       haunch of the standing bind. Check the recast seated roles of the cast matrix.
+- [ ] Elephant timpanist upper arms (4.4): the outer face of each upper arm is a flat pale plate
+      with two straight edges, smooth beside the wrinkled trunk, and the left elbow is a hard
+      corner in the muffle (`reports/2026-11-13-parts/timpanist/arm-L/`). The chain adds no arm
+      ring and no arm edit (`rings.arm` and `edits` of `tools/blender/hand/elephant/params.json`
+      are empty). Add two edge rings to each upper arm, and check the color map at the plate.
 - [ ] Elephant timpanist: the stump grip of 2026-11-12 holds the mallets 13° to 17° down between
       strikes (ball about one inch over the head) and 24° to 26° down at a strike. A level shaft
       puts the stump paws 2 cm to 6 cm into the kettles, because the paws stand over the heads.
@@ -938,6 +948,11 @@ passes.
 - [ ] Tripo tan fox flutist: the free left paw rests on the haunch beside the hip, because the
       arm does not reach the top of the thigh or the flute at rest. In the lowering the right rest
       grip grasps the flute in only 37 % of the samples.
+- [ ] Tripo red fox violinist right elbow (4.4): at rest, from the back and az150, the elbow is a
+      wedge with a flat dark lower face and a point, and a box corner from the front in the play
+      (`reports/2026-11-13-parts/fox-violinist/crops/rest-elbow-wedge.png`). Compare the elbow with
+      the source mesh (`pnpm arm-look fox-violinist`), then add an elbow ring or a bent-elbow shape
+      in `tools/blender/hand/fox/`.
 - [ ] Tripo fox: the new body at the eye height of the fox of 62bf447f4 moves seats in each of the
       18 demos, by up to 1.25 m (a red fox of beethoven-7-4 and beethoven-8-4, a horn pig of
       beethoven-1 1.07 m), and by 4 cm in pachelbel-p37, where the fox itself stays. Causes: the deeper trunk
