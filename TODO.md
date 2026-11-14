@@ -135,6 +135,15 @@ passes.
 - [ ] Rhino tubist: `pnpm wind-grip tubist` and `pnpm body-clip tubist` take boulanger-matin,
       in which the tuba rests in about 80% of the play samples, so the play rows show mostly the
       rest. Read the play pose with `--lines`.
+- [ ] Rhino tubist: the right finger tips lie 5.7 cm off the tuba (median of `pnpm wind-grip
+      tubist`), and the right paw holds in 0% of the samples. The old lead pipe over the valves lay
+      1.9 cm from the tips. Put the right finger tips on the valve buttons.
+- [ ] Tuba: 1360 triangles against the budget 1200 (`INSTRUMENT_BUDGETS`). Main had 1244 after the
+      long slide. The clearance probes measure only closed shells, so a tube keeps its caps.
+      Options: 13 faces on the bell (-22), 5 faces on the long slide (-20), or a higher budget.
+- [ ] Horn: 1596 triangles against the budget 1500. Options: fewer steps of the hoop, or a
+      higher budget.
+- [ ] Horn: the tail of 6 faces meets the throat of 16 faces with a ring step of about 4 mm.
 - [ ] Pig hornist: the bell of the rebuilt horn hangs at the height of the chest, beside the
       right side of the belly (`HORN_PLANE`), because the short right arm does not reach a bell
       at the right thigh. Confirm the look in the app. Option: a longer bell tail that puts the
