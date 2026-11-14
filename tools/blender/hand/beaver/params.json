@@ -164,6 +164,7 @@
   0.352
  ],
  "turnFit": 0.02,
+ "turnBandCuts": 1,
  "earPlane": {
   "points": [
    [

@@ -323,12 +323,19 @@ def turn_paws(body):
             for l, u in zip(face.loops, uv_list):
                 l[uv].uv = u
         gap = max(np.linalg.norm(S[B[(i + shift) % n]] - Bold[i]) for i in range(n))
+        cuts = P.get('turnBandCuts', 0)
+        if cuts:
+            # An edge ring Subdivide of the new band puts a ring halfway between the two rings, so
+            # that the wrist bends over two bands. The new faces keep the face attribute band.
+            ring = [bm.edges.get((bm.verts[A[i]], bm.verts[B[(i + shift) % n]])) for i in range(n)]
+            bmesh.ops.subdivide_edges(bm, edges=ring, cuts=cuts, use_grid_fill=True)
         bm.normal_update()
         bm.to_mesh(me)
         bm.free()
         log(
             f'paw {side}: turn {np.degrees(angle):.1f} deg ({k} steps), {int(move.sum())} vertices, '
-            f'ring offset {shift}, largest gap of a turned ring vertex from its old place {gap:.4f}'
+            f'ring offset {shift}, largest gap of a turned ring vertex from its old place {gap:.4f}, '
+            f'{cuts} band cuts'
         )
     me.update()
 

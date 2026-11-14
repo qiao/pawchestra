@@ -79,10 +79,10 @@ scripts follow the scripts of the Tripo cat (`../cat/README.md`). `make_config.p
 
 | Item | Value |
 |---|---|
-| Size | 383,979 bytes (each run writes other bytes) |
-| SHA-256 | `19860b713dbedc7b22a0051dff1c5ab103f3fac11151ac82f6b8a2bbd9744b1f` |
+| Size | 385,466 bytes (each run writes other bytes) |
+| SHA-256 | `f0dc6fe55cec881f13b4e07925e7a9afa17210f678af488ea60f4627fc8d37b9` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the beaver faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `beaver`: 3,687 vertices and 4,029 faces (3,051 quads and 978 triangles, 7,080 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 85 faces of the nose take the slot `fur` and the color map. The 136 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids the face attribute `lid`, and the 42 faces of the whiskers the face attribute `plain`. The UV map of the FBX, and the property `texture` (`assets/models/beaver/tripo-hand/beaver-color.webp`) |
+| Mesh | One object `beaver`: 3,711 vertices and 4,053 faces (3,075 quads and 978 triangles, 7,128 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 85 faces of the nose take the slot `fur` and the color map. The 136 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids the face attribute `lid`, and the 42 faces of the whiskers the face attribute `plain`. The UV map of the FBX, and the property `texture` (`assets/models/beaver/tripo-hand/beaver-color.webp`) |
 | Armature | `beaver_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.617287 (the shoulder joints at 1.01029 m for each unit, so that H is 0.310441 m, the H of the beaver of main, 0.310442 m), `crease` 180 |
 | Eyes | The eyeballs of the source in their sockets, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -118,7 +118,10 @@ left side):
   axis by whole ring steps of 30 degrees: -120 degrees on the left (4 steps) and 30 degrees on the
   right (1 step), 328 vertices on each side. New quads join the two rings with the step offset,
   and the far ring takes the form of the ring before the turn (a fade to 0 at 0.02 units). The new
-  quads keep the UVs of the old band. The paws keep their form ("Arm twist").
+  quads keep the UVs of the old band. The paws keep their form ("Arm twist"). Then an edge ring
+  Subdivide cuts the new band one time (`turnBandCuts` of the params), so that a ring stands
+  halfway between the two rings, and the wrist rows bend the paw over two bands. Reason: the
+  bent right wrist of the bassoonist showed a square step between the forearm and the paw.
 - **Wrist loop.** The ring at x 0.331 does not turn. It is slanted, so 5 of its 12 vertices lie
   past its mean along the forearm axis. When they turned with the paw, the quads before the ring
   sheared into a pinched wrist with a fan of stretched fur: 10 faces on the left and 12 on the right
@@ -256,7 +259,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/beaver.rig.glb` | 1,224,492 bytes | `0dce90442368ef178e826bca76dff79b6368f297ddc5e99b6035972408d440bc` |
-| `tripo-hand/beaver.rig.json` | 17,197 bytes | `3e15962de667ad34b4a05a0c506d37033145e6f6c303849a55f3c5147f464ddd` |
+| `tripo-hand/beaver.rig.glb` | 1,226,168 bytes | `3f049db15484a71261d1fef1a47bd317d3fc394fc0c0bc4afa4788756645a4ec` |
+| `tripo-hand/beaver.rig.json` | 17,197 bytes | `f30b8fb9c74beb0de6659dfec5068f931de06306750c2cd0d7c095df73c66005` |
 | `tripo-hand/beaver-color.webp` | 199,904 bytes, 2048 × 2048 | `fc5a6f549bc676eefc6837d5398ad00f439d75cf9191a3921707f8034a35bfbc` |
 | `tripo-hand/beaver-normal.webp` | 84,258 bytes, 1024 × 1024 | `aa1edb196f4b423afb6bb80671a424e943ca4f3354f7ba3f01ad755ba0471982` |
