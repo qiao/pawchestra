@@ -45,6 +45,11 @@ export const STRIKE_MOTION = {
    */
   alternateSec: 0.5,
   /**
+   * In a hold whose hands do not cross, a strike within this time of the strike before it takes
+   * the other hand ({@link sideHands}): one hand alone strikes at most 4 times each second.
+   */
+  sideAlternateSec: 0.25,
+  /**
    * The least time between two visible strikes of a roll that alternates the two hands, in
    * seconds: at most 12 strokes each second ({@link thinRolls}).
    */
@@ -285,6 +290,75 @@ export function alternateHands(
         leftX = x;
       } else {
         rightX = x;
+      }
+      last = side;
+    }
+    lastStart = group.start;
+  }
+  return [left, right];
+}
+
+/**
+ * Gives the strikes of a player whose hands do not cross to its two hands (design 5.3): each hand
+ * strikes only the targets on its side of the middle of the player, as the timpanist with short
+ * arms and a kettle on each side. A chord takes both hands. A single target takes the hand on its
+ * side. A single target within `alternateSec` of the strike before it takes the other hand, so
+ * that a roll and a fast run alternate the hands, as a real timpanist plays single strokes from
+ * hand to hand (`docs/reference/percussion-technique.md` 4). A hand that takes a target on the
+ * other side strikes its own last target in place of it, and the sound plays the pitch of each
+ * note. With one hand alone, a run of 9 notes each second showed 4 strikes each second of one
+ * paw, and the other paw did not move.
+ *
+ * @param groups The strikes of the player, sorted by start.
+ * @param own The target of the left and of the right hand before its first strike, or `undefined`
+ *   for a hand that takes no target of the other side before its first strike.
+ * @param alternateSec The longest time from the strike before in which a single target takes the
+ *   other hand, in seconds.
+ * @returns The strikes of the left hand and of the right hand, sorted by start.
+ */
+export function sideHands(
+  groups: readonly StrikeGroup[],
+  own: readonly [left: StrikeTarget | undefined, right: StrikeTarget | undefined],
+  alternateSec: number = STRIKE_MOTION.sideAlternateSec,
+): readonly [left: Strike[], right: Strike[]] {
+  const left: Strike[] = [];
+  const right: Strike[] = [];
+  // The last target of each hand.
+  let [ownL, ownR] = own;
+  let last: 'L' | 'R' | 'both' = 'both';
+  let lastStart = -Infinity;
+  for (const group of groups) {
+    const strike = (target: StrikeTarget): Strike => ({
+      ...target,
+      start: group.start,
+      loudness: group.loudness,
+    });
+    const sorted = group.targets.toSorted((a, b) => a.point[0] - b.point[0]);
+    const first = sorted[0];
+    const end = sorted.at(-1);
+    if (!first || !end) {
+      continue;
+    }
+    if (sorted.length > 1) {
+      left.push(strike(first));
+      right.push(strike(end));
+      ownL = first;
+      ownR = end;
+      last = 'both';
+    } else {
+      const onSide: 'L' | 'R' = first.point[0] < 0 ? 'L' : 'R';
+      const other: 'L' | 'R' = last === 'L' ? 'R' : 'L';
+      const fast: boolean = last !== 'both' && group.start - lastStart < alternateSec;
+      // A fast note goes to the hand that did not strike last: on the target itself when that is
+      // on the side of the hand, and else on the last target of the hand.
+      const taken: StrikeTarget | undefined =
+        fast && other !== onSide ? (other === 'L' ? ownL : ownR) : undefined;
+      const side: 'L' | 'R' = taken ? other : onSide;
+      (side === 'L' ? left : right).push(strike(taken ?? first));
+      if (!taken && side === 'L') {
+        ownL = first;
+      } else if (!taken) {
+        ownR = first;
       }
       last = side;
     }

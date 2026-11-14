@@ -38,9 +38,10 @@ export type PercussionInstrument = InstrumentOf<'percussion'>;
  * How a percussion player shares its strikes between its hands (design 5.3).
  *
  * - `alternate`: two mallets or sticks. See `alternateHands()`.
- * - `sides`: two mallets, and each hand strikes the targets on its side of the middle of the
- *   player, so that a roll on one kettle stays in one hand. A player with short arms and a long
- *   nose between two kettles cannot reach across to the far kettle.
+ * - `sides`: two mallets, and each hand strikes only the targets on its side of the middle of the
+ *   player. A player with short arms and a long nose between two kettles cannot reach across to
+ *   the far kettle. A fast note takes the hand that did not strike last, on the kettle of that
+ *   hand, so that a roll and a fast run alternate the hands. See `sideHands()`.
  * - `right`: the right hand strikes each note. The bass drum has one beater, and the small
  *   percussion player holds the triangle in its left hand.
  * - `pair`: the two cymbals strike each other.

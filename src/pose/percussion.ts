@@ -50,6 +50,7 @@ import {
   alternateHands,
   beatSecAt,
   buildStrikeTrack,
+  sideHands,
   thinRolls,
 } from './strikes.ts';
 import type { Strike, StrikeGroup, StrikeState, StrikeTarget, StrikeTrack } from './strikes.ts';
@@ -261,7 +262,9 @@ export function percussionTracks(
   // A fast roll keeps the strikes of a rate that reads as a roll: two hands in turn, or one hand.
   const kept = thinRolls(
     chords,
-    hold.hands === 'alternate' ? STRIKE_MOTION.rollSec : STRIKE_MOTION.handRollSec,
+    hold.hands === 'alternate' || hold.hands === 'sides'
+      ? STRIKE_MOTION.rollSec
+      : STRIKE_MOTION.handRollSec,
   );
   const rolled = instrument === 'small-percussion' ? triangleRolls(rig, chords, kept) : kept;
   const held = runs ? tambourineRolls(chords, rolled, runs) : null;
@@ -468,9 +471,10 @@ function chordStrikes(
 
 /**
  * Gives the strikes of a percussion player to its hands and calculates the strike data of each
- * hand (design 5.3). An alternate hold or a hold of two sides shares the strikes between the two
- * hands ({@link alternateHands}). The pair of hand cymbals strikes each note with both hands, and
- * a louder crash meets higher. Another hold strikes with the right hand alone.
+ * hand (design 5.3). An alternate hold shares the strikes between the two hands
+ * ({@link alternateHands}), and a hold of two sides gives each hand the targets on its side
+ * ({@link sideHands}). The pair of hand cymbals strikes each note with both hands, and a louder
+ * crash meets higher. Another hold strikes with the right hand alone.
  *
  * @param rig The points of the player.
  * @param groups The strike groups of the player, sorted by start.
@@ -498,9 +502,20 @@ function handTracks(
       amplitude,
       beats,
     );
-  if (hold.hands === 'alternate' || hold.hands === 'sides') {
+  if (hold.hands === 'sides') {
+    // With a pair of front kettles, each paw waits over the kettle of its side.
+    const [frontL, frontR] = frontKettles(rig.targets.size);
+    const [strikesL, strikesR] = sideHands(
+      groups,
+      rig.instrument === 'timpani' && hold.pair
+        ? [rig.targets.get(frontL), rig.targets.get(frontR)]
+        : [undefined, undefined],
+    );
+    return [track(strikesL, hold.offsetL, rig.restL), track(strikesR, hold.offsetR, rig.restR)];
+  }
+  if (hold.hands === 'alternate') {
     const [strikesL, strikesR] = alternateHands(groups, {
-      alternateSec: hold.hands === 'sides' ? 0 : STRIKE_MOTION.alternateSec,
+      alternateSec: STRIKE_MOTION.alternateSec,
       gap: hold.gap,
       pass: hold.pass,
       places: waits ? [rig.restL.point[0], rig.restR.point[0]] : [-Infinity, Infinity],
