@@ -222,7 +222,11 @@ def turn_paws(body):
         Borig = S[B].copy()
         t_a = float(np.mean((S[A] - f) @ axis))
         r = np.linalg.norm((S - f) - np.outer((S - f) @ axis, axis), axis=1)
-        move = (((S - f) @ axis) > t_a + 0.002) & (r < 0.08) & (sign * S[:, 0] > 0.15)
+        move = (
+            (((S - f) @ axis) > t_a + 0.002)
+            & (r < P.get('turnRadius', 0.08))
+            & (sign * S[:, 0] > 0.15)
+        )
         move[A] = False
         S[move] = (S[move] - f) @ R.T + f
         for i in np.nonzero(move)[0]:
