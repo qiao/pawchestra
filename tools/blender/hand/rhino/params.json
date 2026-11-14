@@ -1,5 +1,15 @@
 {
- "edits": [],
+ "edits": [
+  {
+   "kind": "armStretch",
+   "k": 1.2,
+   "ramp": 0.01,
+   "reach": [
+    0.095,
+    0.115
+   ]
+  }
+ ],
  "sourceTexture": "assets/models/rhino/tripo-p2/rhino.fbm/rhino_basecolor.jpg",
  "palm": [
   0.417,
