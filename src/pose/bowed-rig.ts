@@ -1555,7 +1555,10 @@ const DOG_HOLD = {
  * forward, and the grip rests 1.0 H out from the right knee, so that the arm hangs off the round
  * belly: with 0.65 H, the right elbow went 6.4 cm into the belly at rest, and the arm lay flat on
  * it with a crease at the shoulder (`pnpm hold-fit bassist --sets lift,rest,lower`), and with
- * 1.0 H, 2.9 cm. In the lift and the lowering, the tip turns through the front.
+ * 1.0 H, 2.9 cm. In the lift and the lowering, the tip turns from down to the left and the front,
+ * through (-0.5, -0.5, -1) in the middle of the move, the short way to the strings. With
+ * (0.3, 0, -1), the tip turned to the front first, and it stayed 52° or more from its playing
+ * line over the first 0.4 of the move.
  *
  * In pizzicato, the right paw comes up from the side, right of the strings (`pluckSide`), and
  * the bow tip points down and forward (`pizzicatoTip`): with the tip down, the bow went 17.6 cm
@@ -1599,7 +1602,7 @@ const HIPPO_HOLD = {
     lap: { along: 1, offset: [1, 0.5, -0.2] },
     tip: [0.2, -1, -0.5],
     hair: HANGING_BOW.hair,
-    via: { ...UPRIGHT_BOW.via, tip: [0.3, 0, -1], reach: [0.1, 0.5, -0.9] },
+    via: { ...UPRIGHT_BOW.via, tip: [-0.5, -0.5, -1], reach: [0.1, 0.5, -0.9] },
   },
   fit: {
     gap: 0.23,
