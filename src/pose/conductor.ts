@@ -31,19 +31,18 @@ import type { PlantedLegs } from './side-move.ts';
 export const CONDUCTOR_HOLD = {
   /**
    * The point of the tip of the baton at beat 1 of each pattern, from the right shoulder joint.
-   * With the pivot, it puts the wrist of a soft beat 1 about 0.15 H below the shoulder joint,
-   * 0.7 H forward, and 0.35 H out: at the chest, in front of the shoulder, so that the beat stays
-   * below the chin (`conductor-technique.md`). The tip is in front of the shoulder, so that the
-   * baton points in. With the wrist 0.35 H above the shoulder joint, the right paw of the Tripo
-   * bear went to its chin, and the baton crossed its long muzzle in the views from the front
-   * right. The tip is 0.3 H further out than the hold of the mesh bear at 0.93 of its meters,
-   * because with that tip the claws went 7 cm into the muzzle when the head turned to a section
-   * on the right (`pnpm pose-depth conductor`, Mozart K. 525). With the point (0.39, 1.48, -2.0)
-   * of a baton across the fist, the baton along the index finger points up 55°, and the arm
-   * stands out to the side. The tip is 0.25 H further forward than at the first fit of the Tripo
-   * bear, so that the arm reaches further and the forearm comes nearer to the line of the baton.
+   * With the pivot, it puts the wrist of beat 1 about 0.4 H below the shoulder joint, 0.6 H
+   * forward, and 0.5 H out: in front of the lower chest, the ictus of a real conductor
+   * (`conductor-technique.md`, section 1). The arcs and the loud passages then move the wrist up
+   * to about the shoulder joint (median of the play), and the largest loud beats to about the
+   * chin, 0.5 H above the shoulder joint. With the tip 0.71 H higher and 0.41 H further forward,
+   * the wrist of beat 1 was 0.24 H above the shoulder joint, the median of the play was at the
+   * chin, and from the stage camera the two paws stood at the height of the ears. That tip was
+   * also 0.12 H further out, and the arm was straight at beat 1. The tip stays about 0.1 m above
+   * the top edge of the desk of the conductor stand. The tip is in front of the shoulder, so that
+   * the baton points in.
    */
-  beatPoint: [0.35, 0.685, -2.43],
+  beatPoint: [0.23, -0.025, -2.02],
   /**
    * The baton points from this place to its tip, from the right shoulder joint: forward, up 18°,
    * and 12° inward at beat 1, as a conductor points it at the players. The forearm points a
@@ -55,31 +54,25 @@ export const CONDUCTOR_HOLD = {
    * from the tip, about twice as far as the wrist, so that the wrist follows about half of the
    * motion of the tip in the beat plane, and the arm beats with the baton.
    */
-  batonPivot: [0.95, -0.22, 0.35],
+  batonPivot: [0.83, -0.93, 0.76],
   /**
-   * The beat plane turns this part of the turn of the upper body to a cued section on the left.
-   * Thus the arm opens to the right in a turn to the left, and the hand stays beside the head from
-   * behind. With the full turn of 30° to the left, the right hand goes behind the head. In a turn
-   * to the right, the beat plane turns with the whole turn ({@link beatTurnOf}): the head turns
-   * further, and at half of the turn, the long muzzle of the studio bear comes into the right paw.
+   * The left elbow points down and out to the side, so that it hangs a little away from the body
+   * below the shoulder, as the elbow of a real conductor. With the elbow more out than down
+   * (-1, -0.45, -0.3), the upper arm stood out to the side, and the left upper arm twisted 30°
+   * (p95 of `pnpm arm-check conductor`, the base 8°). With the low quiet place, the upper arm
+   * presses up to about 3 cm into the arm root, as in the rest pose (`pnpm pose-depth
+   * conductor`).
    */
-  beatTurn: 0.5,
-  /**
-   * The left elbow points down, out, and a little forward, so that it is below the shoulder, and
-   * the forearm leans out to the paw, as in `bear-views.png` and in the view from behind of
-   * `mockup.png`. An elbow level with the shoulder holds the upper arm out to the side. With the
-   * elbow less out (-0.4, -1, -0.4), the upper arm of the Tripo bear went 2.4 cm into its shoulder
-   * in a cue and at a climax (`pnpm pose-depth conductor`, limit 1.5 cm). Further out (-1), the
-   * left forearm stretches more at the quiet place.
-   */
-  poleL: [-0.7, -1, -0.3],
+  poleL: [-1, -1, 0],
   /**
    * The right elbow points down and out to the side, as the elbow of a conductor is a little away
    * from the body. Thus the forearm points forward and in to the paw, and the baton continues its
-   * line (`conductor-technique.md` 7a). With the elbow down and a little out (0.4, -1, -0.4),
-   * the forearm pointed about 7° further out of the baton.
+   * line (`conductor-technique.md` 7a). With the elbow more out than down (1, -0.4, -0.2), the
+   * right upper arm twisted 36° in the count-in (the base 8°). With the elbow a little forward
+   * (1, -1, -0.2) and half of the turn of the upper body in the beat plane, the right elbow went
+   * 8.1 cm into the side of the belly in a turn to the left.
    */
-  poleR: [1, -1, -0.2],
+  poleR: [1, -1, 0],
   /**
    * The curl of the fingers around the baton, in the play, in the rest pose, and in the bow. A
    * conductor keeps the baton in the closed hand also with the arms down. With no curl at rest,
@@ -409,7 +402,7 @@ export interface ConductorState {
   readonly baton: BatonState;
   /**
    * The cue motion, with the turns already scaled by the weight of the playing pose. The beat
-   * plane turns by half of the turn of the upper body.
+   * plane turns with the upper body.
    */
   readonly cue: CueState;
   /** The weight of the ready gesture of the left hand in a count-in, from 0 to 1. */
@@ -526,8 +519,10 @@ function turnWithTorso(rig: ConductorRig, point: Vector3, yaw: number): Vector3 
 /**
  * Writes the point of the tip of the baton in the model axes (design 5.4): the point of beat 1
  * plus the point `lifted` in the beat plane. The beat plane moves with the expression of the body
- * ({@link followBody}) and turns by {@link CONDUCTOR_HOLD.beatTurn} of the turn of the upper body
- * toward a cued section.
+ * ({@link followBody}) and turns with the upper body toward a cued section, so that the paw
+ * beats in front of the turned chest. With half of a turn to the left, the low right paw reached
+ * out to the side of the turned chest, and the right upper arm twisted 64° (`pnpm arm-check
+ * conductor`, the count-in of `bach-bwv1047`, limit 55°).
  *
  * @param rig The points of the conductor.
  * @param state The motion at the song time.
@@ -539,18 +534,7 @@ function batonPoint(rig: ConductorRig, state: ConductorState, out: Vector3): Vec
     .fromArray(rig.beatPoint)
     .addScaledVector(offset.fromArray(rig.beatRight), lifted.x)
     .addScaledVector(offset.fromArray(rig.beatUp), lifted.y);
-  return turnWithTorso(rig, followBody(rig, out, state), beatTurnOf(state.cue.torsoYaw));
-}
-
-/**
- * Gives the turn of the beat plane for a turn of the upper body (design 5.4): a part of a turn to
- * the left ({@link CONDUCTOR_HOLD.beatTurn}), and the whole turn to the right.
- *
- * @param torsoYaw The turn of the upper body around +y, positive to the left.
- * @returns The turn of the beat plane, positive to the left.
- */
-function beatTurnOf(torsoYaw: number): number {
-  return torsoYaw > 0 ? CONDUCTOR_HOLD.beatTurn * torsoYaw : torsoYaw;
+  return turnWithTorso(rig, followBody(rig, out, state), state.cue.torsoYaw);
 }
 
 /**
@@ -592,7 +576,7 @@ function directionOf(yaw: number, lift: number, out: Vector3): Vector3 {
 /**
  * Writes the arms and the fingers of the conductor (design 5.4, 4.7). The right hand moves the tip
  * of the baton to its point in the beat plane, and the two-bone IK places the arm. The beat plane
- * turns by half of the turn of the upper body. The left hand shows the dynamics and the held chords between its
+ * turns with the upper body. The left hand shows the dynamics and the held chords between its
  * cues, points to a cued section, and points up in the ready gesture of a count-in
  * ({@link poseLeftHand}). In the rest pose, the arms hang a little out to the sides, clear of the
  * body (design 5.2).
@@ -620,7 +604,7 @@ export function poseConductor(
   lifted.x = state.baton.x;
   lifted.y = state.baton.y + cue.batonLift;
   batonPoint(rig, state, tip);
-  turnWithTorso(rig, followBody(rig, pivot.fromArray(rig.pivot), state), beatTurnOf(cue.torsoYaw));
+  turnWithTorso(rig, followBody(rig, pivot.fromArray(rig.pivot), state), cue.torsoYaw);
   batonHand(rig, tip, pivot);
   levelOf(right, frames.root);
   hangingWrist(rig.hangR, hangFrame, hanging);
