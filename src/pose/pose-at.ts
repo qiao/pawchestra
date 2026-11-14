@@ -22,14 +22,7 @@ import type { ExpressionState } from './conductor-expression.ts';
 import { batonAt, resumeLift } from './conductor-notes.ts';
 import type { BatonState } from './conductor-notes.ts';
 import { createCueState, cueStateAt } from './cues.ts';
-import {
-  NO_COUNT_IN,
-  beatLengthAt,
-  countInAt,
-  leaderNodAt,
-  noteLayerTime,
-  readyAt,
-} from './count-in.ts';
+import { NO_COUNT_IN, countInAt, leaderNodAt, noteLayerTime, readyAt } from './count-in.ts';
 import type { CountIn } from './count-in.ts';
 import { poseChoir } from './choir.ts';
 import { CHOIR_MOTION, choirStateAt, createChoirState } from './choir-notes.ts';
@@ -207,23 +200,38 @@ export function createScenePose(plan: PosePlan): ScenePoseBuffer {
 
 /**
  * Gives the side sway of the beat layer at a song time (design 5.1). The sway goes to one side
- * on one beat and to the other side on the next beat, with no jump at a beat. It is 0 before the
- * first beat and after the last beat.
+ * on one beat and to the other side on the next beat. Its phase is the count of beats since the
+ * first beat, which has no jump at a beat or at a change of the tempo. A lag subtracts a part of
+ * a beat from the phase, so that a change of the beat length does not move the sway. The sway is
+ * 0 until the lagged phase reaches 0, and after the last beat.
  *
  * @param beats The times of the beats, sorted.
  * @param time The song time.
  * @param beatsPerSide The number of beats of the sway to one side. A singer sways to each side
  *   in 2 beats (design 5.3).
+ * @param lagBeats The lag of the sway behind the beat, as a part of a beat.
  * @returns The sway, from -1 to 1.
  */
-export function beatSway(beats: Float64Array, time: number, beatsPerSide = 1): number {
+export function beatSway(
+  beats: Float64Array,
+  time: number,
+  beatsPerSide = 1,
+  lagBeats = 0,
+): number {
   const b = lastAtOrBefore(beats, time);
   const start = beats[b];
   const end = beats[b + 1];
   if (start === undefined || end === undefined || end <= start) {
     return 0;
   }
-  return Math.sin((Math.PI * (b + (time - start) / (end - start))) / beatsPerSide);
+
+  const along = (time - start) / (end - start);
+  const phase = b + along - lagBeats;
+  if (phase <= 0) {
+    return 0;
+  }
+
+  return Math.sin((Math.PI * phase) / beatsPerSide);
 }
 
 /**
@@ -434,7 +442,6 @@ function swayOf(plan: PosePlan, player: PlayerPlan, noteTime: number, weight: nu
   }
   const gesture = gestureSize(activity.loudness, player.amplitude);
   const { sign, lag, pulsesPerSide } = player.sway;
-  const late = noteTime - lag * beatLengthAt(plan.pulses, noteTime);
   return (
     BODY_MOTION.sway *
     bodyScale(player) *
@@ -442,7 +449,7 @@ function swayOf(plan: PosePlan, player: PlayerPlan, noteTime: number, weight: nu
     gesture *
     activity.weight *
     weight *
-    beatSway(plan.pulses, late, pulsesPerSide)
+    beatSway(plan.pulses, noteTime, pulsesPerSide, lag)
   );
 }
 
