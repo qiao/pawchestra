@@ -82,8 +82,8 @@ export interface PartBone {
   /** The bind position of the bone: the joint at its start. */
   readonly head: Vec3;
   /**
-   * The eight corners of the box around the corners of the mesh on the bone, or only the head for
-   * a bone with no corner of the mesh. All points are in the axes of the model.
+   * The head, and the eight corners of the box around the corners of the mesh on the bone, or only
+   * the head for a bone with no such corner. All points are in the axes of the model.
    */
   readonly corners: readonly Vec3[];
 }
@@ -92,6 +92,8 @@ export interface PartBone {
  * Gives the points of each bone of a part in the bind pose: its head, and the corners of the box
  * around the corners of the mesh on it. A paw of the elephant is much wider than the distance
  * between its joints, so the box of the mesh gives the size of the part, and the joints do not.
+ * A corner of the mesh counts when its main bone and its second bone are bones of the part. Thus
+ * the skin of the chest that blends into an upper arm does not make the box of the arm wider.
  *
  * @param mesh The mesh of the player in its bind pose, with the bone of each corner.
  * @param heads The bind position of each bone, in the order of `BONE_NAMES`.
@@ -113,7 +115,7 @@ export function partBones(
   }
   for (let v = 0; v < mesh.bones.length; v++) {
     const box = boxes.get(mesh.bones[v] ?? -1);
-    if (!box) {
+    if (!box || !boxes.has(mesh.blendBones[v] ?? -1)) {
       continue;
     }
     for (const axis of [0, 1, 2] as const) {
@@ -129,7 +131,7 @@ export function partBones(
     return {
       bone,
       head,
-      corners: box && box.min[0] <= box.max[0] ? boxCorners(box) : [head],
+      corners: box && box.min[0] <= box.max[0] ? [head, ...boxCorners(box)] : [head],
     };
   });
 }
