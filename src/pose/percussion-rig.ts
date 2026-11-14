@@ -685,12 +685,15 @@ export const PERCUSSION_HOLDS = {
   // The left hand holds the triangle up, and its elbow points out to the left. The beater leaves
   // the front of the right fist (TRIANGLE.malletTilt) and keeps the angle of no twist of the paw
   // between strikes (across). Before a louder note, it turns up to 1.35 times as far back (peak):
-  // with 1.5, the beater went 1.9 cm into the belly, and with 3, 5.5 cm. A roll lifts little
+  // with 1.5, the beater went 1.9 cm into the belly, and with 3, 5.5 cm. The lift of the loudest
+  // note is that share of the rest height (sizes.lift), so that the beater turns through the
+  // whole down stroke. With a lift of 0.05, the beater waited at its peak and made the whole
+  // turn in the last 0.05 s of the stroke, 46° in one frame. A roll lifts little
   // (roll). The badger holds the triangle up also at rest (ready), because the
   // turn of the left paw from the hanging arm swings the paw far in the lift.
   'small-percussion': {
     hands: 'right',
-    sizes: { lift: 0.05, rest: 0.02, roll: 0.01 },
+    sizes: { lift: 0.0225, rest: 0.02, roll: 0.01 },
     offsetL: [0, 0, 0],
     offsetR: [0, 0, 0],
     poleL: [-1, -0.5, 0.3],
