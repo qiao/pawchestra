@@ -297,9 +297,11 @@ passes.
 - [ ] Tripo penguin: the lower beak turns at the back of the mouth slit, and the chin in front of
       the slit follows it a little. Check the chin and the slit walls from below in a close shot.
       Confirm the beak opening (`CHOIR_MOTION.jaw`) in the app.
-- [ ] Tripo penguin: the outer third of each flipper curls about 40° around the folder edge
-      (`CHOIR_HOLD.flex`, `CHOIR_HOLD.curl`). Confirm the amount in the app. The palms now meet
-      their grips within 3.1 mm (1.0 mm before).
+- [ ] Tripo penguin: the outer half of each flipper bends about 50° in one gentle curve beside
+      the lower outer edge of the folder, and the tip touches the edge of the cover
+      (`CHOIR_HOLD.flex`, `CHOIR_HOLD.curl`, `CHOIR_FOLDER.gripIn`, `gripFront`). The sharp kink
+      of the 110° curl is gone. Confirm the amount in the app. If the bend still shows a crease,
+      a wrist blend two times longer (`rows.wrist.band` 0.008 of the penguin chain) is next.
 - [ ] Tripo penguin: no round measured the recast roles of the cast matrix on the new body. The
       `raise` shapes of the earlier penguin ("Penguin recast folds") do not apply to it.
 - [ ] Red fox and rabbit: the string planes are 9° and 10°, under the real 17°, because larger
