@@ -331,7 +331,11 @@ The rest of each family:
   (`HIPPO_HOLD.restBow`). Its left paw holds the neck (`restPlace`) with the elbow out to the
   side, as in the play. Reason: with the arm far out to the side, the hippo read as stiff, and a
   rest elbow far from the play elbow twists the left forearm in the moves. With the grip near the
-  side, the arm lay flat on the belly with a crease at the shoulder.
+  side, the arm lay flat on the belly with a crease at the shoulder. In a move, the bow tip of
+  the cello turns from up to the left, above the strings (`LAP_CELLO_BOW.via`), and the bow tip
+  of the hippo turns from down to the left and the front (`HIPPO_HOLD.restBow.via`). Reason: with
+  the via of the upright violin bow, the tip turned to the front and then down in front of the
+  cello before it came to the strings.
 - **Winds.** The head lifts, and the instrument moves off the mouth. Both paws keep their grips
   (`restAim`), so no paw slides along the tube. A real player can rest the instrument on a leg,
   but the mouse stands with no lap, and the round bellies of the beaver and the pig cover their
@@ -544,6 +548,14 @@ The rest of each family:
   at the start of a lowering.
 - The arms are a little short for the instruments. So the right shoulder turns forward and the
   stick leans, so that the bow reaches the full hair (`bowRangeOf()`).
+- **Reached bow hair.** The strokes use only the part of the hair that the bow arm reaches on
+  all strings with a bent elbow (`BowedRig.bowRange`, `ARM_REACH`). A hold whose bow hand turns
+  on the stick (`stickTurnR`) takes the hand of the pose in the search (`steadyHand()`), at the
+  sounding point of the hold in piano and in forte. Reason: with the bind grip at the contact
+  point of the model, the search and the pose did not agree. The dog then played a short part
+  near the tip, and the hippo played the fallback part of the search, with no visible stroke.
+  The rig tells when the arm reaches no place of the hair (`BowedRig.bowReached`), and the probe
+  tools warn about such a hold and about a short part (`tools/bow-warning.ts`).
 - **Cello hold from the body.** The shared cello hold (`BOWED_HOLDS.cello`) reads the landmarks of
   the body in place of fixed values (`BowedHold.fit`, `fitCelloPlace()`). The end pin stands on
   the floor right of the middle, the cello leans back and to the left (`CELLO_PLACE`), the top of
@@ -561,8 +573,8 @@ The rest of each family:
   strings. Its fit also tests lines across the upper half of the back (`CelloFit.across`), and the
   cello leans back less, so that the back of the upper bout touches the chest at the sternum. Its
   trunk leans further forward and its right shoulder turns further, so that the bow paw reaches
-  the strings in front of the chest, and its bow paw turns on the stick (`stickTurnR`), so that it
-  does not flip. Reason: the chest of the beagle is round, and with the middle line alone, the
+  the strings in front of the chest and plays about half of the hair, and its bow paw turns on
+  the stick (`stickTurnR`), so that it does not flip. Reason: the chest of the beagle is round, and with the middle line alone, the
   upper bout stood deep in the chest in each sample. The short paw of the beagle holds the stick
   under its curled finger tips at the frog end, across the fingers (`SpeciesParams.bowGrip` of the
   dog), and curls the fingers further than the other holds (`BowedHold.curlR`). Its turn on the
@@ -571,11 +583,15 @@ The rest of each family:
   that keeps the forearm at an angle bends the bow elbow until its skin folds. The contrabass of the hippo takes its
   place from the body by the same rule, with its own lean back, lean to the left, turn of the top
   plate, end pin place, and gap (`HIPPO_HOLD.fit`): it stands nearly upright at the left side, in front of the belly, with a
-  small tilt back and a small turn to the right, as a standing bassist holds it. The lower bout
+  small tilt back and a turn to the right, as a standing bassist holds it. The lower bout
   rests against the left thigh, the upper bout stands below the left shoulder, and the scroll
   stands beside the head. The left elbow points out to the side, and the bow plays near level in
   front of the belly, near the end of the fingerboard (`HIPPO_HOLD.soundingPoint`). Reason: with a place that leaned the bass far
-  across the body, the hippo hugged it as a cello. The other
+  across the body, the hippo hugged it as a cello. The turn to the right brings the frog side of
+  the bow nearer to the bow arm, the right shoulder turns far forward (`reach`), and the string
+  planes lie near each other (`stringTurn`), so that the short arm plays about 0.4 of the hair
+  over the round belly. Reason: with a smaller turn of the bass and of the shoulder, the arm
+  reached no part of the hair with a bent elbow. The other
   instruments can take this pattern: a place from the landmarks, and the
   arm values of an accepted player.
 - **Violin hold from the body.** The shared violin hold (`BOWED_HOLDS.violin`) takes the arm
