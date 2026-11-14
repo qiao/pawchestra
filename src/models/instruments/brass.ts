@@ -1074,8 +1074,10 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
     piston(piece, at([v.x, v.top, z]), v.radius, v.top - v.bottom, 0.026);
   }
   tubaLongSlide(piece, at);
-  // The slides of the other valves hang at the right of the valves. Each has 5 faces around its
-  // axis, so that the long slide fits in the triangle budget.
+  // The slides of the other valves hang at the right of the valves. Each leaves its casing, goes
+  // down at the right, and comes back under the valve up into the bottom of its own casing, so
+  // that no slide ends in the air. Each has 5 faces around its axis, so that the long slide fits
+  // in the triangle budget.
   for (const [i, z] of valveZ.entries()) {
     if (i === 0) {
       continue;
@@ -1085,10 +1087,11 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
       piece,
       rounded(
         [
-          at([0.11, 0.43, z]),
+          at([v.x, 0.43, z]),
           at([0.13 + 0.012 * i, 0.43, z]),
           at([0.13 + 0.012 * i, 0.43 - reach, z]),
-          at([0.11, 0.43 - reach, z]),
+          at([v.x, 0.43 - reach, z]),
+          at([v.x, v.bottom + 0.012, z]),
         ],
         0.014,
         1,
