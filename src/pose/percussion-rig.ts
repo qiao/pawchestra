@@ -822,9 +822,15 @@ export const PERCUSSION_HOLDS = {
  * (`SUSPENDED_CYMBAL.malletTilt`), as the sticks of the snare drum, and the two hands strike in
  * turn near the edge, opposite each other: the left hand at the left and the right hand at the
  * right (`docs/reference/percussion-technique.md` 7). The offsets move the target, the middle of a
- * cymbal of the scale 1, to these spots, 1.3 cm in from the rim. The homes stand 0.45 H out from
- * the shoulders, a little further out than for the snare drum, so that the mallets point in to the
- * spots. The spine leans 3° over the cymbal (`lean`), as over the snare drum.
+ * cymbal of the scale 1, to these spots, 1.3 cm in from the rim. The homes stand 0.15 H out from
+ * the shoulders, and the elbows point down and a little out and forward, so that the mallets
+ * point forward to the spots and the upper arms hang near the body: the median upper arm stands
+ * 23° out from the side of the body at the strikes, and at most 28°, as the hanging arm of the
+ * badger (21° to 22°). With the homes 0.45 H out and the mallets of 0.3 m, the mallets pointed
+ * in to the spots, and the upper arms stood 37° out, and at most 42°, as wings. With the elbow
+ * poles of the snare drum ([±0.3, -1, 0.5]), the upper arms went 3.1 cm into the body in the set
+ * position (limit 2.5 cm), and with these poles 2.4 cm. The spine leans 3° over the cymbal
+ * (`lean`), as over the snare drum.
  * Between strikes, each mallet keeps its
  * strike direction, and the wrist holds the ball about 3.5 cm over its spot (`across.pitch`), as
  * the ready position of the snare drum. Before a strike, the wrist lifts the ball higher by the
@@ -849,10 +855,10 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   sizes: { lift: 0.1, rest: 0.03 },
   offsetL: [-0.187, 0, 0],
   offsetR: [0.187, 0, 0],
-  poleL: [-0.6, -1, 0.3],
-  poleR: [0.6, -1, 0.3],
+  poleL: [-0.4, -1, 0.45],
+  poleR: [0.4, -1, 0.45],
   rim: 0,
-  home: [0.45, -0.3, -0.5],
+  home: [0.15, -0.3, -0.5],
   gripRise: null,
   top: 'up',
   across: { rest: -0.6, lift: 0.3, pitch: 0.15, peak: 5 },

@@ -540,10 +540,10 @@ passes.
       must change, such as the two sticks in one paw.
 - [ ] Badger bass drummer: between strikes, the paw keeps its turn in the world while the body
       sways, so its twist on the forearm moves 20° in about 1 s.
-- [ ] Badger cymbalist: the upper arms stand 35° out from the side of the body in the play (21° to
-      22° on the hanging arms). With the elbow poles of the snare drum ([±0.3, -1, 0.5]), the upper
-      arms went 3.5 cm into the body (limit 2.5 cm). Fit the homes, or the spots a little in from
-      opposite each other, as a real player rolls (percussion-technique 7, [31]).
+- [ ] Badger cymbalist: the mallets are 0.25 m long from the grip to the ball, shorter than the
+      snare sticks (0.3 m), so that the upper arms hang near the body. Ask the user if a cymbal
+      10 cm further forward with mallets of 0.3 m is better: it moves the seats, and the paw does
+      not reach the near rim for the muffle.
 - [ ] Badger xylophonist: the grip stays up to 7 cm over its bar (`gripRise`), and a real player
       keeps the hands at most one inch over them (percussion-technique 9). With 0.2 H, a target
       missed by 6.8 mm. The limit bends the paws more on the forearms: the arm gate counts 35 (L)

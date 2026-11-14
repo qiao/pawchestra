@@ -345,7 +345,9 @@ The app follows these facts:
 - **The suspended cymbal (section 7).** The badger plays the cymbal parts on a suspended cymbal
   (`SpeciesParams.cymbalForm`, `SUSPENDED_CYMBAL`). Its short arms cannot hold hand cymbals of the
   smallest real size out of its round body. The paws strike in turn near the edge, opposite each
-  other. Between strikes, each ball stays about 3.5 cm above the plate, with the shaft almost
+  other. The mallets point forward from homes near the shoulders, and the upper arms hang near
+  the body, about 23° out, as the hanging arms (`SUSPENDED_CYMBAL_HOLD.home`, `poleL`, `poleR`).
+  Between strikes, each ball stays about 3.5 cm above the plate, with the shaft almost
   level, as the ready position of the snare drum. Before a strike, it lifts higher for a louder
   note: about 6 cm to 13 cm (`SUSPENDED_CYMBAL_HOLD.across`). After a note with a rest of at
   least 0.5 s after it, the paw that did not strike goes to the near rim, its fingers touch the
@@ -425,6 +427,10 @@ The app does not follow these facts:
   flat on the table twisted the paw 150° in 0.05 s. Between the stand and the tambourine on the
   table, the paw bends about 110° on its forearm in the 0.6 s at the table, with a twist of about
   20° (`tablePaw()`). No source gives the turn of the hand in a change.
+- **The mallets of the suspended cymbal (section 7).** Each mallet is 0.25 m long from the grip
+  to its ball (`SUSPENDED_CYMBAL.mallet`), shorter than the snare sticks, because the arm of the
+  badger is 23 cm long. With 0.3 m, the paws stood far out from the sides of the body, and the
+  upper arms stood 37° out as wings. No source gives the length of a yarn mallet.
 - **The rest at the suspended cymbal (section 7).** No source gives it. The mallets lie across the
   body as the snare sticks, above the plate, side by side and facing opposite directions, as the
   set position of a drumline [37] (`SUSPENDED_CYMBAL_HOLD.set`).

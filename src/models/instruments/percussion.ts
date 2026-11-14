@@ -1769,6 +1769,15 @@ export const SUSPENDED_CYMBAL = {
   /** The radius of the yarn ball of each mallet. */
   ball: 0.02,
   /**
+   * The length of each mallet from the grip to the middle of its ball, in meters. The arm of the
+   * badger is 23 cm long, and the paws stand this far from the strike spots. With 0.25 m, the
+   * paws stand in front of the body, and the upper arms hang near its sides. With the 0.3 m of
+   * the snare sticks, the paws stood far out from the sides, and the upper arms stood 37° out as
+   * wings.
+   */
+  // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
+  mallet: 0.25 as number,
+  /**
    * The angle of each mallet below the level in the bind pose, toward the fingers of the hanging
    * paw, in radians ({@link PAW_TILT}): a real player holds the mallets in the matched grip of
    * the snare drum.
@@ -1805,7 +1814,7 @@ export function buildSuspendedCymbal(scale: number): InstrumentModel {
   space.add(lathe(profile, 12), INSTRUMENT_COLORS.brass, transform(center));
   tripodSpace(space, [center[0], 0, center[2]], [center[0], under, center[2]], 0.24);
   const [left, right] = malletPair({
-    length: 0.3,
+    length: c.mallet,
     tilt: c.malletTilt,
     spot: c.malletSpot,
     butt: MALLET_BUTT,

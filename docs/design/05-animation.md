@@ -855,7 +855,9 @@ The rest of each family:
   tips stood high above the head between strikes, and the stroke did not grow with the loudness.
 - **Reach of the badger.** The spine of the badger leans over each instrument, and the homes of
   the sticks and the mallets stand near the shoulders (`PercussionHold.lean`,
-  `PercussionHold.home`). Reason: with an upright spine and the homes further out, the sticks, the
+  `PercussionHold.home`). At the suspended cymbal, the mallets are shorter than the snare sticks
+  (`SUSPENDED_CYMBAL.mallet`), and they point forward to the two spots. Reason: with long mallets
+  that pointed in to the spots, the upper arms stood out from the body as wings. Reason: with an upright spine and the homes further out, the sticks, the
   beater, and the mallets missed their strike spots. At the bass drum, the neck and the head turn
   back up by the whole lean (`PercussionHold.headUp`), so that the badger looks ahead to the
   conductor, as a real player does. Reason: with the head on the leaned spine, the snout came
