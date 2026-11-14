@@ -1232,11 +1232,12 @@ const WOLF_CLARINET = {
  * 1.1 cm off. The right palm lies above the valves at their right and faces down, and the right
  * paw points to the left across the valve tops: 0.7 of its aim is the side direction across the
  * valves (`aimSide`), and its fingers curl 92° down onto the valves. The right grip moves 0.06 H
- * along the valves toward the mouthpiece and 0.04 H toward the right shoulder (`gripShiftR`). The
- * right paw then grasps the valves in each sample, with its palm 33° from the valve tops
+ * along the valves toward the mouthpiece and 0.05 H toward the right shoulder (`gripShiftR`). The
+ * right paw then grasps the valves in each sample, with its palm 30° from the valve tops
  * (`pnpm wind-grip trumpeter`). With no move toward the shoulder, the palm turned 76° from the
- * valves, and the paw grasped them in 21% of the play samples. With flatter fingers, the finger
- * tips stood 1.3 cm off the valves. The top of the right paw is 5.6 cm above the mouthpiece, so in
+ * valves, and the paw grasped them in 21% of the play samples. With 0.04 H, the two paws went
+ * 1.6 cm into each other (`pnpm clip-probe`). With flatter fingers, the finger tips stood
+ * 1.3 cm off the valves. The top of the right paw is 6.1 cm above the mouthpiece, so in
  * the view from the front, the paw covers the mouth, as the right hand of a real player on the
  * valve buttons. The left paw takes no side aim: the retarget turns the paw back to its forearm in
  * the plane of its palm (`PAW_TURN` of `models/studio-rig.ts`). Both paws keep the hold of the
@@ -1266,7 +1267,7 @@ const MONKEY_TRUMPET = {
   poleR: [1, -1, 0],
   faceTube: ['palm', 'palm'],
   aimSide: [0, 0.7],
-  gripShiftR: [-0.06, 0, -0.04],
+  gripShiftR: [-0.06, 0, -0.05],
   restShift: [0.1, -0.5, 0.12],
   restGripShiftL: [0, 0, 0.04],
   restAim: 1,

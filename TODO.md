@@ -106,7 +106,7 @@ passes.
       Cut the thin faces, or count their pixels in a probe build.
 - [ ] Monkey trumpeter: confirm in the app the trumpet of 0.75 (`trumpetScale`), which points
       9.5° below the level with the spine 5° back (`MONKEY_TRUMPET`). The top of the right paw
-      is 5.6 cm above the mouthpiece, so from the front the paw covers the mouth, as the right
+      is 6.1 cm above the mouthpiece, so from the front the paw covers the mouth, as the right
       hand of a real player on the valve buttons. A flatter paw lifts its finger tips off the
       valves.
 - [ ] Rhino tubist: at rest, the tuba rests against the belly with its top turned forward
