@@ -203,7 +203,8 @@ export function createScenePose(plan: PosePlan): ScenePoseBuffer {
  * on one beat and to the other side on the next beat. Its phase is the count of beats since the
  * first beat, which has no jump at a beat or at a change of the tempo. A lag subtracts a part of
  * a beat from the phase, so that a change of the beat length does not move the sway. The sway is
- * 0 until the lagged phase reaches 0, and after the last beat.
+ * 0 until the lagged phase reaches 0, and it fades to 0 in the last beat, so that it stops at the
+ * last beat with no jump.
  *
  * @param beats The times of the beats, sorted.
  * @param time The song time.
@@ -231,7 +232,8 @@ export function beatSway(
     return 0;
   }
 
-  return Math.sin((Math.PI * phase) / beatsPerSide);
+  const fade = b === beats.length - 2 ? 1 - MathUtils.smoothstep(along, 0, 1) : 1;
+  return fade * Math.sin((Math.PI * phase) / beatsPerSide);
 }
 
 /**
