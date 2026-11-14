@@ -1731,6 +1731,9 @@ copy these numbers of the design:
   `FOREGROUND.bodyShare` of that grid, also in a dirty frame (`foregroundBody()`). Each row of the
   grid counts the cells from the first to the last point of the body. A choir shot has no such
   test, because the orchestra stands under the singers.
+- A solo of the soloist keeps the middle of the body and the feet of the bear out of the frame
+  (`Subject.outside`), because the soloist stands beside the podium (3.8). With the middle of the
+  body alone, the legs of the bear and the podium filled a third of the frame.
 - Each camera keeps 0.6 m from each box, 1.0 m from the podium and the conductor, and 0.6 m above
   the stage top.
 - A camera stays on one side of the beam cone for a full shot, because a crossing darkens the

@@ -161,6 +161,8 @@ interface ConductorSubjects {
   readonly sights: SightPoints;
   /** The middle of the body of the bear, 0.8 m above the podium top. */
   readonly body: Vec3;
+  /** The feet of the bear on the podium top. */
+  readonly feet: Vec3;
   /** The corners of the outline of the bear and its two hands in the stage plane. */
   readonly outline: readonly Vec3[];
   /** The height of the top of the head of the bear with no ears, in meters. */
@@ -222,10 +224,12 @@ export interface Subject {
    */
   readonly focus: Vec3;
   /**
-   * A point that stays out of the frame of a desktop view, or `null`: the middle of the body of
-   * the bear in a solo shot of the soloist, who stands beside the podium (design 5.6).
+   * The points that stay out of the frame of a desktop view: the middle of the body and the feet of
+   * the bear in a solo shot of the soloist, who stands beside the podium (design 5.6). The other
+   * subjects have none. With the middle of the body alone, the legs of the bear and the podium
+   * filled a third of a solo of the soloist.
    */
-  readonly outside: Vec3 | null;
+  readonly outside: readonly Vec3[];
   /**
    * The chests of the singers of a choir subject, or none for the other subjects. A head of
    * another player under them on the screen does not cover a singer (design 5.6).
@@ -699,6 +703,7 @@ export function prepareSubjects(
         place.position[1] + SUBJECT_SIZES.conductorBodyHeight,
         place.position[2],
       ],
+      feet: place.position,
       ...outlineOf(bear, place, sights.parts),
     };
   }
@@ -886,7 +891,10 @@ export function soloSubject(subjects: StageSubjects, seatIndex: number): Subject
     spread: piano ? KEYBOARD_VIEW.spread : 1,
     members: [principal.sights.owner],
     focus: principal.sights.head,
-    outside: seatIndex === subjects.soloist ? (subjects.conductor?.body ?? null) : null,
+    outside:
+      seatIndex === subjects.soloist && subjects.conductor
+        ? [subjects.conductor.body, subjects.conductor.feet]
+        : [],
     floor: [],
     ...extentOf([principal], target),
   };
@@ -967,7 +975,7 @@ export function sectionSubject(
     spread: piano ? KEYBOARD_VIEW.spread : 1,
     members: members.map((p) => p.sights.owner),
     focus: sphere.target,
-    outside: null,
+    outside: [],
     floor: choir ? players.map((p) => p.chest) : [],
     ...extentOf(players, sphere.target),
   };
@@ -999,7 +1007,7 @@ export function conductorCloseSubject(conductor: ConductorSubjects): Subject {
     spread: 1,
     members: [CONDUCTOR_OWNER],
     focus: head,
-    outside: null,
+    outside: [],
     floor: [],
     outline: conductor.outline,
     reach: 0,
@@ -1052,7 +1060,7 @@ export function conductorBackSubject(
     // The players fill the frame behind the bear, so no head of the stage is a foreground head.
     members: subjects.heads.map((h) => h.owner),
     focus: target,
-    outside: null,
+    outside: [],
     floor: [],
     outline: [target],
     reach: SUBJECT_SIZES.conductorBackRadius * subjects.stageSide,
@@ -1148,7 +1156,7 @@ export function sideSubject(
     spread: 1,
     members,
     focus: target,
-    outside: null,
+    outside: [],
     floor: [],
     // The frame holds the heads and the hands of the players in the sphere, and it cuts the rest.
     ...extentOf(framed, target),

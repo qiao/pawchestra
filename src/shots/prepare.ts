@@ -1192,12 +1192,12 @@ function moveForeground(
   if (test === 'bodies' && floor.length > 0) {
     return false;
   }
-  if (test === 'heads' && outside) {
-    // The point stays out of the frame for the full move.
+  if (test === 'heads' && outside.length > 0) {
+    // The points stay out of the frame for the full move.
     for (const i of MOVE_INDICES) {
       const fov = (move.keys[i] ?? move.from).fov;
       const { camera, look } = sampleComposed(planner, move, i);
-      if (inFrame(outside, camera, look, fov, aspect)) {
+      if (outside.some((point) => inFrame(point, camera, look, fov, aspect))) {
         return true;
       }
     }
