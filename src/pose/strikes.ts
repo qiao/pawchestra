@@ -1,3 +1,5 @@
+import { MathUtils } from 'three';
+
 import type { Vec3 } from '../models/tuples.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { gestureSize } from './loudness.ts';
@@ -28,8 +30,13 @@ export const STRIKE_MOTION = {
    * as a real player lifts the mallet at once after the attack (design 5.3).
    */
   legatoSec: 0.75,
-  /** After a strike, the mallet rebounds to its rest height in at most this time. */
+  /**
+   * After a strike, the mallet rebounds to its rest height in this time. A rebound after a small
+   * stroke takes more time, so that it starts no faster than the stroke came down.
+   */
   reboundSec: 0.1,
+  /** The rebound after a small stroke takes at most this time. */
+  reboundMaxSec: 0.4,
   /** The rebound takes at most this part of the time to the next strike of the same hand. */
   reboundShare: 0.4,
   /**
@@ -338,8 +345,10 @@ export interface StrikeTrack {
  * most 1 s before it, and in at most 0.6 of the time from the strike before. The height of the top
  * follows the gesture size of the note, and a short lift is lower in proportion. The down stroke
  * takes at most 0.125 s, and at most half of the lift. After a strike with no legato stroke after
- * it, the mallet rebounds to its rest height in at most 0.1 s, and in at most 0.4 of the time to
- * the next strike.
+ * it, the mallet rebounds to its rest height in 0.1 s, and in at most 0.4 of the time to the next
+ * strike. A rebound starts no faster than its stroke came down: after a stroke with a top below
+ * the rest height, it takes more time, at most 0.4 s. In 0.1 s, the beater of the triangle left a
+ * soft stroke four times faster than it came, 32° in one frame.
  *
  * @param strikes The strikes of the hand, sorted by start.
  * @param first The target of the hand before its first strike.
@@ -369,24 +378,32 @@ export function buildStrikeTrack(
   const ups = strikes.map((s, i) =>
     legato[i] ? gapBefore(i) : Math.min(lead(s.start), m.upShare * gapBefore(i)),
   );
+  const downs = ups.map((up) => Math.min(m.downSec, up / 2));
+  const peaks = strikes.map(
+    (s, i) =>
+      (gapBefore(i) < 1.5 * m.handRollSec ? (sizes.roll ?? sizes.lift) : sizes.lift) *
+      gestureSize(s.loudness, amplitude) *
+      Math.min(1, (ups[i] ?? 0) / m.upSec),
+  );
+  // The down stroke ends with the speed `(π / 2) × top / down`, and a rebound of the time `t`
+  // starts with the speed `2 × rest / t`.
+  const rebound = (i: number): number => {
+    const speed = ((Math.PI / 2) * (peaks[i] ?? 0)) / (downs[i] || 1);
+    const slow = speed > 0 ? (2 * sizes.rest) / speed : m.reboundMaxSec;
+    return MathUtils.clamp(slow, m.reboundSec, m.reboundMaxSec);
+  };
   return {
     starts: Float64Array.from(strikes, (s) => s.start),
     upStarts: Float64Array.from(strikes, (s, i) => s.start - (ups[i] ?? 0)),
-    downs: Float64Array.from(ups, (up) => Math.min(m.downSec, up / 2)),
+    downs: Float64Array.from(downs),
     legato: Uint8Array.from(legato, (l) => (l ? 1 : 0)),
     reboundEnds: Float64Array.from(
       strikes,
-      (s, i) => s.start + Math.min(m.reboundSec, m.reboundShare * gapBefore(i + 1)),
+      (s, i) => s.start + Math.min(rebound(i), m.reboundShare * gapBefore(i + 1)),
     ),
     points: Float64Array.from(strikes.flatMap((s) => s.point)),
     normals: Float64Array.from(strikes.flatMap((s) => s.normal)),
-    peaks: Float64Array.from(
-      strikes,
-      (s, i) =>
-        (gapBefore(i) < 1.5 * m.handRollSec ? (sizes.roll ?? sizes.lift) : sizes.lift) *
-        gestureSize(s.loudness, amplitude) *
-        Math.min(1, (ups[i] ?? 0) / m.upSec),
-    ),
+    peaks: Float64Array.from(peaks),
     rest: sizes.rest,
     first,
   };
