@@ -1175,8 +1175,9 @@ const WOLF_CLARINET_FORWARD = 10;
  * upright at the side, the bell stood 26 cm above the thigh. With the upper arm straight down
  * and the elbow bent 70°, the bell stood on the top of the thigh, but the right forearm went
  * 3.8 cm into the belly at the start of the lift (1.0 cm with these values, limit 1.5 cm). The
- * left paw leaves its grip and hangs beside the left haunch with the upper arm 20° forward and
- * the elbow bent 30° (`restFreeL`). The round belly of the Tripo wolf reaches the seat front, so
+ * left paw leaves its grip and hangs beside the left haunch with the upper arm 5° forward and
+ * the elbow bent 15° (`restFreeL`), as the free hand of a seated clarinetist lies beside or on the
+ * thigh. With 20° and 30°, the paw stood in the air in front of the left hip. The round belly of the Tripo wolf reaches the seat front, so
  * a clarinet in front of the belly between the knees with both paws on it put the left forearm
  * 10.6 cm and the right upper arm 9.9 cm into the belly. A left paw on the top of the left thigh
  * goes 14 cm into the belly.
@@ -1190,7 +1191,7 @@ const WOLF_CLARINET = {
   poleR: [0.6, -1, 0],
   rest: holdTurn(-30, -10),
   restArms: {
-    L: { forward: 20 * MathUtils.DEG2RAD, bend: 30 * MathUtils.DEG2RAD },
+    L: { forward: 5 * MathUtils.DEG2RAD, bend: 15 * MathUtils.DEG2RAD },
     R: { forward: 25 * MathUtils.DEG2RAD, bend: 45 * MathUtils.DEG2RAD },
   },
   restShift: [0, -0.17, 0.05],
