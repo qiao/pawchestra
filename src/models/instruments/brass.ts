@@ -978,7 +978,8 @@ const TUBA_LONG_SLIDE = { upper: 0.33, lower: 0.26, front: -0.12, left: -0.11 } 
 /**
  * Adds the long slide of the first valve of the tuba ({@link TUBA_LONG_SLIDE}): from the front of
  * the first valve casing down and to the left, in front of the bell branch, around a round bow,
- * and back to the bottom of the casing.
+ * and back up into the bottom of the casing. Both ends lie on the axis of the casing, inside it, so
+ * the slide has no caps.
  *
  * @param piece The piece.
  * @param at The function that gives a point of the drawing of {@link tuba} in the axes of the
@@ -986,9 +987,11 @@ const TUBA_LONG_SLIDE = { upper: 0.33, lower: 0.26, front: -0.12, left: -0.11 } 
  */
 function tubaLongSlide(piece: PieceBuilder, at: (p: Vec3) => Vec3): void {
   const s = TUBA_LONG_SLIDE;
+  const v = TUBA_VALVES;
+  const front = v.z[0];
   const bow = (s.upper - s.lower) / 2;
   const upper = rounded(
-    [at([0.1, 0.43, -0.065]), at([0.06, s.upper, s.front]), at([s.left, s.upper, s.front])],
+    [at([v.x, 0.43, front]), at([0.06, s.upper, s.front]), at([s.left, s.upper, s.front])],
     0.03,
     1,
   );
@@ -1002,11 +1005,22 @@ function tubaLongSlide(piece: PieceBuilder, at: (p: Vec3) => Vec3): void {
     4,
   );
   const lower = rounded(
-    [at([s.left, s.lower, s.front]), at([0.1, s.lower, s.front]), at([0.1, 0.362, -0.06])],
+    [
+      at([s.left, s.lower, s.front]),
+      at([0.1, s.lower, s.front]),
+      at([v.x, v.bottom + 0.012, front]),
+    ],
     0.03,
     1,
   );
-  tubeAlong(piece, [...upper, ...around.slice(1, -1), ...lower], [0.0095], TUBE_SEGMENTS, METAL);
+  tubeAlong(
+    piece,
+    [...upper, ...around.slice(1, -1), ...lower],
+    [0.0095],
+    TUBE_SEGMENTS,
+    METAL,
+    false,
+  );
 }
 
 /**
@@ -1081,8 +1095,8 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
   tubaLongSlide(piece, at);
   // The slides of the other valves hang at the right of the valves. Each leaves its casing, goes
   // down at the right, and comes back under the valve up into the bottom of its own casing, so
-  // that no slide ends in the air. Each has 5 faces around its axis, so that the long slide fits
-  // in the triangle budget.
+  // that no slide ends in the air. Both ends lie inside the casing, so a slide has no caps. Each
+  // has 5 faces around its axis, so that the long slide fits in the triangle budget.
   for (const [i, z] of valveZ.entries()) {
     if (i === 0) {
       continue;
@@ -1104,6 +1118,7 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
       [0.0085],
       TUBE_SEGMENTS - 1,
       METAL,
+      false,
     );
   }
   // The lead pipe from the front of the first valve casing, below its top, up over the main
