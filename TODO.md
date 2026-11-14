@@ -97,9 +97,6 @@ passes.
 - [ ] Badger (4.4): the elbow rings double the faces of the elbow, so the fold counts by face of
       `fold-probe` and the arm gate rise for some roles, while the bent elbow is round in the
       crops. Measure the folds by area, or by the dark pixels of the elbow, to compare.
-- [ ] Rhino tubist (4.4): a faint part of the neck ledge stays at y 0.70 to 0.71 of the source,
-      in the back view. A smooth there moves the lowest head vertex and so H. Move only that row
-      of the ledge along the neck, or accept the change of H.
 - [ ] Monkey trumpeter: a dark band stays under each buttock in the back view: the round form of
       the source that faces down, away from the key light.
 - [ ] Monkey trumpeter: two thin faces across the wrists (329 and 1090) fold in each play sample.
@@ -109,9 +106,6 @@ passes.
       is 6.1 cm above the mouthpiece, so from the front the paw covers the mouth, as the right
       hand of a real player on the valve buttons. A flatter paw lifts its finger tips off the
       valves.
-- [ ] Rhino tubist: at rest, the tuba rests against the belly with its top turned forward
-      (`RHINO_TUBA.rest`). 21 faces fold at rest (12 on the left arm), against 15, and the left
-      paw swings 50° on its forearm. Check the left elbow and wrist in 2x crops.
 - [ ] Rhino tubist: the main branch is about 15 cm wide at the left grip, so the left paw lies
       against it and does not close around it. A real tubist grips thinner tubing at the side.
       Option: a thin tube at the left side of the tuba model for the left paw.
@@ -220,11 +214,18 @@ passes.
       finds no depth, so measure the gap of the baton to the head.
 - [ ] Mouse and beaver: they stand in their seated poses with no chair. Measure their balance (the
       center of mass over the feet), and save the balance probe as a tool.
-- [ ] Rhino tubist: ask the user to confirm the stand, the arms of the mesh, the lead pipe, and the
-      hold.
-- [ ] Rhino tubist: with a tuba of about 10 kg, the center of mass lies at the front end of the
-      stable range of the soles. A small lean of the trunk back is an option.
-- [ ] Rhino: check the left forearm from az-150 for a flat flap under the arm.
+- [ ] Rhino tubist: ask the user to confirm the Tripo body in the app, its arms 1.2 times longer
+      than in the source (`armStretch`), and the upright tuba in front of the belly.
+- [ ] Rhino tubist: the thick left upper arm goes about 5.5 cm into the round belly at the elbow
+      in each sample (`pnpm hold-fit tubist`, limit 1.5 cm). The crops show the arm on the side
+      of the belly with no cut. Elbows further out changed it by 0.5 cm or less. Try the arm rows
+      at the inner elbow, or a hold with the left elbow more forward.
+- [ ] Rhino tubist: the inner right elbow folds into a dark crease in the az150 views at the
+      elevation 40 (`pnpm close-views parts <dir> --roles tubist`, `arm-R`). Check the elbow rows
+      of the rhino chain at that bend.
+- [ ] Rhino: the chain logs a largest gap of 0.10 units of the turned ring of the left paw
+      (`turn_paws()` of `tools/blender/hand/rhino/build.py`), and the crops show no slit. Check the
+      gap measure for a ring of 19 edges with the paw turn of -5 steps.
 - [ ] Deer harpist: the high left palm (`highL`) and the damp with no press of 2026-11-12 keep each
       paw at most 1.4 cm in the body. Check the high left notes in 2x crops in the app.
 - [ ] Deer harpist: the harp of 0.975 changes the right grip on purpose. `pnpm arm-check harpist`
@@ -523,16 +524,19 @@ passes.
       gets no muffle (beethoven-9 10 to 9 muffles, beethoven-5-4 90 to 72).
 - [ ] Penguin singer: the paused test `src/pose/choir-notes.test.ts` expects the old jaw timing
       (the phrase lift and the jaw rate of 2026-11-12). Update it when the tests come back.
+- [ ] The mesh rig route now serves only the mannequin: `tools/blender/bear_arms.py` and
+      `elephant_arms.py` have no runner, the bead-eye rules of `ANIMALS` (`eyeShift`, `eyeLevel`,
+      `eyeNormal`, `eyeFill`, `eyeSize`) have no species, and the rig arm of `sizeReach()` of
+      `tools/hold-reach.ts` has no species. Decide what stays for the mannequin, and remove the
+      rest.
 - [ ] Remove the twist bone of the upper arm (`upperTwist` of the rig configs,
       `StudioBody.upperTwist`, `upper_twist()` of `tools/blender/rig_mesh.py`, and design 4.4). No
       body uses it, because the pig now has arm segments.
 - [ ] Hippo: the nose tip lies on a nostril 2.7 cm from the middle plane, and the rig checks warn.
-- [ ] Rhino, polar bear: the lights of the two bead eyes stand at mirror places in the front close
-      view (light x 0.09 / -0.10 and 0.08 / -0.13 of the eye width), so they point toward each
-      other. The rhino gap was 0.05 before its eyes moved up (`eyeShift`).
-- [ ] Rhino: thin dark lines of the old lower lid show under the right bead eye in the front close
-      view. The app view does not show them. Polar bear: a faint light facet stays at the inner
-      side of each bead eye. Penguin: the fur makes small dents at the inner side of the left eye.
+- [ ] Polar bear: the lights of the two bead eyes stand at mirror places in the front close view
+      (light x 0.08 / -0.13 of the eye width), so they point toward each other.
+- [ ] Polar bear: a faint light facet stays at the inner side of each bead eye. Penguin: the fur
+      makes small dents at the inner side of the left eye.
 - [ ] Deer, penguin, polar bear: the upright turn (`uprightRoll()`) leans the ovals 4° to 8° with
       the tops out in the front close view, where they were within 2° of upright. The linear bend
       model misses the fur cover. Try a fit of the turn on the real silhouette.
@@ -610,13 +614,6 @@ passes.
       recast folds 10 faces of the left arm (limit 8), and the snare drum recast twists the left
       forearm 82° (limit 80°, base 80°). The rest shape of the right arm keeps its rule from the
       bent bind, with 3 faces turned over in the rig log, as on `14ef3d67`.
-- [ ] Rhino right bind paw: it keeps no supination in place of the rule value 22°, because 22°
-      takes the right forearm near the elbow 0.6 cm deeper into the tuba at rest, in the lift, and
-      in the lowering (1.3 cm to 1.5 cm, limit 1.5 cm). The largest right paw twist p95 of the
-      cast roles is thus 115° in place of 94° (the violin). The rig log keeps 1 face (444) of the
-      right elbow shape turned over.
-- [ ] Rhino neutral bind elbows: the bent elbow rings of the tuba hold are about 24% narrower
-      (p5 L 4.26 cm against 5.58 cm, R 4.04 against 5.16). The 2x crops show no pinch.
 - [ ] Neutral bind, cast matrix of the elephant, the rhino, and the bear: each recast cell fails on
       `37d5d5c7` and on the tree. The elephant clarinet folds grow (L 19, base 15), and its snare
       drum folds move to the left arm (L 13, base R 10). The rhino flute forearms go deeper into
@@ -1253,8 +1250,6 @@ scene of each demo has its seats and stage size with no overlap.
       chin and the left shoulder in the close views.
 - [ ] Rabbit violinist: the right forearm goes 2.1 cm into the body for 0.2 s at the song end of
       `bach-bwv1050`.
-- [ ] Rhino: the shoulders widen the footprint, and the conductor pose of `boulanger-matin` changes
-      from 257.38 s. Check that the cue of the conductor still aims at the tuba.
 - [ ] Body probe: a change of the panda rig changes the pose sets of other players (38 sets of the
       hippo, the elephant, the badger, and the conductor with the free arms). The layout packs the
       seats of a row by the footprints (`playerFootprint()`), so the 0.7 cm narrower panda moves 9
