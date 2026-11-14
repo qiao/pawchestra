@@ -292,7 +292,9 @@ count-in (5.4, 6.5), and lower them when the hold of `transport.holdSec` after a
   less (`FOX_HANG`), because the full bend points its forearm forward into the air. Its hanging
   left paw turns around its long axis (`FreePaw.hangRoll`), so that the palm faces the leg.
   Reason: the shortest turn of the bind paw down along the forearm twisted the paw 138° on its
-  forearm.
+  forearm. The free left arm of the bass drummer hangs with a smaller forward swing and a bend of
+  about 20° (`FREE_HANG`), because the shoulder carries the lean of the spine over the drum.
+  Reason: with `HANG`, its forearm stood level and forward, and the open paw stayed in the air.
 
 The rest of each family:
 
@@ -877,11 +879,13 @@ The rest of each family:
   `DampRule.restSec`, as a real player stops the sound in a rest (percussion 5, 7). The windows
   come from the score alone (`dampTrack()` of `pose/damps.ts`): the move ends at the contact,
   stays for at most the hold, and ends before the next lift or note. The hand cymbals go against
-  the chest (`ChestDamp`). The free left paw of the bass drummer lays its palm on the near part of
-  the far head, and the upper body turns to bring the left shoulder forward, with the head turned
-  back (`PalmDamp`). Reason: the far head stands out of the reach of the short arm. With no turn,
-  the left upper arm went into the body, and a drum moved or turned to the left put an upper arm
-  into the body or the beater off its spot. The paw of the suspended cymbal that did not strike
+  the chest (`ChestDamp`). While the bass drummer plays, its free left paw rests on the near top of
+  the hoop of the far head (`HOOP_PAW`), and at rest the arm hangs. At a damp, the paw lays its palm
+  on the near part of the far head, and the upper body turns to bring the left shoulder forward,
+  with the head turned back (`PalmDamp`). Reason: the far head stands out of the reach of the short
+  arm. With no turn, the left upper arm went into the body, and a drum moved or turned to the
+  left put an upper arm into the body or the beater off its spot. The paw of the suspended cymbal
+  that did not strike
   the note takes its grip to the near rim, so that the closed paw lies on the edge with its claws
   over the plate, and the spine leans further over the cymbal (`EdgeDamp`). The wrist lifts the mallet, so that it points a
   little up over the plate and its ball stays away from the bell (`EdgeDamp.share`), as a real
@@ -986,15 +990,21 @@ The rest of each family:
   within 1 cm of the top hoop. At the xylophone, a bar past `reach` of one
   shoulder goes to the other paw, so that each paw strikes only the bars near its side. At the bass
   drum, the upper body turns further at a muffle (`PalmDamp.turn`), so that the left forearm stays
-  out of the belly. The left paw that holds the triangle stays in line with its forearm, with no
-  turn around it (`trianglePaw()`), and the triangle turns back around the pinch of the clip, so
-  that it keeps its hang (`PercussionSide.piece`). The clip hangs in the hook of the curled claws,
-  in front of the palm (`TRIANGLE_PINCH`). Reason: the triangle followed the hand of the player,
+  out of the belly. The left paw that holds the triangle stays in line with its forearm
+  (`trianglePaw()`), and the triangle turns back around the pinch of the clip, so that it keeps its
+  hang (`PercussionSide.piece`). The fist closes on the clip as on the shaft of a mallet, with the
+  clip in the palm under the curled fingers (`TRIANGLE_PINCH`), and the paw turns around its
+  forearm until the clip hangs along that grip (`TRIANGLE_GRIP_LINE`). The clip leaves the heel of
+  the fist, and the triangle hangs below it. Reason: the triangle followed the hand of the player,
   whose turn made the visible paw turn 70° in the plane of its palm, off the clip and up to the
-  snout, and a paw with the palm down twisted at the wrist until its skin stood up as a fin.
-  The clip stays below the snout (`triangleClip`), because a higher clip puts the claws into the
-  snout. The left paw curls deeper than the right paw (`PercussionHold.curl`), so that its claw
-  tips close on the thin clip.
+  snout, and a paw with the palm down twisted at the wrist until its skin stood up as a fin. A clip
+  in the hook of the claws needed a curl of 118°, which folded the knuckle rows into one flap. The
+  clip stays in front of the upper chest and below the snout (`triangleClip`), with the left elbow
+  down, because a higher clip puts the claws into the snout, and a clip nearer to the body puts the
+  right forearm into the belly. At the bass drum, the roll of the beater around its shaft comes
+  from the steady arm of the leaning chest (`malletHand()`), so that the turn of the body at a
+  damp does not turn the paw. Reason: the forearm stands where the two rolls of `gripRoll()` meet,
+  and the posed arm turned the right paw 54° in one frame.
 - **Snare drum from the body.** The shared snare drum hold takes the place of the drum from the
   body (`PercussionHold.fit`, `fitDrumPlace()`). The drum goes forward until its near rim stands a
   room in front of the trunk on the middle line, from the head up to the shoulder joints. A deep
