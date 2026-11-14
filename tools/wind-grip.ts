@@ -60,7 +60,6 @@ import { GRIP_GAP, volumeMiddle } from './bow-grip.ts';
 import { setHolds } from './hold-sets.ts';
 import type { DemoFile } from './patch-demos.ts';
 import { probeDemos } from './probe-demos.ts';
-import { BRASS } from '../src/models/instruments/brass.ts';
 import { TRIANGLE_CLIP, malletButt } from '../src/models/instruments/percussion.ts';
 import type { InstrumentId } from '../src/models/instruments/types.ts';
 import { WOODWINDS } from '../src/models/instruments/woodwinds.ts';
@@ -539,27 +538,19 @@ function neckOf(posed: PosedSkeleton): Tube {
 
 /**
  * Gives the posed line of the tips of the three finger levers of the horn, from the lever of the
- * first valve to the lever of the third valve. The points repeat the levers of `horn()` of
- * `models/instruments/brass.ts`: the coil leans back 20° around its middle, and the tip of the
- * lever of valve i lies at 0.93 of a half turn and 0.86 of the coil radius, 2.2 cm out of the
- * plane of the coil, plus 0.45 i valve steps. A change of the levers there changes this line.
+ * first valve to the lever of the third valve: the tube that the horn names for the left palm
+ * (`InstrumentGrips.tubeL`, `horn()` of `models/instruments/brass.ts`).
  *
  * @param posed The posed skeleton.
  * @returns The line of the lever tips.
+ * @throws Error if the horn names no tube for the left palm.
  */
 function hornLevers(posed: PosedSkeleton): Tube {
-  const r = BRASS.horn.coilRadius;
-  const lean = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -20 * MathUtils.DEG2RAD);
-  const angle = Math.PI * 0.93;
-  const first = new Vector3(0.86 * r * Math.cos(angle), 0.86 * r * Math.sin(angle), 0.022)
-    .applyQuaternion(lean)
-    .add(new Vector3(0.08, -0.3, -0.1));
-  const step = new Vector3(0.024, -0.012, 0).applyQuaternion(lean);
-  const third = first.clone().addScaledVector(step, 2 * 0.45);
-  const start = new Vector3(...posedPiecePoint(posed, { bone: 'instrument', at: toVec3(first) }));
-  const end = new Vector3(...posedPiecePoint(posed, { bone: 'instrument', at: toVec3(third) }));
-  const length = end.distanceTo(start);
-  return { start, axis: end.sub(start).normalize(), length };
+  const levers = ownTube(posed, 'L');
+  if (!levers) {
+    throw new Error(`The ${posed.model.instrument.id} has no tube of the left palm.`);
+  }
+  return levers;
 }
 
 /** The length of the axis of the horn bell from the rim in, in meters. */
@@ -567,8 +558,8 @@ const BELL_AXIS = 0.12;
 
 /**
  * Gives the posed axis of the bell of the horn: from the middle of the opening (the target `bell`)
- * into the bell, along its axis. The right palm of the hornist lies on this axis, a little inside
- * the opening (`HORN_PALM_DEPTH` of `models/instruments/brass.ts`).
+ * into the bell, along its axis. The right palm of the hornist lies near this axis, a little inside
+ * the opening (`HORN.palm` of `models/instruments/brass.ts`).
  *
  * @param posed The posed skeleton.
  * @returns The axis of the bell.
