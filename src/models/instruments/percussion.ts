@@ -1566,8 +1566,11 @@ export function buildSnareDrum(): InstrumentModel {
  */
 const CYMBAL_LIFT = 0.12;
 
-/** The faces around the axis of a cymbal. */
-const CYMBAL_SEGMENTS = 16;
+/**
+ * The faces around the axis of a cymbal. With 16 faces, the rim of the suspended cymbal showed its
+ * corners in the close shots of the badger.
+ */
+const CYMBAL_SEGMENTS = 20;
 
 /**
  * The layout form of a cymbal of the scale 1 around its axis (+y), in meters: from the inner face
@@ -1586,8 +1589,9 @@ const CYMBAL_SPACE: readonly ProfilePoint[] = [
  * The rings of a cymbal of the scale 1 around its axis (+y), in meters, as an orchestral cymbal
  * (design 4.6): from the inner face at the axis out to the rim, then back over the bow to the
  * bell. Each ring is a profile and a color. The bow has lathe grooves, so its rings alternate a
- * polished bronze and a darker groove bronze. The 16 faces around the axis make the cymbal 0.40 m
- * wide between two opposite faces, and the bow stays within 1 mm of the straight bow of
+ * polished bronze and a darker groove bronze, in five rings, so that the pair of hand cymbals keeps
+ * its triangle budget with {@link CYMBAL_SEGMENTS}. The faces around the axis make the cymbal
+ * 0.40 m wide between two opposite faces, and the bow stays within 1 mm of the straight bow of
  * {@link CYMBAL_SPACE}, so that a mallet at the edge strikes it at the same height.
  */
 const CYMBAL_RINGS: readonly (readonly [readonly ProfilePoint[], Rgb])[] = (() => {
@@ -1596,25 +1600,18 @@ const CYMBAL_RINGS: readonly (readonly [readonly ProfilePoint[], Rgb])[] = (() =
   const groove = INSTRUMENT_COLORS.cymbalGroove;
   // The bow ends exactly at the foot of the bell, so that the rings make one closed solid for the
   // clearance probes (design 9.3).
-  const bow: ProfilePoint[] = [0, 1, 2, 3, 4, 5, 6].map((i) => {
-    if (i === 6) {
+  const bow: ProfilePoint[] = [0, 1, 2, 3, 4, 5].map((i) => {
+    if (i === 5) {
       return [0.065, -0.033];
     }
-    const r = rim - 0.004 - (i / 6) * (rim - 0.004 - 0.065);
+    const r = rim - 0.004 - (i / 5) * (rim - 0.004 - 0.065);
     // A straight line from the bell to the rim, with a slight dome of up to 0.7 mm.
     const share = (r - 0.065) / (rim - 0.065);
     return [r, -0.033 - 0.012 * share + 0.003 * share * (1 - share)];
   });
   return [
     [
-      [
-        [0, -0.023],
-        [0.05, -0.034],
-        [0.064, -0.041],
-        [0.14, -0.0438],
-        [rim, -0.045],
-        bow[0] ?? [rim, -0.045],
-      ],
+      [[0, -0.023], [0.05, -0.034], [0.064, -0.041], [rim, -0.045], bow[0] ?? [rim, -0.045]],
       bronze,
     ],
     ...bow

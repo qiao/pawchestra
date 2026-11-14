@@ -2090,6 +2090,8 @@ grips keep their places, so the holds and the strikes do not change with the det
 - **Cymbals.** A bell, a domed bow, and a thin rim (`CYMBAL_RINGS`). The rings of the bow
   alternate a polished and a groove bronze, as the lathe grooves of a cymbal. The bow stays near
   the straight bow of the layout form, so that a mallet at the edge strikes it at the same height.
+  The cymbal has more faces around its axis than the snare drum (`CYMBAL_SEGMENTS`), because the
+  rim of the suspended cymbal showed its corners in the close shots.
   A hand cymbal has a leather strap, and the suspended cymbal sits between felt washers under a
   wing nut.
 - **Small percussion.** A padded trap table stands in front of the player, and a stand with a hook
