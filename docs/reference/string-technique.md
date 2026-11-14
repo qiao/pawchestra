@@ -448,7 +448,9 @@ The app follows these facts:
   rest, and the violin moves up or down for the rest of the gap, so that the head stays near
   straight. The red fox turns the head to the left over the chin rest
   (`BowedHold.headTurn`), so that the left side of its long jaw lies on the chin rest and the snout
-  points over the neck, above the bow paw at the frog. No source gives the angle.
+  points over the neck, above the bow paw at the frog. No source gives the angle. The cat holds
+  the tail end of the viola on the left collarbone, left of the middle line (`CAT_HOLD.playShift`),
+  so that the bow passes its wide left cheek.
 - **The thick wrist at rest (1.9).** A real player keeps the forearm free of the body of the
   instrument. At rest, the left paw of a thick wrist holds the neck of the violin nearer to the
   nut (`BowedHold.wristFit`, design 5.3), so that the wrist end of the forearm stays out of the
@@ -575,6 +577,10 @@ The app does not follow these facts:
   the turn of the bow with no tilt. The skin of the arm folds with a turned hand.
 - **The smaller string turns (2.2).** Some holds turn the bow less than the real angle. A larger
   turn folds the skin of the right arm, or puts the bow paw into the instrument or the belly.
+- **The slant of the bow.** The bow of each violin and viola hold slants in the plane of the
+  strings, with the tip toward the scroll (`BowedHold.slant`), so that the short bow arm reaches
+  more of the hair. The slant of the cat also keeps the stick off its wide left cheek. No source of
+  this file gives the angle of the bow to the strings.
 - **The hair near the frog (2.5).** Some holds play no hair near the frog
   (`BowedHold.frogHair`): there, the forearm of the dog and the hippo crosses the rim, and the bow
   paw of the rabbit comes to its jaw.

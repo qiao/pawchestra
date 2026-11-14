@@ -649,6 +649,13 @@ The rest of each family:
   forearm went through the upper bout in each sample of the play and of the rest. The thick paw
   of the rabbit lies off the strings in the play (`RABBIT_HOLD.gapL`). Its forearm still touches
   the back of the violin (`TODO.md`).
+- **Bow clear of a wide head.** The stick of the bow keeps off the head over the whole stroke. The
+  head of the cat is wider than its shoulders, so the cat holds the tail end of the viola on the
+  left collarbone, left of the middle line (`CAT_HOLD.playShift`), and its bow slants in the plane
+  of the strings with the tip toward the scroll (`slant`). Reason: with the viola under the middle
+  of the jaw, the bridge lay under the left cheek, and the stick went through the cheek in the
+  play. A real player holds the instrument on the left collarbone (strings 1.10). The left paw
+  then stops the strings on the half of the fingerboard near the body (`BowedRig.stopRange`).
 - **Cello and contrabass rest grip on the neck.** At rest, the left paw of the shared cello hold
   holds the neck near the nut (`restPlace`). The dog holds it nearer to the nut than the middle,
   and the hippo holds the neck of the contrabass above the upper bout. Reason: at 0.6, the paw

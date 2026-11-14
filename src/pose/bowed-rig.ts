@@ -1165,26 +1165,35 @@ export const BOWED_HOLDS = {
  * of the viola lies about 0.14 m in front of the left shoulder joint. The cat plays a viola of
  * about 12 inches, 0.85 of the viola of the app (`SpeciesParams.violaScale`), larger than a violin
  * shop gives for the arm, and holds it nearer to the body than the viola hold
- * of {@link BOWED_HOLDS}: 0.05 H further right, 0.1 H higher, and 0.23 H further back
- * (`playShift`). The viola points about 48° to the left of the front, near the angle of a real
- * player (`docs/reference/string-technique.md`, section 1.10), with the scroll a little up and
- * the top plate 25° down toward the right (`violinTurn(-15, 5, 25)`), so that it lies about
+ * of {@link BOWED_HOLDS}: 0.17 H further left, 0.1 H higher, and 0.18 H further back
+ * (`playShift`). The tail end lies on the left collarbone, 0.17 H left of the middle line, as a
+ * real player holds it (`docs/reference/string-technique.md`, section 1.10). The head of the cat
+ * is 0.48 m wide, so a viola under the middle of the jaw has its bridge under the left cheek: with
+ * the tail end 0.05 H right of the middle line and 0.19 H back, the stick of the bow was nearer
+ * than 1 cm to the left cheek in 75% of the play samples of `mozart-k525`, and up to 1.8 cm in it
+ * in 18%. With this place, it is in the cheek in 0.2% of the samples. With this place 0.05 H
+ * right of the middle line, it is nearer than 1 cm in 50%, and 0.19 H back, in 21%. The viola
+ * points about 40° to the left of the front, near the angle of a real
+ * player (section 1.10), with the scroll a little up and
+ * the top plate 25° down toward the right (`violinTurn(-25, 5, 25)`), so that it lies about
  * level. With the old turn, the viola fell 10° to the scroll and its top plate turned 60° to the
  * front: it read as upright on the chest, and the bow at the frog stood up across the eye. The
  * head lifts 5° in the play (`headDrop` below 0), so that the jaw lies on the chin rest and the
  * head stays near straight: with a lift of 15°, the cat looked up over the viola. The left
  * shoulder bone turns 25° forward in the play (`reachL`), so that the left paw reaches the
- * fingerboard from 0.20 of its length: with 35° and the viola tilted 5°, the back of the left arm
+ * fingerboard from 0.52 of its length (0.20 with the viola under the middle of the jaw): with 35°
+ * and the viola tilted 5°, the back of the left arm
  * root sinks into pits of 14.5 cm³ in the play. The nearly straight left arm runs from the
  * shoulder up to the neck. With the viola of 0.925, the paw reached the fingerboard only from 0.51
  * of its length, at the upper bout, so that the forearm crossed the upper bout: 2.2 cm deep in
  * each sample of the play with the tilt of `tiltL`, and with 0.875, 2.2 cm in 99% of the play.
  * With 0.85, the paw stops the strings nearer to the nut, and the left forearm goes at most 1.6 cm
  * into the viola in 3% of the lift (limit 1.5, `pnpm body-clip violist`).
- * With the viola 4 cm back, the bow reaches the tip, but the viola goes 2.7 cm into the jaw and
- * the chest (1.2 cm with this hold, limit 2.0). The bow lies square across the strings (`slant`
- * 0), as a real bow: with the slant of -20° of the viola hold, the right paw swings 76° on the
- * wrist in the lift (limit 70).
+ * The bow slants 12° in the plane of the strings (`slant`), with the tip toward the scroll, so
+ * that the stick keeps off the left cheek and the short bow arm reaches 0.37 m of the hair of
+ * 0.43 m: square across the strings, the stick is nearer than 1 cm to the cheek in 49% of the
+ * play samples of `mozart-k525` (0.8% with this slant), and the arm reaches 0.305 m. With the
+ * slant of -20° of the viola hold, the right paw swung 76° on the wrist in the lift (limit 70).
  *
  * The deep chest of the cat takes the room of the left elbow: with the left elbow pole of the
  * chin hold, the left upper arm goes 5.5 cm into the body in the play. The left elbow points down
@@ -1346,11 +1355,11 @@ export const BOWED_HOLDS = {
 const CAT_HOLD = {
   ...BOWED_HOLDS.viola,
   stringTurn: 7 * MathUtils.DEG2RAD,
-  playShift: [0.05, 0.05, 0.1937],
-  playTurn: violinTurn(-15, 5, 25),
+  playShift: [-0.17, 0.05, 0.14],
+  playTurn: violinTurn(-25, 5, 25),
   reachL: 25 * MathUtils.DEG2RAD,
   headDrop: -5 * MathUtils.DEG2RAD,
-  slant: 0,
+  slant: -12 * MathUtils.DEG2RAD,
   tiltL: 25 * MathUtils.DEG2RAD,
   poleL: [-2, -0.8, -0.71],
   elbowPerString: 2 * MathUtils.DEG2RAD,
