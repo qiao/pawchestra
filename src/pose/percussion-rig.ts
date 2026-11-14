@@ -841,14 +841,14 @@ export const PERCUSSION_HOLDS = {
  * side and do not cross: with 0° and 9° up, they crossed in an X. With the right mallet 7° down,
  * the right paw turned 37° from its accepted grip in the play (arm gate limit 30° from the base). In a rest after a
  * note, the paw that did not strike takes its grip to the near rim, and the spine leans 9° more
- * (`damp`), so that the fingers touch the edge: with no lean, the arm stretched 0.12 of the upper
+ * (`damp`), so that the paw grips the edge: with no lean, the arm stretched 0.12 of the upper
  * arm (main 0.04), and a grip at the rim point nearest to the shoulder joint twisted the arm in a
- * lift 64° (main 60°). The grip stands 3 cm out from the rim and 5 cm below it, and the wrist
- * lifts the head by 8 shares of the pitch, so that the closed paw rests on the edge and the
- * mallet points 28° up over the plate, as a real player stops the cymbal with the hand on the
- * edge: each ball near the plate stays at least 5.1 cm from the axis of the bell. With 10 shares,
- * the mallet pointed 40° up toward the chest, and with 7 shares, a ball came within 1.3 cm of the
- * axis. With the grip 4 cm out and 3 cm down and 3 shares, the paw stood over the rim.
+ * lift 64° (main 60°). The grip stands 1.7 cm out from the rim and 0.8 cm below it, so that the
+ * closed paw lies on the edge with its claws over the plate, as a real player stops the cymbal
+ * with the hand on the edge. The wrist lifts the head by 5 shares of the pitch, so that the
+ * mallet points about 30° up over the plate, and its ball stays above the bell. With the grip
+ * 3 cm out and 5 cm down, the closed paw hung below the rim, and only the top of the fist was at
+ * the edge. With 8 shares, the mallet pointed about 55° up toward the chin.
  */
 export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   hands: 'alternate',
@@ -879,9 +879,9 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
     restSec: 0.5,
     hold: 0.5,
     rim: 0.2,
-    grip: [0.123121, -0.205202],
+    grip: [0.06, -0.03],
     around: -0.35,
-    share: 8,
+    share: 5,
     lean: 0.16,
   },
   curl: [GRIP_CURL, GRIP_CURL],

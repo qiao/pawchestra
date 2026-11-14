@@ -350,8 +350,9 @@ The app follows these facts:
   Between strikes, each ball stays about 3.5 cm above the plate, with the shaft almost
   level, as the ready position of the snare drum. Before a strike, it lifts higher for a louder
   note: about 6 cm to 13 cm (`SUSPENDED_CYMBAL_HOLD.across`). After a note with a rest of at
-  least 0.5 s after it, the paw that did not strike goes to the near rim, its fingers touch the
-  edge, and the spine leans 9° over the cymbal, as a player stops the ring of a short note
+  least 0.5 s after it, the paw that did not strike goes to the near rim and lies on the edge
+  with its claws over the plate, and the spine leans 9° over the cymbal, as a player stops the
+  ring of a short note
   [15] [20] [22] (`EdgeDamp`).
 - **The tambourine (section 8).** A run of tambourine notes with a rest of at least 2.7 s
   before it and after it is held in the left paw by its frame, in front of the chest, and the
@@ -435,8 +436,9 @@ The app does not follow these facts:
   body as the snare sticks, above the plate, side by side and facing opposite directions, as the
   set position of a drumline [37] (`SUSPENDED_CYMBAL_HOLD.set`).
 - **The muffle of the suspended cymbal (section 7).** The sources give the stop of the hand cymbals
-  at the chest, and no grip of a suspended cymbal. The closed paw rests on the edge, and the mallet
-  points about 28° up over the plate, away from the bell and from the chest (`EdgeDamp.share`). The rule of the rest is the
+  at the chest, and no grip of a suspended cymbal. The closed paw lies on the edge, and the mallet
+  points about 30° up over the plate, above the bell and away from the chest (`EdgeDamp.grip`,
+  `share`). The rule of the rest is the
   rule of the hand cymbals. A MIDI drum note
   has no written length, so each note before a rest of 0.5 s stops.
 - **The hand cymbals (section 7).** The angle of the flam is 15° at each loudness, smaller than

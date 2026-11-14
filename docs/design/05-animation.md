@@ -766,8 +766,8 @@ The rest of each family:
   back (`PalmDamp`). Reason: the far head stands out of the reach of the short arm. With no turn,
   the left upper arm went into the body, and a drum moved or turned to the left put an upper arm
   into the body or the beater off its spot. The paw of the suspended cymbal that did not strike
-  the note takes its grip to the near rim, so that the closed paw rests on the edge, and the spine
-  leans further over the cymbal (`EdgeDamp`). The wrist lifts the mallet, so that it points a
+  the note takes its grip to the near rim, so that the closed paw lies on the edge with its claws
+  over the plate, and the spine leans further over the cymbal (`EdgeDamp`). The wrist lifts the mallet, so that it points a
   little up over the plate and its ball stays away from the bell (`EdgeDamp.share`), as a real
   player stops the cymbal with the hand on the edge. Reason: a steeper mallet pointed up to the
   chest, and a lower one put its ball near the bell. The plate of the suspended cymbal is a piece on the `slide`
