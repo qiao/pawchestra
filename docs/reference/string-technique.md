@@ -516,9 +516,13 @@ The app follows these facts:
 - **The string planes (2.2).** The bow turns around the strings by `BowedHold.stringTurn` for each
   string: the real angle, or the largest angle below it with which the bow arm still reaches the
   full hair (`bowRangeOf()`). The arm levels come from the geometry, higher for the lower strings.
-- **The crossing leads the note (2.3).** `bowStateAt()` turns the bow to the string of the next
-  note, and the turn ends a little before the note (`BOW_MOTION.crossSec`, `crossShare`,
-  `crossLeadSec`).
+- **The crossing leads the note (2.3).** `crossAt()` turns the bow to the string of the next
+  note, and the turn ends a little before the note (`BOW_MOTION.crossLeadSec`). The turn takes
+  `BOW_MOTION.crossSec` for each string step, also in fast notes, because a crossing does not
+  occur instantly. In fast notes, the player prepares the new string in the note before: the turn
+  starts in an earlier note, and its middle moves toward the bow change, as the turn leads the
+  bow change in a fast pattern. In a fast alternation, the turns overlap, so the arm swings
+  around the middle of the strings and does not swing fully for each note.
 - **The upper arm in a fast crossing (2.3).** In a fast run across two neighbor strings,
   `crossStrings()` gives the notes next to a change of the string the mean of the two strings.
   `crossPole()` then keeps the right elbow near the elbow of the mean string, and the forearm and

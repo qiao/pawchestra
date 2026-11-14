@@ -535,6 +535,15 @@ The rest of each family:
 - The bow changes direction on each note, and short notes in one beat join into one slur
   (`slurSizes()`), because the MIDI files have no slurs. Pizzicato plucks the string, and tremolo
   makes short fast strokes (`BOW_MOTION`).
+- The bow turns to the string of the next note in a smooth step of `BOW_MOTION.crossSec` for each
+  string step, also in fast notes (`crossAt()`). The step ends `BOW_MOTION.crossLeadSec` before
+  the note. When it does not fit into the note before, it starts in an earlier note and ends
+  later by half of the part that does not fit. The steps of the strokes add up, so in a fast
+  alternation they overlap, and the arm swings less around the middle of the strings. Reason:
+  with a share of the note interval, a skip of two strings after a note of 53 ms took 16 ms, and
+  the bow paw jumped up to 32 cm in one frame. A real player prepares the new string in the note
+  before, and in a fast crossing the bow passes between the strings a little before the bow
+  change (strings 2.3).
 - A short run of the other technique keeps the technique of the right hand (`handTechniques()`,
   `BOW_MOTION.techniqueHoldSec`), and a change can start in the notes before the new technique.
   Reason: merged parts alternate the bow and pizzicato each 0.1 s to 0.2 s, and each change

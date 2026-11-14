@@ -47,12 +47,12 @@ export const BOW_MOTION = {
   tremoloAmplitude: 0.02,
   /**
    * The string crossing (`docs/reference/string-technique.md`, section 2.3). The turn of the bow
-   * to the string of the next note takes at most `crossSec`, and at most `crossShare` of the time
-   * from the note start to the next note. It ends `crossLeadSec` before the next note, as the
-   * crossing of a violinist leads the bow change by about 15° of the phase of a stroke pair.
+   * to the string of the next note takes `crossSec` for each string step, and at least `crossSec`.
+   * The time does not shrink in fast notes, so a crossing can start in an earlier note
+   * ({@link crossAt}). It ends `crossLeadSec` before the next note, as the crossing of a violinist
+   * leads the bow change by about 15° of the phase of a stroke pair.
    */
   crossSec: 0.08,
-  crossShare: 0.3,
   crossLeadSec: 0.01,
   /**
    * A stroke whose next stroke starts within this time is fast: at least 4 notes a second, the
@@ -1089,6 +1089,57 @@ function leftHandAt(strokes: readonly Stroke[], index: number, time: number, out
   out.press = Math.max(pressOf(current, time, 0) * (1 - shift), landing);
 }
 
+/** The largest string step of a crossing: from the lowest string to the highest string. */
+const CROSS_MOST_STEPS = 3;
+
+/**
+ * Writes the string of the bow and the string of the right elbow at one time (design 5.3,
+ * `docs/reference/string-technique.md`, section 2.3). Each change of the string between two
+ * strokes is a smooth step that takes `BOW_MOTION.crossSec` for each string step, also in fast
+ * notes. It ends `BOW_MOTION.crossLeadSec` before the later stroke when it fits into the time from
+ * the stroke before. Else it ends later by half of the part that does not fit, so that its middle
+ * moves toward the bow change. The value is the string of a stroke before the time plus the sum
+ * of the later steps. Thus a crossing in fast notes starts in an earlier note, and in a fast
+ * alternation the steps overlap, so the arm swings less around the middle of the strings and
+ * never jumps.
+ *
+ * @param strokes The strokes of the player.
+ * @param index The index of the stroke at the time, or 0 before the first stroke.
+ * @param time The song time.
+ * @param out The state to write: the string and the string of the elbow.
+ */
+function crossAt(strokes: readonly Stroke[], index: number, time: number, out: BowState): void {
+  const m = BOW_MOTION;
+  const longest = CROSS_MOST_STEPS * m.crossSec;
+  // A step ends at the latest half of its longest time after its stroke starts.
+  let first = index;
+  while (first > 0 && (strokes[first]?.start ?? -Infinity) + longest / 2 > time) {
+    first--;
+  }
+  let before = strokes[first];
+  if (!before) {
+    return;
+  }
+
+  out.string = before.string;
+  out.crossMean = before.crossMean;
+  for (let j = first + 1; j < strokes.length; j++) {
+    const after = strokes[j];
+    if (!after || after.start - m.crossLeadSec - longest > time) {
+      break;
+    }
+    const step = after.string - before.string;
+    const mean = after.crossMean - before.crossMean;
+    const cross = m.crossSec * Math.max(1, Math.abs(step), Math.abs(mean));
+    const room = after.start - before.start;
+    const end = after.start - Math.min(m.crossLeadSec, 0.1 * room) + Math.max(0, cross - room) / 2;
+    const x = smoothstep((time - (end - cross)) / cross);
+    out.string += step * x;
+    out.crossMean += mean * x;
+    before = after;
+  }
+}
+
 /**
  * Calculates the bow and the hands of a bowed string player at one time (design 5.3). The
  * state is a function of the strokes and the time only. Each note event happens at the note
@@ -1136,8 +1187,7 @@ export function bowStateAt(
     out.lift = m.lift * smoothstep((first.start - time) / m.landSec);
     out.pizzicato = pizzicatoOf(first);
     out.pluck = -1;
-    out.string = first.string;
-    out.crossMean = first.crossMean;
+    crossAt(strokes, 0, time, out);
     out.loudness = first.loudnessFrom;
     out.fingerboard = first.hand.place;
     out.reach = first.hand.reach;
@@ -1176,18 +1226,9 @@ export function bowStateAt(
     }
   }
 
-  // The bow crosses to the string of the next note just before it, and the right elbow follows
-  // the string of its arm. The sounding point follows the loudness.
-  out.string = current.string;
-  out.crossMean = current.crossMean;
-  if (next) {
-    const interval = next.start - current.start;
-    const cross = Math.min(m.crossSec, m.crossShare * interval);
-    const end = next.start - Math.min(m.crossLeadSec, 0.1 * interval);
-    const x = cross > 0 ? smoothstep((time - (end - cross)) / cross) : 0;
-    out.string += (next.string - current.string) * x;
-    out.crossMean += (next.crossMean - current.crossMean) * x;
-  }
+  // The bow crosses to the string of the next note before it, and the right elbow follows the
+  // string of its arm. The sounding point follows the loudness.
+  crossAt(strokes, i, time, out);
   out.loudness = followLoudness(current.loudnessFrom, current.loudness, time - current.start);
   leftHandAt(strokes, i, time, out);
 
