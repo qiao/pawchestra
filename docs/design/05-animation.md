@@ -321,7 +321,9 @@ The rest of each family:
   the end of the reach, the arm locked straight down to the neck, and the paw bent about 60° off
   the forearm over the neck. Its bow tip turns to the left below the snout in a move
   (`FOX_HOLD.restBow.via`), so that the bow does not cross the snout. The grip also moves out and to the front in the move, and
-  the elbows keep a bend ("Bent elbows in the moves"). A hold can lift the head at rest
+  the elbows keep a bend ("Bent elbows in the moves"). The bow tip of the cat turns to the left
+  below the chin in a move (`CAT_HOLD.restBow.via`). Reason: with the tip forward and up, the
+  stick stood in front of the left cheek and the left eye near the play. A hold can lift the head at rest
   (`BowedHold.restHeadLift`). The cat keeps the head lift of its play at rest. Reason: from the
   height of the stage camera, the brow of the cat hid the top of each eye, and the face read as
   angry.
