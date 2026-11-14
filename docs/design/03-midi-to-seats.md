@@ -299,8 +299,13 @@ soloist gets one player, and `Score.soloist` holds it.
   sits beside the harp (4.2).
 - A **candidate** is a seat of a section that can carry a solo (no timpani, percussion, or choir),
   with at least three other seats with players. It has one player and no other seat of its
-  section has players, or it is an **exposed solo line**: one voice on channels that feed no other
+  section has players, or it is an **exposed solo line**: one line on channels that feed no other
   seat, which sounds alone in its section or louder than it for most of its time.
+- A seat is **one line** when it has one voice, or when two or more of its notes sound together
+  in less than `SOLOIST_RULE.chords` of its sounding time. A solo part can hold a few double
+  notes, as the bassoon of K. 191 does, and they make no section. A seat of one line with one
+  player for each simultaneous note thus counts as a seat of one player. A string section with
+  its base size has more players than voices, so it is no line of one player.
 - A candidate is **clearly the soloist** when it sounds in a large share of the piece, is above
   the orchestra (by its key or by its loudness) in most of its time, and has an orchestra with it.
   Loudness lets a low soloist, such as a bassoon, lead.

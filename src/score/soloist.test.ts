@@ -242,7 +242,7 @@ describe('the soloist of each demo (design 3.8, 8.2)', () => {
     for (const demo of demos) {
       const { seats, notes, durationSec } = scoreOf(demo.bytes, 'one-per-part');
       // With "One per part", each seat has one player for each simultaneous note.
-      const voiced = seats.map((seat) => ({ ...seat, voices: seat.playerCount }));
+      const voiced = seats.map((seat) => ({ ...seat, voices: seat.playerCount, perVoice: true }));
       measureSoloists(voiced, notes, durationSec).forEach((m, i) => {
         if (!m || seats[i]?.section === 'piano') {
           return;

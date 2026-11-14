@@ -125,6 +125,7 @@ export function* assignPlayersSteps(
     ...seat,
     playerCount: plans[s]?.count ?? 0,
     voices: plans[s]?.allocation === 'single' ? 1 : (plans[s]?.onePerPart ?? 0),
+    perVoice: plans[s]?.allocation === 'parts',
   }));
   const soloNotes = notes.map((note, i) => ({ ...note, seatIndex: seating.noteSeats[i] ?? 0 }));
   const soloist = findSoloist(soloSeats, soloNotes, timeline.durationSec);

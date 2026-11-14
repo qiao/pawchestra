@@ -7,9 +7,18 @@ export interface SoloSeat extends Seat {
    * 1 for a seat of one player (the piano, the harp, the timpani). A solo line has one voice.
    */
   readonly voices: number;
+  /**
+   * True if the size rule gives the seat one player for each simultaneous note: a seat of the
+   * winds, or of the strings of a file that is not orchestral. A section of the strings with its
+   * base size has more players than voices, so it is no solo line.
+   */
+  readonly perVoice: boolean;
 }
 
-/** A note as the soloist rule reads it. One note of a seat is enough for each of its players. */
+/**
+ * A note as the soloist rule reads it. The rule counts the notes of a seat that sound together,
+ * so each note of the file comes one time.
+ */
 export type SoloNote = Pick<PlayerNote, 'seatIndex' | 'pitch' | 'velocity' | 'startSec' | 'endSec'>;
 
 /**
@@ -39,6 +48,11 @@ const SOLOIST_RULE = {
   exposed: 0.75,
   /** The orchestra: at least this many other seats with players. */
   orchestra: 3,
+  /**
+   * A solo line sounds two or more notes together in less than this part of its sounding time.
+   * A solo part can hold a few double notes, as the 9 notes of the K. 191 bassoon (0.03).
+   */
+  chords: 0.05,
 } as const;
 
 /**
@@ -86,6 +100,8 @@ interface SeatGrid {
   readonly top: Int8Array;
   /** The highest velocity that sounds at each step, or 0. */
   readonly velocity: Uint8Array;
+  /** The number of notes that sound at each step, up to 255. */
+  readonly count: Uint8Array;
 }
 
 /**
@@ -104,6 +120,7 @@ function gridOf(
   const grids = seats.map((): SeatGrid => ({
     top: new Int8Array(steps).fill(-1),
     velocity: new Uint8Array(steps),
+    count: new Uint8Array(steps),
   }));
   const step = SOLOIST_RULE.stepSec;
   for (const note of notes) {
@@ -116,6 +133,7 @@ function gridOf(
     for (let i = from; i < to; i++) {
       grid.top[i] = Math.max(grid.top[i] ?? -1, note.pitch);
       grid.velocity[i] = Math.max(grid.velocity[i] ?? 0, note.velocity);
+      grid.count[i] = Math.min(255, (grid.count[i] ?? 0) + 1);
     }
   }
   return grids;
@@ -150,11 +168,35 @@ function sharesChannel(index: number, seats: readonly Seat[]): boolean {
 }
 
 /**
+ * Finds if the notes of a seat are one line: the seat has one voice, or two or more of its notes
+ * sound together in less than {@link SOLOIST_RULE}.chords of its sounding time. Thus a few
+ * double notes of a solo part do not make it a section.
+ *
+ * @param seat The seat.
+ * @param grid The grid of the seat.
+ * @returns True for one line.
+ */
+function isLine(seat: SoloSeat, grid: SeatGrid): boolean {
+  if (seat.voices === 1) {
+    return true;
+  }
+  let sounding = 0;
+  let chords = 0;
+  for (const count of grid.count) {
+    sounding += count > 0 ? 1 : 0;
+    chords += count > 1 ? 1 : 0;
+  }
+  return sounding > 0 && chords < SOLOIST_RULE.chords * sounding;
+}
+
+/**
  * Measures a seat for the soloist rule (design 3.8). The seat is a candidate when its section
  * can carry a solo, at least three other seats have players, and one of these is true:
  *
- * - The size rule gives it one player, and no other seat with players has its section.
- * - It is a solo line beside the seats of its section: one voice, on channels that feed no other
+ * - No other seat with players has its section, and the size rule gives it one player. A seat
+ *   with one player for each simultaneous note also counts when its notes are one line
+ *   ({@link isLine}).
+ * - It is a solo line beside the seats of its section: one line, on channels that feed no other
  *   seat. The first violins of a string quartet are such a line too, so the line must also be
  *   exposed ({@link SOLOIST_RULE}).
  *
@@ -181,9 +223,9 @@ function measure(
   if (others.length < rule.orchestra) {
     return null;
   }
-  if (
-    mates.length === 0 ? seat.playerCount !== 1 : seat.voices !== 1 || sharesChannel(index, seats)
-  ) {
+  const line = isLine(seat, own);
+  const alone = seat.playerCount === 1 || (seat.perVoice && line);
+  if (mates.length === 0 ? !alone : !line || sharesChannel(index, seats)) {
     return null;
   }
   let sounding = 0;
