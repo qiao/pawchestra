@@ -952,6 +952,20 @@ function tubaBell(piece: PieceBuilder, bend: Vec3, axis: Vec3, top: number, radi
 }
 
 /**
+ * The four piston valves of the tuba, in meters in the axes of the drawing of {@link tuba}: the x
+ * of their axes, the height of the tops and of the bottoms of the casings, the radius of a
+ * casing, and the z of each valve from the front to the back. Each tube that goes into a valve
+ * ends inside its casing.
+ */
+const TUBA_VALVES = {
+  x: 0.1,
+  top: 0.475,
+  bottom: 0.365,
+  radius: 0.0125,
+  z: [-0.06, -0.025, 0.01, 0.045],
+} as const;
+
+/**
  * The long slide of the first valve of the tuba, in meters in the axes of the drawing of
  * {@link tuba}: the height of its upper leg and of its lower leg, its distance in front of the
  * bell branch, and the end of its bow at the left. The loop crosses the front of the tuba below the
@@ -1015,6 +1029,7 @@ function tubaLongSlide(piece: PieceBuilder, at: (p: Vec3) => Vec3): void {
 function tuba(lead: readonly [back: number, left: number]): BrassBuild {
   const [back, left] = lead;
   const t = BRASS.tuba;
+  const v = TUBA_VALVES;
   const piece = new PieceBuilder();
   mouthpiece(piece, [0, 0, -1], 0.014, 0.09);
   // The axes of the drawing: the bottom bow is at y = 0. The mouthpiece is 0.72 m above it, and
@@ -1040,18 +1055,23 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
   const bend = at([-0.06, TUBA_BELL_LEAN.bend, 0]);
   const top = t.height - TUBA_BELL_LEAN.bend;
   tubaBell(piece, bend, toVec3(bellAxis), top, t.bellRadius);
-  // The bottom bow joins the bell branch to the valve branch, and narrows toward the valves.
+  // The bottom bow joins the bell branch to the valve branch, and narrows toward the valves. The
+  // valve branch ends 0.7 cm above the bottom of the valve casings, so that the middle casings
+  // stand in it. It ended 1.9 cm below them.
   tubeAlong(
     piece,
-    [...arc(at([0.02, rise, 0]), [-1, 0, 0], [0, -1, 0], 0.08, 0, Math.PI, 6), at([0.1, 0.34, 0])],
+    [
+      ...arc(at([0.02, rise, 0]), [-1, 0, 0], [0, -1, 0], 0.08, 0, Math.PI, 6),
+      at([v.x, v.bottom + 0.007, 0]),
+    ],
     [0.068, 0.066, 0.061, 0.055, 0.049, 0.044, 0.04, 0.03],
     TUBE_SEGMENTS + 2,
     METAL,
   );
   // The four valves in a row from the front to the back, with the right fingers on their tops.
-  const valveZ = [-0.06, -0.025, 0.01, 0.045];
+  const valveZ = v.z;
   for (const z of valveZ) {
-    piston(piece, at([0.1, 0.475, z]), 0.0125, 0.11, 0.026);
+    piston(piece, at([v.x, v.top, z]), v.radius, v.top - v.bottom, 0.026);
   }
   tubaLongSlide(piece, at);
   // The slides of the other valves hang at the right of the valves. Each has 5 faces around its
