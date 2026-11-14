@@ -819,10 +819,14 @@ const SHOULDER_HOLD = {
  * skin of the right shoulder of the fox mesh folds in 18% of the play samples
  * (`pnpm fold-probe fox-violinist`), and with the full violin, the turn of 15° folds fewer samples
  * than 25°. At the frog, the right elbow points out, forward, and a little down, (2.4, -0.7, -1),
- * and the bow keeps 0.12 m of free hair at each end: with 0.08 m and the violin further back, the
- * bow paw goes 3.7 cm into the body at the frog, with 0.1 m and the elbow (1.4, -0.7, -1) 3.0 cm,
- * and with the elbow (1.8, -0.7, -1) 2.4 cm, with the same share of folded play samples. The bow
- * paw reaches 0.265 m of the hair, more than half. In pizzicato, the bow tip points up, back,
+ * and the bow keeps the 0.03 m of free hair of the stage at the tip (`freeHair`). It plays no
+ * hair near the frog (`frogHair`, below): with 0.08 m of free hair at the frog and the violin
+ * further back, the bow paw goes 3.7 cm into the body at the frog, with 0.1 m and the elbow
+ * (1.4, -0.7, -1) 3.0 cm, and with the elbow (1.8, -0.7, -1) 2.4 cm, with the same share of folded
+ * play samples. With 0.12 m of free hair at the tip, the bow played only 0.14 m of the hair of
+ * 0.42 m. With 0.03 m, it plays 0.23 m, with the same depths and arm gate values
+ * (`pnpm hold-fit fox-violinist`, `pnpm arm-check fox-violinist`). In pizzicato, the bow tip
+ * points up, back,
  * and a little out, (0.3, 0.5, 1): with the tip of the chin hold, (0.3, 1, 0.4), the bent wrist of
  * the plucking paw moves the middle of the paw 2.1 cm from the stick, and with this tip 1.2 cm.
  *
@@ -898,8 +902,7 @@ const SHOULDER_HOLD = {
  * nut (0.63 with the full violin). A violin of the rule of a violin shop for this arm is 0.56 of
  * the violin of the app. The top plate turns 25° toward up
  * (`violinTurn(-25, 5, 25)`), so that the violin lies about level and only a little down toward
- * the right: with the 50° of the chin hold, the bow at the frog stood up across the eye. The bow paw reaches 0.19 m of the
- * hair. The left paw tilts 10° over the neck (`tiltL`, 30° in the chin hold): with 20°, the left
+ * the right: with the 50° of the chin hold, the bow at the frog stood up across the eye. The left paw tilts 10° over the neck (`tiltL`, 30° in the chin hold): with 20°, the left
  * arm of the fox with four-digit paws took 85° on its two parts in the play. The right elbow
  * points out, forward, and a little up at the frog, (3, 0.8, -0.6), and at the tip, (1, 0.6, -1):
  * with (3, -0.3, -0.6) and (1, -0.15, -1), the right forearm of that fox twisted 59° at the frog
@@ -950,7 +953,7 @@ const FOX_HOLD = {
   bowTilt: 15 * MathUtils.DEG2RAD,
   reach: 15 * MathUtils.DEG2RAD,
   poleTipR: [1, 0.6, -1],
-  freeHair: 0.12,
+  freeHair: FREE_HAIR,
   restPoleR: [0.5, -1, -0.2],
   restPoleL: [-0.75, -1, 0.5],
   restPlace: 0.37,
