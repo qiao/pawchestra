@@ -44,7 +44,8 @@ These rules hold for each route:
 - **Subdivide, never cut.** Add a limb ring only by an edge ring split on a clean quad loop, with
   the new vertices at the edge middles (`rings.subdivide`). Never add a ring with a plane cut. An
   edge ring with a triangle or a pole takes no split: report its place. A limb ring of quads
-  through one triangle can take the split (`seed_rings()`, badger).
+  through one triangle, or a clean band beside a loop through a pole, can take the split
+  (`seed_rings()`, badger and beaver).
 - **A small clip over an over-cut.** A small clip of the arm root into the trunk is better than an
   over-cut. A notch, a gap, a fin, a flap, or a ledge at the armpit or the inner elbow is a fault.
   A fault that a prop or the piano hides still counts.
