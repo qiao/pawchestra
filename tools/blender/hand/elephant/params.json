@@ -186,6 +186,9 @@
  "faceRows": {
   "y": 0.7
  },
+ "bandFade": {
+  "path": "assets/models/elephant/tripo-hand/elephant-bands.json"
+ },
  "hoofTurn": {
   "ring": 0.344,
   "steps": {

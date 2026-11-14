@@ -39,7 +39,8 @@ no split from the trunk, and no stretch. The `ANIMALS` entry of the elephant poi
 | `tripo-hand/elephant.blend` | Made from `tripo-p2/elephant.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain elephant` |
 | `tripo-hand/elephant.rig.glb` | Export of `tripo-hand/elephant.blend`. License as the FBX file | `pnpm rig-export elephant --blend assets/models/elephant/tripo-hand/elephant.blend --out assets/models/elephant/tripo-hand/elephant.rig.glb` |
 | `tripo-hand/elephant.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/elephant-color.webp`, `tripo-hand/elephant-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/elephant-maps.py` |
+| `tripo-hand/elephant-bands.json` | The band faces of the stump turns, for the band fade of the maps (`tools/blender/band_faces.py`) | `pnpm hand-chain elephant` |
+| `tripo-hand/elephant-color.webp`, `tripo-hand/elephant-normal.webp` | Web copies of the color map and the normal map of the FBX, with the band fade ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/elephant-maps.py`, after the chain (the tool reads the band faces) |
 
 ### tripo-p2/elephant.fbx
 
@@ -102,7 +103,10 @@ left side):
   27.7 degrees on the left and -27.7 degrees on the right, 127 vertices on each side. The 13 faces
   between the ring and the paw side go, and Bridge Edge Loops joins the ring to the turned edge
   with 13 new quads, with the UVs of the old band. The paw is a round stump, so the turn does not
-  change its outline ("Arm twist").
+  change its outline ("Arm twist"). The chain writes the 26 new faces to
+  `tripo-hand/elephant-bands.json` (`bandFade`), and both maps paint their texels as a fade from
+  the forearm skin to the turned stump skin (`tools/band_fade.py`). Reason: the stump turned with
+  its UVs, so a thin seam line showed across the stump where the band met it.
 - **Point edits.** None. The paw is a stump as wide as the forearm (about 0.10 units, 19 cm), so it
   does not read too large against the arm, and it keeps its size.
 - **Surface.** `sa.add_surface(elephant, 'elephant', <base color>, eye_fans=False,
@@ -278,5 +282,5 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 |---|---|---|
 | `tripo-hand/elephant.rig.glb` | 1,088,320 bytes | `ad50236ba8eb5278a15d0491ec44ea52f6e89a1f834f94a949a941550cd4d1e6` |
 | `tripo-hand/elephant.rig.json` | 15,348 bytes | `8ff17f3d68bba37d0028e6d8520689d0a672e0708d400da8901080bab3d71183` |
-| `tripo-hand/elephant-color.webp` | 84,838 bytes, 2048 × 2048 | `f24ff816f2d47e08ec49aeb942005d56975e91a371b5bdd814076a322b5d4c68` |
-| `tripo-hand/elephant-normal.webp` | 67,098 bytes, 1024 × 1024 | `c3b6e219e1fd7d56bcbea4531e07b18d93469640152178810f9e3f876d68c564` |
+| `tripo-hand/elephant-color.webp` | 84,808 bytes, 2048 × 2048 | `147a74170ee834bf1060d05d17431f4984db864a0264e14ddd955e782da2496c` |
+| `tripo-hand/elephant-normal.webp` | 66,884 bytes, 1024 × 1024 | `bf2678fac168ddffb83767605e1a1d76a05fbf23f5c3880c1d2efe1859f21656` |
