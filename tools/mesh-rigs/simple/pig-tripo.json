@@ -297,10 +297,10 @@
         0.994724
       ],
       "foot": [
-        -0.258819,
         0.0,
         0.0,
-        0.965926
+        0.0,
+        1.0
       ],
       "toes": [
         0.0,
@@ -309,7 +309,7 @@
         1.0
       ]
     },
-    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 25 degrees down and 15 degrees out, and the shin leans 0 degrees forward of vertical, so that the horn has room at the right knee, and the foot turns 30 degrees with the heel up, the hoof tips flat on the floor, so that the seat is higher (uv run --no-project --with numpy python -I tools/rig/leg_turns.py <config> 25 15 0 30)."
+    "note": "legTurns gives the world turn of each left leg bone from the seated bind to the source: the thigh slopes 25 degrees down and 15 degrees out, and the shin leans 0 degrees forward of vertical, so that the horn has room at the right knee, and the foot turns 0 degrees with the heel up. The hoof is one part with no toe bend, so a heel turn tilts the whole sole: with 0 degrees, each sole lies flat on the floor (uv run --no-project --with numpy python -I tools/rig/leg_turns.py <config> 25 15 0 0)."
   },
   "colors": {
     "samples": 6,

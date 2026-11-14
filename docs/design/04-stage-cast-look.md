@@ -1063,13 +1063,12 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   the steep thighs of the bind rules, only the haunch could sit on the seat. The shins stand
   nearly vertical and the heels are a little up, with the toes on the floor, so that the seat is
   near the seat of the cat. Reason: with flat feet, the chair read too low.
-- The Tripo pig keeps the short legs of its mesh. Its bind turns each foot with the heel up, the
-  hoof tips flat on the floor, as a pig stands on its hoof tips, and its shins stay vertical. So
-  its seat is higher than with flat feet, and the front edge of the seat is nearer to the knees,
-  so that more of each thigh lies on the seat. Reason: with flat feet, the seat was low, and only
-  the haunch sat on it. A higher seat moved players in the sight pass of the layout (4.5), so the
-  seat takes the largest height with no move. Its round back reaches further back than the
-  haunch and sets the chair depth, so the haunch sits on the front half of the seat.
+- The Tripo pig keeps the short legs of its mesh. Its bind keeps the foot turn of the source, so
+  each sole lies flat on the floor, and its shins stay vertical. The front edge of the seat is
+  near the knees, so that more of each thigh lies on the seat. Reason: the hoof is one part with
+  no toe bend, so a bind with the heel up tilted the whole hoof onto its front tip, with the heel
+  above the floor. Its round back reaches further back than the haunch and sets the chair depth,
+  so the haunch sits on the front half of the seat.
 - The Tripo panda keeps the short, thick legs of its mesh, and its bind keeps the leg turns of the
   panda of the old mesh: the thighs slope down and the shins stand vertical, with flat feet. So
   its chair is low, and the front edge of the seat lies about one shin radius behind the knees,

@@ -123,8 +123,8 @@ left side):
   (0.243, -0.968, -0.067), turned by the hoof turn. The bind arms (`bindArms`) are those of the pig
   of main, and each elbow axis turns about the bind upper arm (`hingeTurn`): 80 degrees on the left
   and -110 degrees on the right ("Arm twist"). The leg turns put the thigh 25 degrees down and 15
-  degrees out, and the shin vertical, as on the pig of main, and turn each foot 30 degrees with the
-  heel up, the hoof tips flat on the floor ("Seat"). The tail bones keep the directions of the
+  degrees out, and the shin vertical, as on the pig of main, and keep the foot turn of the source,
+  so each sole lies flat on the floor ("Seat"). The tail bones keep the directions of the
   source in the bind.
 
 The weights, in the rest pose:
@@ -186,17 +186,15 @@ the middle plane, the front of the lower lip lies at y 0.745 and z 0.214, and th
 disc at y 0.753. The mouth of the studio body is 6.1 cm behind the tip of the nose.
 
 **Seat.** The thighs slope 25 degrees down and 15 degrees out in the bind, the shins are vertical,
-and each foot turns 30 degrees about x with the heel up (`tools/rig/leg_turns.py <config> 25 15 0
-30`), so that the hoof tips stay flat on the floor, as a pig stands on its hoof tips. The property
+and each foot keeps the turn of the source (`tools/rig/leg_turns.py <config> 25 15 0 0`), so that
+each sole lies flat on the floor. Reason: the hoof is one part with no toe bend, so a heel turn of
+30 degrees tilted the whole hoof onto its front tip, with the heel about 3 cm above the floor and
+the gray sole in view from behind. The property
 `seat` is {`prop` `chair`, `front` 0.0281, `back` -0.17, `halfWidth` 0.2}: the front lies 0.06
 units behind the knee joint of the bind, and 39 % of the thigh lies on the seat (28 % with the
 front 0.07 units behind the knee). With the front 0.05 units behind the knee, the round back of the
-shin lay over the seat, and `pnpm rig-export` stopped. The seat height is 0.152 m (0.126 m with
-flat feet), with the legs of the source: a heel angle of 15, 25, 30, 35, and 40 degrees gives
-0.140, 0.148, 0.152, 0.154, and 0.156 m. The layout of the demos does not change with 30 or 32
-degrees. With 34 degrees, 9 players of `boulanger-matin` move in the sight pass of the layout
-(design 4.5), and with 40 degrees, 3 players of two demos move. The curly tail stays behind the
-haunch, over the back edge of the seat.
+shin lay over the seat, and `pnpm rig-export` stopped. The seat height is 0.126 m, with the legs
+of the source. The curly tail stays behind the haunch, over the back edge of the seat.
 
 **Sit.** The key `bind_sit` (`sit_key()` of the build, after `bind_belly`) puts the underside of
 the haunch onto the seat: `be.sit_move(pig, pig_rig, {band 0.05, most 0.07, ramp 0.03, end 0.01,
@@ -284,7 +282,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/pig.rig.glb` | 1,009,100 bytes | `3b9d2dd1c233e921797b67ed7d29bd277667dc0936abff2ba9f418907b477990` |
-| `tripo-hand/pig.rig.json` | 16,377 bytes | `3522263944ae7e94b159e7ca5a1d3ebeca45e3519404cb914663e001c03afe73` |
+| `tripo-hand/pig.rig.glb` | 1,009,100 bytes | `e98defbb3db97c3e21193fc04b56f0756b8e7e78cb3f090ce6e6f05b4843937c` |
+| `tripo-hand/pig.rig.json` | 16,377 bytes | `f05943591edd217e8dc3891c338f0cfbbb3d0fcf976229cbc38af6355af4a64c` |
 | `tripo-hand/pig-color.webp` | 54,072 bytes, 2048 × 2048 | `7e93b90c62901e98e717ea958be65306951c6bc7f8ea7ec50fa9f91cc97af295` |
 | `tripo-hand/pig-normal.webp` | 16,518 bytes, 1024 × 1024 | `1f67a4b13f0fcdb7950acf73470ee5d796e7d0a8487acd0a78fa044198b7065b` |

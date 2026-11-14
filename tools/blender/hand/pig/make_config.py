@@ -176,7 +176,8 @@ def main():
         'legTurns gives the world turn of each left leg bone from the seated bind to the source: '
         'the thigh slopes {} degrees down and {} degrees out, and the shin leans {} degrees forward '
         'of vertical, so that the horn has room at the right knee, and the foot turns {} degrees '
-        'with the heel up, the hoof tips flat on the floor, so that the seat is higher '
+        'with the heel up. The hoof is one part with no toe bend, so a heel turn tilts the whole '
+        'sole: with 0 degrees, each sole lies flat on the floor '
         '(uv run --no-project --with numpy python -I tools/rig/leg_turns.py <config> {} {} {} {}).'.format(
             *P['legTurns'], *P['legTurns']
         )
