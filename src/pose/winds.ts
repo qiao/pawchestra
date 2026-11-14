@@ -1949,6 +1949,23 @@ function curlOf(closed: number, weight: number, grip: number | null): number {
   return b.curlHold + (playing - b.curlHold) * weight;
 }
 
+/**
+ * Gives the curl of the fingers of a paw that leaves its grip in the rest pose
+ * (`WindHold.restFreeL`). At rest, the empty paw is relaxed and half open
+ * ({@link WIND_BODY.curlOpen}), as the free hand of a real player lies open on the thigh or hangs
+ * beside it (`docs/reference/wind-technique.md` 3). The paw closes to the curl of its grip by the
+ * square of the weight, so that it stays open in the air and closes when it comes to the tube.
+ * With the grip curl at each weight, the empty paw was a fist with no tube in it.
+ *
+ * @param play The curl of the paw on its grip in the playing pose ({@link curlOf} at the weight 1).
+ * @param weight The weight of the playing pose.
+ * @returns The curl angle.
+ */
+function freeCurlOf(play: number, weight: number): number {
+  const open = WIND_BODY.curlOpen;
+  return open + (play - open) * weight * weight;
+}
+
 const local = new Quaternion();
 const playTurn = new Quaternion();
 const rotation = new Quaternion();
@@ -2464,7 +2481,10 @@ export function poseWind(
     .multiplyScalar(reachedShare(state.slide) * rig.slideReach * weight);
   const { hold } = rig;
   const { freeL } = rig;
-  const left = curlOf(state.fingersL, weight, hold.gripCurl?.[0] ?? null);
+  const gripL = hold.gripCurl?.[0] ?? null;
+  const left = freeL
+    ? freeCurlOf(curlOf(state.fingersL, 1, gripL), weight)
+    : curlOf(state.fingersL, weight, gripL);
   const restPoleL = freeL?.kind === 'hang' ? freeL.hang.pole : rig.restPoleL;
   const poleL = mixPole(restPoleL, hold.poleL, weight);
   leftShoulderTurn(hold, rig.left, leftTurn, turnShare(hold, weight));

@@ -375,6 +375,9 @@ The rest of each family:
   hangs in line with its forearm, turned about its long axis to the turn at which its skin is
   nearest to its bind (`restFreeL.palm`, `fingers`). Reason: the left paw turn of the fox chain
   fits the violin, so a paw that faced the body bent at the wrist and twisted on its forearm.
+  A free paw is relaxed and half open at rest (`WIND_BODY.curlOpen`), and it closes to its grip
+  curl by the square of the weight of the playing pose (`freeCurlOf()`). Reason: with the grip
+  curl at each weight, the empty paw was a fist with no tube in it.
   The panda holds the trombone upright in front of the body, below the mouth,
   with the slide down and a little forward (`PANDA_TROMBONE`), as a seated player holds the slide
   vertical in front of the knee (winds 1.7). Both paws keep the grip of the play on the instrument
