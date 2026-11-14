@@ -787,17 +787,18 @@ const PANDA_PLAY_TURN = toQuat(
  * The panda plays the trombone of the app, 0.83 m long, 0.49 of the height of the seated panda.
  * With the smaller trombone of 0.75, it read as a toy beside the clarinets and the flutes around it.
  *
- * The left palm faces the inner slide tubes near the mouthpiece brace, and the right palm the
- * upright slide brace (`faceTube`, `InstrumentGrips.tubeL` of `models/instruments/brass.ts`), as
- * the left hand of a real trombonist wraps the slide tubes and the tips of the right thumb and the
- * first two fingers hold the brace (`docs/reference/wind-technique.md` 1.1). The left grip moves
- * 0.05 H along the tubes away from the mouthpiece and 0.02 H toward them, and its fingers curl 130°
- * around them (`gripShiftL`, `gripCurl`): with the grip at the mouthpiece brace of the smaller
- * trombone, the left forearm went 2.5 cm into the head, and on the trombone of the app, with the
- * grip 0.02 H away from the mouthpiece, the left paw went 1.6 cm into the chin. With 0.07 H toward
- * the tubes, the middle of the paw lay on the axis of the tubes and the finger tips stood 3 cm off
- * them. The right paw closes around the slide brace from the right side of the panda, with its
- * palm to the left and its thumb up the brace, as a real trombonist puts the thumb on the top of
+ * The left palm faces the inner slide tubes at the hand brace, and the right palm the upright
+ * slide brace (`faceTube`, `InstrumentGrips.tubeL` of `models/instruments/brass.ts`), as the left
+ * hand of a real trombonist holds the braces a hand width in front of the mouth and the tips of the
+ * right thumb and the first two fingers hold the slide brace
+ * (`docs/reference/wind-technique.md` 1.1). The left grip lies on the hand brace
+ * (`TROMBONE_HAND_BRACE`), 0.02 H toward the tubes, and its fingers curl 130° around the tubes and
+ * the brace (`gripShiftL`, `gripCurl`). The mouthpiece and its receiver then show between the lips
+ * and the paw, and the paw stays below the chin. With the grip 2.5 cm from the brace of the old
+ * trombone, 10.5 cm from the rim, the paw lay against the chin and hid the lower lip. With
+ * 0.07 H toward the tubes, the middle of the paw lay on the axis of the tubes and the finger tips
+ * stood 3 cm off them. The right paw closes around the slide brace from the right side of the
+ * panda, with its palm to the left and its thumb up the brace, as a real trombonist puts the thumb on the top of
  * the brace and the fingers below it, with two fingers beneath the lower slide tube
  * (`docs/reference/wind-technique.md` 1.1). Its grip moves 0.11 H down the brace, to 2 cm below
  * the lower slide tube, and 0.02 H away from the brace (`gripShiftR`), and the fingers curl 120°.
@@ -833,9 +834,9 @@ const PANDA_PLAY_TURN = toQuat(
  * H forward and 0.1 H down from the mouthpiece on the lips (`restShift`), so that the short arms
  * reach their grips: at 0.425 H forward, the left paw missed its grip by 6.4 cm. Both paws keep the
  * aim and the roll of the play on the instrument (`restAim`), so that the lift and the lowering
- * turn each hand with the trombone. At rest, the left grip moves 0.04 H toward the tubes and no
- * part of the way along them (`restGripShiftL`), 0.05 H nearer to the mouthpiece than in the
- * play: with the grip 0.075 H along the tubes, the left paw touched the right paw at rest. The
+ * turn each hand with the trombone. At rest, the left grip stays on the hand brace and moves
+ * 0.04 H toward the tubes (`restGripShiftL`), so that the finger tips stay on the tubes. With the left grip
+ * 0.075 H along the tubes from the old brace, the left paw touched the right paw at rest. The
  * elbows point out and down at rest (`restPoleL`, `restPoleR`): the right
  * elbow 1.2 out for each 0.7 down, so that the right upper arm keeps near the belly and rolls at
  * most 44°. Further out, it rolled 47°. A real player never rests the trombone on the slide, and
@@ -854,7 +855,7 @@ const PANDA_TROMBONE = {
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
   aimSide: [0.8, 0.8],
-  gripShiftL: [0.05, 0.02, 0],
+  gripShiftL: [0, 0.02, 0],
   gripShiftR: [0.11, -0.02, 0],
   reach: 70 * MathUtils.DEG2RAD,
   restGripShiftL: [0, 0.04, -0.01],

@@ -43,6 +43,23 @@ const TUBA_BELL_LEAN = { bend: 0.55, angle: 15 } as const;
 const TROMBONE_BACK = 0.08;
 
 /**
+ * The distance of the hand brace of the trombone from the rim of the mouthpiece, in meters: the
+ * brace between the inner slide tubes and the brace from them to the bell section, which the left
+ * hand holds. A real left hand holds the trombone at these braces, a hand width in front of the
+ * mouth (`docs/reference/wind-technique.md` 1.1). At 0.08 m, the braces lay at the end of the
+ * mouthpiece shank, and the left paw of the panda on them lay against the chin and hid the lips.
+ */
+const TROMBONE_HAND_BRACE = 0.15;
+
+/**
+ * The distance of the open ends of the outer slide of the trombone from the rim of the mouthpiece
+ * in the first position, in meters. The ends stay in front of the hand brace
+ * ({@link TROMBONE_HAND_BRACE}), as on a real trombone, so that the brace does not go through the
+ * outer slide tubes.
+ */
+const TROMBONE_SLIDE_END = 0.18;
+
+/**
  * The distance from the axis of the bow of the tuning slide of the trombone, at its back, to the
  * axis of the counterweight, in meters. The counterweight (radius 11 mm) covers the outer half of
  * the tube (radius 6.8 mm), so that its shaded lower side lies in the tube, and it reads as
@@ -477,8 +494,22 @@ function trombone(scale: number): BrassBuild {
     main.rod([0.04, y, 0], [0.62, y, 0], 0.0058, TUBE_SEGMENTS, TRIM, 'metal');
     ferrule(main, [0.04, y, 0], [0.12, y, 0], 0.0072);
   }
-  main.rod([0.08, 0, 0], [0.08, low, 0], 0.0042, TUBE_SEGMENTS, TRIM, 'metal');
-  main.rod([0.08, low / 2, 0], [0.08, low / 2, side], 0.0038, TUBE_SEGMENTS, TRIM, 'metal');
+  main.rod(
+    [TROMBONE_HAND_BRACE, 0, 0],
+    [TROMBONE_HAND_BRACE, low, 0],
+    0.0042,
+    TUBE_SEGMENTS,
+    TRIM,
+    'metal',
+  );
+  main.rod(
+    [TROMBONE_HAND_BRACE, low / 2, 0],
+    [TROMBONE_HAND_BRACE, low / 2, side],
+    0.0038,
+    TUBE_SEGMENTS,
+    TRIM,
+    'metal',
+  );
   // The bell section: the bell pipe from the bell back to the tuning slide beside the cheek,
   // and the return to the lower inner slide tube. The bell pipe widens toward the bell.
   const back = TROMBONE_BACK;
@@ -539,7 +570,12 @@ function trombone(scale: number): BrassBuild {
   tubeAlong(
     slide,
     rounded(
-      [local([0.14, 0, 0]), local([0.7, 0, 0]), local([0.7, low, 0]), local([0.14, low, 0])],
+      [
+        local([TROMBONE_SLIDE_END, 0, 0]),
+        local([0.7, 0, 0]),
+        local([0.7, low, 0]),
+        local([TROMBONE_SLIDE_END, low, 0]),
+      ],
       0.035,
       4,
     ),
@@ -548,7 +584,12 @@ function trombone(scale: number): BrassBuild {
     METAL,
   );
   for (const y of [0, low]) {
-    ferrule(slide, local([0.14, y, 0]), local([0.165, y, 0]), 0.0102);
+    ferrule(
+      slide,
+      local([TROMBONE_SLIDE_END, y, 0]),
+      local([TROMBONE_SLIDE_END + 0.025, y, 0]),
+      0.0102,
+    );
   }
   slide.rod(local([0.3, 0, 0]), local([0.3, low, 0]), 0.0045, TUBE_SEGMENTS, TRIM, 'metal');
   slide.rod(
@@ -570,9 +611,9 @@ function trombone(scale: number): BrassBuild {
       main.build('instrument', hold('mouth', [0, 0, 0], rotation)),
       slide.build('slide', hold('instrument', [0, 0, 0], IDENTITY, scaled(brace))),
     ],
-    palmL: scaled([0.08, low / 2, side / 2]),
+    palmL: scaled([TROMBONE_HAND_BRACE, low / 2, side / 2]),
     palmR: scaled([0, 0, 0.02]),
-    // The left fingers wrap the inner slide tubes near the mouthpiece brace, and the right
+    // The left fingers wrap the inner slide tubes at the hand brace, and the right
     // fingertips hold the upright slide brace (`docs/reference/wind-technique.md` 1.1).
     tubes: {
       tubeL: {
