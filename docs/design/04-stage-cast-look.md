@@ -2157,13 +2157,15 @@ A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded
   space of the layout keeps the older horn, so that no seat moves.
 - **Tuba.** A top-action tuba: the bell branch widens more and more toward the bell, and above the
   grip of the left paw it leans out to the left (`TUBA_BELL_LEAN`), so that the rim of the bell
-  stays off the cheek and the eye of the rhino. The bottom bow joins it to the valves, four piston
+  stays off the cheek and the eye of the rhino. The bell flares fast near the rim to a bead, and a
+  garland of nickel silver goes around the flare (`TUBA_FLARE`, `TUBA_GARLAND`), because a
+  straight cone up to the rim read as a funnel. The bottom bow joins it to the valves, four piston
   valves with pearl buttons, and four valve slides at the right of the valves. The lead pipe
   starts at the end of the mouthpiece shank and goes down in front of the chin, so that no part of
   it goes into the face.
 
-The mouthpieces, the ferrules, the valve caps, and the levers are nickel silver, as on the real
-instruments. The points that the holds read stay: the mouth, the grips, the grip tubes, the bell
+The mouthpieces, the ferrules, the valve caps, the levers, and the garland of the tuba are nickel
+silver, as on the real instruments. The points that the holds read stay: the mouth, the grips, the grip tubes, the bell
 of the horn, and the slide line. The layout reads the space of the simpler model of each wind
 (`wind-space.ts`, `InstrumentPiece.footprint`), so the detail does not move the seats.
 

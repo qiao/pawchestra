@@ -1,7 +1,10 @@
 import { MathUtils, Quaternion, Vector3 } from 'three';
 import { INSTRUMENT_COLORS } from '../colors.ts';
+import { transform } from '../mesh.ts';
+import type { Rgb } from '../mesh.ts';
 import { IDENTITY, toQuat, toVec3 } from '../tuples.ts';
 import type { Vec3 } from '../tuples.ts';
+import { latheBand } from '../primitives.ts';
 import type { ProfilePoint } from '../primitives.ts';
 import { PieceBuilder, hold, pieceSize, pointing } from './piece.ts';
 import { arc, rounded, tubeAlong, turned } from './tubing.ts';
@@ -873,6 +876,65 @@ function horn(): BrassBuild {
 }
 
 /**
+ * The flare of the bell of the tuba above the bend of the bell branch, as the radius at each
+ * distance below the rim, in meters. The bell widens slowly up the branch and fast in its last
+ * 10 cm, as the bell of a real tuba, and the rim rolls over to a bead. With a straight cone up to
+ * 5 cm below the rim, the bell read as a funnel. The radius of the rim is `BRASS.tuba.bellRadius`.
+ */
+const TUBA_FLARE: readonly (readonly [radius: number, below: number])[] = [
+  [0.118, 0.19],
+  [0.14, 0.135],
+  [0.162, 0.1],
+  [0.188, 0.065],
+  [0.207, 0.035],
+];
+
+/**
+ * The steps of {@link TUBA_FLARE} between which a band of nickel silver goes around the bell, as
+ * the garland of a concert tuba: from 10 cm to 6.5 cm below the rim.
+ */
+const TUBA_GARLAND = [2, 3] as const;
+
+/**
+ * Adds the bell of the tuba above the bend of the bell branch ({@link TUBA_FLARE}): the flare
+ * with its garland of nickel silver ({@link TUBA_GARLAND}), the bead of the rim, and the lit
+ * inside of the flare. The bands share their rings, so the bell is one closed solid.
+ *
+ * @param piece The piece.
+ * @param bend The middle of the bell branch at the bend.
+ * @param axis The axis of the bell, from the bend to the rim.
+ * @param top The distance of the rim from the bend along the axis.
+ * @param radius The radius of the rim.
+ */
+function tubaBell(piece: PieceBuilder, bend: Vec3, axis: Vec3, top: number, radius: number): void {
+  const flare = TUBA_FLARE.map(([r, below]): ProfilePoint => [r, top - below]);
+  const [from, to] = TUBA_GARLAND;
+  const garlandStart = flare[from] ?? [0, 0];
+  const garlandEnd = flare[to] ?? [0, 0];
+  const at = transform(
+    bend,
+    toQuat(new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), new Vector3(...axis))),
+  );
+  const bands: readonly (readonly [readonly ProfilePoint[], Rgb])[] = [
+    [[[0, 0], [0.085, 0], ...flare.slice(0, from + 1)], METAL],
+    [[garlandStart, garlandEnd], TRIM],
+    [
+      [
+        ...flare.slice(to),
+        [radius * 1.02, top - 0.01],
+        [radius, top],
+        // The rim turns back into the bell, so that the opening shows the lit inside of the flare.
+        ...openBell(radius, top),
+      ],
+      METAL,
+    ],
+  ];
+  for (const [profile, color] of bands) {
+    piece.add(latheBand(profile, TUBA_SEGMENTS), color, at, 'metal');
+  }
+}
+
+/**
  * Builds the tuba, as a top-action piston tuba such as a Yamaha YFB-822
  * (`docs/reference/wind-technique.md` 6.1). The mouthpiece is at the origin, and the tuba has the
  * axes of the player: the body stands in front of the player, and the bell opens up at the left
@@ -915,21 +977,7 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
   const bellAxis = new Vector3(-Math.sin(lean), Math.cos(lean), 0);
   const bend = at([-0.06, TUBA_BELL_LEAN.bend, 0]);
   const top = t.height - TUBA_BELL_LEAN.bend;
-  turned(
-    piece,
-    bend,
-    toVec3(bellAxis),
-    [
-      [0.085, 0],
-      [0.108, top - 0.28],
-      [0.135, top - 0.15],
-      [t.bellRadius * 0.82, top - 0.05],
-      [t.bellRadius * 1.02, top],
-      ...openBell(t.bellRadius, top),
-    ],
-    TUBA_SEGMENTS,
-    METAL,
-  );
+  tubaBell(piece, bend, toVec3(bellAxis), top, t.bellRadius);
   // The bottom bow joins the bell branch to the valve branch, and narrows toward the valves.
   tubeAlong(
     piece,
