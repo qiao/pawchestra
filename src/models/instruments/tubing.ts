@@ -64,8 +64,6 @@ function tubeRings(points: readonly Vec3[], radius: readonly number[], segments:
  *   points.
  * @param segments The number of faces around the tube.
  * @param color The color.
- * @param caps Whether the two ends get flat caps. A tube whose two ends lie inside other parts,
- *   such as a valve slide that leaves and enters a valve casing, needs none.
  */
 export function tubeAlong(
   piece: PieceBuilder,
@@ -73,9 +71,8 @@ export function tubeAlong(
   radius: readonly number[],
   segments: number,
   color: Rgb,
-  caps = true,
 ): void {
-  piece.add(sweep(tubeRings(points, radius, segments), caps), color, transform(), 'metal');
+  piece.add(sweep(tubeRings(points, radius, segments)), color, transform(), 'metal');
 }
 
 /**
