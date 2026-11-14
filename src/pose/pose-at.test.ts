@@ -523,8 +523,8 @@ describe('the seeded rest motions (design 5.2, 5.5)', () => {
     const { players } = (await boulanger()).plan;
     const m = REST_MOTION;
     for (const { motion } of players) {
-      expect(motion.lift.durationSec).toBeGreaterThanOrEqual(m.liftSec.min);
-      expect(motion.lift.durationSec).toBeLessThanOrEqual(m.liftSec.max);
+      expect(motion.lift.durationSec).toBeGreaterThanOrEqual(m.liftSec.others.min);
+      expect(motion.lift.durationSec).toBeLessThanOrEqual(m.liftSec.carried.max);
       expect(motion.lower.durationSec).toBeGreaterThanOrEqual(m.lowerSec.min);
       expect(motion.lower.durationSec).toBeLessThanOrEqual(m.lowerSec.max);
       expect(motion.lift.delaySec + motion.lift.durationSec).toBeLessThanOrEqual(LIFT_FIT_SEC);
@@ -713,7 +713,7 @@ describe('the seeded rest motions (design 5.2, 5.5)', () => {
       transports.findLast((t) => (t.changedAtWall ?? 0) <= wall) ?? NOT_STARTED;
     // The fastest move is the shortest lift with the scale of the lead time. The eased curve has
     // a slope of less than 2.5 times its mean, and a weight is a product of two heights.
-    const fastestSec = REST_MOTION.liftSec.min * Math.min(1, lead / LIFT_FIT_SEC);
+    const fastestSec = REST_MOTION.liftSec.others.min * Math.min(1, lead / LIFT_FIT_SEC);
     const step = 0.001;
     const largest = (2 * 2.5 * step) / fastestSec;
     // One `expect()` for each sample of each player takes most of the time of the test, so the

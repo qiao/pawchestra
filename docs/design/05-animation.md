@@ -213,6 +213,14 @@ count-in (5.4, 6.5), and lower them when the hold of `transport.holdSec` after a
   `REST_MOTION` of `pose/rest.ts`). The principal of a seat moves first, and the others follow in
   a ripple, as real players watch their leader. The winds lift sooner, because they also breathe
   before the first note. The conductor gives the count-in, so its motion does not vary.
+- **Calm lift.** A carried instrument (`carriesInstrument()`: the violin, the viola, the woodwinds,
+  and the brass) goes from the lap to the jaw or to the lips. Its lift
+  (`REST_MOTION.liftSec.carried`) has the same mean time as the lowering, because a real player
+  brings the instrument up calmly and is ready a moment before the entry. The shorter lift of the
+  other players (`liftSec.others`) moves only the paws and the bow. Reason: with the short lift,
+  the violin of the rabbit went from the lap to the jaw in about 0.45 s after a long rest, and the
+  move read as a snap. Each kind has its own fit (`RestMotion.fitSec`), so the lifts of the other
+  players keep their times.
 
   ```typescript
   /** The timing of one move of the instruments: a lift or a lowering. */
@@ -226,14 +234,16 @@ count-in (5.4, 6.5), and lower them when the hold of `transport.holdSec` after a
   interface RestMotion {
     lift: RestMove;
     lower: RestMove;
-    fitSec: number; // the longest lift of the group, with its delay
+    fitSec: number; // the longest lift of its kind (carried or not), with its delay
   }
   ```
 
 - **No jump.** A move starts from the height of each player at the change, from
   `transport.before` (`changeTransport()` of `app/transport.ts`).
-- **Count-in.** The slowest lift ends before the downbeat. A shorter count-in scales all lifts by
-  one factor (`liftScale()`). A pause in the count-in lowers the instruments at once.
+- **Count-in.** The slowest lift ends before the downbeat. A shorter count-in scales the lifts of
+  each kind by one factor (`liftScale()`), so the downbeat keeps its time. A carried lift in the
+  shortest count-in still takes longer than the lift of the other players. A pause in the
+  count-in lowers the instruments at once.
 - **Long rests.** A wind or string player lowers its instruments in a long rest of its own part,
   as a real player does (winds 4, strings 3.2). The strings need a longer rest, because the carry
   of the violin is a larger move. The viola and the contrabass keep the playing pose
@@ -243,8 +253,11 @@ count-in (5.4, 6.5), and lower them when the hold of `transport.holdSec` after a
   (`longRestHeight()` of `pose/long-rests.ts`), so a seek gives the same pose. A rest of at least
   `LONG_REST.minSec` of its family counts, also before the first note and after the last note.
   The instrument stays up for `LONG_REST.holdSec`, then goes down with the seeded lowering of the
-  player and its ripple. The lift ends at least `LONG_REST.liftEndBeats` before the entry, and the
-  principal of a seat lifts first. The rest pose is the pose of a muted seat (5.5).
+  player and its ripple. The lift starts by the fit of the player (`RestMotion.fitSec`) before
+  the entry, and less `LONG_REST.liftEndBeats`, so that it ends at least that time before the
+  entry and no note sounds in the lift. The principal of a seat lifts first. A rest in which the
+  lift would start before the lowering ends keeps the playing pose. The rest pose is the pose of a
+  muted seat (5.5).
 - **No wrist flip.** A paw does not turn past 180° on its forearm in a move, because the twist
   bone (`TWIST_SHARE` of `models/studio-rig.ts`) then turns over in one frame. The arm gate checks
   each move (`probeMoves()` of `tools/arm-check.ts`). The carried left paw of a violin or a viola

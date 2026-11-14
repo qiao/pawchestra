@@ -630,6 +630,10 @@ The app does not follow these facts:
   the supination. There the paw turns the other way, through the direction of no paw twist
   (`studioPawTwist()`), so that the skin of the forearm does not turn over. No source gives this
   turn.
+- **The time of the lift.** No source gives the time of the lift. The violin and the viola take
+  the longer lift of a carried instrument (`REST_MOTION.liftSec.carried` of `src/pose/rest.ts`,
+  design 5.2), with the mean time of the lowering, so that the player brings the instrument up
+  calmly and is ready at least one beat before the entry.
 - **The top plate at rest (2.9).** No source gives its side in the seated rest. The top plate of
   the violin faces the front. The red fox turns it a little to the right, so that its left paw
   holds the neck with a straight wrist and little twist on the forearm. The top plate of the viola

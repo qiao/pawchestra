@@ -1,4 +1,5 @@
-import type { MotionFamily } from './family.ts';
+import type { InstrumentId } from '../models/instruments/types.ts';
+import { isInFamily } from './family.ts';
 import { hashUnit, mixHash } from './random.ts';
 import type { SeatAudibility, Transport } from './types.ts';
 
@@ -53,9 +54,11 @@ export interface RestMotion {
   readonly lift: RestMove;
   readonly lower: RestMove;
   /**
-   * The longest lift of the group of the animal, with its delay, in seconds. A play with a short
-   * count-in scales all lifts of the group by one factor, so that they end in time and keep
-   * their order ({@link liftScale}).
+   * The longest lift of the group of the animal, with its delay, in seconds. The players with a
+   * carried instrument are one group, and the other players are a second group. A play with a
+   * short count-in scales all lifts of a group by one factor, so that they end in time and keep
+   * their order ({@link liftScale}). A long rest starts the lift of the animal by this time
+   * before the entry (`findLongRests()` of `pose/long-rests.ts`).
    */
   readonly fitSec: number;
 }
@@ -68,8 +71,16 @@ interface Range {
 
 /** The ranges of the seeded lift and lowering of a player, in seconds (design 5.2). */
 export const REST_MOTION = {
-  /** The duration of the lift of a player. */
-  liftSec: { min: 0.6, max: 0.9 },
+  /**
+   * The duration of the lift of a player. A carried instrument ({@link carriesInstrument}) goes
+   * from the lap to the jaw or to the lips, and its lift takes as long as the lowering on the
+   * mean, because a real player brings the instrument up calmly. The lift of the other players
+   * moves only the paws and the bow, so it is shorter.
+   */
+  liftSec: {
+    carried: { min: 1.1, max: 1.5 },
+    others: { min: 0.6, max: 0.9 },
+  },
   /** The duration of the lowering of a player. */
   lowerSec: { min: 1, max: 1.6 },
   /**
@@ -96,13 +107,43 @@ export const REST_MOTION = {
 } as const;
 
 /**
- * The longest lift of a player, with its delay: the longest delay of a seat, the full ripple, and
- * the longest lift. The lifts of all players scale together by it (design 5.2).
+ * Tells if a player carries its instrument from the lap to the jaw or to the lips in a lift
+ * (design 5.2): a violin, a viola, a woodwind, or a brass instrument. A cellist, a contrabassist, a
+ * pianist, a harpist, a percussionist, and a singer lift only the paws and the bow.
+ *
+ * @param instrument The instrument of the player.
+ * @returns True for a carried instrument.
  */
-export const LIFT_FIT_SEC =
-  Math.max(REST_MOTION.seatLiftSec.winds.max, REST_MOTION.seatLiftSec.others.max) +
-  REST_MOTION.rippleSec +
-  REST_MOTION.liftSec.max;
+export function carriesInstrument(instrument: InstrumentId): boolean {
+  return (
+    instrument === 'violin' ||
+    instrument === 'viola' ||
+    isInFamily(instrument, ['woodwind', 'brass'])
+  );
+}
+
+/**
+ * Gives the longest lift of a kind of player, with its delay: the longest delay of a seat, the
+ * full ripple, and the longest lift of the kind (design 5.2). The lifts of the players of one kind
+ * scale together by it in a count-in, and a long rest starts the lift by it.
+ *
+ * @param carried True for a player with a carried instrument ({@link carriesInstrument}).
+ * @returns The time, in seconds.
+ */
+function liftFitSec(carried: boolean): number {
+  const m = REST_MOTION;
+  return (
+    Math.max(m.seatLiftSec.winds.max, m.seatLiftSec.others.max) +
+    m.rippleSec +
+    (carried ? m.liftSec.carried.max : m.liftSec.others.max)
+  );
+}
+
+/**
+ * The longest lift of a player, with its delay: the fit of a carried instrument. After it, no
+ * player moves for a play (design 5.2).
+ */
+export const LIFT_FIT_SEC = liftFitSec(true);
 
 /** The longest lowering of a player, with its delay after the hold (design 5.2). */
 export const LOWER_MAX_SEC =
@@ -157,28 +198,29 @@ function rippleDelay(seatSeed: number, slot: number, index: number): number {
  * first, after the seeded delay of its seat, and the later players follow in a ripple. Each move
  * has its own seeded duration and curve, so a player that lifts early does not lower late.
  *
- * @param family The motion family of the player.
+ * @param instrument The instrument of the player.
  * @param index The index of the player in its seat: 0 is the principal.
  * @param seatSeed The seed of the seat. The players of one seat share it.
  * @param next The seeded random numbers of the player, in [0, 1).
  * @returns The rest motion of the player.
  */
 export function restMotion(
-  family: MotionFamily,
+  instrument: InstrumentId,
   index: number,
   seatSeed: number,
   next: () => number,
 ): RestMotion {
   const m = REST_MOTION;
-  const winds = family === 'woodwind' || family === 'brass';
+  const winds = isInFamily(instrument, ['woodwind', 'brass']);
   const seatLift = winds ? m.seatLiftSec.winds : m.seatLiftSec.others;
+  const carried = carriesInstrument(instrument);
   const s = SEAT_SLOTS;
   return {
     lift: {
       delaySec:
         inRange(seatLift, hashUnit(seatSeed, s.liftDelay)) +
         rippleDelay(seatSeed, s.liftRipple, index),
-      durationSec: inRange(m.liftSec, next()),
+      durationSec: inRange(carried ? m.liftSec.carried : m.liftSec.others, next()),
       skew: inRange(m.skew, next()),
     },
     lower: {
@@ -188,7 +230,7 @@ export function restMotion(
       durationSec: inRange(m.lowerSec, next()),
       skew: inRange(m.skew, next()),
     },
-    fitSec: LIFT_FIT_SEC,
+    fitSec: liftFitSec(carried),
   };
 }
 

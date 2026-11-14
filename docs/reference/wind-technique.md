@@ -362,7 +362,9 @@ These facts hold for each wind player:
   (`windFingering()` of `src/pose/wind-fingering.ts`), and section 7.5 gives its use. The paws
   curl as one block (`WindHold.gripCurl`, `WIND_BODY.keyCurl`).
 - **The lift (1.7, 2.2).** The winds lift first in the count-in (`REST_MOTION` of
-  `src/pose/rest.ts`). No source gives the time.
+  `src/pose/rest.ts`). Each wind takes the longer lift of a carried instrument
+  (`REST_MOTION.liftSec.carried`), with the mean time of the lowering, so that the player brings
+  the instrument up calmly and breathes before the entry. No source gives the time.
 - **The long rest (2.3).** In a rest of at least `LONG_REST.minSec` (`src/pose/long-rests.ts`),
   each wind player lowers the instrument to its rest pose, and lifts it again so that the lift
   ends at least one beat before the entry. The oboe does not lie across the legs: each wind keeps

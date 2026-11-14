@@ -158,9 +158,13 @@ describe('smoothstep', () => {
 });
 
 /** Gives the rest motions of the players of one seat, with the seeds of the plan. */
-function seatMotions(seatSeed: number, count: number, family: 'bowed' | 'brass'): RestMotion[] {
+function seatMotions(
+  seatSeed: number,
+  count: number,
+  instrument: 'violin' | 'trumpet',
+): RestMotion[] {
   return Array.from({ length: count }, (_, index) =>
-    restMotion(family, index, seatSeed, mulberry32(seatSeed * 31 + index)),
+    restMotion(instrument, index, seatSeed, mulberry32(seatSeed * 31 + index)),
   );
 }
 
@@ -168,10 +172,10 @@ describe('restMotion (design 5.2)', () => {
   it('gives each player a lift and a lowering in their ranges', () => {
     const m = REST_MOTION;
     for (let seatId = 0; seatId < 200; seatId++) {
-      for (const motion of seatMotions(seatId, 8, seatId % 2 === 0 ? 'bowed' : 'brass')) {
+      for (const motion of seatMotions(seatId, 8, seatId % 2 === 0 ? 'violin' : 'trumpet')) {
         const { lift, lower } = motion;
-        expect(lift.durationSec).toBeGreaterThanOrEqual(m.liftSec.min);
-        expect(lift.durationSec).toBeLessThanOrEqual(m.liftSec.max);
+        expect(lift.durationSec).toBeGreaterThanOrEqual(m.liftSec.carried.min);
+        expect(lift.durationSec).toBeLessThanOrEqual(m.liftSec.carried.max);
         expect(lower.durationSec).toBeGreaterThanOrEqual(m.lowerSec.min);
         expect(lower.durationSec).toBeLessThanOrEqual(m.lowerSec.max);
         expect(lift.delaySec + lift.durationSec).toBeLessThanOrEqual(LIFT_FIT_SEC);
@@ -187,7 +191,7 @@ describe('restMotion (design 5.2)', () => {
 
   it('moves the principal first, and each later player of the seat after the one before', () => {
     for (let seatId = 0; seatId < 50; seatId++) {
-      const motions = seatMotions(seatId, 6, 'bowed');
+      const motions = seatMotions(seatId, 6, 'violin');
       for (const move of ['lift', 'lower'] as const) {
         const delays = motions.map((m) => m[move].delaySec);
         for (let i = 1; i < delays.length; i++) {
@@ -202,7 +206,7 @@ describe('restMotion (design 5.2)', () => {
 
   it('gives each move its own timing, so an early lifter does not have to lower late', () => {
     const motions = Array.from({ length: 40 }, (_, seatId) =>
-      seatMotions(seatId, 4, 'bowed'),
+      seatMotions(seatId, 4, 'violin'),
     ).flat();
     const liftOrder = motions.map((m) => m.lift.delaySec + m.lift.durationSec);
     const lowerOrder = motions.map((m) => m.lower.delaySec + m.lower.durationSec);
@@ -220,15 +224,15 @@ describe('restMotion (design 5.2)', () => {
   });
 
   it('gives the same motion for the same seeds, and other motions for other seeds', () => {
-    expect(seatMotions(7, 4, 'bowed')).toEqual(seatMotions(7, 4, 'bowed'));
-    expect(seatMotions(8, 4, 'bowed')).not.toEqual(seatMotions(7, 4, 'bowed'));
+    expect(seatMotions(7, 4, 'violin')).toEqual(seatMotions(7, 4, 'violin'));
+    expect(seatMotions(8, 4, 'violin')).not.toEqual(seatMotions(7, 4, 'violin'));
   });
 
   it('lifts the winds a moment before the other seats', () => {
     const m = REST_MOTION.seatLiftSec;
     for (let seatId = 0; seatId < 100; seatId++) {
-      const [winds] = seatMotions(seatId, 1, 'brass');
-      const [strings] = seatMotions(seatId, 1, 'bowed');
+      const [winds] = seatMotions(seatId, 1, 'trumpet');
+      const [strings] = seatMotions(seatId, 1, 'violin');
       expect(winds?.lift.delaySec).toBeLessThanOrEqual(m.winds.max);
       expect(strings?.lift.delaySec).toBeGreaterThanOrEqual(m.others.min);
     }
@@ -236,7 +240,7 @@ describe('restMotion (design 5.2)', () => {
 
   it('spreads the starts of a seat of 4 players over the ripple', () => {
     const spreads = Array.from({ length: 100 }, (_, seatId) => {
-      const delays = seatMotions(seatId, 4, 'bowed').map((m) => m.lift.delaySec);
+      const delays = seatMotions(seatId, 4, 'violin').map((m) => m.lift.delaySec);
       return (delays[3] ?? 0) - (delays[0] ?? 0);
     });
     expect(Math.min(...spreads)).toBeGreaterThan(0.25);

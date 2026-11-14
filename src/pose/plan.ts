@@ -665,12 +665,7 @@ function* preparePlayerSteps(
   const next = mulberry32(seed);
   const timeOffset = (next() * 2 - 1) * PLAYER_OFFSETS.timeSec;
   const amplitude = 1 + (next() * 2 - 1) * PLAYER_OFFSETS.amplitude;
-  const motion = restMotion(
-    MOTION_FAMILIES[place.cast.instrument],
-    place.cast.player,
-    inputs.seatSeed,
-    next,
-  );
+  const motion = restMotion(place.cast.instrument, place.cast.player, inputs.seatSeed, next);
   const [lookYaw, lookPitch] = lookAngles(
     model.skeleton,
     place.position,
