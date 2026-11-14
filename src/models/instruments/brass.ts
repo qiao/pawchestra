@@ -1037,22 +1037,23 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
   const bottom = new Vector3(-0.06 - left, -0.72, back - 0.2);
   const at = (p: Vec3): Vec3 => toVec3(new Vector3(...p).add(bottom));
   // The bell branch rises from the bottom bow to the bell, and widens more and more toward it.
-  // Above the grip of the left paw, it leans out to the left (TUBA_BELL_LEAN).
+  // Above the grip of the left paw, it leans out to the left (TUBA_BELL_LEAN). The branch bends
+  // into the axis of the bell and ends 3 cm inside the bell, so that its ring at the bend leans
+  // half the angle and meets the bell all around. With a flat top at the bend, the leaned bell
+  // left a notch of 2.2 cm at the outer side of the bend. Both ends of the branch lie inside the
+  // bottom bow and the bell, so the branch has no caps.
   const rise = 0.13;
-  turned(
-    piece,
-    at([-0.06, rise, 0]),
-    [0, 1, 0],
-    [
-      [0.068, 0],
-      [0.085, TUBA_BELL_LEAN.bend - rise],
-    ],
-    TUBA_SEGMENTS,
-    METAL,
-  );
   const lean = TUBA_BELL_LEAN.angle * MathUtils.DEG2RAD;
   const bellAxis = new Vector3(-Math.sin(lean), Math.cos(lean), 0);
   const bend = at([-0.06, TUBA_BELL_LEAN.bend, 0]);
+  tubeAlong(
+    piece,
+    [at([-0.06, rise, 0]), bend, toVec3(new Vector3(...bend).addScaledVector(bellAxis, 0.03))],
+    [0.068, 0.085, 0.084],
+    TUBA_SEGMENTS,
+    METAL,
+    false,
+  );
   const top = t.height - TUBA_BELL_LEAN.bend;
   tubaBell(piece, bend, toVec3(bellAxis), top, t.bellRadius);
   // The bottom bow joins the bell branch to the valve branch, and narrows toward the valves. It
