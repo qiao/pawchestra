@@ -102,6 +102,24 @@ passes.
 - [ ] Badger (4.4): the elbow rings double the faces of the elbow, so the fold counts by face of
       `fold-probe` and the arm gate rise for some roles, while the bent elbow is round in the
       crops. Measure the folds by area, or by the dark pixels of the elbow, to compare.
+- [ ] Badger (4.4): a black slit shows at the inner elbow at a deep bend (cymbalist muffle,
+      xylophonist lowest, bass drummer muffle L). A section of the posed arm at the bend of 85°
+      shows the inner skin of the upper arm in the forearm. A helper ramp from x 0.21 to 0.31
+      changed nothing in the crops, and a bind key cannot follow the bend. Options: an elbow
+      shape `arm_raise_<side>` with `bone: 'forearm'` for each side (the badger has none of
+      `STUDIO_RAISES`), or holds that bend the elbow less (`src/pose/percussion-rig.ts`).
+- [ ] Badger (4.4): the outer elbow tip shows a dark nub from behind (cymbalist rest, bass
+      drummer strike). Each elbow band has a triangle at the back of the elbow. A trial moved
+      the triangle of the band at x 0.29 four quads up (`move_band_triangles()`, by face joins):
+      the nub stayed, and a light sliver came at the slanted quads. Find the nub vertices with
+      `pnpm bind-view --pose` first.
+- [ ] Badger (4.4): the tail root underside between the legs shows rust in the low front view.
+      It is the light: a flat normal map gives the same color, and the color of the tail top
+      lifts the mean only from (60, 24, 10) to (71, 30, 13). Check it in the play view first.
+- [ ] Beaver bassoonist (4.4): a dark slot stays along the back of the right arm root (az 150).
+      Back rows as on the badger (x 0.12 to 0.18 or 0.2) made a hard vertical ridge there.
+- [ ] Beaver bassoonist (4.4): the turned right wrist band shows a ring line with a step of
+      tone. Give the beaver the band fade of the bear (`bandFade`, `tools/beaver-maps.py`).
 - [ ] Monkey trumpeter: a dark band stays under each buttock in the back view: the round form of
       the source that faces down, away from the key light.
 - [ ] Monkey trumpeter: two thin faces across the wrists (329 and 1090) fold in each play sample.
