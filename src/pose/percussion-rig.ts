@@ -168,6 +168,11 @@ export interface EdgeDamp {
   readonly share: number;
   /** The forward lean of the spine at the damp, in radians, on top of `PercussionHold.lean`. */
   readonly lean: number;
+  /**
+   * The highest speed of the grip in the move to the rim and back, in meters each second
+   * (`DampHand.moveSec`).
+   */
+  readonly speed: number;
 }
 
 /**
@@ -848,7 +853,9 @@ export const PERCUSSION_HOLDS = {
  * with the hand on the edge. The wrist lifts the head by 5 shares of the pitch, so that the
  * mallet points about 30° up over the plate, and its ball stays above the bell. With the grip
  * 3 cm out and 5 cm down, the closed paw hung below the rim, and only the top of the fist was at
- * the edge. With 8 shares, the mallet pointed about 55° up toward the chin.
+ * the edge. With 8 shares, the mallet pointed about 55° up toward the chin. The paw moves about
+ * 10 cm to the rim, at most at 1.2 m/s (`speed`), as the paw of the timpanist: after a short
+ * note, it moved there in 0.06 s, and the head of its mallet moved 7 cm in one frame.
  */
 export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   hands: 'alternate',
@@ -883,6 +890,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
     around: -0.35,
     share: 5,
     lean: 0.16,
+    speed: 1.2,
   },
   curl: [GRIP_CURL, GRIP_CURL],
   strikeRoll: true,
@@ -1657,7 +1665,10 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
         targets.set(0, top);
         sides = [mallet(left, 'malletL'), mallet(right, 'malletR')];
         if (hold.damp?.kind === 'edge') {
-          dampHands = pawsOnRim(top.point, hold.damp, [left, right], h);
+          dampHands = pawsOnRim(top.point, hold.damp, [left, right], h, [
+            gripAtStrike(offsetTarget(top, hold.offsetL), sides[0]),
+            gripAtStrike(offsetTarget(top, hold.offsetR), sides[1]),
+          ]);
         }
       } else {
         const plates = pairOfPlates(model, left, right, inH, targets);
@@ -1790,17 +1801,8 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
       const move = MathUtils.clamp(c > 0 ? ahead : 0, 0, hold.rim - damp.rim);
       const point = towardPlayer(target, move).point;
       const grip = new Vector3(point[0], point[1] + damp.up * h, point[2]);
-      // The grip at a strike lies the length of the mallet back from the target, on the line
-      // from the home. The smooth step of the move is 1.5 times faster than its mean speed at its
-      // middle.
-      const struck = new Vector3(...target.point);
-      if (side.kind === 'mallet') {
-        const along = struck
-          .clone()
-          .sub(new Vector3(...side.home))
-          .normalize();
-        struck.addScaledVector(along, -side.length);
-      }
+      // The smooth step of the move is 1.5 times faster than its mean speed at its middle.
+      const struck = gripAtStrike(target, side);
       return {
         kind: 'grip',
         grip: toVec3(grip),
@@ -1990,13 +1992,35 @@ function palmOnFarHead(near: StrikeTarget, rule: PalmDamp, h: number): DampHand 
 }
 
 /**
+ * Gives the grip of a mallet at a strike: the length of the mallet back from the target, on the
+ * line from the home of the mallet.
+ *
+ * @param target The target of the strike.
+ * @param side The hand. A hand with no mallet gives the target.
+ * @returns The grip, in the model axes.
+ */
+function gripAtStrike(target: StrikeTarget, side: PercussionSide): Vector3 {
+  const struck = new Vector3(...target.point);
+  if (side.kind === 'mallet') {
+    const along = struck
+      .clone()
+      .sub(new Vector3(...side.home))
+      .normalize();
+    struck.addScaledVector(along, -side.length);
+  }
+  return struck;
+}
+
+/**
  * Gives the grip of the mallet of each hand at a damp of the suspended cymbal (`EdgeDamp`, design
- * 5.3): near the rim point nearest to the shoulder joint of the hand.
+ * 5.3): near the rim point nearest to the shoulder joint of the hand. The move to the grip takes
+ * the time that keeps the grip at `EdgeDamp.speed`.
  *
  * @param middle The middle of the top of the cymbal.
  * @param rule The rule of the damp.
  * @param arms The left and the right arm.
  * @param h The head height `H` of the body, in meters: the unit of `rule.grip`.
+ * @param struck The grip of the left and of the right mallet at a strike ({@link gripAtStrike}).
  * @returns The paw of the left and of the right hand.
  */
 function pawsOnRim(
@@ -2004,8 +2028,9 @@ function pawsOnRim(
   rule: EdgeDamp,
   arms: readonly [ArmRig, ArmRig],
   h: number,
+  struck: readonly [Vector3, Vector3],
 ): readonly [DampHand, DampHand] {
-  const paw = (arm: ArmRig): DampHand => {
+  const paw = (arm: ArmRig, from: Vector3): DampHand => {
     const center = new Vector3(...middle);
     const out = new Vector3(...arm.bind.shoulder)
       .sub(center)
@@ -2022,11 +2047,12 @@ function pawsOnRim(
       keep: false,
       touch: null,
       paw: new Float32Array(),
-      moveSec: 0,
+      // The smooth step of the move is 1.5 times faster than its mean speed at its middle.
+      moveSec: (1.5 * grip.distanceTo(from)) / rule.speed,
       arc: 0,
     };
   };
-  return [paw(arms[0]), paw(arms[1])];
+  return [paw(arms[0], struck[0]), paw(arms[1], struck[1])];
 }
 
 /**
