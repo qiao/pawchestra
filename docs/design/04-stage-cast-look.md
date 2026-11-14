@@ -2158,9 +2158,10 @@ A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded
   of the panda with the slide toward the audience. The counterweight touches the outer side of the
   bow, at the middle between its legs.
 - **Horn** (`HORN`). A double horn in the axes of its coil. The lead pipe goes along the tangent
-  to the hoop and then around the hoop to the valves. The outer hoop widens in one spiral turn
-  into the bell tail, which leaves the coil outside the hoop, and the throat of the bell is wide
-  (`HORN_FLARE`). Four rotary valves with silver caps and the levers of the left fingers, the
+  to the hoop and then around the hoop to the valves. The bell branch leaves the last valve, goes
+  out to the outer hoop (`HORN.hoopFrom`), and widens along the hoop into the bell tail, which
+  leaves the coil outside the hoop and ends inside the throat of the bell. The throat of the bell
+  is wide (`HORN_FLARE`). Four rotary valves with silver caps and the levers of the left fingers, the
   loops of the F side and the B♭ side, and the valve slides. `HORN_PLANE` puts the coil in front
   of the right side of the chest. Reason: a straight lead pipe from the lips to a coil at the
   belly looked like a drinking straw, and the throat of a real horn takes the right hand. The

@@ -705,6 +705,13 @@ const HORN = {
    * last part of the outer hoop, as the bell branch of a real horn lies outside its coil.
    */
   tail: 0.19,
+  /**
+   * The first step of the outer hoop, of the 26 steps of one whole turn that ends at the exit:
+   * the step at 48° on the coil, past the last valve, where the bell branch from that valve
+   * reaches the hoop. Between the last valve and the lead pipe, the F loop and the B♭ loop leave
+   * the hoop room there.
+   */
+  hoopFrom: 9,
   /** The middle of the row of the four valves. */
   valves: [0.04, 0.05],
   /** The step from one valve to the next. */
@@ -859,12 +866,17 @@ function horn(): BrassBuild {
       METAL,
     );
   }
-  // The outer hoop: one turn that widens into the bell tail, which leaves the coil at the exit.
+  // The outer hoop: the bell branch leaves the last valve, goes out to the hoop, and widens around
+  // the coil into the bell tail, which leaves the coil at the exit. The steps of the hoop keep
+  // their place on one whole turn that ends at the exit, from the step `hoopFrom`. The hoop
+  // started at the exit, one whole turn back, and that end stood in the air, 1.2 cm off the lead
+  // pipe and the F loop.
   const exit = f.exit * MathUtils.DEG2RAD;
+  const bellAxis = along(-Math.sin(exit), Math.cos(exit));
   const hoop: Vec3[] = [];
   const radii: number[] = [];
   const turnSteps = 26;
-  for (let i = 0; i <= turnSteps; i++) {
+  for (let i = f.hoopFrom; i <= turnSteps; i++) {
     const share = i / turnSteps;
     const out = MathUtils.smoothstep(share, 0.55, 1);
     hoop.push(
@@ -875,8 +887,21 @@ function horn(): BrassBuild {
     );
     radii.push(0.0065 + (HORN_THROAT - 0.0065) * share * share);
   }
-  tubeAlong(piece, hoop, radii, TUBE_SEGMENTS, METAL);
-  const bellAxis = along(-Math.sin(exit), Math.cos(exit));
+  const [first = [0, 0, 0], second = [0, 0, 0], ...rest] = hoop;
+  const [firstRadius = 0, ...restRadii] = radii;
+  // The branch leaves the last valve a little to the side of the player, so that it passes the
+  // slide of that valve. The tail goes 2 cm on into the bell along its axis, so that its last ring
+  // lies in the throat of the bell.
+  const branch = rounded([valve(3, 0.004), first, second], 0.02, 2);
+  const tailEnd = toVec3(new Vector3(...ring(exit, f.tail)).addScaledVector(bellAxis, 0.02));
+  tubeAlong(
+    piece,
+    [...branch, ...rest, tailEnd],
+    [...branch.slice(0, -1).map(() => firstRadius), ...restRadii, HORN_THROAT],
+    TUBE_SEGMENTS,
+    METAL,
+    false,
+  );
   const bellTarget = bell(
     piece,
     toVec3(new Vector3(...ring(exit, f.tail)).addScaledVector(bellAxis, 0.2)),
