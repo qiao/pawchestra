@@ -147,8 +147,9 @@ export interface WindHold {
    * The share, from 0 to 1, of the part along the tube that the aim of each paw on its grip loses
    * in the playing pose ({@link aimAcross}). With 0, the paw points along the line from its
    * shoulder to its grip. A tube far in front of the body then puts that line along the tube, and
-   * the fingers point past the tube in place of around it. Only a paw that rolls to face its tube
-   * ({@link WindHold.faceTube}) takes it.
+   * the fingers point past the tube in place of around it. A share below 0 adds that part again,
+   * so that the paw points more along the tube, as a paw in the bell of the horn. Only a paw that
+   * rolls to face its tube ({@link WindHold.faceTube}) takes it.
    */
   readonly aimAcross: number;
   /**
@@ -402,6 +403,19 @@ const ROUND_ARMS_FIT = { flute: 23, clarinet: 12, trumpet: 16 } as const;
 const FAR_MOUTH_FIT = 0.9;
 
 /**
+ * The turn of the horn in the rest pose (design 5.2): its right side, with the bell, 15° back
+ * around the vertical, and then its lower end 9° to the right. With the rest move of the hold, the
+ * bell then hangs beside the right thigh, and the mouthpiece points up and to the left, away from
+ * the face, as a real hornist rests the horn on the lap with the bell to the right
+ * (`docs/reference/wind-technique.md` 2.2).
+ */
+const HORN_REST_TURN = toQuat(
+  new Quaternion()
+    .setFromAxisAngle(Y_AXIS, -15 * MathUtils.DEG2RAD)
+    .multiply(new Quaternion().setFromAxisAngle(Z_AXIS, 9 * MathUtils.DEG2RAD)),
+);
+
+/**
  * The holds of the winds. In the rest pose, each instrument moves off the mouth, to the side and
  * a little forward, and tilts, so that the arms that hold it stay out of the body (design 5.3).
  */
@@ -516,17 +530,24 @@ export const WIND_HOLDS = {
     rest: holdTurn(-16, -1, holdTurn(30, 26)),
     restShift: [-0.17, -0.04, -0.02],
   },
-  // In the rest pose, the horn comes up out of the right thigh, so that the bell sits on it. The
-  // right elbow points down, also while the horn plays. It points a little further out than
-  // (0.5, -1, -0.5): with that elbow on the low seats, the right upper arm of the pig goes 0.031 H
-  // into the trunk in play (limit 0.02 H).
+  // The horn hold of each body (design 5.3): the horn of the accepted pig hornist (PIG_HORN), with
+  // the mouthpiece at the mouth. The coil stands in front of the right side of the chest, and the
+  // bell opens back and to the right, beside the right side of the belly (HORN_PLANE of
+  // models/instruments/brass.ts). The left paw lies on the valve levers. The right paw lies in the
+  // bell: it points more along the axis of the bell than the line from its shoulder (aimAcross
+  // below 0), and the back of the paw faces the axis (docs/reference/wind-technique.md 2.2). At
+  // rest, the horn comes down in front of the belly with its bell beside the right thigh
+  // (HORN_REST_TURN, restShift), and both paws keep their hold (restAim). The elbows point down.
   horn: {
     ...WOODWIND,
     poleR: [0.6, -1, -0.5],
     restPoleL: [-0.5, -1, -0.5],
     restPoleR: [0.5, -1, 0],
-    rest: holdTurn(23, -7),
-    restShift: [-0.16, 0.29, -0.1],
+    rest: HORN_REST_TURN,
+    restShift: [0.05, -0.45, -0.1],
+    faceTube: ['none', 'back'],
+    aimAcross: -1.5,
+    restAim: 1,
   },
   // Both shoulder bones turn forward, as the right shoulder of the monkey (MONKEY_TRUMPET) and
   // as the shoulder blades of a real player slide forward. With square shoulders, the paws of most recast
@@ -1056,93 +1077,45 @@ const BEAVER_BASSOON = {
   gripCurl: curls(110, 120),
 } as const satisfies WindHold;
 
-/** The turns of the horn of the pig around the mouthpiece, relative to the chest (design 5.3). */
-interface HornTurns {
-  /**
-   * The turn of the right side, with the bell, forward around the vertical, in degrees. A value
-   * below 0 turns the bell back.
-   */
-  readonly right: number;
-  /** The turn of the lower end back toward the body, after `right`, in degrees. */
-  readonly back: number;
-  /** The turn of the lower end to the left, after `back`, in degrees. */
-  readonly left: number;
-}
-
-/** The turns of the horn of the pig in the playing pose and in the rest pose. */
-const PIG_TURNS = {
-  /**
-   * The playing pose: the bell at the right of the torso, open to the back and to the right, and the
-   * coil in front of the round belly. With the bell 10° forward, it opened to the side and forward,
-   * and the right paw lay at its rim. With the bell 15° back, the right forearm entered the bell at
-   * 38° from its axis, and the long hoof went 12 cm deep, through the wall of the throat. With the
-   * lower end 10° to the left, the coil went 6 cm into the belly.
-   */
-  play: { right: -5, back: 30, left: 0 },
-  /** The rest pose: the horn lower and a little forward, in front of the belly over the lap. */
-  rest: { right: 0, back: 30, left: 15 },
-} as const satisfies Readonly<Record<'play' | 'rest', HornTurns>>;
-
-/**
- * Gives the rotation of the `instrument` bone of the horn of the pig from its turns.
- *
- * @param turns The turns of {@link PIG_TURNS}.
- * @returns The rotation, relative to the chest.
- */
-function pigTurn(turns: HornTurns): Quat {
-  return toQuat(
-    new Quaternion()
-      .setFromAxisAngle(Y_AXIS, turns.right * MathUtils.DEG2RAD)
-      .multiply(new Quaternion(...holdTurn(-turns.back, -turns.left))),
-  );
-}
-
 /**
  * The horn hold of the pig (design 5.3), the hold of a real hornist
  * (`docs/reference/wind-technique.md` 2.2): the left hoof on the valve levers at the middle of the
- * body, the right hoof in the mouth of the bell, and the horn across the body from the mouth to the
- * bell at the right of the torso. The mouthpiece rests on the lips under the snout disc
- * (`StudioBody.mouth`), and the snout puts it far in front of the shoulder joints. The horn turns
- * its lower end 30° back toward the body ({@link PIG_TURNS}), so that the coil stands in front of
- * the round belly, and its right side 5° back, so that the bell opens to the back and to the right,
- * past the right side of the body, as the bell of a real horn. The left shoulder turns 46° forward,
- * as the shoulder blade of a real player slides forward. The Tripo pig has the short arms of its
- * source: with the coil 20° back and the shoulder 36° forward, the left hoof missed the valves by
- * 2.3 cm.
+ * body, below the face, the right hoof in the bell, and the horn across the body from the mouth to
+ * the bell at the right of the torso. The mouthpiece rests on the lips under the snout disc
+ * (`StudioBody.mouth`). The snout puts the mouth 0.31 m in front of the shoulder joints and 0.2 m
+ * above them, and the arms of the Tripo pig are 0.3 m long. So the horn is the horn of
+ * {@link WIND_HOLDS}, whose form fits these arms (`HORN`, `HORN_PLANE` of
+ * `models/instruments/brass.ts`): the top of the coil is 7 cm below the mouth, at the height of the
+ * chin, and the bell opens back, to the right, and a little up at the height of the chest. A bell
+ * at the right thigh is out of the reach of the right arm.
  *
- * The hoof of the Tripo pig is 11.5 cm long and about 6 cm thick, and the bell narrows from a
- * radius of 13 cm at the rim to 9 cm at 5 cm in. With the palm on the grip of the horn, 2.5 cm in
- * the bell, the hoof went up to 12 cm deep, through the wall of the throat. So the right grip moves
- * 0.11 H along the line from the left grip to the right grip (`gripShiftR`), out of the bell, and
- * the right elbow points out to the side and a little up (`poleR`), so that the right forearm comes
- * down into the mouth of the bell at about 75° from its axis. The hoof then lies across the mouth,
- * inside the rim, and no hoof edge crosses the wall of the bell. At rest, the right grip also moves
- * 0.03 H toward the axis of the horn (`restGripShiftR`), for the same reason.
+ * The left shoulder turns 46° forward and the right shoulder 20° (`reachL`, `reach`), as the
+ * shoulder blades of a real player slide forward. The left hoof then reaches the levers with 7 cm
+ * to spare, and the right hoof the bell with 9 cm (`pnpm hold-fit hornist`). The left elbow points
+ * out and a little forward, and the right elbow out, back, and a little down, as a horn player
+ * keeps both arms away from the rib cage (`docs/reference/wind-technique.md` 2.2). The right
+ * forearm then goes into the bell at 30° from its axis.
  *
- * The left elbow points out and a little forward, and the right elbow out to the side, as a horn
- * player keeps both arms away from the rib cage (`docs/reference/wind-technique.md` 2.2). The rest
- * elbow of the left arm points higher, (-1, 0.6, -0.7), so that the left upper arm lies on the side
- * of the belly. At rest, the horn comes down 0.1 H and 0.1 H forward, in front of the round belly
- * over the lap, with its right side square to the chest and its lower end 15° to the left. With
- * the rest horn 0.2 H down and 0.25 H forward, both hooves missed it by about 8 cm. At rest, the
- * left grip moves 0.015 H toward the mouthpiece and 0.015 H away from the left shoulder
- * (`restGripShiftL`), and the right elbow points out and forward (`restPoleR`), so that the left
- * wrist and the right forearm stay off the horn. With the right rest elbow also down, the right
- * upper arm went 2.5 cm into the arm root, against 2.4 cm.
+ * The right hoof lies in the bell near its axis, with its tip about 8 cm in the bell, and 95% of
+ * its skin is in the bell (`HORN.palm`). It points 1.5 times more along the axis of the bell than
+ * the line from the shoulder (`aimAcross`): with that line, the hoof went 0.6 cm through the wall
+ * of the bell. The back of the hoof faces the axis (`faceTube`), so the hoof twists 16° on its
+ * forearm. With the palm to the axis, it twisted 166°.
+ *
+ * At rest, the horn comes down 0.45 H in front of the round belly, 0.1 H forward and 0.05 H to the
+ * right, with the turn of {@link HORN_REST_TURN}. The bell then hangs beside the right thigh, and
+ * the mouthpiece is below the chin. Both hooves keep their hold. The left rest elbow points out
+ * and up, (-1, 0.6, -0.7), so that the left upper arm lies on the side of the belly: with a lower
+ * elbow, the upper arm went 1.7 cm into the shoulder (limit 1.5 cm).
  */
 const PIG_HORN = {
   ...WIND_HOLDS.horn,
+  reach: 20 * MathUtils.DEG2RAD,
   reachL: 46 * MathUtils.DEG2RAD,
-  play: pigTurn(PIG_TURNS.play),
   poleL: [-1, 0.05, -0.5],
-  poleR: [1, 0.25, 0],
-  rest: pigTurn(PIG_TURNS.rest),
-  restShift: [0.05, -0.1, -0.1],
+  poleR: [1, -0.3, 0.4],
   restPoleL: [-1, 0.6, -0.7],
-  restPoleR: [1, 0, -0.6],
-  gripShiftR: [0.11, 0, 0],
-  restGripShiftL: [-0.015, 0, 0.015],
-  restGripShiftR: [0.11, 0.03, 0],
+  restPoleR: [1, -0.3, 0.4],
 } as const satisfies WindHold;
 
 /**

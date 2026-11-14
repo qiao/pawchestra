@@ -119,10 +119,26 @@ function mouthpiece(piece: PieceBuilder, along: Vec3, rim: number, length: numbe
 }
 
 /**
+ * One step of the flare of a bell: the share of the widening from the throat to the rim, and the
+ * share of the length of the flare at which the bell has it.
+ */
+type BellStep = readonly [widening: number, length: number];
+
+/**
+ * The flare of the bell of the trumpet and the trombone ({@link bell}). The last tenth of the
+ * flare keeps the width of the simple model.
+ */
+const BELL_FLARE: readonly BellStep[] = [
+  [0, 0],
+  [0.15, 0.5],
+  [0.35, 0.75],
+  [0.66, 0.9],
+  [1, 1],
+];
+
+/**
  * Adds a bell that opens along an axis: a flare that widens more and more toward the rim, as the
- * bell of a real brass instrument, with the lit inside of the flare. The last tenth of the flare
- * keeps the width of the simple model, because a narrower flare there put the right forearm of
- * the pig 0.2 cm deeper into the rim of the horn.
+ * bell of a real brass instrument, with the lit inside of the flare.
  *
  * @param piece The piece.
  * @param mouth The middle of the opening of the bell.
@@ -131,6 +147,7 @@ function mouthpiece(piece: PieceBuilder, along: Vec3, rim: number, length: numbe
  * @param depth The length of the flare.
  * @param throat The radius at the start of the flare.
  * @param segments The number of faces around the axis.
+ * @param flare The steps of the flare from the throat to the rim. {@link BELL_FLARE} by default.
  * @returns The target at the middle of the opening.
  */
 function bell(
@@ -141,6 +158,7 @@ function bell(
   depth: number,
   throat: number,
   segments: number,
+  flare: readonly BellStep[] = BELL_FLARE,
 ): PlayTarget {
   const n = new Vector3(...axis).normalize();
   const normal = toVec3(n);
@@ -150,11 +168,10 @@ function bell(
     toVec3(new Vector3(...mouth).addScaledVector(n, -depth)),
     normal,
     [
-      [throat, 0],
-      [throat + spread * 0.15, depth * 0.5],
-      [throat + spread * 0.35, depth * 0.75],
-      [throat + spread * 0.66, depth * 0.9],
-      [radius, depth],
+      ...flare.map(([widening, length]): ProfilePoint => [
+        throat + spread * widening,
+        depth * length,
+      ]),
       // The rim turns back into the bell, so that the opening shows the lit inside of the
       // flare, as the bells of the polished images.
       ...openBell(radius, depth),
@@ -579,10 +596,9 @@ function trombone(scale: number): BrassBuild {
 }
 
 /**
- * The turn of the horn around the mouthpiece: its lower end 12° forward and 12° to the right.
- * With no turn, the coil and the bell went 0.17 H into the right thigh of the pig. With 10° and
- * 10°, the bell went 0.045 H into the right shin. A larger forward turn put the left upper arm of
- * a standing horn soloist into its torso in the rest pose.
+ * The turn of the horn around the mouthpiece: its lower end 12° forward and 12° to the right. The
+ * space of the horn in the layout (`hornSpace()` of `wind-space.ts`) has this turn, so that no
+ * seat moves.
  */
 const HORN_TURN = toQuat(
   new Quaternion()
@@ -591,134 +607,176 @@ const HORN_TURN = toQuat(
 );
 
 /**
- * The depth of the middle of the right palm inside the opening of the horn bell, on its axis, in
- * meters. The right paw of the pig points along the line from the shoulder to the palm, about 86°
- * from the axis of the bell. At 6 cm, the wrist goes up to 2.3 cm through the wall of the bell in
- * each sample. At 2.5 cm, no point of the paw or of the forearm goes through the wall, and 92% of
- * the paw vertices are in the bell.
+ * The form of the horn in the axes of its coil, in meters and degrees ({@link horn}). The coil
+ * lies in the plane z = 0 around the origin. In the hold, +x points to the right of the player,
+ * +y up, and +z to the player. An angle on the coil starts at +x and grows toward +y, and the
+ * tube goes from the mouthpiece to the bell in this direction.
  */
-const HORN_PALM_DEPTH = 0.025;
+const HORN = {
+  /**
+   * The middle of the rim of the mouthpiece. The mouthpiece and the lead pipe lie on the tangent
+   * from this point to the hoop, and the lead pipe then follows the hoop. The rim is 0.17 m from
+   * the hoop. With the coil 0.3 m below the mouth, the straight lead pipe looked like a drinking
+   * straw.
+   */
+  mouth: [-0.043, 0.207],
+  /** The angle at which the lead pipe leaves the hoop and goes to the first valve. */
+  leadEnd: 300,
+  /** The distance of the lead pipe from the plane of the coil, on the side of the player. */
+  leadOut: 0.016,
+  /** The angle at which the bell tail leaves the coil. The bell opens along its tangent. */
+  exit: 283,
+  /**
+   * The distance of the bell tail from the middle of the coil at the exit. The tail widens the
+   * last part of the outer hoop, as the bell branch of a real horn lies outside its coil.
+   */
+  tail: 0.19,
+  /** The middle of the row of the four valves. */
+  valves: [0.04, 0.05],
+  /** The step from one valve to the next. */
+  valveStep: [0.02, -0.014],
+  /** The move from the middle of the valves to the middle of the lever tips, with its z. */
+  lever: [0.028, 0.03, 0.03],
+  /** The distance of the left palm from the plane of the coil, on the levers. */
+  palmOut: 0.05,
+  /**
+   * The move from the middle of the opening of the bell to the right palm: 1.2 cm into the bell,
+   * and 2 cm from its axis toward the wall that is next to the right shoulder of the player. The
+   * hoof of the pig is 11.5 cm long and thick, so it fits the bell only near its axis. With the
+   * palm 4 cm in the bell, the hoof went 0.8 cm through the wall, and with the palm 3.5 cm from
+   * the axis, 0.7 cm.
+   */
+  palm: [-0.015, 0.012, 0.013],
+} as const;
+
+/**
+ * The turn of the coil of the horn from its axes ({@link HORN}) to the axes of the player, less the
+ * turn of the hold ({@link HORN_TURN}). The coil stands in front of the right side of the chest,
+ * across the body: its side with the levers faces the player, back, to the left, and down. The
+ * bell then opens back, to the right, and a little up, beside the right side of the belly. The
+ * place fits the pig hornist, whose mouth lies 0.31 m in front of its shoulder joints
+ * (`PIG_HORN` of `pose/winds.ts`).
+ */
+const HORN_PLANE = pointing([0.733, -0.008, 0.681], [-0.111, 0.985, 0.131]);
+
+/**
+ * The flare of the bell of the horn ({@link bell}): a wider throat than the bells of the trumpet
+ * and the trombone, as the throat of a real horn takes the right hand. The radius is 7.3 cm at
+ * 5 cm from the rim, and 5.4 cm at 10 cm.
+ */
+const HORN_FLARE: readonly BellStep[] = [
+  [0, 0],
+  [0.25, 0.5],
+  [0.44, 0.75],
+  [0.68, 0.9],
+  [1, 1],
+];
+
+/** The radius of the throat of the bell of the horn, at the start of its flare, in meters. */
+const HORN_THROAT = 0.028;
 
 /**
  * Builds the horn, as a double horn such as a Conn 8D (`docs/reference/wind-technique.md` 6.1).
- * The mouthpiece is at the origin, and the horn has the axes of the player: the coil stands in
- * front of the right side of the chest, and the bell opens to the right and to the back, above
- * the right thigh. The hold turns it by {@link HORN_TURN}.
+ * The mouthpiece is at the origin. The parts lie in the axes of the coil ({@link HORN}), and
+ * {@link HORN_PLANE} turns them into the axes of the piece. The hold turns the piece by
+ * {@link HORN_TURN}.
  *
- * The parts: the lead pipe from the mouthpiece to the valves, four rotary valves with their caps
- * and the levers of the left fingers, the two inner loops of the F side and the B♭ side, the
- * valve slides, and the outer hoop, which widens into the bell tail and the bell.
+ * The parts: the mouthpiece and the lead pipe, which goes along the tangent to the hoop and then
+ * around the hoop to the valves, four rotary valves with their caps and the levers of the left
+ * fingers, the two inner loops of the F side and the B♭ side, the valve slides, and the outer
+ * hoop, which widens into the bell tail and the bell.
+ *
+ * The left palm lies on the levers, on the side of the coil that faces the player, and the line of
+ * the lever tips is the tube of the left paw (`InstrumentGrips.tubeL`). The right palm lies in the
+ * bell near its axis, and the axis of the bell is the tube of the right paw, so that the paw can
+ * lie along the bell with one side to its wall, as the right hand of a real player
+ * (`docs/reference/wind-technique.md` 2.2).
  *
  * @returns The parts and the play data.
  */
 function horn(): BrassBuild {
   const h = BRASS.horn;
+  const f = HORN;
   const piece = new PieceBuilder();
-  const into = new Vector3(0.25, -0.35, -1).normalize();
-  mouthpiece(piece, toVec3(into), 0.009, 0.065);
-  // The coil leans back 20° from the vertical, with its middle low, 0.08 m at the right of the
-  // mouth, and 0.1 m in front of it. With the coil 0.24 m in front of the mouth, the left palm on
-  // the valves is 1.16 times the reach of the arm.
-  const center = new Vector3(0.08, -0.3, -0.1);
-  const lean = new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), -20 * MathUtils.DEG2RAD);
+  const plane = new Quaternion(...HORN_PLANE);
+  const mouth = new Vector3(f.mouth[0], f.mouth[1], 0);
+  // A point and a direction of the coil in the axes of the piece.
+  const at = (x: number, y: number, z = 0): Vec3 =>
+    toVec3(new Vector3(x, y, z).sub(mouth).applyQuaternion(plane));
+  const along = (x: number, y: number, z = 0): Vector3 =>
+    new Vector3(x, y, z).applyQuaternion(plane).normalize();
   const ring = (angle: number, r: number, out = 0): Vec3 =>
-    toVec3(
-      new Vector3(r * Math.cos(angle), r * Math.sin(angle), out).applyQuaternion(lean).add(center),
-    );
-  const normal = toVec3(new Vector3(0, 0, 1).applyQuaternion(lean));
-  // The bell leaves the coil at its bottom right, and opens to the right and to the back.
-  const bellAxis = new Vector3(0.75, -0.25, 0.6).normalize();
-  const bellAngle = -Math.PI * 0.35;
-  const bellStart = ring(bellAngle, h.coilRadius);
-  // The outer hoop: one turn that widens from the valves into the bell tail.
-  const hoop: Vec3[] = [];
-  const radii: number[] = [];
-  const turnSteps = 22;
-  for (let i = 0; i <= turnSteps; i++) {
-    const share = i / turnSteps;
-    hoop.push(ring(bellAngle + 2 * Math.PI * (1 - share), h.coilRadius * (0.9 + 0.1 * share)));
-    radii.push(0.0065 + 0.0075 * share * share);
-  }
-  tubeAlong(piece, hoop, radii, TUBE_SEGMENTS, METAL);
+    at(r * Math.cos(angle), r * Math.sin(angle), out);
+  // The lead pipe meets the hoop where the tangent from the mouth touches it.
+  const join = Math.atan2(mouth.y, mouth.x) + Math.acos(h.coilRadius / mouth.length());
+  const into = new Vector3(-Math.sin(join), Math.cos(join), 0);
+  mouthpiece(piece, toVec3(along(into.x, into.y)), 0.009, 0.065);
   // The four rotary valves in a row, each a short casing across the coil with a cap of nickel
-  // silver, and the lever of a left finger, which reaches toward the lead pipe.
-  const step = new Vector3(0.024, -0.012, 0).applyQuaternion(lean);
-  const valve = (i: number): Vector3 =>
-    new Vector3(...ring(Math.PI * 0.85, h.coilRadius * 0.55)).addScaledVector(step, i - 1);
-  const across = new Vector3(...normal);
-  const leverTip = new Vector3(...ring(Math.PI * 0.93, h.coilRadius * 0.86, 0.022));
+  // silver on the side of the player, and the lever of a left finger.
+  const valve = (i: number, z = 0): Vec3 =>
+    at(f.valves[0] + f.valveStep[0] * (i - 1.5), f.valves[1] + f.valveStep[1] * (i - 1.5), z);
+  const leverTip = (i: number): Vec3 =>
+    at(
+      f.valves[0] + f.lever[0] + f.valveStep[0] * (i - 1.5) * 0.6,
+      f.valves[1] + f.lever[1] + f.valveStep[1] * (i - 1.5) * 0.6,
+      f.lever[2],
+    );
   for (let i = 0; i < 4; i++) {
-    const at = valve(i);
-    piece.rod(
-      toVec3(at.clone().addScaledVector(across, -0.02)),
-      toVec3(at.clone().addScaledVector(across, 0.02)),
-      0.0105,
-      TUBE_SEGMENTS,
-      METAL,
-      'metal',
-    );
-    const cap = at.clone().addScaledVector(across, 0.02);
-    piece.rod(
-      toVec3(cap),
-      toVec3(cap.clone().addScaledVector(across, 0.004)),
-      0.0115,
-      TUBE_SEGMENTS,
-      TRIM,
-      'metal',
-    );
-    const tip = leverTip.clone().addScaledVector(step, i * 0.45);
-    piece.bar(toVec3(cap), toVec3(tip), 0.004, 0.0025, TRIM, 'metal');
+    piece.rod(valve(i, -0.02), valve(i, 0.02), 0.0105, TUBE_SEGMENTS, METAL, 'metal');
+    piece.rod(valve(i, 0.02), valve(i, 0.024), 0.0115, TUBE_SEGMENTS, TRIM, 'metal');
+    piece.bar(valve(i, 0.024), leverTip(i), 0.004, 0.0025, TRIM, 'metal');
   }
+  // The lead pipe: from the mouthpiece along the tangent to the hoop, around the hoop beside the
+  // outer hoop, and in to the first valve. It widens from the mouthpiece to the valve.
+  const leadEnd = f.leadEnd * MathUtils.DEG2RAD;
+  const leadSteps = 14;
+  const lead: Vec3[] = [at(mouth.x + into.x * 0.06, mouth.y + into.y * 0.06)];
+  for (let i = 0; i <= leadSteps; i++) {
+    lead.push(ring(join + ((leadEnd - join) * i) / leadSteps, h.coilRadius, f.leadOut));
+  }
+  lead.push(ring(leadEnd + 0.3, h.coilRadius * 0.86, f.leadOut), valve(0, f.leadOut));
+  tubeAlong(
+    piece,
+    lead,
+    lead.map((_, i) => 0.0055 + (0.0025 * i) / (lead.length - 1)),
+    TUBE_SEGMENTS,
+    METAL,
+  );
   // The two inner loops of the double horn, the F side and the B♭ side: each leaves one valve,
   // goes around inside the hoop, and comes back to another valve.
-  const inPlane = (x: number): Vec3 => toVec3(new Vector3(x, 0, 0).applyQuaternion(lean));
-  const coilU = inPlane(1);
-  const coilV = toVec3(new Vector3(0, 1, 0).applyQuaternion(lean));
+  const center = at(0, 0);
+  const coilU = toVec3(along(1, 0));
+  const coilV = toVec3(along(0, 1));
   for (const [r, from, to, first, last] of [
-    [0.1, 0.35, -1.1, 3, 0],
-    [0.076, 0.2, -1.0, 2, 1],
+    [0.1, 100, 380, 0, 3],
+    [0.076, 115, 365, 1, 2],
   ] as const) {
     tubeAlong(
       piece,
       [
-        toVec3(valve(first)),
-        ...arc(toVec3(center), coilU, coilV, r, from * Math.PI, to * Math.PI, 12),
-        toVec3(valve(last)),
+        valve(first),
+        ...arc(center, coilU, coilV, r, from * MathUtils.DEG2RAD, to * MathUtils.DEG2RAD, 14),
+        valve(last),
       ],
       [0.006],
       TUBE_SEGMENTS,
       METAL,
     );
   }
-  // The lead pipe from the mouthpiece to the first valve, and the valve slides that rise from
-  // the valves behind the loops.
-  tubeAlong(
-    piece,
-    rounded(
-      [
-        toVec3(into.clone().multiplyScalar(0.06)),
-        ring(Math.PI * 0.62, h.coilRadius * 0.95),
-        ring(Math.PI * 0.8, h.coilRadius * 0.72),
-        toVec3(valve(0)),
-      ],
-      0.04,
-      2,
-    ),
-    [0.0042, 0.0046, 0.005, 0.0052, 0.0054, 0.0056, 0.0058, 0.006],
-    TUBE_SEGMENTS,
-    METAL,
-  );
-  const up = new Vector3(...coilV);
-  const out = new Vector3(...coilU);
+  // The valve slides rise from the valves on the far side of the loops.
   for (let i = 1; i < 4; i++) {
-    const at = valve(i).addScaledVector(across, -0.012);
+    const x = f.valves[0] + f.valveStep[0] * (i - 1.5);
+    const y = f.valves[1] + f.valveStep[1] * (i - 1.5);
     const reach = 0.035 + 0.012 * i;
-    const point = (rise: number, side: number): Vec3 =>
-      toVec3(at.clone().addScaledVector(up, rise).addScaledVector(out, side));
     tubeAlong(
       piece,
       rounded(
-        [point(0, -0.006), point(reach, -0.006), point(reach, 0.012), point(0, 0.012)],
+        [
+          at(x - 0.006, y, -0.012),
+          at(x - 0.006, y + reach, -0.012),
+          at(x + 0.012, y + reach, -0.012),
+          at(x + 0.012, y, -0.012),
+        ],
         0.008,
         1,
       ),
@@ -727,23 +785,47 @@ function horn(): BrassBuild {
       METAL,
     );
   }
+  // The outer hoop: one turn that widens into the bell tail, which leaves the coil at the exit.
+  const exit = f.exit * MathUtils.DEG2RAD;
+  const hoop: Vec3[] = [];
+  const radii: number[] = [];
+  const turnSteps = 26;
+  for (let i = 0; i <= turnSteps; i++) {
+    const share = i / turnSteps;
+    const out = MathUtils.smoothstep(share, 0.55, 1);
+    hoop.push(
+      ring(
+        exit - 2 * Math.PI * (1 - share),
+        h.coilRadius * (0.9 + 0.1 * Math.min(1, share / 0.55)) + (f.tail - h.coilRadius) * out,
+      ),
+    );
+    radii.push(0.0065 + (HORN_THROAT - 0.0065) * share * share);
+  }
+  tubeAlong(piece, hoop, radii, TUBE_SEGMENTS, METAL);
+  const bellAxis = along(-Math.sin(exit), Math.cos(exit));
   const bellTarget = bell(
     piece,
-    toVec3(new Vector3(...bellStart).addScaledVector(bellAxis, 0.2)),
+    toVec3(new Vector3(...ring(exit, f.tail)).addScaledVector(bellAxis, 0.2)),
     toVec3(bellAxis),
     h.bellRadius,
     0.2,
-    0.014,
+    HORN_THROAT,
     BELL_SEGMENTS,
+    HORN_FLARE,
   );
   hornSpace(piece, h.coilRadius, h.bellRadius);
   return {
     pieces: [piece.build('instrument', hold('mouth', [0, 0, 0], HORN_TURN))],
-    // The left palm holds the coil at 0.9 of a half turn and 0.8 of its radius. At 0.8 and 0.6,
-    // the palm is 0.98 of the arm length of the pig with the turn of the horn.
-    palmL: ring(Math.PI * 0.9, h.coilRadius * 0.8),
-    palmR: toVec3(new Vector3(...bellTarget.from).addScaledVector(bellAxis, -HORN_PALM_DEPTH)),
-    tubes: {},
+    palmL: at(f.valves[0] + f.lever[0], f.valves[1] + f.lever[1], f.palmOut),
+    palmR: toVec3(
+      new Vector3(...f.palm).applyQuaternion(plane).add(new Vector3(...bellTarget.from)),
+    ),
+    tubes: {
+      // The left fingers lie on the tips of the levers of the first three valves.
+      tubeL: { bone: 'instrument', from: leverTip(0), to: leverTip(2) },
+      // The right paw lies in the bell, along its axis.
+      tubeR: { bone: 'instrument', from: ring(exit, f.tail), to: bellTarget.from },
+    },
     targets: [bellTarget],
   };
 }
