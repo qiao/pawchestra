@@ -682,8 +682,8 @@ const SHAFT = 0.0055;
  *
  * @param head The radius of the head.
  * @param headColor The color of the head.
- * @param headFinish The finish of the head: `felt` for felt and yarn, so that the head shades
- *   round.
+ * @param headFinish The finish of the head: `felt` for felt and yarn, and `varnish` for hard
+ *   rubber. Both have smooth normals, so that the head shades round.
  * @param segments The faces around the axis of the head. The head has half as many rings, at
  *   least 4.
  * @returns The look.
@@ -2488,7 +2488,7 @@ export function buildXylophone(): InstrumentModel {
     tilt,
     spot: x.malletSpot,
     butt: MALLET_BUTT,
-    look: roundMallet(x.head, INSTRUMENT_COLORS.malletRubber, 'matte'),
+    look: roundMallet(x.head, INSTRUMENT_COLORS.malletRubber, 'varnish'),
     space: x.head,
   });
   const instrument = piece.build('instrument', hold('floor'));
