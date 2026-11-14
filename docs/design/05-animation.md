@@ -285,12 +285,10 @@ The rest of each family:
   one rigid object (`carryLift()`), and the bow tip turns through the front (`BowVia`). The
   instrument turns the short way from the rest to the play: the scroll stays up, and the body
   swings in and up to the jaw. The elbow in the middle of the move (`BowedHold.liftPoleL`) sets
-  the way, because the paw supinates on the arm, and the frame of the arm turns with the elbow. On
-  the cat, the elbow points up, back, and a little in, and the viola leads on a via
-  (`BowedHold.carryVia`): it turns near a middle turn with the scroll up and to the left and the
-  strings to the front, and the paw follows it by its grip. Reason: when the viola hung from the
-  paw, the supination took it up to 69° off the short arc, with the strings down. An elbow out
-  and down keeps the forearm off the viola, but the paw then twists past 180° on its forearm.
+  the way, because the paw supinates on the arm, and the frame of the arm turns with the elbow. An
+  instrument can lead on a via (`BowedHold.carryVia`): it turns near a middle turn, and the paw
+  follows it by its grip. No hold has a via. Reason: the viola of the cat rests in front of the
+  chest, so its way to the jaw is short, and with a via, its paw twisted past 180° on its forearm.
   `pnpm carry-check` gives the detour of each move from the short arc. A
   standing player hangs the bow with the tip down (`HANGING_BOW`). In the shared violin hold and
   the hold of the rabbit, the arms at rest hang out to the sides until they clear the body, with a forward swing and an elbow
@@ -306,11 +304,12 @@ The rest of each family:
   the frog (strings 2.9). A tip only a little out stood in front of the cheek, and a tip that
   turned up through the front crossed the right eye in the front view. The paw grips the stick across the palm, so the stick rises from the thumb
   side of the closed paw, and a tip down twists the forearm. The hair of the rest bow faces the
-  front and in, so that the bow turns little from the rest to the move and the paw does not flip. The cat rests the instrument upright on the left thigh, with the elbows near
-  the sides, as a seated violinist does. The cat rests the viola at the outer side
-  of the left thigh. Reason: with the viola on the top of the thigh, the elbow had to point out to
-  clear the round belly, and the left upper arm then turned far about its axis from the bind and
-  read as bent. The rest grip of a carried instrument lies in the reach of the left arm, because
+  front and in, so that the bow turns little from the rest to the move and the paw does not flip. The cat stands the viola on the top of the left thigh, leaned a little forward, and
+  holds its neck in front of the chest with the elbow bent near the side (`CAT_HOLD.rest`,
+  `restPoleL`), as a seated violinist does. Its top plate faces the front and to the left, so that
+  the viola turns near the short arc in a move. Reason: at the outer side of the thigh, the viola
+  hung from the paw beside the hip, with its lower end below the top of the thigh, and the left
+  arm went straight to the front in the middle of each move. The rest grip of a carried instrument lies in the reach of the left arm, because
   the instrument hangs from the solved paw from the first frame of a move: a grip out of reach
   makes the instrument jump into the paw. Thus the red fox stands the violin near the hip, and
   rests the bow upright beside the right thigh at the reach of its short arm. Its rest grip also

@@ -465,9 +465,8 @@ The app follows these facts:
 - **The seated rest and the lift (2.9).** The instrument stands upright on the left thigh, and the
   left paw holds the neck. In the lift, the instrument turns with the paw the short way: the
   scroll stays up, and the body swings in and up to the jaw (`carryLift()`,
-  `BowedHold.liftPoleL`). The viola of the cat leads on a via, and the paw follows it
-  (`BowedHold.carryVia`): the scroll swings up and to the left with the strings to the front,
-  then the top plate turns up to the jaw. Thus the strings never point to the floor.
+  `BowedHold.liftPoleL`). The viola of the cat stands on the thigh in front of the chest, so its
+  way to the jaw is short, and the left elbow keeps a bend on the way.
 
 The app does not follow these facts:
 
@@ -555,10 +554,10 @@ The app follows these facts:
   the lap with the left elbow near the side. Its right paw rests at the top of the right thigh near
   the hip and holds the bow at the frog in a closed paw, with the tip up, out, and
   forward, away from the music desk and the face (`RABBIT_HOLD`, [86]). In a move, its bow tip
-  turns out to the right, so that the bow does not cross the eyes. The cat rests the viola nearer
-  to the hip and at the outer side of the thigh, so that its shorter arm bends with the elbow near
-  the side and the upper arm keeps near the turn of its bind, and closes its paw around the neck,
-  a little off it, so that the thick wrist stays out of the viola.
+  turns out to the right, so that the bow does not cross the eyes. The cat stands the viola on the
+  top of the left thigh, leaned a little forward, so that its short arm holds the neck in front of
+  the chest with the elbow bent near the side (`CAT_HOLD.rest`), and closes its paw around the
+  neck, a little off it, so that the thick wrist stays out of the viola.
   The red fox stands its violin near the hip, so that its short left arm reaches the rest grip,
   and holds the bow upright beside the right thigh with the upper arm near the side (`FOX_HOLD`).
   Its left elbow bends near the side, the forearm is about level, and the paw holds the neck from
@@ -629,8 +628,8 @@ The app does not follow these facts:
 - **The top plate at rest (2.9).** No source gives its side in the seated rest. The top plate of
   the violin faces the front. The red fox turns it a little to the right, so that its left paw
   holds the neck with a straight wrist and little twist on the forearm. The top plate of the viola
-  faces the front and a little to the left,
-  because with the top to the front the bow paw of the cat turns too fast in a lowering. The bow
+  faces the front and about 50° to the left, so that the viola turns near the short arc in a
+  move, and the bow paw twists little on its forearm. The bow
   paw rests low at the front of the lap or the lower belly, with the elbow hanging and a straight
   wrist.
 - **The bow at rest (2.9).** The source gives the bow up with a fist around the frog [86], and
