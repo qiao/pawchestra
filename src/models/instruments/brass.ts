@@ -1101,12 +1101,20 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
       METAL,
     );
   }
-  // The lead pipe from the last valve over the main tuning slide to the end of the mouthpiece
-  // shank. Its bend stays 0.13 m in front of the rim, so that the pipe passes in front of the chin.
+  // The lead pipe from the front of the first valve casing, below its top, up over the main
+  // tuning slide to the end of the mouthpiece shank. Its bend stays 0.13 m in front of the rim, so
+  // that the pipe passes in front of the chin. It started 2.5 cm above the top of the last
+  // casing, around the finger button.
+  const front = v.z[0];
   tubeAlong(
     piece,
     rounded(
-      [at([0.1, 0.5, 0.045]), at([0.1, 0.65 - back / 4, 0.07 - back]), [0, 0, -0.09]],
+      [
+        at([v.x, v.top - 0.02, front]),
+        at([v.x, v.top + 0.015, front - 0.035]),
+        at([v.x, 0.65 - back / 4, 0.07 - back]),
+        [0, 0, -0.09],
+      ],
       0.08,
       4,
     ),

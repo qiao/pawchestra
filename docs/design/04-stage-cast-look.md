@@ -2175,7 +2175,8 @@ A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded
   at the right of the valves. Reason: with only short slides at the right, the tuba read as a cone
   and a bow, as a large saxophone. The lead pipe
   starts at the end of the mouthpiece shank and goes down in front of the chin, so that no part of
-  it goes into the face.
+  it goes into the face. It goes into the front of the first valve casing below its top, so that
+  it stays off the finger buttons.
 
 The mouthpieces, the ferrules, the valve caps, the levers, and the garland of the tuba are nickel
 silver, as on the real instruments. The points that the holds read stay: the mouth, the grips, the grip tubes, the bell
