@@ -1080,6 +1080,19 @@ scene of each demo has its seats and stage size with no overlap.
 
 ## Step 5. Motion (5, 4.7, 9.7)
 
+- [ ] Bowed strings (5.3): a crossing of one string still moves the bow paw 5 cm to 7 cm in one
+      frame at 60 frames each second (red fox `mozart-k191` 58.97 s, cat `boulanger-matin`
+      203.52 s), as before the least time of each string step. The red fox paw moves about 23 cm
+      for one string step with a bow turn of 9°, and its elbow follows. A normal stroke moves the
+      paw at most 1 cm to 4 cm. Choose: a longer `BOW_MOTION.crossSec` (all crossings, also in the
+      slow passages), or a hold whose bow arm moves less for each string.
+- [ ] Bowed strings (5.3): with the least time of each string step, a skip of two or three
+      strings leaves the string of the note before earlier. The bow is off the string of a note of
+      0.15 s to 0.3 s for up to 24% of its time (up to 13% before). The contrabass skips three
+      strings in `beethoven-9` at 86.07 s and crosses for the whole note of 0.23 s.
+- [ ] Bowed strings (5.3): the change between the bow and pizzicato moves the bow paw up to 19 cm
+      in one frame (red fox `boulanger-matin` 175.50 s, cat 33.97 s), and the dog cellist paw
+      jumps 13 cm in a pluck at 87.15 s.
 - [ ] Dog cellist: the scroll of the cello touches the left ear (pose audit 3, row 15). Move the
       cello, and keep the reached bow hair (0.22 m of 0.46 m, `bowRangeOf()`).
 - [ ] Dog cellist: the bow plays only the upper half of the hair (0.215 m to 0.433 m). A right
