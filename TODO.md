@@ -409,12 +409,9 @@ passes.
       ring B keep UV scale ratios of 2.2 to 4.1 (about 1.2 around them). The join of the paw
       turned by 3 steps and the `turnFit` fade stretch them. Check them in 2x crops, and try a
       longer fade.
-- [ ] Cat violist: with the viola on its via (`carryVia`), the left forearm goes 2.3 cm (lift) and
-      2.1 cm (lowering) into the back of the viola near the rest, in 16% and 17% of the samples
-      (1.6 cm and 1.5 cm when the viola hung from the paw, limit 1.5 cm, `pnpm body-clip
-      violist`). An elbow out, (-1, -0.5, 0), keeps it at 1.2 cm, but the paw then twists past 180°
-      on its forearm in a lowering of `mozart-k525`. The left arm gate folds 43 faces at rest (the
-      curled rest paw).
+- [ ] Cat violist: in the lift and the lowering, the left forearm goes 2.4 cm into the back of
+      the viola (limit 1.5 cm, `pnpm hold-fit violist --sets rest,lift,lower`). The left arm gate
+      folds 43 faces at rest (the curled rest paw).
 - [ ] Rabbit violinist: the left forearm goes 2.3 cm into the back of the violin in 80% of the
       play and 63% of the lowering (limit 1.4 cm, `pnpm body-clip violinist`). No place, elbow,
       tilt, gap, or turn of the violin changes it, and a violin of 0.8 lowers it only to 2.0 cm.
@@ -1044,11 +1041,6 @@ passes.
 - [ ] Shared cello hold: the recast cellists take the new via of the rest bow
       (`LAP_CELLO_BOW.via`, the tip up and to the left). Check the lift of the recast cells
       (`pnpm cast-matrix --roles cellist`, report only).
-- [ ] Tripo cat violist: the left arm twists 55° in the lift (target 45°), the left paw swings
-      72° at rest (limit 70), and the play grip turn is 64°. Each elbow that cut the swing turned
-      the viola off its short arc. Lift elbows (`liftPoleL`, arm-check twist p95 / carry-check
-      detour, base 55° / 36°): (0.6, 0.7, 0.5) 54° / 45°, (0.6, 0.4, 0.5) 48° / 58°,
-      (0.6, 0.4, 0.3) 59° / 43°, (0.6, 0.2, 0.5) 38° / 63°, each with 0 opposed steps.
 - [ ] Tripo red fox violinist: with the lower, left violin of the head turn, a paw goes up to
       1.6 cm into the violin in the lowering (1.3 % of the samples of the fox with four-digit
       paws, limit 1.5 cm). The rest bow via (`restBow.via.reach`) and the violin path
@@ -1088,9 +1080,27 @@ scene of each demo has its seats and stage size with no overlap.
       edge.
 - [ ] Dog: a soft star dent shows on the chest below the right arm root from the right side, and a
       thin dark line at the right root from az150 at rest. Try a fair of the body caps.
-- [ ] Cat violist: the left elbow up in the middle of the lift (`liftPoleL`, 5.2) rolls the left
-      upper arm, and its skin twists 60° in the lift (p95, limit 55, 19° with the elbow out,
-      `pnpm arm-check violist`). Each elbow that turns the viola the short way twists 60° to 64°.
+- [ ] Cat violist moves (5.2): the viola hangs from the left paw with no via, and its tail end
+      swings out to the left around the paw before it comes to the collarbone (25° off the short
+      arc, `pnpm carry-check violist`). A real player swings the tail end in toward the chest.
+      With that way (`carryVia`), the left paw twists past 180° on its forearm with each lift
+      elbow. Tries: a rest with the strings toward the player (the way in, but the back of the
+      viola faces the hall, and the rest paw swings 111° on the wrist), or a bind of the left paw
+      nearer to the rest grip.
+- [ ] Cat violist (5.3): with the viola on the left collarbone, the left paw stops the strings
+      only from 0.54 of the fingerboard (0.20 before), and the bow arm reaches across the chest:
+      the right paw swings 44° on the wrist in the play (28° before, limit 70, `pnpm arm-check
+      violist`), 11 faces of the right arm fold near the play of `bach-bwv1048` (9 before, limit
+      8), and a face folds in 82% of the play samples of `mozart-k525` (75% before, `pnpm
+      hold-fit violist`). A smaller viola (`violaScale`) is the next try.
+- [ ] Cat and red fox faces from the stage camera (4.5): the head lift of the cat (12°, play and
+      rest) shows the eyes from 40° above the floor. The lids of the cat did not change, and the
+      red fox has no rest lift (`BowedHold.restHeadLift`): check its face at 40° in the app.
+- [ ] `BowedHold.carryVia` and `viaTurn()` of `pose/bowed.ts` have no hold that uses them. Remove
+      them, or use them for the way in of the cat viola.
+- [ ] Rabbit violinist: the bow plays 0.17 m of the hair of 0.46 m (37%). A slant of 15° gives
+      0.20 m, but the stick goes 2.0 cm into the fur of the left cheek. Its violin 2 cm further
+      left on the collarbone, as on the cat, is the next try.
 - [ ] `pnpm pose-depth violist` stops on the working tree and on c03179672: the bones of the cat
       have 20 open loops, and the caller expects 25.
 - [ ] Cat violist: in the 5th position, the left wrist under the neck keeps a twisted band.
