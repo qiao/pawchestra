@@ -1493,9 +1493,9 @@ const DOG_HOLD = {
  * wrist, and the round belly stands 0.39 m in front of the shoulder joints.
  *
  * The place of the contrabass comes from the body (`fit`, `fitCelloPlace()`). The end pin stands
- * on the floor in front of the hippo, 0.3 H left of the middle. The contrabass leans 24° back and
- * 12° to the left, its top plate turns 8° to the right, and it moves back until the middle line
- * of its back stands 0.22 H in front of the belly. Then the lower bout rests against the left
+ * on the floor in front of the hippo, 0.26 H left of the middle. The contrabass leans 24° back and
+ * 12° to the left, its top plate turns 16° to the right, and it moves back until the middle line
+ * of its back stands 0.23 H in front of the belly. Then the lower bout rests against the left
  * thigh, as a bassist leans the bass on the left leg. The hippo plays a contrabass of 0.7 of the
  * contrabass of the app (`SpeciesParams.bassScale`) on a short end pin (`BASS_END_PIN`), so that
  * the upper bout stands below the left shoulder, and the left arm passes over it to the neck, as
@@ -1508,11 +1508,28 @@ const DOG_HOLD = {
  * back of the bass missed the belly, and the bow went into it. The trunk leans 8° forward, and
  * both shoulders turn forward (`reach`, `reachL`).
  *
- * The bow plays 0.3 to 0.25 of the string length from the bridge (`soundingPoint`), near the end
- * of the fingerboard, so that the bow arm keeps the height of the higher bass. With the sounding
+ * The bow plays at 0.3 of the string length from the bridge (`soundingPoint`), near the end of the
+ * fingerboard, in piano and in forte, so that the bow arm keeps the height of the higher bass.
+ * With the sounding
  * point of the cello hold on the lower bass, the bow paw rolled to the other side of the stick on
  * the lowest string, and the skin of the forearm flipped by about 150° in 1.6% of the play
  * samples (`pnpm arm-check bassist`, paw jumps).
+ *
+ * The bow arm plays 0.15 m of the hair, from 0.21 m to 0.36 m of 0.39 m (`bowRangeOf()`), so that
+ * the paw moves away from the strings and back in a stroke, as the hand of a bassist does. The
+ * short arm reaches the strings only over the round belly, so the place of the bass and the
+ * shoulder give it the reach. The top plate turns 16° to the right, which brings the frog side
+ * of the bow nearer to the right shoulder, the right shoulder turns 56° forward (`reach`), the
+ * string planes are 4° apart, and a louder note keeps the sounding point. With a turn of 8°, a
+ * shoulder turn of 48°, string planes 6° apart, and a sounding point of 0.25 in forte, the arm
+ * reached 0.01 m of the hair with the bend of `ARM_REACH`, and the hippo showed no bow stroke.
+ * Each further step has a cost. A shoulder turn of 60° folds 47 faces of the right arm (p95 of
+ * `boulanger-matin` and `bach-bwv1048`, `pnpm arm-check bassist`), 56° folds 41, and 48° folds
+ * 30. A slant of the bow of -28° turns the bow paw 39° from its accepted grip (24° with the -20°
+ * of the floor hold). A lean of the trunk of 9° puts the left forearm 3.2 cm into the bass, and
+ * a lean of the bass of 22° back swings the left paw 71° on its wrist (limit 70). A gap of
+ * 0.22 H presses the lower bout 2.8 cm into the left thigh in the lowering (2.3 cm with 0.23 H,
+ * `pnpm hold-fit bassist`).
  *
  * The left elbow points out to the left, (-1, -0.3, 0), in the play and at rest, so that the left
  * arm goes up to the neck from the side, as a bassist raises the left elbow. The left paw tilts
@@ -1520,8 +1537,9 @@ const DOG_HOLD = {
  * between two notes, and with 40° on the lower bass, the left paw bent 79° on the wrist (p95).
  * With 30°, the left claws went 4.2 cm into the upper bout. The right elbow points out and down,
  * (1, -0.7, 0.2), so that the bow arm bows near level in front of the belly: with the elbow down
- * and back, the forearm lay on the belly at the tip. The string planes are 6° apart, below the
- * 25° of a real contrabass, as on the cello of the dog. The left paw lies 1.5 cm off the strings
+ * and back, the forearm lay on the belly at the tip. The string planes are 4° apart, below the
+ * 25° of a real contrabass, so that the arm reaches the hair on the two outer strings. The left
+ * paw lies 1.5 cm off the strings
  * along the normal of its palm (`gapL`), and stops the strings only up to 0.9 of the fingerboard
  * (`stopEnd`).
  *
@@ -1553,10 +1571,10 @@ const DOG_HOLD = {
 const HIPPO_HOLD = {
   ...BOWED_HOLDS.contrabass,
   lean: 8 * MathUtils.DEG2RAD,
-  reach: 48 * MathUtils.DEG2RAD,
+  reach: 56 * MathUtils.DEG2RAD,
   reachL: 34 * MathUtils.DEG2RAD,
-  stringTurn: 6 * MathUtils.DEG2RAD,
-  soundingPoint: [0.3, 0.25],
+  stringTurn: 4 * MathUtils.DEG2RAD,
+  soundingPoint: [0.3, 0.3],
   frogHair: 0.12,
   tiltL: 35 * MathUtils.DEG2RAD,
   gapL: 0.029859,
@@ -1581,11 +1599,11 @@ const HIPPO_HOLD = {
     via: { ...UPRIGHT_BOW.via, tip: [0.3, 0, -1], reach: [0.1, 0.5, -0.9] },
   },
   fit: {
-    gap: 0.22,
+    gap: 0.23,
     left: 12 * MathUtils.DEG2RAD,
     back: 24 * MathUtils.DEG2RAD,
-    turn: 8 * MathUtils.DEG2RAD,
-    side: -0.3,
+    turn: 16 * MathUtils.DEG2RAD,
+    side: -0.26,
   },
 } as const satisfies BowedHold;
 
