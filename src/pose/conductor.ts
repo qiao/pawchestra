@@ -84,14 +84,16 @@ export const CONDUCTOR_HOLD = {
   /**
    * In the rest pose (5.2), the baton of the hanging right paw turns toward this direction, in the
    * model axes: down, in, and a little back. The turn keeps no twist of the paw on its forearm, so
-   * the baton comes only near to it: it hangs down beside the leg, about 27° forward of the
+   * the baton comes only near to it: it hangs down beside the leg, about 17° forward of the
    * vertical, as the baton hangs in the relaxed hand of a conductor with the arms down. With no
    * turn, the baton follows the fingers of the hanging paw, and it points out to the side and
-   * forward, past the width of the belly. With the direction (-0.2, -1, -0.3), it pointed 41°
-   * forward of the vertical. With (-0.35, -1, 0.4), it pointed 22° forward, and the right wrist
-   * turned 2,794°/s at the start of a lift (`pnpm arm-check conductor`, move turn, limit 3,000).
+   * forward, past the width of the belly. With the direction (-0.35, -1, 0.2), it pointed 26°
+   * forward. A baton nearer the vertical turned the right wrist 2,794°/s at the start of a lift
+   * while the lift had its own swing of the baton. With the eased turn of the lift
+   * ({@link LIFT_HAND_EASE}), the largest turn is about 400°/s (`pnpm arm-check conductor`, move
+   * turn, limit 3,000).
    */
-  restBaton: [-0.35, -1, 0.2],
+  restBaton: [-0.35, -1, 0.5],
   /**
    * The roll of the right paw around the baton from the top up, in radians, positive by the right
    * hand around the direction of the baton. The `palm` of the Tripo bear is the true palm of its
