@@ -1132,6 +1132,14 @@ const BEAVER_BASSOON = {
  * keeps both arms away from the rib cage (`docs/reference/wind-technique.md` 2.2). The right
  * forearm then goes into the bell at 30° from its axis.
  *
+ * The left grip moves 0.05 H across the lever tips, away from the left shoulder, and 0.02 H toward
+ * them (`gripShiftL`), so that the hoof lies beside the valve casings and its toes rest on the
+ * levers, as the left fingers of a real hornist lie on the valve levers
+ * (`docs/reference/wind-technique.md` 2.2). The hoof then grasps the lever line in each play
+ * sample (`pnpm wind-grip hornist`). On the grip of the instrument, the two toes went into the
+ * loops of the valve slides, one slide tube lay in the cleft, and the hoof grasped the lever line
+ * in 27% of the play samples.
+ *
  * The right hoof lies in the bell near its axis, with its tip about 8 cm in the bell, and 95% of
  * its skin is in the bell (`HORN.palm`). It points 1.5 times more along the axis of the bell than
  * the line from the shoulder (`aimAcross`): with that line, the hoof went 0.6 cm through the wall
@@ -1152,6 +1160,7 @@ const PIG_HORN = {
   poleR: [1, -0.3, 0.4],
   restPoleL: [-1, 0.6, -0.7],
   restPoleR: [1, -0.3, 0.4],
+  gripShiftL: [0, 0.02, 0.05],
 } as const satisfies WindHold;
 
 /**
