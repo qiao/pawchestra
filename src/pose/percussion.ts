@@ -96,7 +96,10 @@ export interface SmallTracks {
  * two beats before an entrance (`docs/reference/percussion-technique.md` 6).
  */
 const SET_MOTION = {
-  /** A rest between two strikes of at least this length takes the set position. */
+  /**
+   * A rest of at least this length takes the set position. The rest starts at the end of the move
+   * of the hands after the strike before it, such as a damp, and ends at the next strike.
+   */
   restBeats: 6,
   /** The sticks go down to the set position in this time after the last strike. */
   lowerBeats: 1,
@@ -114,7 +117,10 @@ const SET_MOTION = {
 /**
  * Finds the long rests of a player in which the sticks go to their set position (design 5.3).
  * Before the first strike, the sticks stay in the set position until the lift before it, and after
- * the last strike, they go down and stay.
+ * the last strike, they go down and stay. A rest counts from the end of the move of the hands
+ * after its first strike, because the lowering starts there. A rest that counted from the strike
+ * could end its lowering after its lift, and the sticks then jumped back to the playing position
+ * in one frame. A rest whose lowering ends after the start of its lift keeps the playing position.
  *
  * @param starts The starts of the strikes of the player, sorted.
  * @param beats The times of the conducted beats, sorted.
@@ -143,10 +149,12 @@ function setRests(
   }
   rests.push(-Infinity, -Infinity, ...lift(first));
   for (let i = 1; i < starts.length; i++) {
-    const end = starts[i - 1] ?? 0;
+    const end = after[i - 1] ?? starts[i - 1] ?? 0;
     const start = starts[i] ?? 0;
-    if (start - end >= m.restBeats * beat(end)) {
-      rests.push(...lower(after[i - 1] ?? end), ...lift(start));
+    const [lowerStart, lowerEnd] = lower(end);
+    const [liftStart, liftEnd] = lift(start);
+    if (start - end >= m.restBeats * beat(end) && lowerEnd <= liftStart) {
+      rests.push(lowerStart, lowerEnd, liftStart, liftEnd);
     }
   }
   rests.push(...lower(after[starts.length - 1] ?? last), Infinity, Infinity);
