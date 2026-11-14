@@ -1238,6 +1238,12 @@ scene of each demo has its seats and stage size with no overlap.
       upper arm of the mesh lies on the side of the body.
 - [ ] Elephant timpanist: a roll stays in one hand, and the outer kettles stand out of reach
       (`PercussionHold.pair`). Offer the user longer arms.
+- [ ] Elephant timpanist: the outer kettles stand 122° and 101° from the front, beside and behind
+      the hips (`TIMPANI.arc`, `side`). With each outer kettle at most 60° from the front, it
+      stands 1.63 m and 1.41 m from the player, because the front kettles of the real size fill
+      the arc to 42° on each side. That footprint moved 96 players of 6 demos, and the default
+      view of `beethoven-9` then hid the bass drummer and the percussionist (`pnpm sight-lines`).
+      With 90°, it hid 5 players. Ask the user for smaller kettles, two kettles, or a second row.
 - [ ] Triangle: a louder note turns the beater back only up to 1.35 times as far, because a larger
       turn put the beater into the belly (1.9 cm at 1.5). A real loud stroke adds the arm.
 - [ ] Small percussion: no demo has a rest of 2.7 s between the triangle and the tambourine
