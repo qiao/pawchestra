@@ -129,7 +129,12 @@ export const INSTRUMENT_COLORS = {
   oboe: srgb('#2a2522'),
   clarinet: srgb('#1f1b19'),
   brass: srgb('#dcb052'),
-  kettle: srgb('#c27a44'),
+  /**
+   * The polished copper of the timpani bowls: a deep red brown, as the kettles of
+   * `orchestra-latest.png`. With the lighter `#c27a44`, the bowls read as a pale peach in the hall
+   * light, at about 1.7 times the luma of the reference copper.
+   */
+  kettle: srgb('#96502a'),
   drumShell: srgb('#8a2f2a'),
   drumHead: srgb('#efe9dc'),
   hardware: srgb('#1e1a16'),

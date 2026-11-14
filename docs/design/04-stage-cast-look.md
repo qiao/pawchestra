@@ -1295,8 +1295,9 @@ when no light value can match the lit pixels of the reference.
   bassoon is a dark red maple, the flutes are silver, the brass is gold with lit bells and nickel
   silver trim, and the timpani are copper. The piano is a black polish with a gold
   plate, light steel strings, and copper bass strings in its open case (`PIANO_INSIDE`). The harp is varnished maple with a
-  lighter soundboard, gilded parts, and red C strings and dark blue F strings. The timpani are
-  copper in a black frame with chrome lugs. The drums are a red lacquered wood with chrome or wood
+  lighter soundboard, gilded parts, and red C strings and dark blue F strings. The timpani are a
+  deep red-brown copper in a black frame with chrome lugs (`kettle`), because a lighter copper read
+  as a peach plastic in the hall light. The drums are a red lacquered wood with chrome or wood
   hoops, the cymbals are bronze with darker lathe rings, and the xylophone is rosewood over
   aluminum tubes.
 
