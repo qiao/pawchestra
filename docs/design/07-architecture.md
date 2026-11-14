@@ -90,6 +90,7 @@ a frame of the app (`pnpm close-views play --at <species>`) is the proof of a fa
 | `only=<list>` | Keeps the named species and instruments. The badger takes the instrument of a role. |
 | `zoom`, `target`, `azimuth`, `elevation`, `x`, `z`, `distance` | Move the camera from the fit view, or to a fixed distance. |
 | `body`, `head` | Turn the camera around the body of the first animal, or aim at its head. A close view of a new role thus needs no camera values. |
+| `part=<bone,...>`, `margin`, `cut` | Aim the camera at a body part of the first animal in its pose, such as `part=handL,fingersL`. The frame holds the mesh on the bones (`partFrame()` of `src/gallery/parts.ts`), from `azimuth` and `elevation`. `cut` cuts away all that is nearer than the part. |
 | `stand`, `rest` | Give each player the support `stand` (4.5), or the rest pose (5.2). |
 | `lift=<share>`, `lower=<share>` | Show each animal at a share (0 to 1) of its lift or of its lowering, after its seeded delay (`moveTransport()`). |
 | `probe=colors`, `normals`, `noshadow` | Show the face colors, the normals, or no shadow on the bodies (`applyProbe()`). |
@@ -98,6 +99,12 @@ a frame of the app (`pnpm close-views play --at <species>`) is the proof of a fa
 
 `pnpm close-views` uses these queries to show the moments and the views of each role of
 `ROLE_VIEWS` in one grid, and `pnpm choir-check` to compare the penguin with the reference images.
+
+The page reads `part`, `margin`, `cut`, `azimuth`, `elevation`, `rest`, `lift`, and `lower` again
+at each `popstate` event. A tool changes the query with `history.replaceState()` and sends the
+event, so one load of the page shows each part, view, and moment of a role
+(`pnpm close-views parts`). The canvas attribute `data-part` gives the ball of the part and the
+posed head of each bone.
 
 ### Views page
 

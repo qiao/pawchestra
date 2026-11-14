@@ -28,6 +28,8 @@ import { buildPlayer } from '../models/player.ts';
 import type { PlayerModel } from '../models/player.ts';
 import { buildSupport } from '../models/props.ts';
 import { readSourceFile } from '../models/source-clips.ts';
+import { STUDIO_BONES } from '../models/studio-format.ts';
+import type { Vec3 } from '../models/tuples.ts';
 import { clipDuration, clipPoseAt, createClipPose } from '../pose/clip-pose.ts';
 import type { PosePlan } from '../pose/plan.ts';
 import { createScenePose, poseAt } from '../pose/pose-at.ts';
@@ -76,6 +78,8 @@ import {
 import type { GalleryItem } from './items.ts';
 import { DEFAULT_TEST_NOTES, keyName, notesAt, parseTestNotes } from './notes.ts';
 import type { TestNote } from './notes.ts';
+import { partBones, partCamera, partFrame, partView } from './parts.ts';
+import type { PartBone, PartView } from './parts.ts';
 import { galleryPlan } from './plan.ts';
 import { applyProbe } from './probe.ts';
 import type { GalleryAnimal } from './plan.ts';
@@ -330,8 +334,9 @@ if (fill > 0) {
   scene.add(camera);
 }
 const controls = new OrbitControls(camera, canvas);
-const transport = galleryTransport(search);
-const move = galleryMove(search);
+let transport = galleryTransport(search);
+let move = galleryMove(search);
+let part = partView(search);
 
 /**
  * Gives a box of the first animal in the axes of the gallery, for a close view around the body
@@ -579,6 +584,97 @@ function galleryPose(state: GalleryPoses, songTime: number, wallTime: number): S
   return { players, conductor };
 }
 
+/** The near plane of the camera with no part view, in meters. */
+const CAMERA_NEAR = camera.near;
+
+/** The smallest near plane of the camera of a part view, in meters. */
+const PART_NEAR = 0.005;
+
+/** The posed point of {@link framePart}, which it writes before it reads it. */
+const posedPartPoint = new Vector3();
+
+/**
+ * The points of the bones of the part view in the bind pose ({@link partBones}), which
+ * {@link readView} makes one time for each part view.
+ */
+let partPoints = part ? subjectPartBones(part) : [];
+
+/**
+ * Gives the points of the bones of a part view on the first animal, in the bind pose.
+ *
+ * @param view The part view.
+ * @returns The points of each bone, or none when the page shows no animal.
+ */
+function subjectPartBones(view: PartView): PartBone[] {
+  const model = models.find((one) => one.player)?.player?.model;
+  return model ? partBones(model.mesh, model.skeleton.positions, view.bones) : [];
+}
+
+/**
+ * Aims the camera at a body part of the first animal in the pose of this frame (the query `part`,
+ * design 7.1): the bone matrix of each bone of the part moves its points from their bind places
+ * to their posed places. The canvas gets the attribute `data-part` for the image tools: the middle
+ * and the radius of the ball of the part, then the posed head of each bone, in meters, in the
+ * axes of the gallery.
+ *
+ * @param view The part view.
+ */
+function framePart(view: PartView): void {
+  const subject = models.find((model) => model.player);
+  if (!subject?.player || partPoints.length === 0) {
+    return;
+  }
+  const { mesh } = subject.player;
+  const posed = (bone: number, point: Vec3): Vec3 => {
+    const matrix = mesh.skeleton.bones[STUDIO_BONES.length + bone]?.matrix;
+    posedPartPoint.set(...point);
+    if (matrix) {
+      posedPartPoint.applyMatrix4(matrix);
+    }
+    return posedPartPoint.applyMatrix4(mesh.matrixWorld).toArray();
+  };
+  const posedCorners = partPoints.flatMap((one) =>
+    one.corners.map((corner) => posed(one.bone, corner)),
+  );
+  const heads = partPoints.map(({ bone, head }) => posed(bone, head));
+
+  const ball = partFrame(posedCorners, view.margin);
+  const placed = partCamera(ball, view, subject.object.rotation.y, GALLERY_FOV_DEG, camera.aspect);
+  // A small part puts the camera close, so the near plane comes in with the camera. A cut puts
+  // the near plane at the ball.
+  camera.near = view.cut
+    ? Math.max(PART_NEAR, placed.distance - ball.radius)
+    : Math.max(PART_NEAR, Math.min(CAMERA_NEAR, placed.distance / 5));
+  camera.updateProjectionMatrix();
+  camera.position.set(...placed.position);
+  controls.target.set(...placed.target);
+  canvas.dataset['part'] = [ball.center, [ball.radius], ...heads]
+    .flat()
+    .map((value) => value.toFixed(4))
+    .join(' ');
+}
+
+/**
+ * Reads the part view, the transport, and the move from the query of the page again. A tool
+ * changes the query with `history.replaceState()` and sends a `popstate` event, so that one load
+ * of the page shows each view and each moment of a role (`pnpm close-views parts`).
+ */
+function readView(): void {
+  const next = new URLSearchParams(window.location.search);
+  const before = part;
+  transport = galleryTransport(next);
+  move = galleryMove(next);
+  part = partView(next);
+  partPoints = part ? subjectPartBones(part) : [];
+  updateNotes();
+  if (before && !part) {
+    camera.near = CAMERA_NEAR;
+    camera.updateProjectionMatrix();
+    delete canvas.dataset['part'];
+    frameModels();
+  }
+}
+
 const cast = galleryCast();
 /** The pose plan of the test notes, and the poses that each frame writes. */
 let poses: GalleryPoses | null = null;
@@ -669,6 +765,7 @@ time.addEventListener('input', () => {
 });
 notesInput.addEventListener('input', updateNotes);
 window.addEventListener('resize', resize);
+window.addEventListener('popstate', readView);
 resize();
 updateNotes();
 
@@ -696,6 +793,9 @@ function frame(): void {
       cast?.meshes ?? [],
       galleryPose(poses, Number(time.value), performance.now() / 1000),
     );
+  }
+  if (part) {
+    framePart(part);
   }
   controls.update();
   renderer.render(scene, camera);
