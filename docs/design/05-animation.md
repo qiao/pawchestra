@@ -345,7 +345,12 @@ The rest of each family:
 - **Winds.** The head lifts, and the instrument moves off the mouth. Both paws keep their grips
   (`restAim`), so no paw slides along the tube. A real player can rest the instrument on a leg,
   but the mouse stands with no lap, and the round bellies of the beaver and the pig cover their
-  thighs. So these instruments stay in front of the belly. The beaver lowers the bassoon across its belly, flatter
+  thighs. So these instruments stay in front of the belly. The pig lowers the horn in front of
+  its belly, with the bell beside the right thigh and the mouthpiece below the chin
+  (`HORN_REST_TURN`), as a hornist rests the horn on the lap with the bell to the right (winds
+  2.2). The tuba of the rhino stays on its body: its top turns forward about its bottom bow, and
+  the bottom bow rests against the belly (`RHINO_TUBA`). Reason: with a move down and forward,
+  the tuba hung in the air. The beaver lowers the bassoon across its belly, flatter
   than in the play, with the reed to the left below the chin (`BEAVER_BASSOON`). Reason: its short
   arms reach no lower rest with both paws on the bassoon, and with the right paw alone on the
   bassoon upright at its side, the bassoon went through the head in the lift and into the right
@@ -446,10 +451,10 @@ The rest of each family:
   degree of the turn moves the upper arm further from the trunk. When the forearm and not the upper
   arm lies on the trunk, a nearer grip pushes the forearm in. A grip away from the shoulder frees
   the forearm, but moves the paw off its keys, so the pig keeps the left grip of the play and moves only the grip of the
-  rest (`restGripShiftL`). The long hoof of the pig does not fit in the narrow throat of the horn
-  bell, so its right grip moves out of the bell, the right elbow points out to the side, and the
-  hoof lies across the mouth of the bell, inside the rim (`gripShiftR`, `poleR`). Reason: with the
-  palm on the grip of the horn, the hoof went through the wall of the throat. The grip turn of the arm gate counts from the posed forearm, so the turn
+  rest (`restGripShiftL`). The right hoof of the pig lies in the bell of the horn near its axis,
+  and points more along the bell than the line from its shoulder (`aimAcross` below 0), with its
+  back to the axis (`faceTube`). Reason: the hoof is long and thick, so off the axis it went
+  through the wall of the bell, and with the palm to the axis it twisted 166° on its forearm. The grip turn of the arm gate counts from the posed forearm, so the turn
   of the elbow adds to it (`ACCEPTED_GRIPS`). A large forward turn of the shoulder folds the
   shoulder. Reason: on a bent arm, the swivel moves the arm root off the trunk, and each paw keeps
   its grip.
@@ -504,12 +509,12 @@ The rest of each family:
   bodies still miss the valves at `MAX_BOW` (`TODO.md`). The own trumpet hold of the monkey
   (`MONKEY_TRUMPET`) takes the rule with an own fit: the big head of the Tripo monkey puts its mouth
   farther than its arm from the shoulders, and with the head up, the straight arms stop short of the
-  valves. Its spine also turns back in the play (`WindHold.lean`), and the trumpet turns further
-  down on the face (`play`), so the head stays near the vertical. The lean turns the trumpet up
-  with the chest, so the trumpet points only a little more down than the "slightly down" of a real
-  player (winds 2.1), and the grips do not change. Reason: the arms
-  reach the valves of the trumpet of the app, while the head stays over the chest and the hips and
-  the center of mass over the middle of the soles. The right paw lies on the valves below the
+  valves. It plays a smaller trumpet (`trumpetScale`, 4.6), its spine turns a little back in the
+  play (`WindHold.lean`), and the trumpet turns a little further down on the face (`play`), so the
+  head stays near the vertical and the trumpet points "slightly down", as the trumpet of a real
+  player (winds 2.1). Reason: the arms reach the valves of the trumpet of the app only with the
+  trumpet far below the level, and its bell then went behind the music stand. The head stays over
+  the chest and the hips. The right paw lies on the valves below the
   mouth (`gripShiftR`), and the right forearm stays below the chin. Reason: a real player keeps
   the right hand on the valves below the face (winds 2.1), and the front view is the default
   view. With the paw nearer to the mouthpiece, the paw and the forearm covered the mouth. With the head bowed 14° to 16° from the vertical,

@@ -889,8 +889,9 @@ Its paws and its elbow axes turn so that each part of each arm takes at most 45�
 the bassist. The Tripo pig (`assets/models/pig/tripo-hand/`) is the body of the hornist, by the
 same rules. Its source paints each eye on faces of the head with no light, so the eye faces take
 the face attribute `eye`, the finish `eye` with the eye light, and a blink lid. Its arms keep the
-short length of the source, so the horn hold turns the coil further back and the left shoulder
-further forward (`PIG_HORN`, 5.3). Its arm loops stop at poles, so no ring takes a split: each
+short length of the source, so the form of the horn puts its coil and its bell in their reach
+(`HORN_PLANE`, 4.6), and the shoulders turn forward (`PIG_HORN`, 5.3). Its arm loops stop at
+poles, so no ring takes a split: each
 hoof turns by whole steps of the one closed wrist ring, and a bridge of new quads joins the ring
 again (`turn_hooves()` of its build). Each elbow axis also turns. Each part of each arm then takes
 at most 45° in the moments of the hornist. Its face takes the head bone alone above the chin,
@@ -1105,10 +1106,10 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   player does: its hips stand over its feet, its knees bend a little, and its shoulders stay over
   its hips. Its center of mass thus stays over the middle of its soles. As a soloist, it keeps
   this stance, because the straight legs of its sheet put the center of mass off the middle.
-  It plays the trumpet of the app, and in the play its spine turns 7° back and its head stays
-  upright (5.3), so the head stays over the chest and the hips. Reason: a smaller trumpet read
-  small beside the big head and paws. At the body size of 4.4, the arms reach the valves of the
-  trumpet of the app with 1.4 cm to spare.
+  It plays a smaller trumpet (`trumpetScale`), and in the play its spine turns a little back and
+  its head stays upright (5.3), so the head stays over the chest and the hips. Reason: with the
+  trumpet of the app, the arms reach the valves only with the trumpet far below the level, and
+  its bell went behind the music stand.
 - The hippo, the elephant, the badger, the rhino, and the penguin stand to play, in the standing
   pose of their meshes. The seat of the Tripo badger is the crotch between its legs
   (`seatWidth`), and the app builds no chair under it. The rhino stands as a real tubist on a strap does. The Tripo elephant
@@ -1895,7 +1896,7 @@ the body sets the hold, the instrument fits the body, as the table names.
 | Harp | The base on the floor with the pedals at the hooves, in front of the chest, and the top of the soundbox against the chest, in front of and below the right shoulder. The deer plays a harp of 0.975 (`harpScale`), upright, diagonal, and as near to the stool as the chest lets it (`HARP_PLACE`). The right arm passes outside the top of the soundbox with the elbow up. Reason for the size: a smaller harp read as the harp of a child. Reason for the place: at the right of the chest, the shortest treble strings of a harp larger than 0.85 stand beside the right shoulder, so the right upper arm goes through them. |
 | Piano | Larger than a real grand piano (`PIANO_SCALE`), on longer legs (`PIANO_LIFT`), so the forearms of the polar bear are almost level with the keys. The keys stand in front of its belly (`PIANO_FRONT_H`). |
 | Flute, oboe, clarinet, bassoon | The lip plate, the reed, or the mouthpiece at the mouth. The flute points to the right, and the bassoon crosses the body to the left. The shared flute and clarinet holds take their arms from the body (5.3). The mouse plays a smaller oboe (`oboeScale`), and its shoulders turn forward, so that the short arms of its source reach the grips (5.3). A recast flute or clarinet takes the size rule of the winds. |
-| Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The pig turns its horn back toward the body, with the coil in front of the belly (`PIG_HORN`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. A smaller trombone keeps the footprint of the trombone of the app, so that no seat moves. |
+| Horn, trumpet, trombone, tuba | The mouthpiece at the mouth. The coil of the horn stands in front of the right side of the chest, and its bell opens back and to the right beside the belly (`HORN_PLANE`). The monkey plays a smaller trumpet (`trumpetScale`), and the rhino has a longer lead pipe (`tubaPipe`). A recast trumpet takes the size rule of the winds. A smaller trumpet or trombone keeps the footprint of the instrument of the app, so that no seat moves. |
 | Timpani | Kettles of the real size in an arc. The kettles of the elephant move to its short arms, with a gap for its trunk (`TIMPANI`). |
 | Percussion | Drums, a xylophone, a triangle, and a tambourine within the reach of the badger, and a suspended cymbal (`cymbalForm`, `SUSPENDED_CYMBAL`). The bass drum has the size of a person-sized drum at the scale of the badger crown (`BADGER_SCALE`), so it follows the body. Its beater keeps the real length in front of the grip, as the snare sticks (`BASS_DRUM.mallet`), because a beater at the scale looked as a ball on the fist. The xylophone bars stand below the shoulder joints of the badger (`XYLOPHONE.barHeight`). The section "Percussion" below gives their parts. |
 | Choir folder | In both flippers, in front of the chest (`CHOIR_FOLDER`). |
@@ -2128,9 +2129,14 @@ A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded
   tuning slide that ends beside the cheek (`TROMBONE_BACK`), so that it stays out of the big head
   of the panda with the slide toward the audience. The counterweight touches the outer side of the
   bow, at the middle between its legs.
-- **Horn.** A double horn: the outer hoop widens in one spiral turn into the bell tail. Four
-  rotary valves with silver caps and the levers of the left fingers, the loops of the F side and
-  the B♭ side, and the valve slides.
+- **Horn** (`HORN`). A double horn in the axes of its coil. The lead pipe goes along the tangent
+  to the hoop and then around the hoop to the valves. The outer hoop widens in one spiral turn
+  into the bell tail, which leaves the coil outside the hoop, and the throat of the bell is wide
+  (`HORN_FLARE`). Four rotary valves with silver caps and the levers of the left fingers, the
+  loops of the F side and the B♭ side, and the valve slides. `HORN_PLANE` puts the coil in front
+  of the right side of the chest. Reason: a straight lead pipe from the lips to a coil at the
+  belly looked like a drinking straw, and the throat of a real horn takes the right hand. The
+  space of the layout keeps the older horn, so that no seat moves.
 - **Tuba.** A top-action tuba: the bell branch widens more and more toward the bell, and above the
   grip of the left paw it leans out to the left (`TUBA_BELL_LEAN`), so that the rim of the bell
   stays off the cheek and the eye of the rhino. The bottom bow joins it to the valves, four piston
