@@ -678,28 +678,32 @@ const SHAFT = 0.0055;
 
 /**
  * Gives the look of a mallet with a round head: a shaft of 6 faces and a ball, such as the felt
- * mallet of the timpani or the yarn mallet of the suspended cymbal.
+ * mallet of the timpani or the yarn mallet of the suspended cymbal. The shaft has a cap only at
+ * its butt, because its other end is in the head.
  *
  * @param head The radius of the head.
  * @param headColor The color of the head.
  * @param headFinish The finish of the head: `felt` for felt and yarn, and `varnish` for hard
  *   rubber. Both have smooth normals, so that the head shades round.
- * @param segments The faces around the axis of the head. The head has half as many rings, at
- *   least 4.
+ * @param segments The faces around the axis of the head. The head has half as many rings. A
+ *   small head with 6 faces showed a hexagon in its outline, so a larger head takes more faces.
  * @returns The look.
  */
-function roundMallet(head: number, headColor: Rgb, headFinish: Finish, segments = 6): MalletLook {
+function roundMallet(head: number, headColor: Rgb, headFinish: Finish, segments = 8): MalletLook {
   return (piece, length, butt) => {
-    piece.rod(
-      [-butt, 0, 0],
-      [length - 0.5 * head, 0, 0],
-      SHAFT,
-      6,
+    const shaft: readonly ProfilePoint[] = [
+      [0, -butt],
+      [SHAFT, -butt],
+      [SHAFT, length - 0.5 * head],
+    ];
+    piece.add(
+      latheBand(shaft, 6),
       INSTRUMENT_COLORS.stick,
+      transform([0, 0, 0], ALONG_X),
       'varnish',
     );
     piece.add(
-      ball(head, segments, Math.max(4, segments / 2)),
+      ball(head, segments, segments / 2),
       headColor,
       transform([length, 0, 0], ALONG_X),
       headFinish,
@@ -1215,7 +1219,7 @@ export function buildTimpani(kettles: KettleCount): InstrumentModel {
     tilt,
     spot: t.malletSpotL,
     butt: t.malletButt,
-    look: roundMallet(0.025, INSTRUMENT_COLORS.felt, 'felt', 8),
+    look: roundMallet(0.025, INSTRUMENT_COLORS.felt, 'felt', 10),
     space: 0.025,
   };
   const [left, right] = malletPair(timpaniMallet, { ...timpaniMallet, spot: t.malletSpotR });
@@ -1400,7 +1404,7 @@ export function buildBassDrum(): InstrumentModel {
     tilt: BASS_DRUM.malletTilt,
     spot: BASS_DRUM.malletSpot,
     butt: BASS_DRUM.malletButt,
-    look: roundMallet(BASS_DRUM.ball, INSTRUMENT_COLORS.felt, 'felt', 8),
+    look: roundMallet(BASS_DRUM.ball, INSTRUMENT_COLORS.felt, 'felt', 10),
     space: BASS_DRUM.ball,
   });
   const instrument = piece.build('instrument', hold('floor'));
@@ -1831,7 +1835,7 @@ export function buildSuspendedCymbal(scale: number): InstrumentModel {
     tilt: c.malletTilt,
     spot: c.malletSpot,
     butt: MALLET_BUTT,
-    look: roundMallet(c.ball, INSTRUMENT_COLORS.yarn, 'felt'),
+    look: roundMallet(c.ball, INSTRUMENT_COLORS.yarn, 'felt', 10),
     space: c.ball,
   });
   const instrument = piece.build('instrument', hold('floor'));

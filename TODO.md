@@ -1649,7 +1649,7 @@ navigation menu at the top of the mockup is out of scope.
 - [ ] Camera: the default view and the shots of `scene.png`.
 - [ ] Cast: the faceted animals and the instruments of `scene.png`.
 - [ ] Timpani (4.6): the heads show 16 corners in close shots. More faces need the rods aligned
-      to the faces, and go over the budget of 2400 triangles (now 2200). The bowls are still a
+      to the faces, and go over the budget of 2400 triangles (now 2252). The bowls are still a
       little lighter than the copper of `orchestra-latest.png` (88 against about 63 to 74).
 - [ ] Tuba (4.6): the bell has only 14 faces, and the model has no triangles left (1196 of 1200).
 - [ ] Mallets (4.6): the felt and yarn heads look faceted, because the matte finish shades each

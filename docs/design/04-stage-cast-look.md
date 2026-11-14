@@ -2110,7 +2110,9 @@ grips keep their places, so the holds and the strikes do not change with the det
   mallets and the bass drum beater, a yarn ball on the cymbal mallets, a rubber head on the
   xylophone mallets, a hickory snare stick with a taper and a bead, and a steel triangle beater
   with a grip sleeve. The felt and the yarn heads take the finish `felt` (4.5), and the hard
-  rubber heads take the soft gloss of `varnish`, so that each head shades round.
+  rubber heads take the soft gloss of `varnish`, so that each head shades round. A larger head
+  has more faces around its axis (`roundMallet()`), because a head of 6 faces showed a hexagon
+  in its outline.
 
 These rules hold for the models:
 
