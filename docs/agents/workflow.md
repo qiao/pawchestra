@@ -223,6 +223,10 @@ and `--elevation 40`, and add az150 and az-150. The stage camera looks from behi
 defect can show only from there. A measure that says that no view shows a defect is no proof. Show
 the images.
 
+`pnpm close-views parts` is the set that checks the arms, the paws, the seat, and the ankles. It
+frames each part of each role in its pose, with the thing that the paw holds, the seat, or the
+floor. Open the cells of a part before you report its fault or its fix.
+
 When a change has a side effect on the look that you cannot explain, render one pair of the base
 and the change with only the suspected cause removed. Report the side effect as an open problem
 with the images, and add it to `TODO.md`.
