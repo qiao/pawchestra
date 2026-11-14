@@ -1288,12 +1288,14 @@ const MONKEY_TRUMPET = {
  * range of turn. With the palms on their tubes, the elbows out turn the left forearm 84° and the
  * right forearm 57° from neutral, near the end of the turn of a real forearm, and the skin of each
  * forearm twists. With these elbows, the left forearm turns 67° and the right forearm 15°. With the
- * elbows straight down, the thick upper arms go into the round belly. At rest, the tuba moves 0.25
- * H down and 0.12 H forward (`restShift`), and its lower end turns 5° forward, so that the
- * mouthpiece leaves the lips by about 11 cm, below the chin, as a real player takes the tuba off
- * the mouth between two entrances. With the small move of {@link WIND_HOLDS}, the mouthpiece
- * stayed on the lips, and the rest looked the same as the play. With 0.3 H down, the bottom bow
- * came near the knees.
+ * elbows straight down, the thick upper arms go into the round belly. At rest, the tuba stays on
+ * the body, as the tuba of a real player on a strap. Its top turns 15° forward about its bottom
+ * bow (`rest`), so that the mouthpiece leaves the lips by about 10 cm, to the front and below the
+ * mouth, as a real player takes the tuba off the mouth between two entrances. The tuba also moves
+ * 9 cm back, so that its bottom bow rests against the belly (`restShift`). With a move of 0.25 H
+ * down and 0.12 H forward, the tuba hung in the air in front of the belly, with straight arms.
+ * With the small move of {@link WIND_HOLDS}, the mouthpiece stayed on the lips, and the rest
+ * looked the same as the play.
  *
  * The right palm faces the valve tops, and the left palm faces the main branch (`faceTube`,
  * `InstrumentGrips.tubeL` of `models/instruments/brass.ts`), as the left hand of a real tubist
@@ -1309,10 +1311,9 @@ const MONKEY_TRUMPET = {
  * the near side of the branch, the finger tips stood 1.9 cm off it, and the paw went 2.1 cm into
  * it. With 0.03 H toward the shoulder or 0.09 H, the tips stood 0.7 cm off the branch. The branch
  * is about 15 cm wide at the grip, so no paw closes around it. The left paw keeps the grip of the
- * play at rest, so that its finger tips touch the branch in the lift and the rest. Together with
- * the low rest place, this grip keeps the left forearm 1.2 cm or less in the branch: with the old
- * grip at the low rest place, the left forearm went 2.6 cm into the branch, and with the new grip
- * at the old rest place, the inner left elbow folded 13 faces at rest. Both paws keep the aim and the
+ * play at rest, so that its finger tips touch the branch in the lift and the rest. At rest, the
+ * left paw goes 1.3 cm into the branch (`pnpm body-clip tubist`), and each paw reaches its grip
+ * with 9.0 cm (left) and 6.0 cm (right) to spare. Both paws keep the aim and the
  * roll of the play at rest (`restAim`): with the roll of the shoulder at rest, the left paw flips
  * in the lowering (the wrist turns 17960° each second). The right fingers curl 80°. The right grip
  * moves 0.15 H along the row of the valves toward the front and 0.1 H toward the right shoulder
@@ -1330,8 +1331,8 @@ const RHINO_TUBA = {
   play: holdTurn(7, 25),
   poleL: [-0.75, -1, 0],
   poleR: [0.75, -1, 0],
-  rest: holdTurn(5, 20),
-  restShift: [0, -0.25, -0.12],
+  rest: holdTurn(-8, 25),
+  restShift: [0, -0.04, -0.26],
   restPoleL: [-0.75, -1, 0],
   restPoleR: [0.75, -1, 0],
   faceTube: ['palm', 'palm'],
