@@ -93,6 +93,7 @@ a frame of the app (`pnpm close-views play --at <species>`) is the proof of a fa
 | `part=<bone,...>`, `margin`, `cut` | Aim the camera at a body part of the first animal in its pose, such as `part=handL,fingersL`. The frame holds the mesh on the bones (`partFrame()` of `src/gallery/parts.ts`), from `azimuth` and `elevation`. `cut` cuts away all that is nearer than the part. |
 | `stand`, `rest` | Give each player the support `stand` (4.5), or the rest pose (5.2). |
 | `lift=<share>`, `lower=<share>` | Show each animal at a share (0 to 1) of its lift or of its lowering, after its seeded delay (`moveTransport()`). |
+| `wall=<seconds>` | Stop the idle motion at a wall clock time, so that two renders of a moment show the same pose. |
 | `probe=colors`, `normals`, `noshadow` | Show the face colors, the normals, or no shadow on the bodies (`applyProbe()`). |
 | `fill=<lux>` | Add a light from the camera, so that a close view shows the side that the key light leaves dark. |
 | `clip=<file>[:<animation>]` | Play a clip of `clips/<file>.glb` on each animal at the time of the slider (4.4). The animals stand, and the instrument hides. |
@@ -100,8 +101,8 @@ a frame of the app (`pnpm close-views play --at <species>`) is the proof of a fa
 `pnpm close-views` uses these queries to show the moments and the views of each role of
 `ROLE_VIEWS` in one grid, and `pnpm choir-check` to compare the penguin with the reference images.
 
-The page reads `part`, `margin`, `cut`, `azimuth`, `elevation`, `rest`, `lift`, and `lower` again
-at each `popstate` event. A tool changes the query with `history.replaceState()` and sends the
+The page reads `part`, `margin`, `cut`, `azimuth`, `elevation`, `rest`, `lift`, `lower`, and `wall`
+again at each `popstate` event. A tool changes the query with `history.replaceState()` and sends the
 event, so one load of the page shows each part, view, and moment of a role
 (`pnpm close-views parts`). The canvas attribute `data-part` gives the ball of the part and the
 posed head of each bone.

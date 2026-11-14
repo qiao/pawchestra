@@ -346,6 +346,20 @@ export function galleryTransport(search: URLSearchParams): Transport {
 }
 
 /**
+ * Reads the fixed wall clock time of the poses from the query of the gallery (design 7.1):
+ * `wall=<seconds>` stops the idle motion at that time, so that two renders of a moment show the
+ * same pose. With no query, the wall clock of the page runs.
+ *
+ * @param search The query of the page.
+ * @returns The wall clock time, in seconds, or `null` with no query or with no number.
+ */
+export function galleryWall(search: URLSearchParams): number | null {
+  const text = search.get('wall')?.trim() ?? '';
+  const seconds = Number(text);
+  return text !== '' && Number.isFinite(seconds) ? seconds : null;
+}
+
+/**
  * A move of the instruments of the gallery between the rest pose and the playing pose (design
  * 5.2, 7.1): a point of the lift or of the lowering.
  */

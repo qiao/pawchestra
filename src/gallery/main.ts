@@ -68,6 +68,7 @@ import {
   galleryProbe,
   gallerySupport,
   galleryTransport,
+  galleryWall,
   gridPlaces,
   headBoundsOf,
   instrumentItems,
@@ -337,6 +338,7 @@ const controls = new OrbitControls(camera, canvas);
 let transport = galleryTransport(search);
 let move = galleryMove(search);
 let part = partView(search);
+let wall = galleryWall(search);
 
 /**
  * Gives a box of the first animal in the axes of the gallery, for a close view around the body
@@ -655,9 +657,10 @@ function framePart(view: PartView): void {
 }
 
 /**
- * Reads the part view, the transport, and the move from the query of the page again. A tool
- * changes the query with `history.replaceState()` and sends a `popstate` event, so that one load
- * of the page shows each view and each moment of a role (`pnpm close-views parts`).
+ * Reads the part view, the transport, the move, and the fixed wall clock time from the query of
+ * the page again. A tool changes the query with `history.replaceState()` and sends a `popstate`
+ * event, so that one load of the page shows each view and each moment of a role
+ * (`pnpm close-views parts`).
  */
 function readView(): void {
   const next = new URLSearchParams(window.location.search);
@@ -666,6 +669,7 @@ function readView(): void {
   move = galleryMove(next);
   part = partView(next);
   partPoints = part ? subjectPartBones(part) : [];
+  wall = galleryWall(next);
   updateNotes();
   if (before && !part) {
     camera.near = CAMERA_NEAR;
@@ -773,8 +777,8 @@ const projected = new Vector3();
 
 /**
  * Poses the players at the time of the slider, with the idle motion of the wall clock time
- * (design 5.1), at the move of the query `lift` or `lower` when it has one, and renders the
- * gallery.
+ * (design 5.1) or of the fixed time of the query `wall`, at the move of the query `lift` or
+ * `lower` when it has one, and renders the gallery.
  */
 function frame(): void {
   if (clip && cast) {
@@ -791,7 +795,7 @@ function frame(): void {
   } else if (poses) {
     applyScenePose(
       cast?.meshes ?? [],
-      galleryPose(poses, Number(time.value), performance.now() / 1000),
+      galleryPose(poses, Number(time.value), wall ?? performance.now() / 1000),
     );
   }
   if (part) {
