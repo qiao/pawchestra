@@ -104,23 +104,31 @@ passes.
       the source that faces down, away from the key light.
 - [ ] Monkey trumpeter: two thin faces across the wrists (329 and 1090) fold in each play sample.
       Cut the thin faces, or count their pixels in a probe build.
-- [ ] Monkey trumpeter: the trumpet points about 23° below the level with the spine 12° back in
-      the play (`MONKEY_TRUMPET.lean`), against "slightly down" of a real player (wind-technique
-      2.1). Confirm the backward spine in the app. With the trumpet 20° down on the face, the top
-      of the right paw comes to the height of the mouthpiece.
+- [ ] Monkey trumpeter: confirm in the app the trumpet of 0.75 (`trumpetScale`), which points
+      9.5° below the level with the spine 5° back (`MONKEY_TRUMPET`). The top of the right paw
+      is 5.6 cm above the mouthpiece, so from the front the paw covers the mouth, as the right
+      hand of a real player on the valve buttons. A flatter paw lifts its finger tips off the
+      valves.
+- [ ] Rhino tubist: at rest, the tuba rests against the belly with its top turned forward
+      (`RHINO_TUBA.rest`). 21 faces fold at rest (12 on the left arm), against 15, and the left
+      paw swings 50° on its forearm. Check the left elbow and wrist in 2x crops.
 - [ ] Rhino tubist: the main branch is about 15 cm wide at the left grip, so the left paw lies
       against it and does not close around it. A real tubist grips thinner tubing at the side.
       Option: a thin tube at the left side of the tuba model for the left paw.
 - [ ] Rhino tubist: `pnpm wind-grip tubist` and `pnpm body-clip tubist` take boulanger-matin,
       in which the tuba rests in about 80% of the play samples, so the play rows show mostly the
       rest. Read the play pose with `--lines`.
-- [ ] Pig hornist: the right hoof still lies across the mouth of the bell (`PIG_HORN`). Grips
-      nearer to the rim or further out of the bell kept the grasp share at 0% and the palm 90° to
-      134° from the bell axis (`pnpm wind-grip hornist`). A hoof at the far rim along the bell
-      wall needs a forearm near the bell axis, but the forearm meets the axis at 72° to 89° with
-      each turn of the right side of the horn from 35° back to 15° forward, each grip, and each
-      elbow, and a hoof off the axis goes through the wall. A cupped paw in the bell needs a paw that fits the throat of
-      the horn, a larger horn, or a bell that opens toward the right shoulder.
+- [ ] Pig hornist: the bell of the rebuilt horn hangs at the height of the chest, beside the
+      right side of the belly (`HORN_PLANE`), because the short right arm does not reach a bell
+      at the right thigh. Confirm the look in the app. Option: a longer bell tail that puts the
+      bell lower, with a longer right arm in the pig chain.
+- [ ] Pig hornist: 9 faces fold at rest (7 on the left arm), against 2 with the old horn, and the
+      claws of the right hoof go 1.2 cm into the wall of the bell (limit 1.5 cm). Check both in
+      2x crops.
+- [ ] Horn: the space of the horn in the layout (`hornSpace()` of `wind-space.ts`) keeps the old
+      horn, with the coil at the belly. Give it the rebuilt horn, and check the seats that move.
+- [ ] Horn: the shared hold (`WIND_HOLDS.horn`) takes the horn of the pig. Run the cast matrix of
+      the hornist, and fit the cells that fail.
 - [ ] Beaver bassoonist: from the front, the long joint passes in front of the left cheek and the
       whiskers, 4.8 cm from the skin, as the bell of a real bassoonist rises at the left of the
       line of sight (`BEAVER_PLAY_TURN`). Confirm the look in the app.
@@ -130,8 +138,8 @@ passes.
       each reader of the seat height of a body with no chair.
 - [ ] Trombonist panda (Tripo body): ask the user to confirm the arm stretch of 1.2 (as on the
       hippo and the deer, 2026-11-12). It lets the panda play the full trombone of the app (0.83 m,
-      0.49 of the seated panda) with a slide travel of 13.5 cm at the 7th position, and the slide
-      40° below the level. The paws are only 1.0 cm apart in the play: a left grip nearer the
+      0.49 of the seated panda) with a slide travel of 12.5 cm at the 7th position, and the slide
+      40° below the level. The paws touch in the first position: a left grip nearer the
       mouthpiece puts the left paw into the chin.
 - [ ] Trombonist panda: the arm gate folds p95 are 75 (left) and 82 (right) after the arm stretch
       (63 and 78 before). Check the paws in 2x crops.
@@ -154,8 +162,8 @@ passes.
       the middle line only moved the folds. With `--set 'trombone@panda.reach=25deg'`, clavicle_R
       folds 4 samples, but the right upper arm goes 3.3 cm into the belly (45°: 16,490 samples and
       1.7 cm, limit 1.5 cm). Try a lower reach with the right elbow further out.
-- [ ] Trumpeter monkey: the body of 1.2 times H with the trumpet of the app folds 47 arm faces in
-      the rest sample of `hold-fit`. The arm gate did not run at this scale (folds p95 20 right
+- [ ] Trumpeter monkey: the body of 1.2 times H folds 40 arm faces in the rest sample of
+      `hold-fit`. The arm gate did not run at this scale (folds p95 20 right
       and 26 left, skin twist 44 and 29 degrees at the scale before). Run it, and check the
       elbows in 2x crops.
 - [ ] Trumpeter monkey: the body of 1.2 times H moves players in each of the 8 demos with a
@@ -966,12 +974,6 @@ passes.
 - [ ] Pig hornist (4.4): the left armpit face 4454 still folds in 73% of the play and 48% of the
       lift (`pnpm fold-probe hornist`), at the front of the arm root. Check it in 2x crops from
       below.
-- [ ] Pig hornist: the right grip moves 0.11 H out of the horn bell (`gripShiftR`), so the note
-      target of the right palm is 4.5 cm from the grip of the horn (`pnpm hold-fit hornist`, within
-      5 mm). Move the grip of the horn to the mouth of the bell (`HORN_PALM_DEPTH`), or let the
-      target count the grip shift.
-- [ ] Pig hornist: the right hoof is long and thick, so only about a third of it lies inside the
-      flare of the bell, at the mouth. Check the hoof in the bell in the app.
 - [ ] Tripo pig: in the last two of the 21 steps of the blink, 5 to 6 edge points of each closed
       lid lie just out of the head. Check a blink in a close play frame.
 - [ ] Tripo pig: the denser mesh adds 36 KB to the first download (839 KB of 1 MB).
@@ -1144,8 +1146,6 @@ scene of each demo has its seats and stage size with no overlap.
       horn. The B♭ side needs a thumb valve and a second fundamental, B♭1 (wind-technique 2.2).
 - [ ] Panda trombonist: the shadow of the left arm crosses the belly in the front view. Show the
       user the front view.
-- [ ] Panda trombonist: from the front, the right paw lies below the lower slide tube with its tips
-      on the brace, so it reads as a paw under the slide.
 - [ ] Hippo bassist: the right elbow goes 0.6 cm into the back of the contrabass at 197.40 s of
       `beethoven-1` (0 cm with the old body). The touch is accepted for now, because the T-pose
       body takes the upper arms from 5.1 cm to 1.3 cm out of the body. Try an elbow path for the
@@ -1218,8 +1218,6 @@ scene of each demo has its seats and stage size with no overlap.
       grasps in 54% of the play. Check the right oboe grip.
 - [ ] Accepted grips: after a check of the 2x paw crops, update `ACCEPTED_GRIPS` for the bassoonist,
       the trombonist, the oboist, the clarinetist, the wolf, the tubist, and the xylophone.
-- [ ] Horn: the right palm lies across the bell opening, 2.5 cm inside it (`HORN_PALM_DEPTH`). A
-      real hand goes deeper, against the far wall at 2 o'clock. Turn the paw along the bell.
 - [ ] Tripo beaver bassoonist: the curled digits and the paws fold 23 (left) and 20 (right) faces
       in the play (arm gate, limit 8), and the left grip turn p50 is 36° (17° on the old beaver).
       Check the paws on the bassoon in a 2x crop.
@@ -1255,8 +1253,9 @@ scene of each demo has its seats and stage size with no overlap.
       body change shows the moved seats apart from a pose change.
 - [ ] Tan fox flutist: the grips of the play and the rest lie on two sides of the flute, so the
       right paw turns around the tube in the lift (`gripAround`). Show the user the 2x crops.
-- [ ] Pig hornist: the round belly covers the short thighs, so the horn rests on the belly. Show the
-      user the close views.
+- [ ] Pig hornist: the round belly covers the short thighs, so the rest horn hangs in front of the
+      belly with its bell beside the right thigh (`HORN_REST_TURN`). Show the user the close
+      views.
 - [ ] Pig: in the front view, the skin of the armpits stretches into bands to the raised upper arms.
       Show the user the close views.
 - [ ] Pig: 22 faces of the right armpit turn past 45° at rest, and the rest shape keeps face 217
