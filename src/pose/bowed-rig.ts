@@ -1165,7 +1165,7 @@ export const BOWED_HOLDS = {
  * of the viola lies about 0.14 m in front of the left shoulder joint. The cat plays a viola of
  * about 12 inches, 0.85 of the viola of the app (`SpeciesParams.violaScale`), larger than a violin
  * shop gives for the arm, and holds it nearer to the body than the viola hold
- * of {@link BOWED_HOLDS}: 0.17 H further left, 0.1 H higher, and 0.18 H further back
+ * of {@link BOWED_HOLDS}: 0.17 H further left, 0.14 H higher, and 0.18 H further back
  * (`playShift`). The tail end lies on the left collarbone, 0.17 H left of the middle line, as a
  * real player holds it (`docs/reference/string-technique.md`, section 1.10). The head of the cat
  * is 0.48 m wide, so a viola under the middle of the jaw has its bridge under the left cheek: with
@@ -1178,8 +1178,11 @@ export const BOWED_HOLDS = {
  * the top plate 25° down toward the right (`violinTurn(-25, 5, 25)`), so that it lies about
  * level. With the old turn, the viola fell 10° to the scroll and its top plate turned 60° to the
  * front: it read as upright on the chest, and the bow at the frog stood up across the eye. The
- * head lifts 5° in the play (`headDrop` below 0), so that the jaw lies on the chin rest and the
- * head stays near straight: with a lift of 15°, the cat looked up over the viola. The left
+ * head lifts 12° in the play (`headDrop` below 0), and the viola sits 0.04 H higher under the
+ * jaw: from the height of the stage camera, 40° above the floor, the brow hid the top of each eye
+ * with a lift of 5°, and the face read as angry. With the lift of 12°, the stick also keeps 2 cm
+ * or more off the left cheek in each play sample of `mozart-k525` and `bach-bwv1048`. With a lift
+ * of 15°, the cat looked up over the viola. The left
  * shoulder bone turns 25° forward in the play (`reachL`), so that the left paw reaches the
  * fingerboard from 0.52 of its length (0.20 with the viola under the middle of the jaw): with 35°
  * and the viola tilted 5°, the back of the left arm
@@ -1355,10 +1358,10 @@ export const BOWED_HOLDS = {
 const CAT_HOLD = {
   ...BOWED_HOLDS.viola,
   stringTurn: 7 * MathUtils.DEG2RAD,
-  playShift: [-0.17, 0.05, 0.14],
+  playShift: [-0.17, 0.09, 0.14],
   playTurn: violinTurn(-25, 5, 25),
   reachL: 25 * MathUtils.DEG2RAD,
-  headDrop: -5 * MathUtils.DEG2RAD,
+  headDrop: -12 * MathUtils.DEG2RAD,
   slant: -12 * MathUtils.DEG2RAD,
   tiltL: 25 * MathUtils.DEG2RAD,
   poleL: [-2, -0.8, -0.71],

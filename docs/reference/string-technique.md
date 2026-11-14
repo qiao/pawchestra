@@ -501,8 +501,9 @@ The app does not follow these facts:
   a violin student (`BowedHold.poleL`). With the elbow further in, the left paw twists too far on
   its forearm.
 - **The head (1.10).** The head of the cat and of the red fox lifts a little, because the long
-  jaw already lies on the chin rest. The rabbit lowers its head a little (`BowedHold.headDrop`),
-  so that its violin sits higher out of the chest.
+  jaw already lies on the chin rest. The cat lifts its head further, so that its brow does not
+  hide its eyes from the height of the stage camera. The rabbit lowers its head a little
+  (`BowedHold.headDrop`), so that its violin sits higher out of the chest.
 
 ### 3.2 The bow arm
 
