@@ -1214,14 +1214,18 @@ export const BOWED_HOLDS = {
  * passes through the middle of the paw (`SpeciesParams.bowGrip`), and the hand sits about 4 cm
  * further out on the bow, so the right elbow of the play points a little further out than the
  * elbow of the chin hold. The right elbow of the play points out to the side, a little down, and
- * forward, (2, -0.3, -0.7), so that it comes near the height of the hand, as the elbow of a real
+ * forward, (2, -0.45, -0.7), so that it comes near the height of the hand, as the elbow of a real
  * violist at the frog, and the arm does not bend in an unnatural way. With the elbow level,
  * (2, 0, -0.5), the paw twist of the bow arm passes the margin of the arm gate. With
  * (1.2, -0.5, -1), the upper arm hangs down the side of the body, and the forearm folds up to the
  * chin. With (1.1, -1, -1), the back of the upper arm goes 3.8 cm into the body. At the tip, the
- * right elbow points down, out, and forward, (1.5, -1, -1), further out than the elbow of the
- * rabbit, because the shorter arm reaches the tip nearly straight across the round belly: with
- * (1, -1, -1), the right upper arm goes 2.7 cm into the belly at the tip (2.1 cm with this elbow).
+ * right elbow points out, forward, and a little down, (1.5, -0.6, -1), further out than the elbow
+ * of the rabbit, because the shorter arm reaches the tip nearly straight across the round belly:
+ * with (1, -1, -1), the right upper arm goes 2.7 cm into the belly at the tip. With the viola on
+ * the left collarbone, the bow arm reaches further across the chest: with the elbows
+ * (2, -0.3, -0.7) and (1.5, -1, -1), 9 faces of the right arm fold near the play of `mozart-k525`
+ * (p95 of `pnpm arm-check violist`, limit 8), and the bow paw twists 76° on its forearm. With these
+ * elbows, 8 faces fold, and the paw twists 72°.
  * With the elbow up of the chin hold, (0.5, 1, -1), a dark wedge fold opens under the right armpit
  * at the tip, the right paw turns 116° on its forearm (90° with this elbow), and the narrowest ring
  * of the right arm keeps 0.14 of its axis (0.49 with this elbow). The right shoulder bone turns 36°
@@ -1369,8 +1373,8 @@ const CAT_HOLD = {
   poleL: [-2, -0.8, -0.71],
   elbowPerString: 2 * MathUtils.DEG2RAD,
   highTilt: 20 * MathUtils.DEG2RAD,
-  poleR: [2, -0.3, -0.7],
-  poleTipR: [1.5, -1, -1],
+  poleR: [2, -0.45, -0.7],
+  poleTipR: [1.5, -0.6, -1],
   polePizzicato: [1.2, -0.5, -1],
   pluckSide: 0.294654,
   reach: 36 * MathUtils.DEG2RAD,
