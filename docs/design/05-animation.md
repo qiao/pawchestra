@@ -808,8 +808,13 @@ The rest of each family:
   (`turnShare()`). The rest comes from the hanging arms (5.2). Reason: the sign from the geometry
   turned the right flute paw of 7 recast bodies about 180°, and the lip shift of the wolf under
   its long muzzle put the forearms of short snouts into the body. The tan fox and the wolf keep
-  their own holds (`FOX_FLUTE`, `WOLF_CLARINET`). The shared trumpet hold turns both shoulder bones
-  forward (`reach`, `reachL`), as the shoulder blades of a real player slide forward. Reason: with
+  their own holds (`FOX_FLUTE`, `WOLF_CLARINET`). `FOX_FLUTE` also keeps the side signs of the
+  accepted grip, so the right palm of the fox faces the audience behind the flute, with the paw up
+  and the digits over the keys, as a flutist turns the right palm away from the body (winds 2.4).
+  Reason: the short arms of the Tripo fox put the right paw nearly in the plane of its shoulder and
+  its tube, the sign from the geometry turned, and the palm faced up under the flute. The shared
+  trumpet hold turns both shoulder bones forward (`reach`, `reachL`), as the shoulder blades of a
+  real player slide forward. Reason: with
   square shoulders, the paws of most recast bodies miss the valves, also with the smallest trumpet
   of the size rule (4.6). A body with a far mouth also bows the head ("Far mouth in a shared
   hold"). The right palm faces the valve tops, and the right paw points a part of the way across

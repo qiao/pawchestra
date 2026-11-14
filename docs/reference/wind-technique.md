@@ -297,8 +297,10 @@ from the first position (derived).
   the right of the first finger [47 (secondary)], and Kincaid uses it to support the flute
   [46 (secondary)]. Only the fingers move [43] [46].
 - **The right hand.** The right thumb is "directly under and in between the first and second
-  fingers", and the right hand "forms a C" [46]. Thus the right hand comes to the flute from the
-  side of the player, below and behind it, with the fingers on the keys on the top (derived).
+  fingers", and the right hand "forms a C" [46]. The left palm faces the player, and the right
+  palm faces away from the player [124] [125]. Thus the right hand comes to the flute from the
+  side of the player, below and behind it, with the fingers on the keys on the top and the back
+  of the hand toward the player (derived).
 - **The angles.** The flutist turns the head about 30° to the side, and the flute lies about
   square to the face [40]. The flute slopes down to the right by "approximately the width of the
   hand" from the level [45], and the head tilts toward the right ear [6]. A flute parallel to the
@@ -451,7 +453,9 @@ The app follows these facts:
   reaches across the body. The flute lies about square to the face and slopes down to the right
   (`FOX_FLUTE_BACK`, `play`). The left paw holds the flute near the lip plate from its front
   (`gripShiftL`), and the right paw lies behind the flute and a little below it, so that the fingers
-  of both paws curl over the top onto the keys (`aimSide`, `gripCurl`). At rest, the flute stands on
+  of both paws curl over the top onto the keys (`aimSide`, `gripCurl`). The right paw points up,
+  and its palm faces the flute and the audience, as a flutist turns the right palm away from the
+  body (`aimSigns`). At rest, the flute stands on
   the right thigh in the right paw (`rest`, `restShift`, `gripAround`). A seated flutist can rest
   the free left hand on the thigh, but the short arm of the fox does not reach the top of the thigh.
   So the seated fox rests the free left paw on the top of the left haunch near the hip. The paw
@@ -923,6 +927,10 @@ Each source opened on 2026-10-18, except where its entry gives another date.
      https://www.trumpetherald.com/forum/viewtopic.php?p=1287763
 123. Yamaha, Musical Instrument Guide, "Bassoon: How to Play" (opened 2026-11-08).
      https://www.yamaha.com/en/musical_instrument_guide/bassoon/play/
+124. Music To Your Home, "How to Play the Flute for Beginners" (opened 2026-11-14).
+     https://www.musictoyourhome.com/blog/how-to-play-the-flute-for-beginners/
+125. Dynamic Music Room, "How To Hold The Flute (And Avoid Pain!)" (opened 2026-11-14).
+     https://dynamicmusicroom.com/how-to-hold-the-flute/
 
 ## 6. The parts of the instruments
 
