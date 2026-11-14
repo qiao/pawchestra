@@ -556,8 +556,11 @@ passes.
       because a real player muffles only in the rests (percussion-technique 5). Ask the user if the
       paw must wait at the far rim.
 - [ ] Badger percussionist: the left paw curls 118° on the triangle clip, so the arm gate counts
-      16 to 17 folded faces at the knuckles inside the fist (10 at 75°). The left paw grasps the
-      clip in 79% of the play and the lift, and the right paw the beater in 88% of the play.
+      16 to 17 folded faces at the knuckles inside the fist (10 at 75°). The clip hangs in the hook
+      of the claws, 1.1 cm from the claw tips, and `pnpm wind-grip percussionist` counts no grasp
+      of the left paw. The right paw grasps the beater in 88% of the play. The paws at the trap
+      table and at the stand (`SWITCH_MOTION`) have no check with the new clip place, because no
+      demo has a switch.
 - [ ] Badger percussionist: the triangle stays up in the left paw at rest, because the trap table
       stands under it. A rest with the triangle on its stand and the beater on the table
       (`restSwitch()` trial) bent the empty left paw 123° on the forearm, or turned it over 178°

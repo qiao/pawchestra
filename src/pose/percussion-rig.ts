@@ -711,10 +711,10 @@ export const PERCUSSION_HOLDS = {
     fit: null,
     damp: null,
     // The left paw closes on the clip of the triangle with a deep curl, so that the claw tips
-    // touch the thin clip (pnpm wind-grip percussionist): at 118°, the left paw grasps the clip in
-    // 79% of the play and in the rest, with the tips 0.5 cm off it. At 75°, the tips stood 3.0 cm
-    // off, and the paw grasped in no sample. The deep curl folds 16 faces at the knuckles inside
-    // the fist (10 at 75°). The right paw closes on the short beater with less curl.
+    // come near the thin clip (pnpm wind-grip percussionist): at 118°, the tips stand 1.1 cm
+    // off the clip, which hangs in the hook of the claws (`TRIANGLE_PINCH`). The deep curl folds
+    // 16 faces at the knuckles inside the fist (10 at 75°). The right paw closes on the short
+    // beater with less curl.
     curl: [118 * MathUtils.DEG2RAD, 75 * MathUtils.DEG2RAD],
     // A beater near the line of the forearm turns the paw fast with a roll that removes the
     // side bend, so the forearm lies in the plane of the palm.
@@ -948,8 +948,9 @@ export const PERCUSSION_PLACES = {
    */
   crash: [0, -0.09, -1.1],
   /**
-   * The clip of the triangle at the tip of the left thumb, from the left shoulder joint: a little
-   * above the shoulder and out to the left, below the long snout of the Tripo badger. A real player
+   * The upper end of the clip of the triangle in the curled claws of the left paw, from the left
+   * shoulder joint: a little above the shoulder and out to the left, below the long snout of the
+   * Tripo badger. A real player
    * holds the triangle near the eye level, but the claws of the left paw in line with its forearm
    * ({@link trianglePaw}) go 5.8 cm into the snout with a clip 0.4 H higher, and 6.0 cm with a
    * clip 0.7 H higher.
@@ -957,8 +958,8 @@ export const PERCUSSION_PLACES = {
   triangleClip: [0.4, 0.1, -0.8],
   /**
    * The world rotation of the triangle from the bind pose of the paw that holds it: the turn of
-   * the bind paw with the thumb down, so that the clip hangs from its tip, between the thumb and
-   * the curled fingers (`TRIANGLE_PINCH` of `models/instruments/percussion.ts`), and the triangle
+   * the bind paw with the thumb down, so that the clip hangs from the curled claws
+   * (`TRIANGLE_PINCH` of `models/instruments/percussion.ts`), and the triangle
    * hangs in the plane x-y, turned 40° around the vertical. Thus the side of the triangle that the
    * beater strikes faces the right hand. The paw at the trap table takes this turn. The paw in the
    * play takes its own turn in line with its forearm ({@link trianglePaw}), and the triangle turns
@@ -966,14 +967,6 @@ export const PERCUSSION_PLACES = {
    */
   // holdTurn(-90, 40) of pose/winds.ts.
   triangleTurn: [-0.664463, 0.241845, 0.241845, 0.664463],
-  /**
-   * The turn of the left paw that holds the triangle around its forearm, in radians, from the
-   * hand in line with the forearm with no twist from the bind pose ({@link trianglePaw}): the
-   * palm faces the clip (32° in `pnpm wind-grip percussionist`), and the paw twists 84° on its
-   * forearm. With no turn, the palm faced away from the clip (146°), and the paw twisted 175°.
-   */
-  // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
-  triangleTwist: 90 * MathUtils.DEG2RAD,
 } as const;
 
 /**
@@ -2125,9 +2118,10 @@ function towardPlayer(target: StrikeTarget, distance: number): StrikeTarget {
 /**
  * Gives the world rotation of the left paw that holds the clip of the triangle (design 5.3): the
  * hand in line with its forearm, as a real player holds the clip at the end of the raised
- * forearm, turned around the forearm by `PERCUSSION_PLACES.triangleTwist`. The wrist follows the
- * hand, so that the pinch of the thumb stays at the clip place, and the forearm follows the wrist,
- * so the function solves the arm a few times.
+ * forearm, with no turn around the forearm, so that the skin of the paw does not twist. With a
+ * turn of 90°, the paw twisted 84° at the wrist, and its skin stood up as a flat fin. The wrist
+ * follows the hand, so that the pinch of the claws stays at the clip place, and the forearm
+ * follows the wrist, so the function solves the arm a few times.
  *
  * @param arm The left arm.
  * @param clip The clip place, in the model axes.
@@ -2145,14 +2139,11 @@ function trianglePaw(arm: ArmRig, clip: Vector3, pinch: Vector3, pole: Vec3): Qu
   const toPinch = pinch.clone().sub(bindWrist);
   const poleAt = new Vector3(...pole);
   const hand = new Quaternion(...PERCUSSION_PLACES.triangleTurn);
-  const twist = new Quaternion();
   for (let pass = 0; pass < 4; pass++) {
     const wrist = clip.clone().sub(toPinch.clone().applyQuaternion(hand));
     const joints = solveTwoBone(shoulder, wrist, upper, lower, poleAt);
     const fore = joints.wrist.clone().sub(joints.elbow).normalize();
-    hand
-      .setFromUnitVectors(bindFore, fore)
-      .premultiply(twist.setFromAxisAngle(fore, PERCUSSION_PLACES.triangleTwist));
+    hand.setFromUnitVectors(bindFore, fore);
   }
   return hand;
 }

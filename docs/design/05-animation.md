@@ -864,10 +864,12 @@ The rest of each family:
   within 1 cm of the top hoop. At the xylophone, a bar past `reach` of one
   shoulder goes to the other paw, so that each paw strikes only the bars near its side. At the bass
   drum, the upper body turns further at a muffle (`PalmDamp.turn`), so that the left forearm stays
-  out of the belly. The left paw that holds the triangle stays in line with its forearm
-  (`trianglePaw()`), and the triangle turns back around the pinch of the clip, so that it keeps
-  its hang (`PercussionSide.piece`). Reason: the triangle followed the hand of the player, whose
-  turn made the visible paw turn 70° in the plane of its palm, off the clip and up to the snout.
+  out of the belly. The left paw that holds the triangle stays in line with its forearm, with no
+  turn around it (`trianglePaw()`), and the triangle turns back around the pinch of the clip, so
+  that it keeps its hang (`PercussionSide.piece`). The clip hangs in the hook of the curled claws,
+  in front of the palm (`TRIANGLE_PINCH`). Reason: the triangle followed the hand of the player,
+  whose turn made the visible paw turn 70° in the plane of its palm, off the clip and up to the
+  snout, and a paw with the palm down twisted at the wrist until its skin stood up as a fin.
   The clip stays below the snout (`triangleClip`), because a higher clip puts the claws into the
   snout. The left paw curls deeper than the right paw (`PercussionHold.curl`), so that its claw
   tips close on the thin clip.

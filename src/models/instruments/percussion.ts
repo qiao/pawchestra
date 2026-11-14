@@ -447,14 +447,16 @@ export const TRIANGLE_CLIP = {
 
 /**
  * The place of the triangle in the hanging left paw of the bind pose (design 4.6): the origin of
- * its piece at the tip of the thumb, where the thumb and the curled fingers meet
- * ({@link TRIANGLE_CLIP}), from the middle of the palm, in head heights `H`: toward the palm, down
- * along the fingers, and forward toward the thumb. The piece points forward, as a mallet does, so
- * that the triangle hangs down from the thumb when the paw takes its turn of the play, with the
- * thumb down (`PERCUSSION_PLACES.triangleTurn`).
+ * its piece in the hook of the curled claws, in front of the palm ({@link TRIANGLE_CLIP}), from
+ * the middle of the palm, in head heights `H`: toward the palm, down along the fingers, and
+ * forward toward the thumb. The curled claws close on the upper end of the clip, 1.1 cm from it
+ * (`pnpm wind-grip percussionist`), and the clip hangs out of the paw at each turn of the paw.
+ * With the origin in the paw at the thumb, 0.8 cm from its middle plane, the clip left the paw
+ * through the palm only with the palm down, and that turn twisted the paw 84° on its forearm
+ * into a flat fin. The piece points forward, as a mallet does.
  */
 const TRIANGLE_PINCH = {
-  at: [0.03, -0.06, -0.15],
+  at: [0.19, -0.06, -0.03],
   turn: toQuat(new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), 90 * MathUtils.DEG2RAD)),
 } satisfies { readonly at: Vec3; readonly turn: Quat };
 

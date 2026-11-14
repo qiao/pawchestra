@@ -363,11 +363,11 @@ The app follows these facts:
   paw along the rim on the head, as a thumb roll [65] [66]. Between uses, the tambourine and the
   beater lie on a padded trap table [65] [66], and the triangle hangs from the hook of a stand.
   In the rest, the paws put down one instrument and take the other (`SWITCH_MOTION`).
-- **The triangle (section 8).** The left paw holds the upper end of the clip between the tip of
-  the thumb and the fingers, curled deep on the thin clip (`PercussionHold.curl`), with the thumb
-  down, and the clip and the triangle hang below
-  the paw in a loop of cord [15] [25] (`TRIANGLE_CLIP`). The paw stays in line with its forearm,
-  and the triangle keeps its hang below the pinch (`trianglePaw()`). A single note strikes the side
+- **The triangle (section 8).** The left paw holds the upper end of the clip in the hook of its
+  claws, curled deep on the thin clip (`PercussionHold.curl`), and the clip and the triangle hang
+  below the paw in a loop of cord [15] [25] (`TRIANGLE_CLIP`, `TRIANGLE_PINCH`). The paw stays in
+  line with its raised forearm, with no turn around it, and the triangle keeps its hang below
+  the claws (`trianglePaw()`). A single note strikes the side
   across from the open corner [63]. Before a louder note, the beater turns further back
   (`MalletAcross.peak`). A roll moves the beater fast between the two sides of the closed lower
   corner, from inside [25] [63] (`TRIANGLE_ROLL`, `triangleRolls()`).
@@ -410,9 +410,10 @@ The app does not follow these facts:
   strikes at most 6 times each second (`handRollSec`).
 - **The hold of the triangle (section 8).** The clip is a little below the mouth
   (`PERCUSSION_PLACES.triangleClip`). A real player holds it near eye level, but the long snout of
-  the badger stands there: a clip 0.4 H higher put the claws 5.8 cm into the snout. The paw turns
-  90° around its forearm, so that the palm faces the clip (`triangleTwist`). No source gives the
-  turn of the hand.
+  the badger stands there: a clip 0.4 H higher put the claws 5.8 cm into the snout. The palm
+  faces to the right of the player, and the claw tips stand 1.1 cm from the clip
+  (`pnpm wind-grip percussionist` counts no grasp). No source gives the turn of the hand. A paw
+  with the palm down twisted 84° at the wrist, and its skin stood up as a fin.
 - **The change of the instrument (section 8).** A switch takes 2.7 s of rest: 0.2 s after the
   note, two moves of 0.45 s, 0.6 s at the table, and the lift of 1 s before the next note
   (`switchRestSec()`). No source gives the time [67]. With a shorter rest, the left paw keeps the
