@@ -1387,8 +1387,7 @@ function blendNear(
 
 /**
  * Runs the tests of a close move that the planner keeps for each camera, because they do not
- * depend on the cut (design 5.6). The cheap tests come first, and the cover of the objects and of
- * the bodies last.
+ * depend on the cut (design 5.6). The cheap tests come first, and the cover of the objects last.
  *
  * @param planner The planner.
  * @param move The cameras of the move.
@@ -1401,6 +1400,10 @@ function keptRefusal(planner: Planner, move: ComposedMove): KeptRefusal | null {
   if (moveForeground(planner, move, 'heads')) {
     return 'head';
   }
+  // The body test refuses many cameras and costs less than the tests of the clearance.
+  if (moveForeground(planner, move, 'bodies')) {
+    return 'body';
+  }
   const { held, sights } = subjectLines(planner, move.subject);
   const refusal = moveRefusal(planner, move, held, sights);
   if (refusal) {
@@ -1409,10 +1412,7 @@ function keptRefusal(planner: Planner, move: ComposedMove): KeptRefusal | null {
   if (moveNear(planner, move)) {
     return 'near';
   }
-  if (moveForeground(planner, move, 'objects')) {
-    return 'object';
-  }
-  return moveForeground(planner, move, 'bodies') ? 'body' : null;
+  return moveForeground(planner, move, 'objects') ? 'object' : null;
 }
 
 /**
