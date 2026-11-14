@@ -824,7 +824,8 @@ function horn(): BrassBuild {
     METAL,
   );
   // The two inner loops of the double horn, the F side and the B♭ side: each leaves one valve,
-  // goes around inside the hoop, and comes back to another valve.
+  // goes around inside the hoop, and comes back to another valve. Both ends lie on the axes of the
+  // valves, inside the casings, so a loop has no caps.
   const center = at(0, 0);
   const coilU = toVec3(along(1, 0));
   const coilV = toVec3(along(0, 1));
@@ -842,6 +843,7 @@ function horn(): BrassBuild {
       [0.006],
       TUBE_SEGMENTS,
       METAL,
+      false,
     );
   }
   // The valve slides rise from the valves on the far side of the loops. Both legs of a slide leave
