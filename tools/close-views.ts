@@ -5530,7 +5530,7 @@ function sideParts(side: 'L' | 'R'): [arm: BodyPart, paw: BodyPart, ankle: BodyP
     {
       name: `ankle-${side}`,
       bones: [`foot${side}`],
-      margin: 0.3,
+      margin: 0.4,
       views: around(10),
     },
   ];
