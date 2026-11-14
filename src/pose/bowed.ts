@@ -1,7 +1,7 @@
 import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import { boneIndex } from '../models/rig.ts';
-import { palmTurnAngle, studioPawTwist } from '../models/studio-rig.ts';
+import { studioPawTwist } from '../models/studio-rig.ts';
 import type { Quat } from '../models/tuples.ts';
 import { X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { mixDirection, mixRotation, mixRotationNear } from './blend.ts';
@@ -21,9 +21,14 @@ export const BOWED_HANDS = {
   pluckHeight: 0.035,
   /** The plucking hand moves this far to each side of the strings, at a gesture size of 1. */
   pluck: 0.012,
-  /** The curl of the left fingers, and the extra curl of a press at the note start. */
-  curlL: 40 * MathUtils.DEG2RAD,
+  /** The extra curl of the left fingers of a press at the note start. */
   pressL: 15 * MathUtils.DEG2RAD,
+  /**
+   * The part of the length of the left finger block, from the knuckles, on which the contact with
+   * the strings can lie ({@link stopHandAt}): nearer to the knuckles, the palm goes into the
+   * fingerboard, and past the end, the tips do not reach the strings.
+   */
+  padSpan: [0.3, 0.6],
   /**
    * The turn of the left hand around the normal of the strings toward the finger of the note, at
    * a reach of 1 (`BowState.reach`). The four fingers are one block, so the hand turns in place
@@ -500,6 +505,21 @@ interface StopFinger {
 /** The finger in the middle of the hand frame and of the strings: no turn and no roll. */
 export const MIDDLE_FINGER: StopFinger = { reach: 0, stopString: 1.5 };
 
+/** The grip of the left paw on the neck ({@link stopHandAt}). */
+export interface StopGrip {
+  /** The curl of the finger block, in radians. */
+  curl: number;
+  /** The further tilt of the hand over the neck, in radians ({@link leftTilt}). */
+  tilt: number;
+  /**
+   * The turn of the paw that the viewer sees in the plane of its palm, in radians (`pawTurnL` of
+   * `AnimalPose`): a positive turn points the paw toward the scroll.
+   */
+  turn: number;
+  /** The free space between the pads of the palm and the edge of the fingerboard, in meters. */
+  gap: number;
+}
+
 const neck = new Vector3();
 const fingers = new Vector3();
 const fingersUp = new Vector3();
@@ -510,37 +530,58 @@ const stopPoint = new Vector3();
 const handTurn = new Quaternion();
 const rollPivot = new Vector3();
 const rollAxis = new Vector3();
-const palmNormal = new Vector3();
+const seenTurn = new Quaternion();
 
 /**
- * Places the left hand so that the middle of its finger block presses the strings at a place
- * on the fingerboard. The fingers point up from the strings, tilted over the neck by
- * `BowedHold.tiltL` and the further tilt of a high position, and the palm faces the neck from
- * below. The hand turns around the normal of the strings toward the finger of
- * the note, by `BOWED_HANDS.reachTurn` at a reach of 1, and it rolls around the neck to the
- * string of the finger, by `BOWED_HANDS.rollL` for each string from the middle of the strings.
+ * Gives the curl of the left finger block that lays its pads on the strings (design 5.3): 90°
+ * minus the tilt of the hand over the neck, plus the dip of the hold (`BowedHold.dipL`).
+ *
+ * @param hold The hold of the instrument.
+ * @param tilt The further tilt of the hand over the neck, in radians ({@link leftTilt}).
+ * @returns The curl, in radians.
+ */
+export function stopCurl(hold: BowedHold, tilt: number): number {
+  return Math.PI / 2 - hold.tiltL - tilt + hold.dipL;
+}
+
+/**
+ * Places the left hand on the neck at a place on the fingerboard, as the hand of a player holds
+ * it (`docs/reference/string-technique.md`, section 1.9): the palm stands beside the neck on the
+ * side of the high strings and does not touch it, and the finger block curls over the fingerboard
+ * and lies with its pads on the strings. The hand points up from the strings, tilted over the
+ * neck by `BowedHold.tiltL` and the further tilt of a high position, and the palm faces the neck.
+ *
+ * The contact with the strings lies on the pads of the block, at the distance from the knuckles
+ * that puts the pads of the palm on the edge of the fingerboard, within `BOWED_HANDS.padSpan` of
+ * the block. The gap of the grip then moves the palm that far off the edge. The pads of each paw lie off its bones by
+ * `BowedRig.padsL`. The paw that the viewer sees turns in the plane of its palm by the turn of
+ * the grip (`pawTurnL` of `AnimalPose`). The wrist takes the place that keeps the contact of that
+ * paw on the strings, so the paw turns around its contact, and not around its wrist.
+ *
+ * The hand turns around the normal of the strings toward the finger of the note, by
+ * `BOWED_HANDS.reachTurn` at a reach of 1, and it rolls around the neck to the string of the
+ * finger, by `BOWED_HANDS.rollL` for each string from the middle of the strings.
  *
  * @param rig The points of the player.
  * @param place The place of the instrument.
  * @param strings The strings at their posed place.
  * @param stop The place on the target `fingerboard`: 0 at the nut, 1 at the end.
- * @param curlAngle The curl of the fingers, in radians.
- * @param tilt The further tilt of the hand over the neck, in radians ({@link leftTilt}).
+ * @param grip The curl, the tilt, the turn, and the gap of the grip.
  * @param finger The reach and the string of the finger. {@link MIDDLE_FINGER} gives no turn.
  * @param out The hand to write.
- * @returns `out`, with the wrist and the rotation of the hand.
+ * @returns `out`, with the wrist and the rotation of the hand of the player, before the turn of
+ *   the paw in the plane of its palm.
  */
 export function stopHandAt(
   rig: RigPoints,
   place: InstrumentPlace,
   strings: StringsPlace,
   stop: number,
-  curlAngle: number,
-  tilt: number,
+  grip: Readonly<StopGrip>,
   finger: StopFinger,
   out: StopHand,
 ): StopHand {
-  const fullTilt = rig.hold.tiltL + tilt;
+  const fullTilt = rig.hold.tiltL + grip.tilt;
   onInstrument(
     rig,
     place,
@@ -557,7 +598,7 @@ export function stopHandAt(
     .addScaledVector(strings.top, -Math.sin(fullTilt));
   // The bind hand hangs: its fingers point to -y, and its palm faces +x.
   setFromBasis(out.rotation, palmSide, fingersUp.negate());
-  // The turn toward the finger keeps the middle of the finger block on the stop.
+  // The turn toward the finger keeps the contact of the finger block on the stop.
   if (finger.reach !== 0) {
     out.rotation.premultiply(
       handTurn.setFromAxisAngle(
@@ -566,8 +607,26 @@ export function stopHandAt(
       ),
     );
   }
-  curl.setFromAxisAngle(Z_AXIS, curlAngle);
-  block.fromArray(rig.fingerBlock).applyQuaternion(curl).add(neck.fromArray(rig.knuckles));
+
+  // The contact on the pads of the block: the distance from the knuckles at which the pads of the
+  // palm stand the gap off the edge of the fingerboard, across the strings.
+  const pads = rig.padsL;
+  const [nutHalf, endHalf] = rig.boardHalf;
+  const half = nutHalf + (endHalf - nutHalf) * MathUtils.clamp(stop, 0, 1);
+  const length = 2 * Math.hypot(...rig.fingerBlock);
+  const [from, to] = BOWED_HANDS.padSpan;
+  const sine = Math.max(Math.sin(grip.curl), from);
+  const onEdge =
+    (pads.palm - pads.fingers * Math.cos(grip.curl) + half * Math.cos(fullTilt)) / sine;
+  const padAt = Math.min(
+    MathUtils.clamp(onEdge, from * length, to * length) + grip.gap / sine,
+    length,
+  );
+  curl.setFromAxisAngle(Z_AXIS, grip.curl);
+  block.set(pads.fingers, -padAt, 0).applyQuaternion(curl).add(neck.fromArray(rig.knuckles));
+  if (grip.turn !== 0) {
+    block.applyQuaternion(seenTurn.setFromAxisAngle(X_AXIS, grip.turn));
+  }
   out.wrist.copy(stopPoint).sub(block.applyQuaternion(out.rotation));
 
   // The roll around the middle of the neck, below the strings. A positive roll moves the
@@ -587,15 +646,17 @@ export function stopHandAt(
   return out;
 }
 
+const restStop: StopGrip = { curl: 0, tilt: 0, turn: 0, gap: 0 };
+
 /**
  * Places the left paw in its rest grip on the neck of a violin or a viola (design 5.2): the
  * playing grip of the middle finger in the first position, at the rest place
- * (`BowedHold.restPlace`), with the fingers closed around the neck by `BowedHold.restCurlL`, off
- * the neck by `BowedRig.restGapL`, and turned a little around the normal of the top plate through
- * the middle of the neck by `BowedHold.restYawL`. The paw that the viewer sees then turns at the
- * wrist in the plane of its palm by `BowedHold.restPawTurnL` in place of the turn of the retarget
- * (`carryLift()`, design 4.4), as the paw of the play turns toward a forearm along the neck. Thus
- * the paw holds the neck from the side of the high strings, near the grip of the play.
+ * (`BowedHold.restPlace`), with the fingers closed around the neck by `BowedHold.restCurlL`, the
+ * palm off the fingerboard by `BowedRig.restGapL`, and turned a little around the normal of the
+ * top plate through the middle of the neck by `BowedHold.restYawL`. The paw that the viewer sees
+ * turns around its contact with the strings in the plane of its palm by `BowedHold.restPawTurnL`
+ * (`carryLift()`, design 4.4). Thus the paw holds the neck from the side of the high strings,
+ * near the grip of the play.
  *
  * @param rig The points of the player.
  * @param place The place of the instrument.
@@ -612,25 +673,49 @@ export function restHandAt(
   at: number = rig.hold.restPlace,
 ): StopHand {
   const hold = rig.hold;
-  stopHandAt(rig, place, strings, at, hold.restCurlL, 0, MIDDLE_FINGER, out);
-  // The bind hand palm faces +x: the paw moves to the back of the hand, off the neck.
-  palmNormal.set(1, 0, 0).applyQuaternion(out.rotation);
-  out.wrist.addScaledVector(palmNormal, -rig.restGapL);
-  if (hold.restYawL !== 0) {
-    onInstrument(
-      rig,
-      place,
-      stopPoint.fromArray(rig.nut).addScaledVector(neck.fromArray(rig.neck), at),
-    );
-    rollPivot
-      .copy(strings.top)
-      .normalize()
-      .multiplyScalar(-BOWED_HANDS.neckDepth * neck.length())
-      .add(stopPoint);
-    handTurn.setFromAxisAngle(rollAxis.copy(strings.top).normalize(), hold.restYawL);
-    out.wrist.sub(rollPivot).applyQuaternion(handTurn).add(rollPivot);
-    out.rotation.premultiply(handTurn);
+  restStop.curl = hold.restCurlL;
+  restStop.turn = hold.restPawTurnL ?? hold.turnL;
+  restStop.gap = rig.restGapL;
+  stopHandAt(rig, place, strings, at, restStop, MIDDLE_FINGER, out);
+  return yawOnNeck(rig, place, strings, at, hold.restYawL, out);
+}
+
+/**
+ * Turns a hand on the neck around the normal of the top plate, through the middle of the neck at
+ * a place on the fingerboard (`BowedHold.restYawL`).
+ *
+ * @param rig The points of the player.
+ * @param place The place of the instrument.
+ * @param strings The strings at their posed place.
+ * @param at The place on the target `fingerboard`: 0 at the nut, 1 at the end.
+ * @param yaw The turn, in radians.
+ * @param out The hand. The function turns it in place.
+ * @returns `out`.
+ */
+function yawOnNeck(
+  rig: RigPoints,
+  place: InstrumentPlace,
+  strings: StringsPlace,
+  at: number,
+  yaw: number,
+  out: StopHand,
+): StopHand {
+  if (yaw === 0) {
+    return out;
   }
+  onInstrument(
+    rig,
+    place,
+    stopPoint.fromArray(rig.nut).addScaledVector(neck.fromArray(rig.neck), at),
+  );
+  rollPivot
+    .copy(strings.top)
+    .normalize()
+    .multiplyScalar(-BOWED_HANDS.neckDepth * neck.length())
+    .add(stopPoint);
+  handTurn.setFromAxisAngle(rollAxis.copy(strings.top).normalize(), yaw);
+  out.wrist.sub(rollPivot).applyQuaternion(handTurn).add(rollPivot);
+  out.rotation.premultiply(handTurn);
   return out;
 }
 
@@ -889,6 +974,7 @@ const placeInverse = new Quaternion();
 
 /** The finger of the left hand that the pose writes before each use. */
 const finger = { reach: 0, stopString: 1.5 } satisfies StopFinger;
+const playGrip: StopGrip = { curl: 0, tilt: 0, turn: 0, gap: 0 };
 
 /**
  * The places of the hand frame of the violin in the fourth and in the sixth positions, on the
@@ -1036,17 +1122,16 @@ const carryArm = createArmPose();
 const handInRest = new Quaternion();
 const handInPlay = new Quaternion();
 const handInMix = new Quaternion();
-const gripRest = createGrip();
-const gripPlay = createGrip();
-const gripTurn = new Quaternion();
-const gripWrist = new Vector3();
+const mixHand: StopHand = { wrist: new Vector3(), rotation: new Quaternion() };
+const grip = createGrip();
+const gripInverse = new Quaternion();
 const carryShift = new Vector3();
 const carryInverse = new Quaternion();
 const carryPoint = new Vector3();
 const carryRestPole = new Vector3();
-const carryFore = new Vector3();
 const playFinger = { reach: 0, stopString: MIDDLE_FINGER.stopString } satisfies StopFinger;
 const playPoleL = new Vector3();
+const carryGrip: StopGrip = { curl: 0, tilt: 0, turn: 0, gap: 0 };
 
 const armForearm = new Vector3();
 const armUpper = new Vector3();
@@ -1118,18 +1203,6 @@ function handInArm(
   return out.invert().multiply(hand.rotation);
 }
 
-/**
- * Gives the turn of the left paw toward its forearm that the studio retarget gives the paw of the
- * arm in the module value `carryArm` (`palmTurnAngle()` of `models/studio-rig.ts`, design 4.4).
- *
- * @param hand The world rotation of the hand of the player.
- * @returns The turn, in radians.
- */
-function retargetTurn(hand: Quaternion): number {
-  carryFore.subVectors(carryArm.wrist, carryArm.elbow).normalize();
-  return palmTurnAngle('L', hand, carryFore);
-}
-
 const pawTurn = new Quaternion();
 
 /**
@@ -1145,8 +1218,7 @@ function turnedPaw(hand: Quaternion, angle: number, out: Quaternion): Quaternion
   return out.copy(hand).multiply(pawTurn.setFromAxisAngle(X_AXIS, angle));
 }
 
-const seenRest = new Quaternion();
-const seenPlay = new Quaternion();
+const seenGrip = new Quaternion();
 const seenMix = new Quaternion();
 
 /**
@@ -1155,11 +1227,13 @@ const seenMix = new Quaternion();
  * a player lifts the instrument by its neck. The paw leads, and the instrument hangs from the paw
  * that the viewer sees ({@link turnedPaw}): it turns with the paw, in the same direction, as one
  * rigid object in a hand. At rest, the paw takes its own turn in the plane of its palm
- * (`BowedHold.restPawTurnL`) in place of the turn of the retarget toward the forearm, near the
- * turn of the play, so that the grip in the paw changes little. In the move, the paw takes the turn
- * of the retarget plus the rest difference times `(1 - weight)²`: with the difference times
- * `1 - weight`, the claws of the cat go 2.4 cm into the viola in a lowering. The grip in the paw
- * goes on the short path from the rest grip to the playing grip of the note. The wrist moves on a
+ * (`BowedHold.restPawTurnL`), and at the play the turn of the hold (`BowedHold.turnL`). In the
+ * move, the paw takes the turn of the play plus the rest difference times `(1 - weight)²`: with
+ * the difference times `1 - weight`, the claws of the cat go 2.4 cm into the viola in a lowering.
+ * Each value of the grip (the place on the neck, the curl, the tilt, the turn, the gap, and the
+ * turn around the top plate) goes from the rest grip to the playing grip of the note, so that the
+ * neck stays between the palm and the finger block on the way ({@link stopHandAt}). The wrist
+ * moves on a
  * line from its rest place to its playing place, plus `4 × weight × (1 - weight)` times
  * `BowedHold.liftReach`. The twist of the paw on its forearm goes from the rest to the play with a
  * supination ({@link mixTwist}), as a real forearm turns. The bind of the left paw of these bodies
@@ -1178,7 +1252,8 @@ const seenMix = new Quaternion();
  * @param place The place of the instrument to write.
  * @param out The left hand to write.
  * @returns The turn of the left paw in the plane of its palm (`pawTurnL` of `AnimalPose`), or
- *   `null` for an instrument that the paw does not carry and at the play.
+ *   `null` for an instrument that the paw does not carry and at the play, where the paw takes the
+ *   turn of the hold.
  */
 function carryLift(
   rig: RigPoints,
@@ -1221,26 +1296,18 @@ function carryLift(
   stringsAt(rig, liftPlay, carryStrings);
   playFinger.reach = state.reach;
   playFinger.stopString = state.stopString;
-  stopHandAt(
-    rig,
-    liftPlay,
-    carryStrings,
-    note,
-    BOWED_HANDS.curlL,
-    leftTilt(hold, state.fingerboard),
-    playFinger,
-    playHand,
-  );
+  const playAngle = hold.turnL;
+  const playTilt = leftTilt(hold, state.fingerboard);
+  carryGrip.tilt = playTilt;
+  carryGrip.curl = stopCurl(hold, playTilt);
+  carryGrip.turn = playAngle;
+  carryGrip.gap = rig.gapL;
+  stopHandAt(rig, liftPlay, carryStrings, note, carryGrip, playFinger, playHand);
 
   // The paw at this weight: the wrist on its path, and the twist and the turn mixed.
   handInArm(rig, frames, 0, carryRestPole.fromArray(rig.restPoleL), restHand, handInRest);
-  // The rest turn of the paw differs from the turn of the retarget at rest by this angle.
-  const restOffset = restTurn - retargetTurn(restHand.rotation);
-  turnedPaw(restHand.rotation, restTurn, seenRest);
   const restTwist = studioTwist(rig, restHand.rotation, restTurn);
   handInArm(rig, frames, 1, leftElbow(hold, state, playPoleL), playHand, handInPlay);
-  const playAngle = retargetTurn(playHand.rotation);
-  turnedPaw(playHand.rotation, playAngle, seenPlay);
   const playTwist = studioTwist(rig, playHand.rotation, playAngle);
   mixTwist(rig, handInRest, handInPlay, playTwist - restTwist, weight, handInMix);
   out.wrist
@@ -1260,25 +1327,35 @@ function carryLift(
   armFrame(rig, shoulder.position, carryArm.elbow, carryArm.wrist, out.rotation).multiply(
     handInMix,
   );
-  let angle = retargetTurn(out.rotation) + restOffset * (1 - weight) ** 2;
-  turnedPaw(out.rotation, angle, seenMix);
+  const angle = rig.carryVia
+    ? restTurn + (playAngle - restTurn) * weight
+    : playAngle + (restTurn - playAngle) * (1 - weight) ** 2;
 
-  // The instrument hangs from the paw that the viewer sees, with the grip mixed from the rest grip
-  // to the playing grip of the note. With a via, the instrument leads, and the paw follows it.
-  gripOf(liftRest, restHand.wrist, seenRest, gripRest);
-  gripOf(liftPlay, playHand.wrist, seenPlay, gripPlay);
-  mixRotation(gripRest.turn, gripPlay.turn, weight, gripTurn);
-  gripWrist.lerpVectors(gripRest.wrist, gripPlay.wrist, weight);
+  // The grip at this weight: each value of the grip mixes from the rest grip to the playing grip
+  // of the note, so that the neck stays between the palm and the finger block on the whole way.
+  const stop = rig.restCarryPlace + (note - rig.restCarryPlace) * weight;
+  carryGrip.tilt = playTilt * weight;
+  carryGrip.curl = hold.restCurlL + (stopCurl(hold, carryGrip.tilt) - hold.restCurlL) * weight;
+  carryGrip.turn = angle;
+  carryGrip.gap = rig.restGapL + (rig.gapL - rig.restGapL) * weight;
+  playFinger.reach = state.reach * weight;
+  playFinger.stopString =
+    MIDDLE_FINGER.stopString + (state.stopString - MIDDLE_FINGER.stopString) * weight;
+  stopHandAt(rig, liftPlay, carryStrings, stop, carryGrip, playFinger, mixHand);
+  yawOnNeck(rig, liftPlay, carryStrings, stop, hold.restYawL * (1 - weight), mixHand);
+  gripOf(liftPlay, mixHand.wrist, turnedPaw(mixHand.rotation, angle, seenGrip), grip);
+
+  // The instrument hangs from the paw that the viewer sees by this grip. With a via, the
+  // instrument leads, and the paw follows it.
   if (rig.carryVia) {
     viaTurn(rig, rig.carryVia, frames, weight, place.rotation);
-    seenMix.copy(place.rotation).multiply(gripTurn);
-    angle = restTurn + (playAngle - restTurn) * weight;
+    seenMix.copy(place.rotation).multiply(grip.turn);
     out.rotation.copy(seenMix).multiply(pawTurn.setFromAxisAngle(X_AXIS, -angle));
-    gripTurn.invert();
   } else {
-    place.rotation.copy(seenMix).multiply(gripTurn.invert());
+    turnedPaw(out.rotation, angle, seenMix);
+    place.rotation.copy(seenMix).multiply(gripInverse.copy(grip.turn).invert());
   }
-  place.pivot.copy(out.wrist).sub(gripWrist.applyQuaternion(place.rotation));
+  place.pivot.copy(out.wrist).sub(grip.wrist.applyQuaternion(place.rotation));
   const parent = rig.parent === BONES.chest ? frames.chest : frames.root;
   place.local.copy(parent.rotation).invert().multiply(place.rotation);
   placeOffset(rig, frames, place);
@@ -1419,13 +1496,14 @@ function mixTwist(
 
 /**
  * Gives the curl of the left fingers at rest: the curl of the rest grip of a violin or a viola
- * ({@link restHandAt}), and none for a hold with no rest grip.
+ * ({@link restHandAt}), and the curl of the play for an instrument that stays at its place
+ * ({@link stopCurl}).
  *
  * @param hold The hold of the instrument.
  * @returns The curl, in radians.
  */
 function restCurlOf(hold: BowedHold): number {
-  return hold.restPawTurnL === null ? 0 : hold.restCurlL;
+  return hold.restPawTurnL === null ? stopCurl(hold, 0) : hold.restCurlL;
 }
 
 /** The bow arm of one hold: the bow on the strings, or pizzicato ({@link holdArm}). */
@@ -1827,12 +1905,13 @@ function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm 
  * Writes the arms and the instrument of a bowed string player (design 5.3, 4.7). The bow plays
  * on the strings at the place of the bow state, on the string of the stroke, and lifts in a rest.
  * Pizzicato moves the right hand over the strings near the end of the fingerboard to pluck. The
- * middle of the left finger block presses the strings at the middle of the hand frame of the
- * position on the fingerboard, and the hand moves only in a shift and in the vibrato. The block
- * turns toward the finger of the note and rolls to its string, the hand tilts further over the
- * neck in a high position, and the left elbow follows the string. The two-bone IK places each arm. In the rest pose (design 5.2), the violin and
- * the viola stand on the left thigh, and the left fingers keep the strings. The right hand holds
- * the bow on the right thigh.
+ * pads of the left finger block press the strings at the middle of the hand frame of the
+ * position on the fingerboard, with the palm beside the neck ({@link stopHandAt}), and the hand
+ * moves only in a shift and in the vibrato. The block turns toward the finger of the note and
+ * rolls to its string, the hand tilts further over the neck in a high position, and the left
+ * elbow follows the string. The two-bone IK places each arm. In the rest pose (design 5.2), the
+ * violin and the viola stand on the left thigh, and the left fingers keep the strings. The right
+ * hand holds the bow on the right thigh.
  *
  * The right elbow points to the directions of the hold, so that the arms stay out of the body.
  * The right hand rolls around the stick so that the back of the hand points to the elbow. A change
@@ -1849,8 +1928,9 @@ function holdArm(input: HoldArmInput, pizzicato: number, out: HoldArm): HoldArm 
  * @param offset The instrument offset of the pose to write: the move of the violin and the viola
  *   to the lap.
  * @returns The turn of the left paw in the plane of its palm that the retarget takes in place of
- *   its own turn (`pawTurnL` of `AnimalPose`): the turn of the playing grip of a carried violin or
- *   viola at rest and in the lift and the lowering ({@link carryLift}), else `null`.
+ *   its own turn (`pawTurnL` of `AnimalPose`): the turn of the grip of a carried violin or viola
+ *   at rest and in the lift and the lowering ({@link carryLift}), else the turn of the hold
+ *   (`BowedHold.turnL`).
  */
 export function poseBowed(
   rig: BowedRig,
@@ -1859,7 +1939,7 @@ export function poseBowed(
   weight: number,
   rotations: Float32Array,
   offset: [number, number, number],
-): number | null {
+): number {
   const h = BOWED_HANDS;
   const chest = frames.chest;
   const { place, strings, bow, hand: heldHand } = places;
@@ -1988,13 +2068,14 @@ export function poseBowed(
   finger.reach = state.reach * weight;
   finger.stopString = MIDDLE_FINGER.stopString + (state.stopString - 1.5) * weight;
   const handTilt = leftTilt(rig.hold, state.fingerboard) * weight;
+  const restCurl = restCurlOf(rig.hold);
+  const curlL = restCurl + (stopCurl(rig.hold, handTilt) - restCurl) * weight;
   if (!carried) {
-    stopHandAt(rig, place, strings, stop, h.curlL * weight, handTilt, finger, handL);
-    if (rig.gapL !== 0) {
-      // The bind hand palm faces +x: the paw moves to the back of the hand, off the neck.
-      palmNormal.set(1, 0, 0).applyQuaternion(handL.rotation);
-      handL.wrist.addScaledVector(palmNormal, -rig.gapL);
-    }
+    playGrip.curl = curlL;
+    playGrip.tilt = handTilt;
+    playGrip.turn = rig.hold.turnL;
+    playGrip.gap = rig.gapL;
+    stopHandAt(rig, place, strings, stop, playGrip, finger, handL);
   }
   shoulderTurnL(rig, weight, turnL);
   const shoulderFrameL = poseShoulder(rig.armL, chest, rig.chestBind, turnL, shoulderL);
@@ -2014,10 +2095,8 @@ export function poseBowed(
   setBoneRotation(rotations, rig.armL.bones.shoulder, turnL);
   setBoneRotation(rotations, BONES.instrument, place.local);
   place.offset.toArray(offset);
-  // The fingers close around the neck in the rest grip of a violin or a viola.
-  const restCurl = restCurlOf(rig.hold);
-  const playCurl = h.curlL + h.pressL * state.press * state.gesture;
-  writeCurl(rig.armL, restCurl + (playCurl - restCurl) * weight, rotations);
+  // The press of a note curls the finger block further onto the strings.
+  writeCurl(rig.armL, curlL + h.pressL * state.press * state.gesture * weight, rotations);
   writeCurl(rig.armR, rig.hold.curlR, rotations);
-  return pawTurnL;
+  return carried ? pawTurnL : rig.hold.turnL;
 }

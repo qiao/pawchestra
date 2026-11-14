@@ -6,7 +6,7 @@ import type { PawBind } from '../models/studio-rig.ts';
 import { boneIndex } from '../models/rig.ts';
 import type { SpeciesId } from '../models/species.ts';
 import { placePoint } from '../models/instruments/hold.ts';
-import { VIOLIN } from '../models/instruments/strings.ts';
+import { FINGERBOARD, VIOLIN } from '../models/instruments/strings.ts';
 import type { PlayTarget, PlayTargetKind } from '../models/instruments/types.ts';
 import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
@@ -23,10 +23,12 @@ import {
   shoulderTurnL,
   soundingPointAt,
   steadyHand,
+  stopCurl,
   stopHandAt,
   stringsAt,
 } from './bowed.ts';
-import { pawGirth, wristGirth } from './girth.ts';
+import { pawGirth, pawPads, wristGirth } from './girth.ts';
+import type { PawPads } from './girth.ts';
 import { hangingArm } from './hang.ts';
 import type { HangAngles } from './hang.ts';
 import type { InstrumentOf } from './family.ts';
@@ -58,10 +60,26 @@ export interface BowedHold {
   readonly fingers: Vec3;
   /**
    * The tilt of the left hand from the normal of the strings to the side of
-   * {@link BowedHold.fingers}, in the playing pose and the rest pose. The fingers point up from
-   * the strings, tilted over the neck, and the palm is below the neck, on the other side.
+   * {@link BowedHold.fingers}, in the playing pose and the rest pose. The hand points up from the
+   * strings, tilted over the neck, and the palm stands beside the neck, on the other side.
    */
   readonly tiltL: number;
+  /**
+   * The dip of the left finger block below the plane of the strings toward its tips while the
+   * player plays, in radians (`stopCurl()` of `pose/bowed.ts`, design 5.3). The block curls 90°
+   * minus the tilt of the hand plus this dip, so 0 lays its pads flat on the strings, and a larger
+   * dip presses the tips down. An instrument that stays at its place keeps this curl at rest.
+   */
+  readonly dipL: number;
+  /**
+   * The turn of the left paw in the plane of its palm while the player plays, in radians
+   * (`pawTurnL` of `AnimalPose`), in place of the turn of the retarget toward the forearm (design
+   * 4.4). 0 keeps the knuckles along the neck. A positive turn points the paw toward the scroll,
+   * onto the line of a forearm that comes from the side of the bridge. The paw turns around its
+   * contact with the strings (`stopHandAt()` of `pose/bowed.ts`). An instrument that stays at its
+   * place keeps this turn at rest.
+   */
+  readonly turnL: number;
   /**
    * The direction to which the left elbow points while the player plays, with the finger on the
    * highest string, below the fourth position.
@@ -308,23 +326,22 @@ export interface BowedHold {
    */
   readonly restYawL: number;
   /**
-   * The move of the paw of the rest grip from the neck, along the normal of its palm, in head
-   * heights `H` (`restHandAt()` of `pose/bowed.ts`), so that the palm lies on the neck and does
-   * not go into it. The playing grip puts the middle of the finger block on the strings, so the
-   * palm of a thick paw goes into the neck.
+   * The free space between the pads of the left palm and the edge of the fingerboard in the rest
+   * grip, in head heights `H` (`restHandAt()` of `pose/bowed.ts`). A space below 0 presses the
+   * palm onto the edge.
    */
   readonly restGapL: number;
   /**
-   * The move of the left paw from the neck, along the normal of its palm, in head heights `H`
-   * (`poseBowed()` of `pose/bowed.ts`): in the play, and for a floor instrument also in the rest
-   * and the moves between them. The grip puts the middle of the finger block on the strings, so
-   * the thick wrist of a short paw goes into the back of the neck. 0 keeps the grip on the strings.
+   * The free space between the pads of the left palm and the edge of the fingerboard, in head
+   * heights `H` (`stopHandAt()` of `pose/bowed.ts`): in the play, and for a floor instrument also
+   * in the rest and the moves between them. 0 puts the pads of the palm on the edge.
    */
   readonly gapL: number;
   /**
    * The rule of the grip clearance from the girth (design 5.3): the girth of the left paw of the
    * body that the hold fits (`pawGirth()`), in meters, as the rule measures the girth of each body.
-   * A thicker paw lies further off the neck by the difference, which adds to the gap of
+   * A thicker paw keeps its palm further off the fingerboard by the difference, which adds to the
+   * gap of
    * {@link BowedHold.gapL} in meters (`BowedRig.gapL`), so that it keeps the free gap of that body.
    * `null` keeps the gap of the hold on each body, as an own hold does.
    */
@@ -472,11 +489,19 @@ const FREE_HAIR = 0.03;
  * that the upper arm hangs at the side. The right elbow points out and a little forward, so that
  * the forearm passes over the front of the thigh: nearer to the side, the arm goes into the
  * haunch and the thigh. The bow tip points 0.3 to the front, away from the scroll.
+ *
+ * The left paw tilts 15° over the neck (`tiltL`) and turns 25° toward the scroll in the plane of
+ * its palm (`turnL`). The left forearm comes up from the side of the bridge, so the turn brings
+ * the paw toward the line of the forearm: with no turn, the left wrist of the rabbit bent about
+ * 55° to the side, and with this turn about 20° (song time 20 s of `mozart-k525`). With a tilt of
+ * 30°, it bent 28°.
  */
 const CHIN_HOLD = {
   tip: [0, 1, 0],
   fingers: [0, 1, 0],
-  tiltL: 30 * MathUtils.DEG2RAD,
+  tiltL: 15 * MathUtils.DEG2RAD,
+  dipL: 0,
+  turnL: 25 * MathUtils.DEG2RAD,
   poleL: [-0.5, -1, -1],
   elbowToward: [1, 0, 0],
   elbowPerString: 5 * MathUtils.DEG2RAD,
@@ -554,11 +579,18 @@ const CHIN_HOLD = {
  * contrabass, less than on the violin (section 2.1). The bow plays at 1/9 of the string length
  * from the bridge in piano and at 1/15 in forte: the mean sounding points of six cellists were
  * 1/9 and 1/12 of the string (section 2.4), and no source measures the contrabass.
+ *
+ * The left paw tilts 5° over the neck (`tiltL`), with no turn in the plane of its palm (`turnL`).
+ * The left forearm comes from behind the neck, so the paw points forward beside the neck, and
+ * the finger block curls back onto the strings. With a tilt of 45°, the left wrist of the dog
+ * bent 72° toward the palm, and with this tilt it bends less than 10° (`mozart-k525`).
  */
 const FLOOR_HOLD = {
   tip: [-1, 0, 0],
   fingers: [1, 0, 0],
-  tiltL: 30 * MathUtils.DEG2RAD,
+  tiltL: 5 * MathUtils.DEG2RAD,
+  dipL: 0,
+  turnL: 0,
   poleL: [-0.6, -1, -0.2],
   elbowToward: [0, 1, 0],
   elbowPerString: 10 * MathUtils.DEG2RAD,
@@ -738,7 +770,8 @@ const HANGING_BOW = {
  * 0.2 H to the front, the violin goes 2.8 cm into the body in a lowering, and with no move to the
  * front, the bow goes 3.6 cm into the body. At rest, the paw holds the neck in its rest grip
  * (`restHandAt()` of `pose/bowed.ts`): the playing grip at the rest place, with the fingers curled
- * 60° (`restCurlL`), 5 mm off the neck (`restGapL`), and turned -5° around the normal of the top
+ * 60° (`restCurlL`), the palm 5 mm off the fingerboard (`restGapL`), and turned -5° around the
+ * normal of the top
  * plate (`restYawL`), and the paw takes a turn of 20° in the plane of its palm (`restPawTurnL`),
  * near the turn of 34° of the play, so that the grip in the paw changes by 22° in a move (56° with
  * the turn of 30° around the normal), and the paw goes 0.2 cm into the violin. With no turn around
@@ -856,7 +889,8 @@ const SHOULDER_HOLD = {
  * stood 38° from the vertical, the bow leaned 20°, and the frog was not over the thigh. With the
  * grip 0.15 H out, the right forearm goes 1.7 cm into the belly at rest (1.1 cm at 0.2 H). The left
  * rest elbow points down, out, and back, (-0.75, -1, 0.5) (`restPoleL`). The left paw holds the
- * neck at rest in the rest grip of the rabbit, 5 mm toward the neck (`restGapL`), with a turn of
+ * neck at rest in the rest grip of the rabbit, the palm 5 mm onto the fingerboard (`restGapL`),
+ * with a turn of
  * -30° around the normal of the top plate (`restYawL`) and a turn of 10° in the plane of its palm
  * (`restPawTurnL`): the paw closes around the neck from the outer side, with the palm to the neck
  * and the fingers across the fingerboard, and the back of the paw stays in line with the forearm
@@ -902,8 +936,10 @@ const SHOULDER_HOLD = {
  * nut (0.63 with the full violin). A violin of the rule of a violin shop for this arm is 0.56 of
  * the violin of the app. The top plate turns 25° toward up
  * (`violinTurn(-25, 5, 25)`), so that the violin lies about level and only a little down toward
- * the right: with the 50° of the chin hold, the bow at the frog stood up across the eye. The left paw tilts 10° over the neck (`tiltL`, 30° in the chin hold): with 20°, the left
- * arm of the fox with four-digit paws took 85° on its two parts in the play. The right elbow
+ * the right: with the 50° of the chin hold, the bow at the frog stood up across the eye. The left
+ * paw tilts 10° over the neck (`tiltL`) and turns 20° toward the scroll in the plane of
+ * its palm (`turnL`), so that the left wrist bends less than 15° in the play of `mozart-k525`. The
+ * right elbow
  * points out, forward, and a little up at the frog, (3, 0.8, -0.6), and at the tip, (1, 0.6, -1):
  * with (3, -0.3, -0.6) and (1, -0.15, -1), the right forearm of that fox twisted 59° at the frog
  * and 69° at the tip. The skin of the left forearm twists 35° at rest (p95 of `pnpm arm-check
@@ -936,6 +972,7 @@ const SHOULDER_HOLD = {
 const FOX_HOLD = {
   ...SHOULDER_HOLD,
   tiltL: 10 * MathUtils.DEG2RAD,
+  turnL: 20 * MathUtils.DEG2RAD,
   poleL: CHIN_HOLD.poleL,
   playTurn: violinTurn(-25, 5, 25),
   reachL: 20 * MathUtils.DEG2RAD,
@@ -1091,7 +1128,8 @@ const LAP_CELLO_BOW = {
  * recast bodies turned 134° to 172° from the accepted grip or flipped through 180°. With the
  * right elbow out and down, near the body, the paw keeps near the direction of no paw twist.
  *
- * The left paw tilts 55° over the neck (`tiltL`), and the left elbow points out to the left and
+ * The left paw keeps the small tilt of {@link FLOOR_HOLD}, and the left elbow points out to the
+ * left and
  * nearly level, because the leaned neck comes near the left shoulder, and turns up 2° for each
  * lower string. From the second position to the fifth position, the left paw tilts 20° further
  * over the neck (`highTilt`), so that the wrist comes up beside the upper bout, as the hand of a
@@ -1136,7 +1174,6 @@ const CELLO_HOLD = {
   lean: 3 * MathUtils.DEG2RAD,
   stringTurn: 6 * MathUtils.DEG2RAD,
   frogHair: 0.12,
-  tiltL: 55 * MathUtils.DEG2RAD,
   highTilt: 20 * MathUtils.DEG2RAD,
   poleL: [-1, -0.15, 0],
   elbowPerString: 2 * MathUtils.DEG2RAD,
@@ -1266,7 +1303,8 @@ export const BOWED_HOLDS = {
  * opens to 131°, and the arm reaches far forward and looks long. The left paw
  * closes around the neck in the rest grip, as a seated violist holds the neck with the left hand
  * (`docs/reference/string-technique.md`, section 2.9): the playing grip at the rest place, curled
- * 115°, 0.02 H off the neck (`restGapL`), and turned 10° around the normal of the top
+ * 115°, the palm 0.02 H off the fingerboard (`restGapL`), and turned 10° around the normal of the
+ * top
  * plate, and the paw takes a turn of 42° in the plane of its palm (`restPawTurnL`), so that the
  * grip in the paw changes by 29° in a move. The neck then runs through the closed paw, and the
  * paw goes 0.4 cm into the viola. With the palm on the neck, the thick wrist end of the forearm
@@ -1336,14 +1374,11 @@ export const BOWED_HOLDS = {
  * With 20°, the fingers still point down to the strings, and the wrist bends 48°. The remaining
  * depth of the forearm at the upper bout is accepted.
  *
- * The left paw tilts 25° over the neck (`tiltL`, 30° in the chin hold), so that the fingers come
- * down on the strings from above and the wrist stays on the side of the back of the viola, as the
- * wrist of a real violist stays under the neck (`docs/reference/string-technique.md`, section
- * 1.9). With 55°, the wrist came 2.5 cm over the middle plane of the body of the viola, beside the
- * neck, so that the left forearm crossed that plane and went 2.6 cm through the upper bout in each
- * sample of the play and of the rest (`pnpm body-clip violist`). The grip turn of the left paw then
- * was 63° (limit 45, `pnpm arm-check violist`), and with 25° it is 30°. In the fifth position, the
- * paw tilts 45° with `highTilt`.
+ * The left paw tilts 10° over the neck (`tiltL`), so that the wrist stays on the side of the back
+ * of the viola, as the wrist of a real violist stays under the neck
+ * (`docs/reference/string-technique.md`, section 1.9). The left forearm comes from under the
+ * middle of the viola, so a tilt bends the wrist toward the palm: about 25° with this tilt, and
+ * about 40° with 25° (`mozart-k525`). In the fifth position, the paw tilts 30° with `highTilt`.
  *
  * In the rest pose, the top plate of the viola faces the front and 53° to the left, toward the
  * audience, as the bridge of a resting violin faces out (`docs/reference/string-technique.md`,
@@ -1378,7 +1413,7 @@ const CAT_HOLD = {
   headDrop: -12 * MathUtils.DEG2RAD,
   restHeadLift: 12 * MathUtils.DEG2RAD,
   slant: -12 * MathUtils.DEG2RAD,
-  tiltL: 25 * MathUtils.DEG2RAD,
+  tiltL: 10 * MathUtils.DEG2RAD,
   poleL: [-2, -0.8, -0.71],
   elbowPerString: 2 * MathUtils.DEG2RAD,
   highTilt: 20 * MathUtils.DEG2RAD,
@@ -1471,9 +1506,7 @@ const CAT_HOLD = {
  *   into the cello.
  * - At rest, the left paw holds the cello at 0.25 of the fingerboard (`restPlace`): at 0.6, the
  *   paw went 4.4 cm into the upper bout at rest and in the moves, and at 0.3, 2.1 cm in 10% of
- *   the lowering (`pnpm body-clip cellist`, limit 1.9 cm). A gap of the left paw off the
- *   strings (`gapL`) of 1.5 cm kept the claws further out of the neck, but the paw then bent
- *   sideways on the wrist up to 79° (p95) in the play.
+ *   the lowering (`pnpm body-clip cellist`, limit 1.9 cm).
  * - The bow paw turns in the plane of its palm around the grip on the stick, so that the forearm
  *   stays on the line of the palm in that plane (`stickTurnR`), as on the hippo. With no turn, the
  *   bow paw flipped by about 180° on its forearm in 1.4% of the play samples in front of the
@@ -1483,8 +1516,6 @@ const CAT_HOLD = {
  * - The right fingers curl 65° around the stick (`curlR`), so that the finger tips of the short
  *   paw close over it, as the fingers of a cellist drape over the stick. With 75° or more, the
  *   skin of the right knuckles folds over in each play sample.
- * - The left paw tilts 45° over the neck (`tiltL`): with the 55° of {@link CELLO_HOLD}, the left
- *   forearm of the Tripo beagle twists 46° in the play (43° with 45°).
  */
 const DOG_HOLD = {
   ...CELLO_HOLD,
@@ -1496,7 +1527,6 @@ const DOG_HOLD = {
   pluckSide: 0.600629,
   restPoleR: [0.8, -1, 0.4],
   slant: -5 * MathUtils.DEG2RAD,
-  tiltL: 45 * MathUtils.DEG2RAD,
   poleL: [-1, -0.25, 0],
   highElbow: 15 * MathUtils.DEG2RAD,
   restPoleL: [-2, -1, 0],
@@ -1561,16 +1591,13 @@ const DOG_HOLD = {
  * `pnpm hold-fit bassist`).
  *
  * The left elbow points out to the left, (-1, -0.3, 0), in the play and at rest, so that the left
- * arm goes up to the neck from the side, as a bassist raises the left elbow. The left paw tilts
- * 35° over the neck (`tiltL`): at 60° and 80°, the twist of the left forearm jumped by up to 100°
- * between two notes, and with 40° on the lower bass, the left paw bent 79° on the wrist (p95).
- * With 30°, the left claws went 4.2 cm into the upper bout. The right elbow points out and down,
+ * arm goes up to the neck from the side, as a bassist raises the left elbow. The left paw keeps
+ * the small tilt of {@link FLOOR_HOLD}, and its wrist bends about 25° toward the palm in the play
+ * of `bach-bwv1048`. The right elbow points out and down,
  * (1, -0.7, 0.2), so that the bow arm bows near level in front of the belly: with the elbow down
  * and back, the forearm lay on the belly at the tip. The string planes are 4° apart, below the
  * 25° of a real contrabass, so that the arm reaches the hair on the two outer strings. The left
- * paw lies 1.5 cm off the strings
- * along the normal of its palm (`gapL`), and stops the strings only up to 0.9 of the fingerboard
- * (`stopEnd`).
+ * paw stops the strings only up to 0.9 of the fingerboard (`stopEnd`).
  *
  * In the rest pose, the contrabass stays at its playing place, and the left paw holds the neck at
  * 0.3 of the fingerboard (`restPlace`), above the upper bout, as the fingers of a bassist hold the
@@ -1608,7 +1635,6 @@ const HIPPO_HOLD = {
   stringTurn: 4 * MathUtils.DEG2RAD,
   soundingPoint: [0.3, 0.3],
   frogHair: 0.12,
-  tiltL: 35 * MathUtils.DEG2RAD,
   gapL: 0.029859,
   restPlace: 0.3,
   poleL: [-1, -0.3, 0],
@@ -1663,11 +1689,11 @@ const HIPPO_HOLD = {
  * in front of the chest. The left paw holds the neck at 0.35 of the fingerboard (`restPlace`), so
  * that the lower end of the violin stands about 2 cm above the lap of the fourth Tripo rabbit: at
  * 0.5, it stood 4.7 cm above it, and at 0.3, 1.0 cm, but in the lowering the violin went 4.5 cm
- * into the body (3.7 cm at 0.4, `pnpm hold-fit violinist`). The paw lies
- * 1.5 cm off the neck (`restGapL`), so that the violin stands nearer to the lap (1.4 cm above it
- * with 5 mm). The paw turns 90° in the plane of its palm (`restPawTurnL`), so that the left
- * forearm twists 32° at rest and the paw bends 64° on it: with 100°, the bend was 73°, over the
- * 70° of the arm gate, and with 80°, the twist was 48°.
+ * into the body (3.7 cm at 0.4, `pnpm hold-fit violinist`). The palm lies
+ * 1.5 cm off the fingerboard (`restGapL`), so that the violin stands nearer to the lap (1.4 cm
+ * above it with 5 mm). The paw turns 90° in the plane of its palm (`restPawTurnL`), so that the
+ * left forearm twists 32° at rest and the paw bends 64° on it: with 100°, the bend was 73°, over
+ * the 70° of the arm gate, and with 80°, the twist was 48°.
  *
  * The right upper arm swings 10° forward and the elbow bends 50° (`restArms`), so that the paw
  * rests at the top of the right thigh near the hip, with the elbow near the side. The paw holds the
@@ -1709,11 +1735,6 @@ const HIPPO_HOLD = {
  * that the short bow arm reaches 0.17 m of the hair of 0.46 m: with the 5° of the shoulder hold,
  * it reaches 0.14 m. With 15°, it reaches 0.20 m, but the stick goes up to 2.0 cm into the fur of
  * the left cheek in the play of `mozart-k525` (1.4 cm with 5° and with 10°).
- *
- * In the play, the left paw lies 0.03 H off the strings along the normal of its palm (`gapL`), so
- * that the thick paw keeps out of the neck and the upper bout: with the grip on the strings, the
- * left paw went 1.9 cm into the violin in 79% of the play, and with this gap, 1.5 cm in 6%
- * (`pnpm body-clip violinist`).
  */
 const RABBIT_HOLD = {
   ...SHOULDER_HOLD,
@@ -1728,7 +1749,6 @@ const RABBIT_HOLD = {
     R: { forward: 10 * MathUtils.DEG2RAD, bend: 50 * MathUtils.DEG2RAD },
   },
   poleL: [0, -1, -0.5],
-  gapL: 0.03,
   restPoleL: [-1, -0.9, -0.2],
   restPawTurnL: 90 * MathUtils.DEG2RAD,
   restGapL: 0.050251,
@@ -1832,6 +1852,10 @@ export interface BowedRig {
   readonly knuckles: Vec3;
   /** The middle of the left finger block, from the `fingersL` bone. */
   readonly fingerBlock: Vec3;
+  /** The depth of the pads of the left paw below its bones (`pawPads()` of `pose/girth.ts`). */
+  readonly padsL: PawPads;
+  /** The half width of the fingerboard at the nut and at its end, in meters. */
+  readonly boardHalf: readonly [nut: number, end: number];
   /** The point on the strings above which the right hand plucks. */
   readonly pluck: Vec3;
   /** The start of the bow hair at the frog, from the `bow` bone at the grip. */
@@ -1864,10 +1888,13 @@ export interface BowedRig {
   readonly playShift: Vec3;
   /** The move of the plucking palm toward the frog side, in meters (`BowedHold.pluckSide`). */
   readonly pluckSide: number;
-  /** The move of the left paw of the rest grip off the neck, in meters (`BowedHold.restGapL`). */
+  /**
+   * The free space between the left palm of the rest grip and the fingerboard, in meters
+   * (`BowedHold.restGapL`).
+   */
   readonly restGapL: number;
   /**
-   * The move of the left paw of a floor instrument off the neck, in meters: the gap of
+   * The free space between the left palm and the fingerboard, in meters: the gap of
    * {@link BowedHold.gapL} with the rule of the girth ({@link BowedHold.girthFit}).
    */
   readonly gapL: number;
@@ -2105,9 +2132,15 @@ function stopRangeOf(rig: RigPoints): readonly [low: number, high: number] {
   const hand = { wrist: new Vector3(), rotation: new Quaternion() };
   let best: [number, number] | null = null;
   let start = -1;
-  let nearest = 0;
   let nearestDistance = Infinity;
+  const grip = {
+    curl: stopCurl(rig.hold, 0),
+    tilt: 0,
+    turn: rig.hold.turnL,
+    gap: rig.gapL,
+  };
   const steps = Math.round(rig.hold.stopEnd / STOP_STEP);
+  let nearest = 0;
   for (let k = 0; k <= steps; k++) {
     const stop = k * STOP_STEP;
     const distance = stopHandAt(
@@ -2115,8 +2148,7 @@ function stopRangeOf(rig: RigPoints): readonly [low: number, high: number] {
       place,
       strings,
       stop,
-      BOWED_HANDS.curlL,
-      0,
+      grip,
       MIDDLE_FINGER,
       hand,
     ).wrist.distanceTo(shoulder);
@@ -2207,6 +2239,8 @@ export function bowedRig(
   const nut = placed('instrument', board.from);
   const neckEnd = placed('instrument', board.to);
   const neck = neckEnd.clone().sub(nut);
+  // The model of each bowed string is the violin model at its scale.
+  const boardScale = neck.length() / (VIOLIN.nut - VIOLIN.fingerboardEnd);
   const axis = neck.clone().negate().normalize();
   const hairFrom = placed('bow', hair.from);
   const hairTo = placed('bow', hair.to);
@@ -2266,6 +2300,8 @@ export function bowedRig(
     fingerBlock: toVec3(
       new Vector3(...model.body.fingerBlockL).sub(new Vector3(...at(BONES.fingersL))),
     ),
+    padsL: pawPads(model, 'L'),
+    boardHalf: [(FINGERBOARD.nutWidth / 2) * boardScale, (FINGERBOARD.endWidth / 2) * boardScale],
     pluck: toVec3(contact.clone().sub(neckEnd).multiplyScalar(hold.pluckPlace).add(neckEnd)),
     hairStart: toVec3(hairFrom.clone().sub(new Vector3(...at(BONES.bow)))),
     grip: toVec3(new Vector3(...at(BONES.bow)).sub(new Vector3(...at(BONES.handR)))),
@@ -2530,7 +2566,8 @@ function standingRest(
   if (rig.hold.restPawTurnL !== null) {
     restHandAt(rig, place, strings, hand, rig.restCarryPlace);
   } else {
-    stopHandAt(rig, place, strings, rig.restCarryPlace, 0, 0, MIDDLE_FINGER, hand);
+    const grip = { curl: stopCurl(rig.hold, 0), tilt: 0, turn: rig.hold.turnL, gap: rig.gapL };
+    stopHandAt(rig, place, strings, rig.restCarryPlace, grip, MIDDLE_FINGER, hand);
   }
   const wristL = new Vector3(...rig.armL.bind.shoulder).add(new Vector3(...hangL.wrist));
 

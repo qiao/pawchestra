@@ -25,11 +25,11 @@ import { SPECIES, SPECIES_IDS, isSpeciesId } from '../src/models/species.ts';
 import type { SpeciesId, SpeciesParams } from '../src/models/species.ts';
 import { BOWED_HOLDS, bowedRig, playingFrames } from '../src/pose/bowed-rig.ts';
 import {
-  BOWED_HANDS,
   MIDDLE_FINGER,
   createBowPlaces,
   instrumentAt,
   shoulderTurnL,
+  stopCurl,
   stopHandAt,
   stringsAt,
 } from '../src/pose/bowed.ts';
@@ -119,7 +119,8 @@ function firstPositionElbow(model: PlayerModel): number {
     shoulderTurnL(rig, 1, new Quaternion()),
   ).position;
   const hand = { wrist: new Vector3(), rotation: new Quaternion() };
-  stopHandAt(rig, place, strings, FIRST_POSITION, BOWED_HANDS.curlL, 0, MIDDLE_FINGER, hand);
+  const grip = { curl: stopCurl(rig.hold, 0), tilt: 0, turn: rig.hold.turnL, gap: rig.gapL };
+  stopHandAt(rig, place, strings, FIRST_POSITION, grip, MIDDLE_FINGER, hand);
   const bind = rig.armL.bind;
   const upper = new Vector3(...bind.shoulder).distanceTo(new Vector3(...bind.elbow));
   const fore = new Vector3(...bind.elbow).distanceTo(new Vector3(...bind.wrist));
