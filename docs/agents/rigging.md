@@ -213,6 +213,9 @@ Design 4.4 gives the rule and the reason of each config key.
   round arm takes the room of the elbows: point them out, and check the grip turn (design 5.3).
 - A round belly takes the room of short forearms. Place a floor instrument by its contact point,
   and lean the spine.
+- An own wind hold with a side aim and no `aimSigns` takes the side sign of each paw from the arm.
+  A body change can flip that sign and turn the paw over (the tan fox flute). Set `aimSigns`, as
+  the shared hold does.
 - A long snout puts the mouthpiece far forward. Turn the instrument back around the mouthpiece, or
   move the mouthpiece under the muzzle (`lipShift`).
 - A turned paw moves on an arc around the wrist: put the bow stick along it. A forearm turn
