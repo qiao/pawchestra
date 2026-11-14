@@ -280,7 +280,7 @@ const TRUMPET = {
  * The valves stand up (+y), and the player holds it horizontal and forward. A species with short
  * arms plays a smaller trumpet (`SpeciesParams.trumpetScale`), as a child plays a fractional
  * violin. The trumpet, its grips, and its bell target shrink toward the mouthpiece, so the
- * mouthpiece stays at the mouth.
+ * mouthpiece stays at the mouth. The space of the layout keeps the size of the trumpet of the app.
  *
  * The parts follow a real trumpet ({@link TRUMPET}): the lead pipe from the mouthpiece to the
  * main tuning slide in front of the valves, the return into the third valve, the bell bow
@@ -300,7 +300,8 @@ const TRUMPET = {
 function trumpet(scale: number): BrassBuild {
   const t = BRASS.trumpet;
   const v = TRUMPET;
-  const piece = new PieceBuilder(scale);
+  // The footprint keeps the size of the trumpet of the app, so that no seat moves.
+  const piece = new PieceBuilder(scale, 1);
   const scaled = (at: Vec3): Vec3 => [at[0] * scale, at[1] * scale, at[2] * scale];
   const [first, middle, third] = v.valves;
   mouthpiece(piece, [1, 0, 0], 0.0095, 0.07);
