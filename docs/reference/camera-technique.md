@@ -182,9 +182,10 @@ The app follows these facts:
   foreground rule, and the side camera stays low (`KEY_SEARCH.sideCeiling`).
 - **The dirty frame (section 3).** A near head or a near box of another object that the depth of
   field blurs can stand at one side edge of a close shot (`FOREGROUND.dirtyBlur`). Its inner edge
-  stays in the outer third of the frame width (`FOREGROUND.dirtyShare`), and the dirty heads of a
+  stays in the outer fifth of the frame width (`FOREGROUND.dirtyShare`), and the dirty heads of a
   frame stay at one side. A head over the subject always counts. Thus a solo camera can stay low
-  behind the heads of the front rows.
+  behind the heads of the front rows. The head stays almost sharp (see "The soft shoulder"
+  below), so it takes less of the frame than the third of a soft shoulder.
 - **The distance to the animals (section 3).** Each animal in the frame of a close shot, also a
   head of a dirty frame, stays at least `ANIMAL_FLOOR` from the camera, because the low-poly
   animals show their facets and the seams of their meshes from near. A blend between two close
@@ -226,7 +227,8 @@ The app does not follow these facts:
 - **The zoom out (section 5).** A long close shot pushes in slowly, and it does not zoom out.
 - **The soft shoulder (section 3).** The lens of the app blurs a point in front of the focus to
   at most `LENS.maxNearBlur` of the image height (design 4.5), so the head at the edge of a dirty
-  frame is only a little soft.
+  frame is only a little soft. A sharp head of another player in a third of the frame took the
+  eye from the subject, so the dirty frame keeps a fifth.
 - **Other cutaways (section 6).** The film has no insert of the printed music and no out of focus
   lamps. No source of this file gives such a cutaway in a concert film, and the music faces the
   players, away from the cameras of the hall.

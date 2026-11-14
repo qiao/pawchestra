@@ -1737,7 +1737,10 @@ the shoulder of an over-the-shoulder shot (`camera-technique.md`), a near head o
 another object can stand at one side edge of the frame, when the depth of field of 4.5 blurs it
 (`FOREGROUND.dirtyBlur`). Its inner edge stays in the outer part of the frame width
 (`FOREGROUND.dirtyShare`), and all dirty heads of a frame stay at one side. A head over the
-subject always counts. Thus a solo camera can stay low behind the front rows.
+subject always counts. Thus a solo camera can stay low behind the front rows. The lens blurs a
+near point only a little (4.5), so a dirty head stays almost sharp. Thus the part is a fifth, less
+than the third of a soft shoulder in a film: with a third, the sharp head of another player took
+the eye from the subject.
 
 **The distance to the animals.** No point of an animal body in the frame of a close camera comes
 nearer than `ANIMAL_FLOOR` at a sample of the move (`NEAR_SAMPLES`). The rule holds for each

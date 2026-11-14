@@ -117,9 +117,11 @@ const FOREGROUND = {
    * The dirty frame (`docs/reference/camera-technique.md`): a near head, or a near box of another
    * object, that the depth of field blurs can stand at one side edge of the frame, as the shoulder
    * of an over-the-shoulder shot. Its inner edge stays this far from its side edge, as a part of
-   * the frame width: one third.
+   * the frame width: one fifth. The lens blurs a near point by at most `LENS.maxNearBlur`, so the
+   * head stays almost sharp. With one third, the limit of a soft shoulder in a film, a sharp head
+   * of another player took the eye from the subject.
    */
-  dirtyShare: 1 / 3,
+  dirtyShare: 0.2,
   /**
    * A point counts as blurred when the lens of design 4.5 gives it a blur disc in front of the
    * focus of at least this part of the image height: the near limit of the lens.
@@ -171,7 +173,7 @@ function blurred(depth: number, focus: number, lens: number): boolean {
  *
  * A near or a large head that the depth of field blurs makes a dirty frame, as the shoulder of an
  * over-the-shoulder shot, and it does not count. It stays at one side edge, with its inner edge
- * in the outer third of the width, and all such heads stay at the same side. A head over the
+ * in the outer fifth of the width, and all such heads stay at the same side. A head over the
  * subject always counts.
  *
  * @param heads The heads of the players and of the conductor.
@@ -252,7 +254,7 @@ export function foregroundHead(
     if ((!near && !large) || x - outside * radiusX >= 1 || y - outside * radiusY >= 1) {
       continue;
     }
-    // A blurred head in the outer third of one side edge makes a dirty frame.
+    // A blurred head in the outer fifth of one side edge makes a dirty frame.
     const side = Math.sign(right);
     if (blurred(depth, focusDepth, lens) && x - radiusX >= edge && dirtySide !== -side) {
       dirtySide = side;
@@ -313,7 +315,7 @@ const NEAR_DEPTH = 0.1;
  * the risers do not count. A box counts when its middle is nearer to the camera than 0.9 of the
  * depth of the focus. The test marks the cells of a grid of 20 × 20 over the frame that the
  * screen rectangle of each box covers, and counts the cells of each object. A box that the depth
- * of field blurs, with its screen rectangle in the outer third of one side edge, makes a dirty
+ * of field blurs, with its screen rectangle in the outer fifth of one side edge, makes a dirty
  * frame and does not count, as a head of {@link foregroundHead}.
  *
  * @param clearance The obstacles of the stage.
