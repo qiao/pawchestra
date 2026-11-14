@@ -121,11 +121,13 @@ export const CONDUCTOR_HOLD = {
    */
   readyCurl: 50 * MathUtils.DEG2RAD,
   /**
-   * In the ready gesture of a count-in, the left hand points this far up, so that both paws are
-   * up at the height of the chin, 0.63 H above the shoulder joints, as in `bear-views.png` (design
-   * 5.4). At 21°, the left paw of the studio bear is 0.23 H lower than the right paw.
+   * In the ready gesture of a count-in, the left hand points this far up: level, so that the left
+   * paw is at the height of the right paw, at the height of the shoulder joints and below the
+   * chin, as the raised hands of a real conductor before the first beat. With 34°, the left paw
+   * was 0.53 H higher than the right paw, which waits above the low beat of the lower chest
+   * (`beatPoint`).
    */
-  readyLift: 34 * MathUtils.DEG2RAD,
+  readyLift: 0,
   /**
    * In the ready gesture, the left wrist is this part of the reach of the arm from the shoulder
    * joint. With 0.75, the bent elbow of the Tripo bear folded 5 faces more at its inner side, and
@@ -134,10 +136,8 @@ export const CONDUCTOR_HOLD = {
   readyReach: 0.9,
   /**
    * In the ready gesture, the left hand points this far outward, to the left of the front, so
-   * that the paw shows beside the head from behind, and the two paws are nearly at the same width,
-   * as in `bear-views.png`. The right paw of the studio bear is still 0.3 H further out, because a
-   * paw further in meets its muzzle. At 32°, the left paw is 0.16 H further in. At 10° inward, the
-   * forearm comes 0.8 cm from the head.
+   * that the paw shows beside the body from behind, and the two paws are nearly at the same width
+   * (0.63 H and 0.55 H out from the shoulder joints). At 32°, the left paw is 0.16 H further in.
    */
   readyOut: 44 * MathUtils.DEG2RAD,
   /**
