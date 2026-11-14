@@ -1274,10 +1274,14 @@ const WOLF_CLARINET = {
  * forearm with the thumb up and back toward the first valve slide, and its fingers curl 130°
  * around the thin casings of the trumpet (`gripCurl`): with 109°, the finger tips stand
  * 1.1 cm off. The right palm lies above the valves at their right and faces down, and the right
- * paw points to the left across the valve tops: 0.7 of its aim is the side direction across the
- * valves (`aimSide`), and its fingers curl 92° down onto the valves. The right grip moves 0.06 H
+ * paw points up along its forearm and a part of the way to the left across the valve tops: 0.35
+ * of its aim is the side direction across the valves (`aimSide`), and its fingers curl 92° down
+ * onto the valves. The wrist then stays nearly straight, as the wrists of a real player
+ * (`docs/reference/wind-technique.md` 2.1): the right paw bends 20° on its forearm (p95 of the
+ * play, `pnpm hold-fit trumpeter`). With 0.7, the forearm came up from below, the paw lay level
+ * across the valves, and it bent 37°. The right grip moves 0.06 H
  * along the valves toward the mouthpiece and 0.05 H toward the right shoulder (`gripShiftR`). The
- * right paw then grasps the valves in each sample, with its palm 30° from the valve tops
+ * right paw then grasps the valves in each sample, with its palm 42° from the valve tops
  * (`pnpm wind-grip trumpeter`). With no move toward the shoulder, the palm turned 76° from the
  * valves, and the paw grasped them in 21% of the play samples. With 0.04 H, the two paws went
  * 1.6 cm into each other (`pnpm clip-probe`). With flatter fingers, the finger tips stood
@@ -1310,7 +1314,7 @@ const MONKEY_TRUMPET = {
   poleL: [-1, -1, 0],
   poleR: [1, -1, 0],
   faceTube: ['palm', 'palm'],
-  aimSide: [0, 0.7],
+  aimSide: [0, 0.35],
   gripShiftR: [-0.06, 0, -0.05],
   restShift: [0.1, -0.5, 0.12],
   restGripShiftL: [0, 0, 0.04],
