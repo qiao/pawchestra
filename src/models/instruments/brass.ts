@@ -1055,16 +1055,20 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
   const bend = at([-0.06, TUBA_BELL_LEAN.bend, 0]);
   const top = t.height - TUBA_BELL_LEAN.bend;
   tubaBell(piece, bend, toVec3(bellAxis), top, t.bellRadius);
-  // The bottom bow joins the bell branch to the valve branch, and narrows toward the valves. The
-  // valve branch ends 0.7 cm above the bottom of the valve casings, so that the middle casings
-  // stand in it. It ended 1.9 cm below them.
+  // The bottom bow joins the bell branch to the valve branch, and narrows toward the valves. It
+  // starts 2 cm up inside the bell branch, so that its first ring is near level and its outer
+  // side meets the bottom edge of the branch. With its first ring at the bottom of the branch,
+  // that ring leaned 15° and left a notch of 1.8 cm on the outer side. The valve branch ends
+  // 0.7 cm above the bottom of the valve casings, so that the middle casings stand in it. It
+  // ended 1.9 cm below them.
   tubeAlong(
     piece,
     [
+      at([-0.06, rise + 0.02, 0]),
       ...arc(at([0.02, rise, 0]), [-1, 0, 0], [0, -1, 0], 0.08, 0, Math.PI, 6),
       at([v.x, v.bottom + 0.007, 0]),
     ],
-    [0.068, 0.066, 0.061, 0.055, 0.049, 0.044, 0.04, 0.03],
+    [0.066, 0.068, 0.066, 0.061, 0.055, 0.049, 0.044, 0.04, 0.03],
     TUBE_SEGMENTS + 2,
     METAL,
   );
