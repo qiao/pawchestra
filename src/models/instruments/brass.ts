@@ -812,8 +812,7 @@ function horn(): BrassBuild {
     METAL,
   );
   // The two inner loops of the double horn, the F side and the B♭ side: each leaves one valve,
-  // goes around inside the hoop, and comes back to another valve. Both ends lie on the axes of the
-  // valves, inside the casings, so a loop has no caps.
+  // goes around inside the hoop, and comes back to another valve.
   const center = at(0, 0);
   const coilU = toVec3(along(1, 0));
   const coilV = toVec3(along(0, 1));
@@ -831,7 +830,6 @@ function horn(): BrassBuild {
       [0.006],
       TUBE_SEGMENTS,
       METAL,
-      false,
     );
   }
   // The valve slides rise from the valves on the far side of the loops. Both legs of a slide leave
@@ -892,7 +890,6 @@ function horn(): BrassBuild {
     [...branch.slice(0, -1).map(() => firstRadius), ...restRadii, HORN_THROAT],
     TUBE_SEGMENTS,
     METAL,
-    false,
   );
   const bellTarget = bell(
     piece,
@@ -1007,8 +1004,7 @@ const TUBA_LONG_SLIDE = { upper: 0.33, lower: 0.26, front: -0.12, left: -0.11 } 
 /**
  * Adds the long slide of the first valve of the tuba ({@link TUBA_LONG_SLIDE}): from the front of
  * the first valve casing down and to the left, in front of the bell branch, around a round bow,
- * and back up into the bottom of the casing. Both ends lie on the axis of the casing, inside it, so
- * the slide has no caps.
+ * and back up into the bottom of the casing. Both ends lie on the axis of the casing, inside it.
  *
  * @param piece The piece.
  * @param at The function that gives a point of the drawing of {@link tuba} in the axes of the
@@ -1042,14 +1038,7 @@ function tubaLongSlide(piece: PieceBuilder, at: (p: Vec3) => Vec3): void {
     0.03,
     1,
   );
-  tubeAlong(
-    piece,
-    [...upper, ...around.slice(1, -1), ...lower],
-    [0.0095],
-    TUBE_SEGMENTS,
-    METAL,
-    false,
-  );
+  tubeAlong(piece, [...upper, ...around.slice(1, -1), ...lower], [0.0095], TUBE_SEGMENTS, METAL);
 }
 
 /**
@@ -1083,8 +1072,7 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
   // Above the grip of the left paw, it leans out to the left (TUBA_BELL_LEAN). The branch bends
   // into the axis of the bell and ends 3 cm inside the bell, so that its ring at the bend leans
   // half the angle and meets the bell all around. With a flat top at the bend, the leaned bell
-  // left a notch of 2.2 cm at the outer side of the bend. Both ends of the branch lie inside the
-  // bottom bow and the bell, so the branch has no caps.
+  // left a notch of 2.2 cm at the outer side of the bend.
   const rise = 0.13;
   const lean = TUBA_BELL_LEAN.angle * MathUtils.DEG2RAD;
   const bellAxis = new Vector3(-Math.sin(lean), Math.cos(lean), 0);
@@ -1095,7 +1083,6 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
     [0.068, 0.085, 0.084],
     TUBA_SEGMENTS,
     METAL,
-    false,
   );
   const top = t.height - TUBA_BELL_LEAN.bend;
   tubaBell(piece, bend, toVec3(bellAxis), top, t.bellRadius);
@@ -1124,8 +1111,8 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
   tubaLongSlide(piece, at);
   // The slides of the other valves hang at the right of the valves. Each leaves its casing, goes
   // down at the right, and comes back under the valve up into the bottom of its own casing, so
-  // that no slide ends in the air. Both ends lie inside the casing, so a slide has no caps. Each
-  // has 5 faces around its axis, so that the long slide fits in the triangle budget.
+  // that no slide ends in the air. Each has 5 faces around its axis, so that the long slide fits
+  // in the triangle budget.
   for (const [i, z] of valveZ.entries()) {
     if (i === 0) {
       continue;
@@ -1147,7 +1134,6 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
       [0.0085],
       TUBE_SEGMENTS - 1,
       METAL,
-      false,
     );
   }
   // The lead pipe from the front of the first valve casing, below its top, up over the main
