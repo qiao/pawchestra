@@ -1299,15 +1299,19 @@ export const BOWED_HOLDS = {
  * went straight to the front in the middle of the move, with the viola at its end. With the viola
  * on a via with the scroll up and to the left and the strings to the front (`carryVia`), it turns
  * 4° off the short arc, but the paw twists past 180° on its forearm in the lift with each lift
- * elbow, and the skin turns over. In the middle, the bow tip points to the left and to the front,
- * (-0.8, 0, -0.6), with the hair back and down, (0, -0.5, 1), and the grip moves 0.5 H out,
+ * elbow, and the skin turns over. In the middle, the bow tip points to the left, to the front,
+ * and a little down, (-0.8, -0.2, -0.6), with the hair back and down, (0, -0.5, 1), and the grip
+ * moves 0.5 H out,
  * 0.3 H up, and 0.15 H to the front (`restBow.via`), so that the stick comes to the strings from
  * the left, below the chin, and the bow arm passes outside the round belly and the viola. With
  * the tip forward and a little out and up, (0.4, 0.3, -1), the bow stood up in front of the left
  * cheek in the last quarter of the lift and in the first half of the lowering, 0.9 cm from the
- * left eye in the front view. With this via, the stick keeps 11.8 cm off the eyes in that view.
+ * left eye in the front view. With this via, the stick keeps 15.8 cm off the eyes in that view
+ * and 15 cm off the music desk. With a level tip, (-0.8, 0, -0.6), the stick stands in front of
+ * the edge of the left cheek at the start of the lowering, and with the tip further down,
+ * (-0.8, -0.35, -0.6), it comes 12 cm from the music desk.
  * With the hair down and to the front, (0, -1, -0.3), the bow paw twists 73° on its forearm in the
- * middle of the lift (52° with this hair, 41° in the play, `pnpm arm-check violist --trace`). With
+ * middle of the lift (56° with this hair, 44° in the play, `pnpm arm-check violist --trace`). With
  * the grip 0.3 H out and 0.15 H to the front, the right upper arm goes 7.2 cm into the belly in a
  * lowering of `brahms-2`.
  *
@@ -1401,7 +1405,7 @@ const CAT_HOLD = {
     lap: { along: 0.6, offset: [0.3, 0.3, -0.2] },
     tip: [0.15, 1, -0.45],
     hair: [0, 0, -1],
-    via: { tip: [-0.8, 0, -0.6], hair: [0, -0.5, 1], reach: [0.5, 0.3, -0.15] },
+    via: { tip: [-0.8, -0.2, -0.6], hair: [0, -0.5, 1], reach: [0.5, 0.3, -0.15] },
   },
   standBow: HANGING_BOW,
 } as const satisfies BowedHold;
