@@ -207,7 +207,11 @@ colors. The normal map of the source is smooth (median tilt 0.012 at 1024 pixels
 to 0.028 on the cat, the wolf, and the rabbit), so the strands also go into `badger-normal.webp`:
 each x, y tilt of the source limited to 0.2 (0.61 % of the texels), a box scale to 1024 pixels,
 the slope of the strands added, the tilts times 4 in red and green, 255 in blue, and
-`cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
+`cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0). On the back of the neck and the top of the back
+(`FLAT`: 124 triangles that face back, at |x| below 0.13 and y from 0.5 to 0.86, grown by 2
+texels with an edge of 1.5 texels), the normal map keeps only the tilt of the strands. Reason: the
+source paints a crumpled pattern of small bumps there, which showed as red and brown dots behind a
+raised left arm.
 
 **Differences from the source.** The app light is warm and comes from above, so the dark brown fur
 reads lighter and warmer than in the even gray light of an FBX viewer. The fold relax moves the
@@ -222,4 +226,4 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 | `tripo-hand/badger.rig.glb` | 1,257,292 bytes | `743c059eb0ce8a261fec9988cfdcfb5b7b931b581fad6996be9c38536da873c9` |
 | `tripo-hand/badger.rig.json` | 16,699 bytes | `7aed3a6e695f48938021a0230b258894b72c92c232f7af6fd9bccb69bfa25c3a` |
 | `tripo-hand/badger-color.webp` | 153,548 bytes, 2048 × 2048 | `11aac51d538ed6221ab83617e707062a40d1f895ec1e19de1710d821b02af718` |
-| `tripo-hand/badger-normal.webp` | 117,358 bytes, 1024 × 1024 | `88d50cb835488a10fc3dbff89e2bac000f8217715d117f2022de2efc1ce0dca0` |
+| `tripo-hand/badger-normal.webp` | 112,466 bytes, 1024 × 1024 | `6958e8fe9bcd4d219685692fe0191e96684c95f5daf61f7b4658ebf67f2dbcd3` |

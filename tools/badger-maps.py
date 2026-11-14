@@ -2,8 +2,9 @@
 # (design 4.5, assets/models/badger/README.md, "Maps"). The color map is the source image at 2048
 # pixels with fur strands (STRANDS): each color takes a small luma step along the strands, and the
 # hue stays. The eye paint stays as the FBX shows it, and the eyeballs keep their colors. The
-# normal map adds the slope of the same strands to the tilts of the source. The output depends
-# only on the input files, the eyes of the rig file, and cwebp 1.5.0.
+# normal map adds the slope of the same strands to the tilts of the source, with no tilt of the
+# source on the back of the neck (FLAT). The output depends only on the input files, the eyes and
+# the triangles of the rig file, and cwebp 1.5.0.
 #
 # Usage: uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/badger-maps.py
 import os
@@ -12,7 +13,7 @@ import sys
 import tempfile
 
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFilter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import gaze_shift  # noqa: E402
@@ -57,6 +58,23 @@ STRANDS = {
     'luma': 0.08,
     #: The largest height of a strand, in standard deviations.
     'clip': 2.5,
+}
+#: The back of the neck and the top of the back, where the normal map of the source paints a
+#: crumpled pattern of small bumps: the triangles of the rig file with the middle at |x| below
+#: `side`, y from `above` to `below`, and z below `behind`, and a normal with z below `facing` (the
+#: studio units and axes of the bind: y up, +z forward). In the warm light, the bumps showed as red
+#: and brown dots behind a raised left arm. The texels of these triangles take no tilt of the
+#: source, only the tilt of the strands. The area grows by `grow` texels at NORMAL_SIZE, so that the
+#: bilinear samples at the edges of its triangles take no bump, and then takes a soft edge of
+#: `feather` texels.
+FLAT = {
+    'side': 0.13,
+    'above': 0.5,
+    'below': 0.86,
+    'behind': -0.1,
+    'facing': -0.45,
+    'grow': 2,
+    'feather': 1.5,
 }
 
 
@@ -154,11 +172,37 @@ def strand_tilts(height):
     return t * (STRANDS['tilt'] / np.sqrt((t ** 2).sum(-1).mean()))
 
 
-def normal_map(extra=None):
+def flat_mask(rig):
+    """Gives the share of the source tilt that each texel of the normal map loses (FLAT): 1 on
+    the texels of the chosen triangles grown by `grow` texels, with a Gaussian edge of `feather`
+    texels."""
+    triangles, positions, points, _ = rig
+    corners = positions[triangles]
+    mid = corners.mean(axis=1)
+    normal = np.cross(corners[:, 1] - corners[:, 0], corners[:, 2] - corners[:, 0])
+    normal /= np.linalg.norm(normal, axis=1)[:, None] + 1e-12
+    f = FLAT
+    chosen = (np.abs(mid[:, 0]) < f['side']) & (mid[:, 1] > f['above']) & (mid[:, 1] < f['below'])
+    chosen &= (mid[:, 2] < f['behind']) & (normal[:, 2] < f['facing'])
+    mask = Image.new('L', (NORMAL_SIZE, NORMAL_SIZE), 0)
+    draw = ImageDraw.Draw(mask)
+    for t in np.nonzero(chosen)[0]:
+        draw.polygon(
+            [(float(u) * NORMAL_SIZE, float(v) * NORMAL_SIZE) for u, v in points[triangles[t]]],
+            fill=255,
+        )
+    mask = mask.filter(ImageFilter.MaxFilter(2 * f['grow'] + 1))
+    share = np.asarray(mask.filter(ImageFilter.GaussianBlur(f['feather']))).astype(np.float64) / 255
+    print(f'flat: {int(chosen.sum())} triangles, {int((share > 0.5).sum())} texels')
+    return share
+
+
+def normal_map(extra=None, flat=None):
     """Writes the normal map of the fur: each x, y tilt of the source limited to the length
     NORMAL_LIMIT, a box scale to NORMAL_SIZE, then the tilts times NORMAL_GAIN in red and green,
     255 in blue (the shader does not read it), and cwebp -q 60 -sharp_yuv -m 6. The limit comes
-    before the gain, so that no stored value clips."""
+    before the gain, so that no stored value clips. The source tilts lose the share `flat`
+    (`flat_mask()`) before the strand tilts `extra` come in."""
     a = np.asarray(Image.open(NORMAL_SOURCE).convert('RGB')).astype(np.float64) / 255 * 2 - 1
     t = a[..., :2].copy()
     length = np.linalg.norm(t, axis=-1)
@@ -166,6 +210,8 @@ def normal_map(extra=None):
     t[over] *= (NORMAL_LIMIT / length[over])[:, None]
     k = t.shape[0] // NORMAL_SIZE
     small = t.reshape(NORMAL_SIZE, k, NORMAL_SIZE, k, 2).mean(axis=(1, 3))
+    if flat is not None:
+        small *= (1 - flat)[..., None]
     if extra is not None:
         small = small + extra
         length = np.linalg.norm(small, axis=-1)
@@ -194,7 +240,7 @@ def main():
         image.save(COLOR_OUT, 'WEBP', quality=QUALITY, method=6)
         print(f'{COLOR_OUT}: {SIZE} x {SIZE}, {os.path.getsize(COLOR_OUT)} bytes')
     if 'normal' in which:
-        normal_map(strand_tilts(height))
+        normal_map(strand_tilts(height), flat_mask(rig))
 
 
 if __name__ == '__main__':
