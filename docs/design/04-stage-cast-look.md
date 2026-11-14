@@ -2159,8 +2159,11 @@ A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded
   grip of the left paw it leans out to the left (`TUBA_BELL_LEAN`), so that the rim of the bell
   stays off the cheek and the eye of the rhino. The bell flares fast near the rim to a bead, and a
   garland of nickel silver goes around the flare (`TUBA_FLARE`, `TUBA_GARLAND`), because a
-  straight cone up to the rim read as a funnel. The bottom bow joins it to the valves, four piston
-  valves with pearl buttons, and four valve slides at the right of the valves. The lead pipe
+  straight cone up to the rim read as a funnel. The bottom bow joins it to the valves, and four
+  piston valves have pearl buttons. The long slide of the first valve crosses the front of the
+  tuba below the grip of the left paw (`TUBA_LONG_SLIDE`), and the slides of the other valves hang
+  at the right of the valves. Reason: with only short slides at the right, the tuba read as a cone
+  and a bow, as a large saxophone. The lead pipe
   starts at the end of the mouthpiece shank and goes down in front of the chin, so that no part of
   it goes into the face.
 

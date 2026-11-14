@@ -935,6 +935,50 @@ function tubaBell(piece: PieceBuilder, bend: Vec3, axis: Vec3, top: number, radi
 }
 
 /**
+ * The long slide of the first valve of the tuba, in meters in the axes of the drawing of
+ * {@link tuba}: the height of its upper leg and of its lower leg, its distance in front of the
+ * bell branch, and the end of its bow at the left. The loop crosses the front of the tuba below the
+ * grip of the left paw, as the long slide loops of a concert tuba, so that the audience sees
+ * tubing between the bell branch and the valves. With only the short slides at the right of the
+ * valves, the tuba read as a cone and a bow, as a large saxophone.
+ */
+const TUBA_LONG_SLIDE = { upper: 0.33, lower: 0.26, front: -0.12, left: -0.11 } as const;
+
+/**
+ * Adds the long slide of the first valve of the tuba ({@link TUBA_LONG_SLIDE}): from the front of
+ * the first valve casing down and to the left, in front of the bell branch, around a round bow,
+ * and back to the bottom of the casing.
+ *
+ * @param piece The piece.
+ * @param at The function that gives a point of the drawing of {@link tuba} in the axes of the
+ *   piece.
+ */
+function tubaLongSlide(piece: PieceBuilder, at: (p: Vec3) => Vec3): void {
+  const s = TUBA_LONG_SLIDE;
+  const bow = (s.upper - s.lower) / 2;
+  const upper = rounded(
+    [at([0.1, 0.43, -0.065]), at([0.06, s.upper, s.front]), at([s.left, s.upper, s.front])],
+    0.03,
+    1,
+  );
+  const around = arc(
+    at([s.left, s.lower + bow, s.front]),
+    [0, 1, 0],
+    [-1, 0, 0],
+    bow,
+    0,
+    Math.PI,
+    4,
+  );
+  const lower = rounded(
+    [at([s.left, s.lower, s.front]), at([0.1, s.lower, s.front]), at([0.1, 0.362, -0.06])],
+    0.03,
+    1,
+  );
+  tubeAlong(piece, [...upper, ...around.slice(1, -1), ...lower], [0.0095], TUBE_SEGMENTS, METAL);
+}
+
+/**
  * Builds the tuba, as a top-action piston tuba such as a Yamaha YFB-822
  * (`docs/reference/wind-technique.md` 6.1). The mouthpiece is at the origin, and the tuba has the
  * axes of the player: the body stands in front of the player, and the bell opens up at the left
@@ -943,8 +987,9 @@ function tubaBell(piece: PieceBuilder, bend: Vec3, axis: Vec3, top: number, radi
  * the chin before it goes back to the valves. With its end behind the rim, the pipe went 2.6 cm
  * into the chin of the rhino.
  *
- * The parts: the bell branch, the bottom bow, the valve branch, four piston valves with pearl
- * buttons, the valve slides at the right of the valves, and the main tuning slide over them.
+ * The parts: the bell branch with its garland, the bottom bow, the valve branch, four piston valves
+ * with pearl buttons, the long slide of the first valve across the front, the slides of the other
+ * valves at the right of the valves, and the lead pipe.
  *
  * @param lead The lengths by which the lead pipe reaches back and to the left from the
  *   mouthpiece, in meters (`SpeciesParams.tubaPipe`).
@@ -991,8 +1036,13 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
   for (const z of valveZ) {
     piston(piece, at([0.1, 0.475, z]), 0.0125, 0.11, 0.026);
   }
-  // The valve slides hang at the right of the valves.
+  tubaLongSlide(piece, at);
+  // The slides of the other valves hang at the right of the valves. Each has 5 faces around its
+  // axis, so that the long slide fits in the triangle budget.
   for (const [i, z] of valveZ.entries()) {
+    if (i === 0) {
+      continue;
+    }
     const reach = 0.06 + 0.035 * i;
     tubeAlong(
       piece,
@@ -1007,7 +1057,7 @@ function tuba(lead: readonly [back: number, left: number]): BrassBuild {
         1,
       ),
       [0.0085],
-      TUBE_SEGMENTS,
+      TUBE_SEGMENTS - 1,
       METAL,
     );
   }
