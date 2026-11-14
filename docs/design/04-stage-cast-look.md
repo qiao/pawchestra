@@ -2112,7 +2112,9 @@ grips keep their places, so the holds and the strikes do not change with the det
   with a grip sleeve. The felt and the yarn heads take the finish `felt` (4.5), and the hard
   rubber heads take the soft gloss of `varnish`, so that each head shades round. A larger head
   has more faces around its axis (`roundMallet()`), because a head of 6 faces showed a hexagon
-  in its outline.
+  in its outline. The timpani mallets have thicker shafts of a warm maple (`TIMPANI.shaft`,
+  `malletShaft`), as the mallets of `orchestra-latest.png`, because thin pale shafts read as
+  sticks in the large stump paws of the elephant.
 
 These rules hold for the models:
 

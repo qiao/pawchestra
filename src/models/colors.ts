@@ -143,6 +143,8 @@ export const INSTRUMENT_COLORS = {
   drumHead: srgb('#d4c4a6'),
   hardware: srgb('#1e1a16'),
   stick: srgb('#cdb27a'),
+  /** The varnished maple of the timpani mallet shafts. */
+  malletShaft: srgb('#b8854f'),
   xylophoneBars: srgb('#b07a45'),
   xylophoneFrame: srgb('#3a2a22'),
   // Percussion

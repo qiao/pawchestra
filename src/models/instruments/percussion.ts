@@ -117,6 +117,12 @@ export const TIMPANI = {
   malletButt: 0.04 as number,
   /** The radius of the felt ball of each mallet, in meters. */
   ball: 0.025,
+  /**
+   * The radius of the shaft of each mallet, in meters: thicker than the other shafts
+   * ({@link SHAFT}), as the shafts of `orchestra-latest.png` are about a quarter of the width of
+   * the ball. With the other shafts, the mallets read as thin sticks in the large stump paws.
+   */
+  shaft: 0.007,
 } as const;
 
 /**
@@ -689,21 +695,25 @@ const SHAFT = 0.0055;
  *   rubber. Both have smooth normals, so that the head shades round.
  * @param segments The faces around the axis of the head. The head has half as many rings. A
  *   small head with 6 faces showed a hexagon in its outline, so a larger head takes more faces.
+ * @param shaftRadius The radius of the shaft, in meters.
+ * @param shaftColor The color of the wood of the shaft.
  * @returns The look.
  */
-function roundMallet(head: number, headColor: Rgb, headFinish: Finish, segments = 8): MalletLook {
+function roundMallet(
+  head: number,
+  headColor: Rgb,
+  headFinish: Finish,
+  segments = 8,
+  shaftRadius = SHAFT,
+  shaftColor: Rgb = INSTRUMENT_COLORS.stick,
+): MalletLook {
   return (piece, length, butt) => {
     const shaft: readonly ProfilePoint[] = [
       [0, -butt],
-      [SHAFT, -butt],
-      [SHAFT, length - 0.5 * head],
+      [shaftRadius, -butt],
+      [shaftRadius, length - 0.5 * head],
     ];
-    piece.add(
-      latheBand(shaft, 6),
-      INSTRUMENT_COLORS.stick,
-      transform([0, 0, 0], ALONG_X),
-      'varnish',
-    );
+    piece.add(latheBand(shaft, 6), shaftColor, transform([0, 0, 0], ALONG_X), 'varnish');
     piece.add(
       ball(head, segments, segments / 2),
       headColor,
@@ -1221,7 +1231,14 @@ export function buildTimpani(kettles: KettleCount): InstrumentModel {
     tilt,
     spot: t.malletSpotL,
     butt: t.malletButt,
-    look: roundMallet(t.ball, INSTRUMENT_COLORS.felt, 'felt', 10),
+    look: roundMallet(
+      t.ball,
+      INSTRUMENT_COLORS.felt,
+      'felt',
+      10,
+      t.shaft,
+      INSTRUMENT_COLORS.malletShaft,
+    ),
     space: t.ball,
   };
   const [left, right] = malletPair(timpaniMallet, { ...timpaniMallet, spot: t.malletSpotR });
