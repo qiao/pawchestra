@@ -29,7 +29,7 @@ model folder gives the files of each step.
 | wolf | Hand rig. | `clarinetist`, `violinist@wolf` (recast) |
 | badger | Hand rig at the crown of the older badger, arms 1.2 times longer, a left eyeball fused to its socket (`fused_ball()`), a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
 | monkey | Hand rig at 1.2 times H of the older monkey, no chair, a smaller trumpet (`trumpetScale`). | `trumpeter` |
-| rhino | T-pose mesh, rebuilt arms (`rhino_tpose_arms.py`), elbow `raise` shapes, a tail ball. Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
+| rhino | Hand rig at the standing eye height of the older rhino, arms 1.2 times longer, the left paw turned by 5 ring steps, face rows on the long muzzle (`faceRows`). Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
 | deer | Hand rig of the fawn, arms 1.5 times longer. Sits on the harp stool, with the harp of 0.975 (`harpScale`) in front of the chest. | `harpist` |
 | penguin | Hand rig. Stands on its riser. | `singer` |
 | mannequin | The test body: the animal preset of `mannequin.py`, its own faces (`arm_rebuild.py --keep-faces`). | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
@@ -299,6 +299,8 @@ Design 4.4 gives the merges of each copy.
 
 ### Legs, seat, and tail
 
+- A near vertical thigh bone gives its roll no clear hint, and the export refuses the leg frames
+  ("scales or shears"). Slope the thigh about 15° back (the rhino).
 - Put the hip joints of short thick legs in the haunch. Keep the shin to thigh ratio of the mesh,
   and fit the bench to the legs. A long thigh puts the feet forward: lengthen the shin
   (`shinFactor`), and move `headFloor` and each lap share (`lap.along`) with the legs.
@@ -308,7 +310,8 @@ Design 4.4 gives the merges of each copy.
   root can set the seat top: fix it with `sit.top` and `sit.root`.
 - A girth move that ends at a joint leaves a ledge in the seated bind. Relax the posed bind there
   in a few plain Laplacian rounds, into the sit key by the inverse skin. Taubin keeps the ledge.
-  A standing body gets the source back from `legs_straight`: use `smooth` boxes (rhino).
+  A standing body gets the source back from `legs_straight`: use `smooth` boxes (the old rhino
+  of `8e42c4eaa`).
 
 ### Head and colors
 
