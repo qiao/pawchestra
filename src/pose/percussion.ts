@@ -1285,26 +1285,35 @@ function topTurn(
  * points up or toward the shoulder joint (`PercussionHold.top`). With `PercussionHold.strikeRoll`,
  * the paw also turns around the shaft until it has no side bend on the forearm at the strike
  * ({@link gripRoll}), and keeps that roll through the stroke. The forearm of the strike comes
- * from the two-bone solution to the wrist, two times, because the wrist follows the roll. The
- * function writes the module vectors `wrist` and `turn`, and it changes `point`.
+ * from the two-bone solution to the wrist on the steady arm (`PercussionRig.steadyChest`), two
+ * times, because the wrist follows the roll. Thus the sway and the turn of the body at a damp do
+ * not turn the paw around the shaft: with the posed arm, the right paw of the bass drummer turned
+ * 54° in one frame where the two rolls of {@link gripRoll} met. The function writes the module
+ * vectors `wrist` and `turn`, and it changes `point`.
  *
+ * @param rig The points of the player.
  * @param side The hand with a mallet.
  * @param point The target of the mallet head. The function writes the head into it.
  * @param hand The strike state of the hand.
  * @param joint The posed shoulder joint of the side.
- * @param pole The direction to which the elbow points, in the model axes.
+ * @param pole The direction to which the elbow points, in the axes of the chest.
  */
 function malletHand(
+  rig: PercussionRig,
   side: Extract<PercussionSide, { kind: 'mallet' }>,
   point: Vector3,
   hand: StrikeState,
   joint: Vector3,
-  pole: Vector3,
+  pole: Vec3,
 ): void {
   const { arm } = side;
   wristBind.fromArray(arm.bind.wrist);
   rollTurn.identity();
   if (side.strikeRoll) {
+    steadyChest.position.fromArray(rig.steadyChest.position);
+    steadyChest.rotation.fromArray(rig.steadyChest.rotation);
+    poseShoulder(arm, steadyChest, rig.chestBind, NO_TURN, steadyShoulder);
+    steadyPole.fromArray(pole).applyQuaternion(steadyChest.rotation);
     strikeDirection.copy(point).sub(offset.fromArray(side.home)).normalize();
     topTurn(side, strikeDirection, point, joint, strikeTurn);
     shoulderBind.fromArray(arm.bind.shoulder);
@@ -1315,7 +1324,7 @@ function malletHand(
       strikeHand.copy(strikeTurn).multiply(rollTurn);
       offset.fromArray(side.head).sub(wristBind).applyQuaternion(strikeHand);
       wrist.copy(point).sub(offset);
-      solveTwoBone(joint, wrist, upper, lower, pole, joints);
+      solveTwoBone(steadyShoulder.position, wrist, upper, lower, steadyPole, joints);
       forearm.subVectors(joints.wrist, joints.elbow).normalize();
       gripRoll(side, strikeDirection, forearm, rollTurn.copy(strikeTurn));
     }
@@ -1509,7 +1518,7 @@ function poseHand(
   } else if (side.kind === 'mallet' && fingers) {
     fingerHand(rig, hand, state.small);
   } else if (side.kind === 'mallet') {
-    malletHand(side, head, hand, shoulder.position, turnedPole);
+    malletHand(rig, side, head, hand, shoulder.position, pole);
   } else if (side.kind === 'plate') {
     plateHand(rig, side, hand, state.damp, state.ring);
   } else if (side.kind === 'hold' && rig.switch && state.swap.held[0] === 1) {
