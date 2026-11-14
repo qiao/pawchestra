@@ -1288,16 +1288,19 @@ const WOLF_CLARINET = {
  * 1.3 cm off the valves. The top of the right paw is 6.1 cm above the mouthpiece, so in
  * the view from the front, the paw covers the mouth, as the right hand of a real player on the
  * valve buttons. The left paw takes no side aim: the retarget turns the paw back to its forearm in
- * the plane of its palm (`PAW_TURN` of `models/studio-rig.ts`). Both paws keep the hold of the
- * play at rest (`restAim`), so that the right fingers stay on the valves. At rest, the left grip
- * moves 0.04 H along the casings toward the bell (`restGripShiftL`), so that the left finger tips
- * stay on the casings of the upright trumpet.
+ * the plane of its palm (`PAW_TURN` of `models/studio-rig.ts`).
  *
- * At rest, the trumpet moves 0.5 H down, 0.1 H to the right, and 0.12 H back from the mouth
- * (`restShift`), so that it turns down in front of the belly with the elbows a little bent, as a
- * player rests the trumpet in front of the body. With 0.25 H back, the bent elbows folded more
- * faces of the arms, and the inner elbows showed a soft crease. With 0.05 H back, the arms are
- * almost straight in front of the body at rest.
+ * At rest, the arms hang from square shoulders (`restArms`), and the trumpet hangs from the
+ * right paw in front of the right thigh with its bell down, as a player holds the trumpet in one
+ * hand in front of the body between two entrances. The right upper arm hangs 30° forward with the
+ * elbow down and bent 25°, and the left paw leaves the valves and hangs beside the body with a
+ * soft bend of the elbow (`restFreeL`). The right paw keeps the roll and the aim of the play at
+ * rest (`restAim`), so it holds the valves, and it lies nearly in line with its forearm. With the
+ * trumpet 0.5 H below the mouth in both paws and the rest elbows of the shared hold, the upper
+ * arms stood out to the side, almost level, and the forearms crossed the chest. With both paws on
+ * the trumpet at the hanging arms, the elbows went 5.7 cm into the belly. With the right elbow
+ * bent 60°, the right forearm lay level and the right paw stood up at the wrist. With the right
+ * upper arm 20° forward, its root went 1.7 cm into the body.
  *
  * Both elbows point down and out, as a real player lets the elbows hang. The mouthpiece rim rests
  * on the lips, as the rim of a real trumpet player (`docs/reference/wind-technique.md` 2.1): it
@@ -1316,8 +1319,17 @@ const MONKEY_TRUMPET = {
   faceTube: ['palm', 'palm'],
   aimSide: [0, 0.35],
   gripShiftR: [-0.06, 0, -0.05],
-  restShift: [0.1, -0.5, 0.12],
-  restGripShiftL: [0, 0, 0.04],
+  restShift: [0, 0, 0],
+  restArms: {
+    L: { forward: 15 * MathUtils.DEG2RAD, bend: 20 * MathUtils.DEG2RAD },
+    R: { forward: 30 * MathUtils.DEG2RAD, bend: 25 * MathUtils.DEG2RAD },
+  },
+  restFreeL: {
+    lap: { along: 0.45, offset: [-0.5, -0.55, -0.12] },
+    palm: [0.85, -0.37, 0.38],
+    fingers: [0, -1, -0.3],
+    arc: [0.3, 0.04, 0.31],
+  },
   restAim: 1,
   gripCurl: curls(130, 92),
   lipShift: [0, 0, 0.012],
