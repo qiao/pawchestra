@@ -914,8 +914,20 @@ passes.
       before). Try the clavicle rows and the rest elbows of `FOX_FLUTE`, and check 2x crops.
 - [ ] Tripo fox wrists: the 28 band quads of the paw turn take one planar patch of the color map
       (`bandPatch`), so a straight light line shows where the band meets the forearm in the play
-      view (`reports/2026-11-13-fox-wrist/play-red-fox/pair-az0-wrists-2x.png`). Try UVs that
-      continue the forearm fur on the near ring.
+      view (`reports/2026-11-13-fox-wrist/play-red-fox/pair-az0-wrists-2x.png`). Try the band
+      fade of the bear in place of the patch (`bandFade`, `tools/band_fade.py`), and the same for
+      the rabbit.
+- [ ] Tripo bear conductor wrists: after the band fade, a thin line of 1 to 2 pixels stays at the
+      far ring of each band in the close-ups (`reports/2026-11-13-fix-chain-bands/fault1-*.png`).
+      The fold angles there are as at the other arm edges, and flat band normals do not remove
+      it, so it is the texture filter at the UV edge of the band. Check it in the app view first.
+- [ ] Tripo elephant timpanist: at rest, a ring line with a step of tone and a small ledge at its
+      inner side shows at the start of the left stump, from the front (e20 and e40). It lies at
+      the wrist bend, above the turned band (the band fade does not change it), and a longer
+      wrist blend (12 steps of 0.0055 units) did not change it. Check the source mesh and its
+      color map there.
+- [ ] Tripo wolf clarinetist left wrist (paw turn of -2 steps, no band patch): a weaker ring line
+      shows across the forearm from above and from the front at rest. Try the band fade.
 - [ ] Tripo red fox violinist: with the right paw turn of 4 steps, the bow paw twists 45° (p95)
       and the move twist is 48° (77° before the bent elbows of 5.2). Check the bow paw in the lift
       and the lowering in the app.
