@@ -306,9 +306,16 @@ soloist gets one player, and `Score.soloist` holds it.
   notes, as the bassoon of K. 191 does, and they make no section. A seat of one line with one
   player for each simultaneous note thus counts as a seat of one player. A string section with
   its base size has more players than voices, so it is no line of one player.
-- A candidate is **clearly the soloist** when it sounds in a large share of the piece, is above
-  the orchestra (by its key or by its loudness) in most of its time, and has an orchestra with it.
-  Loudness lets a low soloist, such as a bassoon, lead.
+- A candidate is **clearly the soloist** when it sounds in a large share of the piece, leads the
+  orchestra, and has an orchestra with it. A seat leads when it is above the orchestra by its key
+  or by its loudness in most of its time. Loudness lets a low soloist, such as a cello, lead.
+- **Wind soloist.** A candidate of the woodwinds or the brass also leads when the other woodwinds
+  and brass rest in `SOLOIST_RULE.windsRest` of its sounding time, and it plays
+  `SOLOIST_RULE.busy` of the notes of the busiest other seat. In a concerto for a wind, the
+  strings accompany the solo, and the other winds play in the tutti. Reason: a file with one
+  velocity for all notes, as the files of K. 191 and K. 417, gives a bassoon or a horn no lead by
+  its key or its loudness. The count of notes keeps a horn that holds long notes under the
+  strings in its row.
 - Exactly one candidate must pass. Two candidates that pass, as in a double concerto, give no
   soloist.
 - The share "above the orchestra" is high enough that a concertino of several equal soloists,

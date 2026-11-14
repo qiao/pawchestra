@@ -222,8 +222,8 @@ describe('the soloist of each demo (design 3.8, 8.2)', () => {
     ['bach-bwv1047.mid', 'none'],
     ['bach-bwv1050.mid', 'none'],
     ['mendelssohn-op61.mid', 'none'],
-    ['mozart-k417.mid', 'none'],
-    ['mozart-k191.mid', 'none'],
+    ['mozart-k417.mid', 'horn'],
+    ['mozart-k191.mid', 'bassoon'],
     ['pachelbel-p37.mid', 'none'],
     ['beethoven-5-4.mid', 'none'],
     ['beethoven-7-4.mid', 'none'],
@@ -238,7 +238,12 @@ describe('the soloist of each demo (design 3.8, 8.2)', () => {
     }
   });
 
-  it('finds the K. 315 flute with a margin, and no other seat that leads', () => {
+  it('finds the K. 315 flute with a margin, and no seat that leads in a piece with no soloist', () => {
+    const soloists = new Map([
+      ['mozart-k315.mid', 'flute'],
+      ['mozart-k191.mid', 'bassoon'],
+      ['mozart-k417.mid', 'horn'],
+    ]);
     for (const demo of demos) {
       const { seats, notes, durationSec } = scoreOf(demo.bytes, 'one-per-part');
       // With "One per part", each seat has one player for each simultaneous note.
@@ -247,9 +252,9 @@ describe('the soloist of each demo (design 3.8, 8.2)', () => {
         if (!m || seats[i]?.section === 'piano') {
           return;
         }
-        const flute = demo.file === 'mozart-k315.mid' && seats[i]?.section === 'flute';
-        expect(passesSoloistRule(m), `${demo.file} seat ${i}`).toBe(flute);
-        if (flute) {
+        const soloist = soloists.get(demo.file) === seats[i]?.section;
+        expect(passesSoloistRule(m), `${demo.file} seat ${i}`).toBe(soloist);
+        if (soloist && demo.file === 'mozart-k315.mid') {
           expect(m.coverage).toBeGreaterThan(0.7);
           expect(m.above).toBeGreaterThan(0.85);
           expect(m.accompanied).toBeGreaterThan(0.85);

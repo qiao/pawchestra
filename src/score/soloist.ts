@@ -53,6 +53,19 @@ const SOLOIST_RULE = {
    * A solo part can hold a few double notes, as the 9 notes of the K. 191 bassoon (0.03).
    */
   chords: 0.05,
+  /**
+   * A soloist of the woodwinds or the brass also leads when no other seat of the woodwinds and
+   * the brass sounds in this part of its sounding time or more. The solo parts of the K. 191
+   * bassoon and the K. 417 horn have 0.86 and 0.96, and each other wind seat of the demos has
+   * 0.27 or less.
+   */
+  windsRest: 0.6,
+  /**
+   * Such a soloist also plays at least this part of the notes of the busiest other seat. The
+   * two solo parts have 0.84 and 0.81. A horn that holds long notes under the strings is no
+   * soloist.
+   */
+  busy: 0.5,
 } as const;
 
 /**
@@ -66,6 +79,21 @@ const SOLO_SECTIONS: ReadonlySet<SectionId> = new Set<SectionId>([
   'contrabass',
   'harp',
   'piano',
+  'flute',
+  'oboe',
+  'clarinet',
+  'bassoon',
+  'horn',
+  'trumpet',
+  'trombone',
+  'tuba',
+]);
+
+/**
+ * The sections of the woodwinds and the brass. In a concerto for one of them, the strings
+ * accompany the solo, and the other winds play in the tutti.
+ */
+const WIND_SECTIONS: ReadonlySet<SectionId> = new Set<SectionId>([
   'flute',
   'oboe',
   'clarinet',
@@ -102,6 +130,8 @@ interface SeatGrid {
   readonly velocity: Uint8Array;
   /** The number of notes that sound at each step, up to 255. */
   readonly count: Uint8Array;
+  /** The number of notes of the seat. */
+  notes: number;
 }
 
 /**
@@ -121,6 +151,7 @@ function gridOf(
     top: new Int8Array(steps).fill(-1),
     velocity: new Uint8Array(steps),
     count: new Uint8Array(steps),
+    notes: 0,
   }));
   const step = SOLOIST_RULE.stepSec;
   for (const note of notes) {
@@ -128,6 +159,7 @@ function gridOf(
     if (!grid) {
       continue;
     }
+    grid.notes += 1;
     const from = Math.max(0, Math.round(note.startSec / step));
     const to = Math.min(steps, Math.round(note.endSec / step));
     for (let i = from; i < to; i++) {
@@ -152,6 +184,13 @@ interface SoloMeasures {
    * exposed ({@link SOLOIST_RULE}). `null` for the only seat of its section.
    */
   readonly exposed: number | null;
+  /**
+   * For a seat of the woodwinds or the brass beside other such seats: the part of its sounding
+   * time in which no other such seat sounds. `null` for each other seat.
+   */
+  readonly windsRest: number | null;
+  /** The notes of the seat as a part of the notes of the busiest other seat that can carry a solo. */
+  readonly busy: number;
 }
 
 /**
@@ -228,10 +267,18 @@ function measure(
   if (mates.length === 0 ? !alone : !line || sharesChannel(index, seats)) {
     return null;
   }
+  const winds = others.filter((i) => WIND_SECTIONS.has(seats[i]?.section ?? 'percussion'));
+  const busiest = Math.max(
+    1,
+    ...others.map((i) =>
+      SOLO_SECTIONS.has(seats[i]?.section ?? 'percussion') ? (grids[i]?.notes ?? 0) : 0,
+    ),
+  );
   let sounding = 0;
   let above = 0;
   let accompanied = 0;
   let exposed = 0;
+  let windsRest = 0;
   for (let t = span[0]; t < span[1]; t++) {
     const key = own.top[t] ?? -1;
     if (key < 0) {
@@ -267,6 +314,9 @@ function measure(
     if (velocity >= rule.louder * mateVelocity) {
       exposed++;
     }
+    if (winds.every((i) => (grids[i]?.top[t] ?? -1) < 0)) {
+      windsRest++;
+    }
   }
   const heard = Math.max(1, sounding);
   return {
@@ -274,14 +324,34 @@ function measure(
     above: above / heard,
     accompanied: accompanied / heard,
     exposed: mates.length === 0 ? null : exposed / heard,
+    windsRest: WIND_SECTIONS.has(seat.section) && winds.length > 0 ? windsRest / heard : null,
+    busy: own.notes / busiest,
   };
 }
 
 /**
+ * Finds if a seat of the woodwinds or the brass leads as the soloist of a concerto does: the
+ * strings accompany its solo, the other woodwinds and brass rest ({@link SOLOIST_RULE}.windsRest),
+ * and it plays a line of many notes ({@link SOLOIST_RULE}.busy).
+ *
+ * @param m The measures of a candidate.
+ * @returns True if the seat leads the winds.
+ */
+function leadsTheWinds(m: SoloMeasures): boolean {
+  return (
+    m.windsRest !== null && m.windsRest >= SOLOIST_RULE.windsRest && m.busy >= SOLOIST_RULE.busy
+  );
+}
+
+/**
  * Finds if the measures of a seat pass the soloist rule: it sounds in half the piece or more, it
- * is above the orchestra in register or in loudness in three quarters of its sounding time, and
- * two or more other seats sound with it in 0.6 of that time. A solo line beside the seats of its
- * section is also exposed in three quarters of its sounding time.
+ * leads the orchestra, and two or more other seats sound with it in 0.6 of its sounding time. A
+ * seat leads when it is above the orchestra in register or in loudness in three quarters of its
+ * sounding time. A seat of the woodwinds or the brass also leads when the other woodwinds and
+ * brass rest in 0.6 of its sounding time, and it plays half the notes of the busiest other seat
+ * or more. A file with one loudness for all notes gives a low soloist, such as a bassoon or a
+ * horn, no other lead. A solo line beside the seats of its section is also exposed in three
+ * quarters of its sounding time.
  *
  * @param m The measures of a candidate.
  * @returns True if the seat is clearly the soloist.
@@ -290,7 +360,7 @@ export function passesSoloistRule(m: SoloMeasures): boolean {
   const rule = SOLOIST_RULE;
   return (
     m.coverage >= rule.coverage &&
-    m.above >= rule.above &&
+    (m.above >= rule.above || leadsTheWinds(m)) &&
     m.accompanied >= rule.accompanied &&
     (m.exposed === null || m.exposed >= rule.exposed)
   );

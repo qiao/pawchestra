@@ -50,7 +50,7 @@ of 23 June 2021 add one rule: no training or test of a machine learning model.
 | # | Hash id | Piece | Source | License | What it shows |
 |---|---|---|---|---|---|
 | 1 | `mozart-k191` | Mozart, Bassoon Concerto, mvt 3 | Mutopia 686 | public domain | Solo bassoon, oboes, horns, strings |
-| 2 | `mozart-k417` | Mozart, Horn Concerto 2, mvt 3 | Mutopia 901 | public domain | Horns, oboes, and strings |
+| 2 | `mozart-k417` | Mozart, Horn Concerto 2, mvt 3 | Mutopia 901 | public domain | Solo horn, horns, oboes, strings |
 | 3 | `bach-bwv1050` | Bach, Brandenburg Concerto 5, mvt 3 | Mutopia 548 | public domain | Solo flute, violin, harpsichord |
 | 4 | `beethoven-9` | Beethoven, Symphony 9, finale, excerpt ("Ode to Joy") | OpenScore | CC0 | Choir on the risers, full orchestra, timpani, percussion |
 | 5 | `pachelbel-p37` | Pachelbel, Canon in D, P. 37 | Mutopia 2047 | CC BY 4.0 | Three violins and a cello, with one player for each note |
