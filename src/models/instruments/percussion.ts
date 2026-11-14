@@ -115,6 +115,8 @@ export const TIMPANI = {
    */
   // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
   malletButt: 0.04 as number,
+  /** The radius of the felt ball of each mallet, in meters. */
+  ball: 0.025,
 } as const;
 
 /**
@@ -1219,8 +1221,8 @@ export function buildTimpani(kettles: KettleCount): InstrumentModel {
     tilt,
     spot: t.malletSpotL,
     butt: t.malletButt,
-    look: roundMallet(0.025, INSTRUMENT_COLORS.felt, 'felt', 10),
-    space: 0.025,
+    look: roundMallet(t.ball, INSTRUMENT_COLORS.felt, 'felt', 10),
+    space: t.ball,
   };
   const [left, right] = malletPair(timpaniMallet, { ...timpaniMallet, spot: t.malletSpotR });
   const instrument = piece.build('instrument', hold('floor'));

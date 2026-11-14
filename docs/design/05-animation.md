@@ -868,8 +868,11 @@ The rest of each family:
   legato stroke: the mallet lifts at once after the strike before, to the top of the new strike,
   and waits there. Reason: a real player lifts the mallet at once after the attack (percussion 3,
   4), and with a rebound to the low rest height, the mallets stood still near the heads between
-  the notes of a passage. Another strike lifts from the rest height one beat before the note
-  (`leadSec`), at least `upSec` before it and in at most `upShare` of the gap. Reason: a real
+  the notes of a passage. At the note start, the head touches the struck surface: each strike
+  point rises by the radius of the head (`PercussionHold.ballLift`, or the offsets of the snare
+  drum, the cymbal, and the bass drum). Reason: with the middle of the head on the surface, half
+  of a felt ball went into the timpani head. Another strike lifts from the rest height one beat
+  before the note (`leadSec`), at least `upSec` before it and in at most `upShare` of the gap. Reason: a real
   player brings the mallets up a beat before an entry, and a lift of 0.25 s read as a start with
   no preparation. A rebound starts no faster than its stroke came down, so it takes more than
   `reboundSec` after a stroke with a top below the rest height (`reboundMaxSec`). Reason: the

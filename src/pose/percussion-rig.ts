@@ -270,6 +270,13 @@ interface PercussionHold {
   /** The move of the target of each hand from the middle of a head, in meters. */
   readonly offsetL: Vec3;
   readonly offsetR: Vec3;
+  /**
+   * The rise of each strike point out of the struck surface, in meters: the radius of the mallet
+   * head, so that the head touches the surface at the note start and does not go into it. Only the
+   * strikes take it, and the rest and the damp keep their points. 0 for a hold whose offsets
+   * already lift the target, such as the snare drum.
+   */
+  readonly ballLift: number;
   /** The directions to which the elbows point. */
   readonly poleL: Vec3;
   readonly poleR: Vec3;
@@ -479,6 +486,9 @@ export const PERCUSSION_HOLDS = {
     // mallet: with no offset, the left mallet points 17° in and the right mallet 22°.
     offsetL: [0.08, 0, 0],
     offsetR: [-0.05, 0, 0],
+    // The felt ball touches the head at the note start. With no lift, half of the ball went into
+    // the head.
+    ballLift: TIMPANI.ball,
     poleL: [-0.8, -1, 0.2],
     poleR: [0.8, -1, 0.2],
     rim: 0.25,
@@ -577,6 +587,7 @@ export const PERCUSSION_HOLDS = {
     // The middle of the head of the beater one radius of its head off the drum head, so that it
     // touches the head at the note start.
     offsetR: [0.0215, 0, 0.08],
+    ballLift: 0,
     poleL: POLE_L,
     poleR: [0, -0.5, 0.4],
     rim: 0,
@@ -637,6 +648,7 @@ export const PERCUSSION_HOLDS = {
     // note start. With no lift, the ball went 8 mm into the head.
     offsetL: [-0.04, SNARE_DRUM.tip, 0],
     offsetR: [0.04, SNARE_DRUM.tip, 0],
+    ballLift: 0,
     // The elbows point down and a little out and forward, so that the upper arms hang near the
     // body, as a real player keeps the elbows about a fist from the body (percussion 6): the
     // median upper arm stands 19° and 20° out from the side of the body in the play, as the
@@ -677,6 +689,7 @@ export const PERCUSSION_HOLDS = {
     sizes: { lift: 0.15, rest: 0.06 },
     offsetL: [0, 0, 0],
     offsetR: [0, 0, 0],
+    ballLift: 0,
     poleL: [-0.5, -1, 0.3],
     poleR: [0.5, -1, 0.3],
     rim: 0,
@@ -717,6 +730,7 @@ export const PERCUSSION_HOLDS = {
     sizes: { lift: 0.0225, rest: 0.02, roll: 0.01 },
     offsetL: [0, 0, 0],
     offsetR: [0, 0, 0],
+    ballLift: 0,
     poleL: [-0.5, -1, 0.2],
     poleR: POLE_R,
     rim: 0,
@@ -768,6 +782,9 @@ export const PERCUSSION_HOLDS = {
     // bends the left wrist 53° at the lowest bars, and 2 cm 49°.
     offsetL: [0, 0, 0.02],
     offsetR: [0, 0, -0.02],
+    // The rubber head touches the bar at the note start. With no lift, half of the head went into
+    // the bar.
+    ballLift: XYLOPHONE.head,
     // The elbows point down, a little out, and back. With the homes out from the shoulders, the
     // median upper arm stands 28° (left) and 32° (right) out from the side of the body in the
     // play, and at most 63° and 58°. With the right elbow at [2, -1, 0.3], the right upper arm
@@ -885,6 +902,7 @@ export const SUSPENDED_CYMBAL_HOLD: PercussionHold = {
   sizes: { lift: 0.1, rest: 0.03 },
   offsetL: [-0.187, 0, 0],
   offsetR: [0.187, 0, 0],
+  ballLift: 0,
   poleL: [-0.4, -1, 0.45],
   poleR: [0.4, -1, 0.45],
   rim: 0,

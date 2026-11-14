@@ -304,7 +304,9 @@ The app does not follow these facts:
 - **The playing spot (section 4).** Each mallet strikes farther in from the near rim
   (`PercussionHold.rim`), because the short arms hold the paws above the near rims. Each hand
   plays only the front kettle on its side (`PercussionHold.pair`), so the two mallets never strike
-  one head together. The spots move toward the middle of the player (`offsetL`, `offsetR`).
+  one head together. The spots move toward the middle of the player (`offsetL`, `offsetR`). At
+  the note start, the felt ball touches the head and does not go into it
+  (`PercussionHold.ballLift`).
 
 ### The badger at the other instruments
 
@@ -487,7 +489,8 @@ The app does not follow these facts:
   over the two rows of bars [34].
 - **The two depths (section 9).** The left mallet strikes nearer to the player than the middle of
   a bar, and the right mallet farther (`offsetL`, `offsetR`), because the short left arm misses
-  the far part of the bars. No source gives a numeric height between strikes.
+  the far part of the bars. No source gives a numeric height between strikes. At the note start,
+  the head touches the top of the bar (`PercussionHold.ballLift`).
 
 ### The instruments
 

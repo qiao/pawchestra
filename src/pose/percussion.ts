@@ -494,9 +494,15 @@ function handTracks(
   // With a gap, a hand waits at its rest target before its first strike, and the other hand keeps
   // the gap from that place.
   const waits = hold.gap > 0;
+  // Each strike point rises out of its surface by the radius of the mallet head (ballLift).
+  const lifted = (s: Strike, offset: Vec3): Vec3 => {
+    const [nx, ny, nz] = s.normal;
+    const lift = hold.ballLift;
+    return [offset[0] + nx * lift, offset[1] + ny * lift, offset[2] + nz * lift];
+  };
   const track = (strikes: readonly Strike[], offset: Vec3, rest: StrikeTarget): StrikeTrack =>
     buildStrikeTrack(
-      strikes.map((s) => ({ ...s, point: offsetTarget(s, offset).point })),
+      strikes.map((s) => ({ ...s, point: offsetTarget(s, lifted(s, offset)).point })),
       strikes[0] && !waits ? offsetTarget(strikes[0], offset) : rest,
       hold.sizes,
       amplitude,
