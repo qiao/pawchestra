@@ -352,9 +352,8 @@ export const HANDS_HOLDS = {
   // the right paw of the old deer up to 74° on its forearm (`pnpm hold-fit harpist`). The left fingers point up and back
   // along the strings (`aimL`): with the fingers on
   // the line from the shoulder and the palm square to the strings, the left paw bends 86° to 91°
-  // on its bent bind forearm. The elbows point out and down, in the play and
-  // at rest: with the elbows down, the left upper arm goes 6.3 cm into the chest when it reaches
-  // across to the strings. The left elbow points down and a little back (`poleL`): with the left
+  // on its bent bind forearm. The elbows point out and down in the play: with the elbows down,
+  // the left upper arm goes 6.3 cm into the chest when it reaches across to the strings. The left elbow points down and a little back (`poleL`): with the left
   // elbow at [-0.85, -1, 0] on the harp of the scale 0.85, the left paw went 4.4 cm into the body in
   // 31 % of the samples, and with this elbow 1.1 cm (`scratch/dh/evalc.ts`). With the elbow at
   // [-0.85, -1.5, 0.5], the left arm folded 7 faces (p95 of `pnpm arm-check harpist`), and with
@@ -407,39 +406,33 @@ export const HANDS_HOLDS = {
     // the right thumb shows a thin crease, so the bend stays at 50°.
     thumbClosed: 50 * MathUtils.DEG2RAD,
     restArc: [0, 0, 0],
-    // The hooves rest on the lap with the elbows bent, as a pianist rests the hands on the lap
-    // before a performance (`docs/reference/piano-technique.md`, section 8). The arms of the Tripo fawn
-    // are short: the shoulder is 0.33 m above the top of the thigh, and the arm reaches 0.25 m. The
-    // palms thus lie on the front of the belly where it meets the thighs, 0.48 H above the thigh
-    // at 0.4 of the way to the knee, 0.5 H forward, and 0.04 H in. On the harp of 0.975 in front
-    // of the chest, the left hoof rests 0.16 H out, and the right hoof 0.8 H forward: with the left
-    // hoof 0.04 H in, the left fingers went 2.2 cm into the soundbox at rest and in 5 % of the
-    // samples, and with the right hoof 0.5 H forward, the right paw went 1.8 cm into it in 5.3 %
-    // (`scratch/dh/evalc.ts` of the round 2026-11-13). The wrist is 0.227 m from the
-    // shoulder (0.91 of the reach), and the elbows bend to 122°. With the old places, 0.35 H out
-    // and 0.5 H above the knee, the wrists lay 0.32 m from the shoulder: the arms locked straight
-    // (179.7°), and the elbows snapped where the lift left the reach limit. The palms face back
-    // and down onto the belly, and the fingers point down and a little forward. The left elbow
-    // points down and back (`pole` z 0.6): with z 0.3, the right paw went 2.2 cm into the belly
-    // and the right forearm 2.5 cm (`pnpm pose-depth harpist`). The right elbow points down and
-    // forward (z -0.6), so that the right arm lies in front of the soundbox: with z 0.6, the right
-    // upper arm went 1.6 cm into the harp at rest, and with z -0.6 0.8 cm (`pnpm hold-fit
-    // harpist`), and the right forearm no longer goes 2.2 cm into the soundbox. On the harp of
-    // 0.975, the right elbow points further forward ([0.1, -1, -1.4]): with [0.4, -1, -0.6], the
-    // right upper arm passed 1.4 cm into the neck of the harp in the lift. The right palm
-    // turns a little to the right (x -0.4), so that the right forearm of the Tripo fawn twists at
-    // most 45° from the bind.
+    // The arms hang at the sides, and each hoof touches the outer side of its thigh, as the arms
+    // of a harpist hang loose at the sides in a rest (`docs/reference/harp-technique.md`, section
+    // 5). The deep belly of the Tripo fawn covers the tops of its thighs, and the knees lie 0.57 m
+    // from the shoulders, out of the reach of the arms. With the palms 0.48 H above the thigh and
+    // 0.5 H forward, the hooves hung in the air in front of the belly with the wrists bent 26° to
+    // 47°, and with the right elbow forward ([0.1, -1, -1.4]) the right paw twisted 82° on its
+    // forearm at rest (`pnpm hold-fit harpist --sets rest,lift,lower`). With the palms at the
+    // front of the thigh tops, the hooves went 4 to 7 cm into the belly. Now the palms lie 0.36 H
+    // out from the thigh top at 0.4 of the way to the knee, 0.05 H up, and 0.1 H back. They face
+    // in to the thighs and a little back, and the fingers point down. The elbows bend to 129° and
+    // point back, and each wrist bends 11° from the line of its forearm. The hooves touch the
+    // thighs: the left claws go 0.9 cm into the skin, and no arm goes into the harp, the strings,
+    // or the body further than in the play (`scratch/hr/touch.ts`, `scratch/dh/evalc.ts` of the
+    // round harp-rest). The paws twist 29° (left) and 13° (right) at rest. With the palms square
+    // to the thighs, they twist 49° and 33°, and with the palms turned 0.5 back, the claws go 1.2 cm
+    // into the thighs. The hanging right arm passes behind and outside the top of the soundbox.
     restL: {
-      lap: { along: 0.4, offset: [-0.16, 0.48, -0.5] },
-      palm: [0, -0.5, 1],
-      fingers: [0.2, -1, -0.5],
-      pole: [-0.4, -1, 0.6],
+      lap: { along: 0.4, offset: [-0.36, 0.05, 0.1] },
+      palm: [1, 0, 0.4],
+      fingers: [0, -1, -0.2],
+      pole: [-0.5, 0, 1],
     },
     restR: {
-      lap: { along: 0.4, offset: [0.04, 0.48, -0.8] },
-      palm: [-0.4, -0.5, 1],
-      fingers: [-0.2, -1, -0.5],
-      pole: [0.1, -1, -1.4],
+      lap: { along: 0.4, offset: [0.36, 0.05, 0.1] },
+      palm: [-1, 0, 0.4],
+      fingers: [0, -1, -0.2],
+      pole: [0.5, 0, 1],
     },
   },
 } as const satisfies Readonly<Record<HandsInstrument, HandsHold>>;
