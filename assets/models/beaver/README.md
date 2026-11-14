@@ -79,10 +79,10 @@ scripts follow the scripts of the Tripo cat (`../cat/README.md`). `make_config.p
 
 | Item | Value |
 |---|---|
-| Size | 380,241 bytes (each run writes other bytes) |
-| SHA-256 | `a01ac87709d83978b9f8ba1e2af7b691284e1c42603845628aff84f317f02593` |
+| Size | 383,834 bytes (each run writes other bytes) |
+| SHA-256 | `b9ab4b20e2322be4713e6722b59f0df5cb36b2a7293e090742daab7b2f992cf4` |
 | Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the beaver faces -y, and +x is its left side. No object has a transform |
-| Mesh | One object `beaver`: 3,639 vertices and 3,981 faces (3,003 quads and 978 triangles, 6,984 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 85 faces of the nose take the slot `fur` and the color map. The 136 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids the face attribute `lid`, and the 42 faces of the whiskers the face attribute `plain`. The UV map of the FBX, and the property `texture` (`assets/models/beaver/tripo-hand/beaver-color.webp`) |
+| Mesh | One object `beaver`: 3,687 vertices and 4,029 faces (3,051 quads and 978 triangles, 7,080 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 85 faces of the nose take the slot `fur` and the color map. The 136 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids the face attribute `lid`, and the 42 faces of the whiskers the face attribute `plain`. The UV map of the FBX, and the property `texture` (`assets/models/beaver/tripo-hand/beaver-color.webp`) |
 | Armature | `beaver_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.617287 (the shoulder joints at 1.01029 m for each unit, so that H is 0.310441 m, the H of the beaver of main, 0.310442 m), `crease` 180 |
 | Eyes | The eyeballs of the source in their sockets, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
@@ -95,9 +95,15 @@ left side):
 - **Arm rings.** Edge ring Subdivide (`bmesh.ops.subdivide_edges(bm, edges=<ring>, cuts=1,
   use_grid_fill=True)`) of the clean quad bands of 12 edges between the closed arm loops at x 0.204
   and 0.234, and at x 0.299 and 0.331.
-- **Rings with no split.** The arm root to x 0.186, the band from x 0.234 to 0.299 at the elbow
-  (poles at x 0.268 to 0.287), and the paw from x 0.352 stop at triangles or poles. The legs are
-  short stumps under the belly, and their bind keeps the pose of the source, so they take no ring.
+- **Elbow rings.** The elbow from x 0.234 to 0.299 has a ring through two poles (x 0.268 to
+  0.276) and no closed loop there, but each band at its two sides is a clean ring of 12 quads.
+  `seed_rings()` cuts each band one time at its middle (`ringSeeds` of the params: the seeds
+  (0.2504, 0.5769, 0.1756) and (0.2802, 0.5594, 0.1473), mirrored on the right). Thus a ring
+  stands each 0.015 units over the bend, as on the upper arm and the forearm. Reason: over bands
+  of 0.03 units, the bent right elbow of the bassoonist showed a sharp corner with flat faces.
+- **Rings with no split.** The arm root to x 0.186 and the paw from x 0.352 stop at triangles or
+  poles. The legs are short stumps under the belly, and their bind keeps the pose of the source,
+  so they take no ring.
 - **Folds.** The source has small folds of the surface: on the back (x ±0.064, y 0.61), on each
   cheek (x ±0.19, y 0.83), under the jaw (x ±0.17, y 0.74), and on the back of the head. The FBX
   viewer shades them with the custom normals of the file, but the app makes its normals from the
@@ -248,7 +254,7 @@ The export of the file and the maps. License of each file: CC BY-NC 4.0, as the 
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/beaver.rig.glb` | 1,196,840 bytes | `d0588f2d5bc6d06a593a0e271684aa4687d1c143f0367461d548042f698392ba` |
-| `tripo-hand/beaver.rig.json` | 17,197 bytes | `01e80b3e884748ed965b976382ecee134e2dd791d6c1c3ff782513c10020afaf` |
+| `tripo-hand/beaver.rig.glb` | 1,224,492 bytes | `abacad555a6cff42e8a8706d83e0d0a689c2404ace55bd20a4b8d3f13e476b3f` |
+| `tripo-hand/beaver.rig.json` | 17,197 bytes | `3b925c494f61474e46b6c94eb03df882e8284493b0894704b63caf2b1fad2349` |
 | `tripo-hand/beaver-color.webp` | 199,904 bytes, 2048 × 2048 | `fc5a6f549bc676eefc6837d5398ad00f439d75cf9191a3921707f8034a35bfbc` |
 | `tripo-hand/beaver-normal.webp` | 84,258 bytes, 1024 × 1024 | `aa1edb196f4b423afb6bb80671a424e943ca4f3354f7ba3f01ad755ba0471982` |
