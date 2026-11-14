@@ -243,10 +243,6 @@ passes.
 - [ ] Deer harpist: the footprint of the harp of 0.975 moves seats of `boulanger-matin`: the fox
       violinist of seat 7 0.54 m, the contrabass 0.72 m, the small percussion 0.72 m, and seven
       other seats 0.1 to 0.2 m. Check the sight lines to the conductor (`pnpm sight-lines`).
-- [ ] Deer harpist: with the forward right rest elbow (`restR.pole`) of the harp of 0.975, the
-      right paw twists 82° at rest (p95, limit 170, 26 before), and the right forearm 43° (limit
-      80, 15 before) (`pnpm arm-check harpist --base 19f45196b`). Check the right arm at rest in 2x
-      crops.
 - [ ] Deer harpist: in the fast run near 112 s of boulanger-matin, the right forearm turns 15° in
       one 1/30 s step (`scratch/tripo-audit/motion.ts`). The turn speed is lower than before the
       harp of 2026-11-13 (459 deg/s against 538), but the neighbor steps are slower now.
