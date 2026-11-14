@@ -559,7 +559,10 @@ fur color, and with `eye_fans=False` the mesh gets no gloss fan on them, because
 or the eye faces give the eyes. Then a person edits the colors in Blender, and the export reads
 them only from the face attribute `color`. A hand rig can also show the color map of its source
 in place of the face colors ("Materials" of 4.5): the mesh keeps the UV map of the source, and each
-new face gets UVs that sample the fur next to it. The `.blend` holds the data that a person draws. The
+new face gets UVs that sample the fur next to it. The new band faces of a paw turn keep the UVs of the old band, and
+the maps tool of the species paints their texels as a fade from the forearm fur to the turned paw
+fur (`bandFade` of the params, `tools/band_fade.py`). Reason: the paw turns with its UVs, so its
+fur at the band comes from another side of the map, and a ring line with a step of tone showed. The `.blend` holds the data that a person draws. The
 export calculates only the measures, with the functions of `tools/blender/rig_mesh.py`, so that
 each measure has one definition. It checks each point of the layout below, and stops with the
 name of the first fault.

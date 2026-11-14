@@ -270,6 +270,8 @@ Design 4.4 gives the rule and the reason of each config key.
   part within about 45°. The app takes the smooth normals from the bind, so keep the bind
   supination near 0 when the twists stay far from 180°. Keep the near ring out of the turn
   (`move[A] = False`): a cut at the mean place of a slanted ring shears the wrist into a pinch.
+- A turned paw keeps its UVs, so a ring line with a step of tone shows at the band. Fade the band
+  texels in the maps (`bandFade`). A planar patch (`bandPatch`) shows one fur piece on each quad.
 - When no weight rule or ring removes a fold, fit a `raise` shape after the hold with
   `pnpm raise-fit`. A shape fixes only the poses near its rule, and design 4.4 gives its limits.
 - A grip far in front of a deep chest turns the shoulder past any shape. Turn the shoulder bone
