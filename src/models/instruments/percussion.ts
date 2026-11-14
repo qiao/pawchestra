@@ -266,16 +266,21 @@ export const BASS_DRUM = {
   turn: 0,
   /**
    * The angle of the beater below the level in the bind pose, toward the fingers of the hanging
-   * paw, in radians ({@link PAW_TILT}): the shaft leaves the fist at the side of the thumb, in the
-   * grip of the legato stroke of the snare drum (`docs/reference/percussion-technique.md` 5). The
-   * curled claws close on it in each sample of `pnpm wind-grip bass-drummer`, and the paw twists
-   * 3° on the forearm in the play. At 0.9, the shaft ran 52° from the fingers, the claw tips stood
-   * 2.3 cm off it, and the paw twisted 31°.
+   * paw, in radians: the shaft leaves the fist at the side of the thumb, in the grip of the legato
+   * stroke of the snare drum (`docs/reference/percussion-technique.md` 5). The shaft runs nearer
+   * to the fingers than with {@link PAW_TILT}, because the forearm comes within about 30° of the
+   * beater along the head: the paw then bends 20° on the forearm at p95 (`pnpm hold-fit
+   * bass-drummer`), and at {@link PAW_TILT}, 61°, with the wrist bent down in a hard step. At 0.9,
+   * the shaft ran 52° from the fingers, the claw tips stood 2.3 cm off it, and the paw twisted 31°.
    */
   // SAFETY: the literal widens to a number, so that a hold tool can set it in memory.
-  malletTilt: PAW_TILT,
-  /** The grip of each mallet in the closed paw ({@link PAW_SPOT}). */
-  malletSpot: PAW_SPOT,
+  malletTilt: 0.7 as number,
+  /**
+   * The grip of the beater in the closed paw: {@link PAW_SPOT}, 0.032 H further toward the thumb,
+   * so that the curled claws close on the shaft of the steeper beater in each sample of
+   * `pnpm wind-grip bass-drummer`. At {@link PAW_SPOT}, the claw tips stood 1.1 cm off it.
+   */
+  malletSpot: [PAW_SPOT[0], PAW_SPOT[1], 0.05],
   /**
    * The length of the shaft behind its grip, in meters ({@link MALLET_BUTT}). The butt end stays
    * in the wrist of the thick forearm, so no view shows it. With the 14 cm of a real grip one
