@@ -36,6 +36,11 @@ development Mac with no dropout.
       a block is at most 0.53 ms, but each run has a few blocks above 1.3 ms.
 - [ ] Make the seek chase fit in one block of 2.667 ms. The first seek in the Boulanger demo takes
       about 4 ms. For example, keep the chase state at fixed points of the event list (6.5).
+- [ ] Soloist rule (3.8): the lead of a wind soloist while the other winds rest
+      (`SOLOIST_RULE.windsRest`, `busy`) has two demos as its proof, K. 191 and K. 417. Check it
+      on more concerto files. A low string soloist in a file with one loudness, such as a cello
+      concerto, still gets no soloist. A continuo bassoon beside oboes that rest most of the time
+      can become a false soloist.
 
 Done when: each rule of section 3 has at least one test that fails without the rule, the demo
 tests pass for all demos, and the step 2 targets of 9.7 pass: the score build, the audio
@@ -503,8 +508,15 @@ passes.
       2.1 cm into the cello in the lowering (16.7 %) and the lift (9.7 %).
 - [ ] Layout: it knows only the bind footprints, so only a piano case keeps the reach of a player in
       play. A hold that reaches further can clip (a bassist beside a clarinet in `beethoven-8`).
-- [ ] Layout sight lines (4.5): with no row risers and the lane search, 49 of 453 players stay
-      blocked and 18 are hidden from the audience (`pnpm sight-lines`). Most are horns and
+- [ ] Layout (4.5): in `mozart-k191`, the back desk of the second violins (seat 1, player 3) sits
+      in the gap of the conductor at -8° and faces the default camera. The open gap of row 1 puts
+      it there. With the limit of `seatBonds()`, the same desk left the gap in `mozart-k315` and
+      `mozart-k417` (report `2026-11-13-fix-layout-solo`, `pair-k191-40.png`).
+- [ ] Layout (4.5): `seatBonds()` limits two neighbors of one seat in one row. A back desk of one
+      player can sit far from the first desk of its seat: 2.4 m in `mozart-k525` (violin seat 0),
+      2.2 m in `boulanger-matin` (cello), and 2.0 m in `bach-bwv1050` (viola).
+- [ ] Layout sight lines (4.5): with no row risers and the lane search, 37 of 452 players stay
+      blocked and 19 are hidden from the audience (`pnpm sight-lines`). Most are horns and
       percussion on the left of rows 3 and 4: row 0 keeps the gap of the conductor at about ±30°,
       and row 1 fills the other gaps of row 0 on the left. The user keeps this layout and accepts this count. A wider row 0
       (branch `worktree-agent-af5dcad398484b454`, report `2026-11-08-seat-lanes-2`) gave 7 blocked,
@@ -1265,7 +1277,8 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] Pig: 22 faces of the right armpit turn past 45° at rest, and the rest shape keeps face 217
       turned over. `cut_seam()` fails on the pig seam (a vertex with two loop edges).
 - [ ] Pose depth: `pnpm pose-depth --soloist` takes only a bowed role, so a standing pig soloist
-      gets no check.
+      gets no check. `mozart-k417` shows the standing pig hornist at the front left, and
+      `mozart-k191` the beaver bassoonist.
 - [ ] Badger percussionist: ask the user to confirm the suspended cymbal, or longer arms for hand
       cymbals.
 - [ ] Badger: the front fur and the eye stripes are darker than the sheet, and the warm light shows
@@ -1450,6 +1463,10 @@ each control.
 
 - [ ] Take frames of each kind of shot of each demo at both sizes, and the GIF, and check them
       against 5.6 (9.8).
+- [ ] The solo shot of the bassoon soloist of `mozart-k191` (36.8 s) shows the legs of the
+      conductor and the podium in the right quarter of the frame (report
+      `2026-11-13-fix-layout-solo`, `k191-shot-beaver/play-shot-beaver.png`). The solo shots of
+      the K. 315 flute keep the bear out of the frame.
 - [ ] Check the title in the frame at 844 × 390: it covers about 30% of the frame height at the
       left. A smaller title in Cinematic mode, or a fade some seconds after a piece starts, can
       help (2.3).
