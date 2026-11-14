@@ -170,9 +170,23 @@ passes.
       `beethoven-1` 1.37 m, the clarinet wolf and a horn pig there 0.96 m, and in
       `bach-bwv1047` each player 6 cm back. No monkey comes within 10 cm of a neighbor or
       14.8 cm of a stand. Check the hall views of each demo with a monkey trumpeter.
-- [ ] Trumpeter monkey: at rest, with the trumpet in front of the belly (`restShift`), the upper
-      arms roll 70.6° and -50.6° from the clavicles (`pose-preview`), more than 45°. The skin twist
-      of the arm gate stays 29° and 25°. Check the arms at rest in a 2x crop.
+- [ ] Trumpeter monkey: at rest, the arms hang from square shoulders, and the trumpet hangs from
+      the right paw (`restArms`, `restFreeL`). The upper arms turn 79° and 60° at rest (`hold-fit`,
+      109° and 91° before), and the right arm root goes 1.6 cm into the body in the lowering (limit
+      1.5 cm). Check the arm roots at rest in a 2x crop.
+- [ ] Trumpeter monkey: the free left paw at rest and in the lift is a closed fist, because
+      `curlOf()` gives it the grip curl of 130°. The free paw curl of the round `wood-holds`
+      (`curlOf()`, `poseWind()`) opens it. Check it after that merge.
+- [ ] Trumpeter monkey: in the play, both elbows stay low and the forearms rise steeply. A real
+      player holds the elbows out at about 45° (wind-technique 2.1). Level poles moved the elbows a
+      little and bent the paws more (paw swing p95 51° left, 40° right). The left paw still bends
+      48° on its forearm (p95). Try a lower grip on the casings or a longer forearm in the chain.
+- [ ] Panda trombonist: a fold line with a notch crosses the knuckles of the right paw at rest and
+      in the seventh position (curl 120°). With 115° and 110°, the finger tips stood 1.2 cm and
+      1.9 cm off the brace, and the paw grasped it in no sample (`pnpm wind-grip trombonist`). Fix
+      the digit rows in the panda chain.
+- [ ] Panda trombonist: at rest, the left paw on the hand brace touches the right paw (paws gap
+      0.0 cm, 0.3 cm before). Check the two paws at rest in a 2x crop.
 - [ ] Conductor bear: in the steps of the end turn, the hips turn up to about 45° from the
       planted foot (`TURN_STEPS`, 5.4). Check the skin of the hips and the thighs in 2x crops.
 - [ ] Conductor bear: at rest, the right arm folds 5 faces (p95, limit 8) against 1 before the
