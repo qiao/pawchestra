@@ -321,12 +321,17 @@ The app follows these facts:
   snare sticks, and its head has the scale of the drum (`BASS_DRUM.mallet`, `ball`). The badger
   stands behind the drum, and the right paw holds the beater at the near rim. At the strike, the
   beater lies along the head, as the photos of [13] show, and strikes a little off the middle,
-  toward the player [14]. The left arm hangs while the badger
-  plays, because a single note often needs no muffling and a march muffles in the rests, not at the
-  strikes [13]. After a note with a rest of at least 0.5 s after it, the free left paw lays its open
-  palm and fingers on the far head and goes back before the next note, as a player muffles the back
-  head with the free hand [13] [58] (`PalmDamp`). The right upper arm hangs beside the body with the
-  elbow down and back (section 3, `poleR`), so that the round rebuilt arm stays out of the belly.
+  toward the player [14]. The beater runs nearer to the fingers than the snare sticks
+  (`BASS_DRUM.malletTilt`), so that the wrist stays nearly straight with the forearm near the line
+  of the beater. While the badger plays, the free left paw rests on the near top of the hoop of
+  the far head, near the head that it muffles (`HOOP_PAW`). No source of this file gives the place
+  of the free hand between the muffles. The paw does not muffle at the strikes, because a single
+  note often needs no muffling and a march muffles in the rests [13]. At rest, the left arm hangs
+  relaxed at the side. After a note with a rest of at least 0.5 s after it, the free left paw
+  lays its open palm and fingers on the far head and goes back before the next note, as a player
+  muffles the back head with the free hand [13] [58] (`PalmDamp`). The right upper arm hangs beside
+  the body with the elbow down and back (section 3, `poleR`), so that the round rebuilt arm stays
+  out of the belly.
   The neck and the head turn back up by the lean of the spine, so that the badger looks ahead to
   the conductor over the drum, as a player focuses on the movement of the conductor [68]
   (`PercussionHold.headUp`).
@@ -371,11 +376,11 @@ The app follows these facts:
   paw along the rim on the head, as a thumb roll [65] [66]. Between uses, the tambourine and the
   beater lie on a padded trap table [65] [66], and the triangle hangs from the hook of a stand.
   In the rest, the paws put down one instrument and take the other (`SWITCH_MOTION`).
-- **The triangle (section 8).** The left paw holds the upper end of the clip in the hook of its
-  claws, curled deep on the thin clip (`PercussionHold.curl`), and the clip and the triangle hang
-  below the paw in a loop of cord [15] [25] (`TRIANGLE_CLIP`, `TRIANGLE_PINCH`). The paw stays in
-  line with its raised forearm, with no turn around it, and the triangle keeps its hang below
-  the claws (`trianglePaw()`). A single note strikes the side
+- **The triangle (section 8).** The left paw holds the clip in its fist, with the clip in the palm
+  under the curled fingers, as it holds a mallet, and the clip and the triangle hang below the
+  heel of the paw in a loop of cord [15] [25] (`TRIANGLE_CLIP`, `TRIANGLE_PINCH`). The paw stays
+  in line with its raised forearm, so the wrist is straight, and it turns around the forearm
+  until the clip hangs along its grip (`trianglePaw()`). A single note strikes the side
   across from the open corner [63]. Before a louder note, the beater turns further back
   (`MalletAcross.peak`), and it turns to the triangle through the whole down stroke
   (`StrikeSizes.lift`). After a soft note, it goes back no faster than it came
@@ -418,12 +423,15 @@ The app does not follow these facts:
 - **The rolls (sections 7 and 8).** A roll of the suspended cymbal strikes at most 12 times each
   second with the two paws in turn (`STRIKE_MOTION.rollSec`, `thinRolls()`). A triangle roll
   strikes at most 6 times each second (`handRollSec`).
-- **The hold of the triangle (section 8).** The clip is a little below the mouth
-  (`PERCUSSION_PLACES.triangleClip`). A real player holds it near eye level, but the long snout of
-  the badger stands there: a clip 0.4 H higher put the claws 5.8 cm into the snout. The palm
-  faces to the right of the player, and the claw tips stand 1.1 cm from the clip
-  (`pnpm wind-grip percussionist` counts no grasp). No source gives the turn of the hand. A paw
-  with the palm down twisted 84° at the wrist, and its skin stood up as a fin.
+- **The hold of the triangle (section 8).** The clip is in front of the upper chest, below the
+  snout, so that the face stays in view (`PERCUSSION_PLACES.triangleClip`). A real player holds it
+  near eye level, but the long snout of the badger stands there: a clip 0.4 H higher put the claws
+  5.8 cm into the snout. The thumb and the first finger do not pinch the clip apart from the other
+  fingers, because the badger paw has one bone for all its digits: the whole fist closes on the
+  clip. The left elbow bends 68°, less than the 90° of a real player, because a triangle nearer to
+  the body put the right forearm that strikes it into the belly. No source gives the turn of the
+  hand. A paw with the palm down twisted 84° at the wrist, and its skin stood up as a fin. At rest,
+  the triangle stays up, because the pad of the trap table stands about 3 cm below it.
 - **The change of the instrument (section 8).** A switch takes 2.7 s of rest: 0.2 s after the
   note, two moves of 0.45 s, 0.6 s at the table, and the lift of 1 s before the next note
   (`switchRestSec()`). No source gives the time [67]. With a shorter rest, the left paw keeps the
