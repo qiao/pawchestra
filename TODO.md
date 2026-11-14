@@ -1175,9 +1175,12 @@ scene of each demo has its seats and stage size with no overlap.
       rabbit, and the cat. Fit each hold, or accept the depth with its reason.
 - [ ] Merge gate: it runs no clearance sweep. Add the pair "instrument in body" of each held role to
       the gate, or end the test pause for it.
-- [ ] Mouse oboist: the big head and the long muzzle put the reed 11 cm in front of the shoulder
-      joints and high above them, so the paws hold the oboe at the height of the shoulders, with
-      the right elbow bent 28° and the left 49°. Show the user, and offer a bowed head.
+- [ ] Mouse oboist: the head bows 15° (`MOUSE_OBOE_FIT`), and the oboe hangs about 15° from the
+      vertical, in place of the 40° to 45° of a real oboist. At 33° and 45°, the right paw misses
+      its grip by 1.0 cm and 3.1 cm. Show the user the close views, and ask if longer arms are
+      better than the near vertical oboe.
+- [ ] Mouse oboist: at rest, the left elbow still shows a small corner from the back left
+      (az -150).
 - [ ] Mouse oboist: the mitten paws have one bone for the digit block and none for the thumb, so
       the digits close together and the thumb lies along the tube. Ask the user if the paws need
       digit bones and a thumb bone (chain `tools/blender/hand/mouse/`).
@@ -1186,7 +1189,10 @@ scene of each demo has its seats and stage size with no overlap.
       top is 3.5 cm below the head top. At 0.8 the boot goes 8 cm into the belly.
 - [ ] Beaver bassoonist: the bassoon of 0.7 moves 20 players by 1 cm to 27 cm in mozart-k191 (the
       pig horn 27.1 cm, red fox violins 21.3 cm and 15.4 cm), and each beaver stand 2 cm in 10
-      demos. The reed blade hides behind the teeth, so from the front only the bocal shows.
+      demos.
+- [ ] Beaver bassoonist: the reed goes into the mouth at the left of the left front tooth
+      (`BOCAL_END`, `lipShift`), and the reed blade is inside the lips, with its thread at the lips.
+      Show the user the close head views, and ask if the reed must go in at the middle.
 - [ ] Beaver bassoonist: the forward turn of 2026-11-12 (`BEAVER_PLAY_TURN`) clears the eye in the
       app view, but in the close front-left head view (az -45) the bell end touches the front of
       the eye, and the tube covers the snout. A longer bocal (`BASSOON_REED`) could move it out, and
@@ -1269,6 +1275,10 @@ scene of each demo has its seats and stage size with no overlap.
       body change shows the moved seats apart from a pose change.
 - [ ] Tan fox flutist: the grips of the play and the rest lie on two sides of the flute, so the
       right paw turns around the tube in the lift (`gripAround`). Show the user the 2x crops.
+- [ ] Tan fox flutist: the right palm lies behind the flute with three digits over the keys, but
+      it turns about 70° from the axis, so `pnpm wind-grip flutist` counts no grasp of the right
+      paw (74% before), and the paw twists 78° on its forearm in the play (51° before). The
+      right forearm stays level, so the wrist still bends 38°. Check the forearm skin in the app.
 - [ ] Pig hornist: the round belly covers the short thighs, so the rest horn hangs in front of the
       belly with its bell beside the right thigh (`HORN_REST_TURN`). Show the user the close
       views.
