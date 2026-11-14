@@ -2161,8 +2161,8 @@ A bent brass tube is one smooth solid along its path (`tubeAlong()` and `rounded
   to the hoop and then around the hoop to the valves. The bell branch leaves the last valve, goes
   out to the outer hoop (`HORN.hoopFrom`), and widens along the hoop into the bell tail, which
   leaves the coil outside the hoop and ends inside the throat of the bell. The throat of the bell
-  is wide (`HORN_FLARE`). Four rotary valves with silver caps and the levers of the left fingers, the
-  loops of the F side and the B♭ side, and the valve slides. `HORN_PLANE` puts the coil in front
+  is wide (`HORN_FLARE`). Four rotary valves with silver caps and the levers of the left fingers,
+  the loops of the F side and the B♭ side, and the valve slides. `HORN_PLANE` puts the coil in front
   of the right side of the chest. Reason: a straight lead pipe from the lips to a coil at the
   belly looked like a drinking straw, and the throat of a real horn takes the right hand. The
   space of the layout keeps the older horn, so that no seat moves.
