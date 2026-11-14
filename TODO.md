@@ -1305,8 +1305,14 @@ scene of each demo has its seats and stage size with no overlap.
       timpanist to `docs/reference/percussion-technique.md`, and check the rest against it.
 - [ ] Elephant timpanist: dark lines and areas show on the chest beside the raised arms, where the
       upper arm of the mesh lies on the side of the body.
-- [ ] Elephant timpanist: a roll stays in one hand, and the outer kettles stand out of reach
-      (`PercussionHold.pair`). Offer the user longer arms.
+- [ ] Elephant timpanist: in a roll or a fast run, the second paw strikes the other front kettle
+      (`sideHands()`), because each paw reaches only the kettle of its side, and the outer kettles
+      stand out of reach (`PercussionHold.pair`). A real roll plays with both mallets on one head.
+      Offer the user longer arms, or one kettle between the paws.
+- [ ] Elephant timpanist: with the steady roll of the left mallet (`steadyRoll()`), the left paw
+      twists 39° on its forearm at p95 (24° before, limit 170°, `pnpm arm-check timpanist`). The
+      left forearm stands where the two solutions of `gripRoll()` meet. Check the left paw in the
+      close views, and move the left home (`PercussionHold.home`) if the paw shows a bend.
 - [ ] Elephant timpanist: the outer kettles stand 122° and 101° from the front, beside and behind
       the hips (`TIMPANI.arc`, `side`). With each outer kettle at most 60° from the front, it
       stands 1.63 m and 1.41 m from the player, because the front kettles of the real size fill
@@ -1315,6 +1321,12 @@ scene of each demo has its seats and stage size with no overlap.
       With 90°, it hid 5 players. Ask the user for smaller kettles, two kettles, or a second row.
 - [ ] Triangle: a louder note turns the beater back only up to 1.35 times as far, because a larger
       turn put the beater into the belly (1.9 cm at 1.5). A real loud stroke adds the arm.
+- [ ] Triangle: between strikes, the tip of the beater rests about 11 cm from the triangle and
+      22 cm from the tambourine on the table, so each stroke and each rebound is a long swing: at
+      most 23° of the paw and 6 cm of the tip in one frame of 1/60 s (`boulanger-matin`, 62.83 s),
+      two times the speed of a cymbal mallet. A real player holds the beater a few cm from the
+      triangle. Move the rest direction of the beater nearer to its strike directions
+      (`MalletAcross.rest` of the small percussion hold).
 - [ ] Small percussion: no demo has a rest of 2.7 s between the triangle and the tambourine
       (`switchRestSec()`), so each demo plays the tambourine on the trap table with the beater.
       `boulanger-matin` changes the instrument in 0 s to 2.1 s. Ask the user for a demo or a
