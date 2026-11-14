@@ -547,28 +547,19 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
       eyeFinish: 'varnish',
     },
   ],
-  // The tuba rhino (design 4.4). It stands to play the tuba, so the export keeps the standing pose
-  // of the rig. The tip of its nose is the front of the muzzle under the horn. The head measures
-  // start at the chin: bone heat gives the throat under the chin of the copy with the arm tubes a
-  // head weight just above 0.5. The T-pose mesh has its head top at 1.462 m, its chin at 0.70, and
-  // its horn from 0.83.
+  // The tuba rhino (design 4.4): the hand rig of the Tripo P2 mesh
+  // (`assets/models/rhino/tripo-hand/rhino.blend`), by the route of the Tripo hippo, with no arm
+  // cut and no arm stretch. It stands to play the tuba in the pose of the source. Its `.blend`
+  // holds the facts of the body: the scale that keeps the standing eye height of the rhino of
+  // `rhino.rig.glb` at 8e42c4eaa, and the crease angle 180°.
   [
     'rhino',
     {
       landmark: 'shoulders',
-      height: 0.958199,
       seated: true,
       soloist: true,
       constant: 'STUDIO_RHINO',
-      crease: 35,
-      glb: 'assets/models/rhino/rhino.rig.glb',
-      noseTop: 0.8,
-      headFloor: 0.7,
-      // At the old eyes, the ridge of the horn covered the inner edge of each bead eye, and the
-      // slope of the cheek leaned the tops of the ovals 18° and 14° toward each other, a sad look.
-      // Eyes 0.05 H higher sit on a flatter face: the full ovals show and stand within 3° of
-      // upright.
-      eyeShift: [0, 0.05],
+      glb: 'assets/models/rhino/tripo-hand/rhino.rig.glb',
     },
   ],
   // The harp deer (design 4.4): the hand rig of the Tripo P2 fawn
