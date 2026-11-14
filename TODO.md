@@ -631,19 +631,22 @@ passes.
       folds low, but spread the arms out as wings.
 - [ ] Badger xylophonist: a fast run between the lowest and the highest bars keeps the body in the
       middle (`side`), so both paws reach wide. Try a larger side lean for a run at one end.
-- [ ] Badger bass drummer: the free left paw hangs open beside the body while the badger plays,
-      because a real player muffles only in the rests (percussion-technique 5). Ask the user if the
-      paw must wait at the far rim.
-- [ ] Badger percussionist: the left paw curls 118° on the triangle clip, so the arm gate counts
-      16 to 17 folded faces at the knuckles inside the fist (10 at 75°). The clip hangs in the hook
-      of the claws, 1.1 cm from the claw tips, and `pnpm wind-grip percussionist` counts no grasp
-      of the left paw. The right paw grasps the beater in 88% of the play. The paws at the trap
-      table and at the stand (`SWITCH_MOTION`) have no check with the new clip place, because no
-      demo has a switch.
+- [ ] Badger percussionist: the clip of the triangle goes through the closed left paw (1.0 cm deep),
+      but its claw tips stand 4.0 cm from the clip, so `pnpm wind-grip percussionist` counts no
+      grasp of the left paw. The top of the clip shows between the digits in the inner cut view.
+      The paws at the trap table and at the stand (`SWITCH_MOTION`), and the tambourine in the left
+      paw, which takes the new grip (`TRIANGLE_PINCH`), have no check, because no demo has a switch.
+- [ ] Badger percussionist: the left elbow bends 68° at the triangle, less than the 90° of a real
+      player. A clip near enough for 90° put the right forearm 5.3 cm into the belly. With the clip
+      of now, the right forearm goes 2.8 cm into the right shoulder at a loud stroke (base 1.2 cm,
+      limit 1.5 cm, `pnpm hold-fit percussionist`, `boulanger-matin` 262.88 s). Try a right elbow
+      further out, or a smaller turn back of the beater before a loud note.
 - [ ] Badger percussionist: the triangle stays up in the left paw at rest, because the trap table
       stands under it. A rest with the triangle on its stand and the beater on the table
       (`restSwitch()` trial) bent the empty left paw 123° on the forearm, or turned it over 178°
-      between the hanging arm and the stand (16,423°/s). Ask the user for the rest place.
+      between the hanging arm and the stand (16,423°/s). A lower triangle at rest goes into the pad:
+      the lower side of the triangle stands about 3 cm above it in the play. Ask the user for the
+      rest place.
 - [ ] Close views: `pnpm close-views play` renders with no fill light. Add a fill to the play mode
       for the checks (9.8).
 - [ ] Recast roles: with `--base`, `pnpm arm-check --views` and `pnpm close-views` render the
@@ -1354,9 +1357,6 @@ scene of each demo has its seats and stage size with no overlap.
       cymbals.
 - [ ] Badger: the front fur and the eye stripes are darker than the sheet, and the warm light shows
       the stripes on the head as a mid brown. Show the user the faces.
-- [ ] Badger triangle: the clip hangs from the tip of the thumb near the shoulder height, below the
-      long snout. A real player holds it near the eye level, but a clip 0.4 H higher put the left
-      claws 5.8 cm into the snout. Ask the user for a triangle at the chest or on its stand.
 - [ ] Xylophone: a scale stays in one paw (122 of 127 fast strikes of the test score), because a
       paw never passes the other (`pass` 0), and one paw does not reach the outer bars. A real
       player alternates the hands over the two rows of bars (percussion-technique 9).
