@@ -19,7 +19,7 @@ import { pawBindOf } from '../models/studio-rig.ts';
 import type { PawBind } from '../models/studio-rig.ts';
 import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
-import { Y_AXIS, Z_AXIS } from './axes.ts';
+import { X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import type { InstrumentOf } from './family.ts';
 import { hangingArm } from './hang.ts';
 import type { HangingArm } from './hang.ts';
@@ -1156,6 +1156,13 @@ export interface PercussionRig {
   /** The head height `H` of the body, in meters. */
   readonly headHeight: number;
   readonly chestBind: Vec3;
+  /**
+   * The chest of the body that only leans over the instrument (`PercussionHold.lean`), with no
+   * sway, no breath, and no damp. The roll of a mallet across the forearm in its paw comes from
+   * the arm of this chest (`PercussionHold.strikeRoll`), so the roll does not change with the
+   * motion of the body.
+   */
+  readonly steadyChest: SteadyChest;
   readonly left: PercussionSide;
   readonly right: PercussionSide;
   /** The targets of the instrument, by a key of each target (see `targetKeyOf()`). */
@@ -1191,6 +1198,14 @@ export interface PercussionRig {
   readonly dampHands: readonly [left: DampHand | null, right: DampHand | null];
   /** The held tambourine and the trap table of the small percussion player, or `null`. */
   readonly switch: SwitchRig | null;
+}
+
+/** The chest of a body with only the lean of its hold (`PercussionRig.steadyChest`). */
+export interface SteadyChest {
+  /** The place of the `chest` bone, in the model axes. */
+  readonly position: Vec3;
+  /** The world rotation of the `chest` bone from the bind pose. */
+  readonly rotation: Quat;
 }
 
 /** A wrist and the world rotation of its hand from the bind pose. */
@@ -1799,11 +1814,21 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
     };
     dampHands = [spot(restL, hold.offsetL, sides[0]), spot(restR, hold.offsetR, sides[1])];
   }
+  // The lean turns the `spine` bone forward, and the chest follows it (`writeBody()`).
+  const chestBind = model.skeleton.positions[boneIndex('chest')] ?? [0, 0, 0];
+  const spineBind = new Vector3(...(model.skeleton.positions[boneIndex('spine')] ?? chestBind));
+  const leaned = new Quaternion().setFromAxisAngle(X_AXIS, -hold.lean);
   return {
     instrument,
     hold,
     headHeight: h,
-    chestBind: model.skeleton.positions[boneIndex('chest')] ?? [0, 0, 0],
+    chestBind,
+    steadyChest: {
+      position: toVec3(
+        new Vector3(...chestBind).sub(spineBind).applyQuaternion(leaned).add(spineBind),
+      ),
+      rotation: toQuat(leaned),
+    },
     left: sides[0],
     right: sides[1],
     targets,
