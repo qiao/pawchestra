@@ -67,6 +67,10 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
 
 These probes need no build and change no source file. [`rigging.md`](rigging.md) gives the roles.
 
+A hold fix loops on the fast probes first: `hold-reach --set` (about 1 s) and `wind-grip --set`
+(about 11 s). Run `hold-fit` and `arm-check` (2 to 6 minutes) only on the last variants, with all
+variants as `--set` options of one run.
+
 | Command | Action |
 |---|---|
 | `pnpm pose-probe <sheet> [--time <s>]...` | Prints the posed elbow, wrist, and palm of each arm of a sheet pose (design 7.1), and the tip direction of the instrument. |
