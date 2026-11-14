@@ -166,9 +166,6 @@ passes.
 - [ ] Trumpeter monkey: at rest, with the trumpet in front of the belly (`restShift`), the upper
       arms roll 70.6° and -50.6° from the clavicles (`pose-preview`), more than 45°. The skin twist
       of the arm gate stays 29° and 25°. Check the arms at rest in a 2x crop.
-- [ ] Conductor bear: the quiet place of the left hand and the cue point stay at the height of the
-      head, as `mockup.png` and design 5.4 give them. Check them against a real conductor, whose
-      gestures stay below the chin (`conductor-technique.md`, section 1).
 - [ ] Conductor bear: in the steps of the end turn, the hips turn up to about 45° from the
       planted foot (`TURN_STEPS`, 5.4). Check the skin of the hips and the thighs in 2x crops.
 - [ ] Conductor bear: at rest, the right arm folds 5 faces (p95, limit 8) against 1 before the
@@ -177,9 +174,30 @@ passes.
       of it inward (`batonPivot`, 5.4). A baton 3.5° in gives 19°, but it touches the desk of the
       stand when the arms come down after the final chord of `beethoven-8-4`. Move the baton of
       the lowering clear of the desk, then point the baton less in.
-- [ ] Conductor bear: the rest baton hangs 27° forward of the vertical (`restBaton`, 5.4). A baton
-      nearer the vertical (22°) turns the right wrist 2,794°/s at the start of a lift (limit
-      3,000, the base 1,594). Spread the turn of the paw over the lift, then hang the baton lower.
+- [ ] Conductor bear: at rest, the baton hangs about 17° forward (`restBaton`, 5.4), and it still
+      comes out of the bottom of the fist, with the claws closed above it. The paw turns with no
+      twist on its forearm, so the baton cannot reach the vertical. Check the grip of the hanging
+      paw in a 2x crop.
+- [ ] Conductor bear: with the beat at the lower chest and the bent elbows (5.4), the inner elbow
+      faces fold in about 40% of the play: right 1956, 1958, 1959, and 1963, left 4258, 4259,
+      and 4262 (`pnpm fold-probe conductor --faces`, the base 0% to 6%). The arm gate gives the
+      right folds p95 13 (limit 8, the base 2). The 2x crops show no crease at the elbows. Check
+      the elbow rows of the body chain at a bend of about 60°.
+- [ ] Conductor bear: at the low quiet place of the left hand, the left upper arm presses 2.6 cm to
+      3.2 cm into the arm root in about half of the play (`pnpm pose-depth conductor`, play limit
+      1.5 cm, the rest pose 3.6 cm of limit 4), so the paused clearance tests
+      `conductor-clearance-<n>.test.ts` fail on it in each demo. An elbow further out (-1, -0.6,
+      -0.15) keeps 1.6 cm, but the left forearm stretches 0.42 (arm gate, limit 0.35). Check the
+      left armpit in 2x crops at az -90 and az -150, and decide between the two.
+- [ ] Conductor bear: in the count-in of `bach-bwv1047` (a cue to the left), the right arm folds
+      13 faces (p95 of the lift, limit 8, the base 2). Check the right elbow at wall 1.2 s.
+- [ ] Conductor bear: from the stage camera, the upper arms stand out to the sides at about the
+      height of the shoulders, because the paws are 0.6 H in front of the chest and the camera
+      looks down. Ask the user if the paws must come nearer to the body.
+- [ ] Conductor bear: the comment of `CONDUCTOR_MOTION.readyLift` (`conductor-notes.ts`) says that
+      both paws are at the height of the chin in the ready gesture. They now wait at the height of
+      the shoulder joints. Correct the comment and the test `ends the ready gesture of the left
+      hand` when the tests start again.
 - [ ] Conductor bear (5.4): with the continuous elbow rows, the left inner elbow faces 443, 5222,
       5223, and 5226 no longer fold at a bend of about 45°. Try a more bent left arm in the ready
       gesture and at a cue (`readyReach`, `cueReach`), and check the faces 4254, 4258, 4259, and
