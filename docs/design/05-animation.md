@@ -409,12 +409,13 @@ The rest of each family:
   that hangs the triangle on its stand turns over between the hanging arm and the stand. A hold
   with a set position and no ready pose also takes it in a long rest of the music (`setRests()`,
   `SET_MOTION`): before the first note, in a rest of at least 6 beats, and after the last note.
-  The sticks go down in the beat after the last strike, and lift from 2 beats to 1 beat before
+  A rest starts at the end of the damp or the follow move of the strike before it (`setRests()`
+  `after`). The sticks go down in the beat after that, and lift from 2 beats to 1 beat before
   the next strike, as a drumline does (percussion 6). Reason: the sticks stood still a few cm
-  over the head through each long rest. The hand cymbals also go down to the hanging arms in a
-  long rest, after the damp or the follow move of the last crash (`setRests()` `after`), because
-  no concert source gives a rest place, and a marching method holds the plates at the sides
-  (percussion 7).
+  over the head through each long rest. A rest that counted from the strike ended its lowering
+  after its lift, and the mallets of the cymbalist jumped back to the playing position in one
+  frame. The hand cymbals also go down to the hanging arms in a long rest, because no concert
+  source gives a rest place, and a marching method holds the plates at the sides (percussion 7).
 - **Choir.** The penguin keeps the folder in front of the chest, as a choir between two pieces.
   The flat flippers of the Tripo penguin start at the back half of the sides, so the folder hangs
   within their reach (`CHOIR_FOLDER.forward`), and the flipper tips curl over its outer edges.
@@ -786,7 +787,11 @@ The rest of each family:
 **Percussion** (`pose/strikes.ts`, `pose/percussion.ts`, percussion 10):
 
 - Each paw holds its mallet in the closed fingers, with the head out of the front of the fist,
-  and keeps one roll on the shaft through the stroke (`MalletSpot`, `gripRoll()`). The palm of
+  and keeps one roll on the shaft through the stroke (`MalletSpot`, `gripRoll()`). The roll of a
+  mallet across the forearm comes from the arm of a body that only leans over the instrument
+  (`steadyRoll()`, `PercussionRig.steadyChest`), so the sway and the breath do not turn the paw
+  around the shaft. Reason: the forearm of the elephant stands where the two solutions of the
+  roll meet, and the roll of the posed arm changed by up to 20° in one frame. The palm of
   each stump paw of the timpanist faces down, as in the German grip, and the shaft lies under the
   stump, in the skin of its palm side (`TIMPANI.malletSpotL`, `malletButt`). Reason: the stump
   has no fingers, and a shaft through the stump came out of the lower side of the forearm.
@@ -802,8 +807,17 @@ The rest of each family:
   the notes of a passage. Another strike lifts from the rest height one beat before the note
   (`leadSec`), at least `upSec` before it and in at most `upShare` of the gap. Reason: a real
   player brings the mallets up a beat before an entry, and a lift of 0.25 s read as a start with
-  no preparation. A chord takes both hands, a fast repeat takes the other hand, and a hand
-  does not cross the other.
+  no preparation. A rebound starts no faster than its stroke came down, so it takes more than
+  `reboundSec` after a stroke with a top below the rest height (`reboundMaxSec`). Reason: the
+  beater of the triangle left a soft stroke four times faster than it came. A chord takes both
+  hands, a fast repeat takes the other hand, and a hand does not cross the other.
+- **Timpani hands** (`sideHands()`). Each paw of the elephant strikes only the front kettle on
+  its side, because the short arms and the trunk do not let a paw cross (`PercussionHold.pair`).
+  A note takes the kettle of its pitch. A note within `sideAlternateSec` of the strike before it
+  takes the paw that did not strike last, on the kettle of that paw, so that a roll and a fast
+  run alternate the paws, as a real timpanist plays single strokes from hand to hand (percussion
+  4). The sound plays the pitch of each note. Reason: with one paw for each kettle, a run of 9
+  notes each second showed 4 strikes each second of one paw, and the other paw did not move.
 - **Damps.** A note is damped at its end when the silence to the next note is at least
   `DampRule.restSec`, as a real player stops the sound in a rest (percussion 5, 7). The windows
   come from the score alone (`dampTrack()` of `pose/damps.ts`): the move ends at the contact,
@@ -817,7 +831,9 @@ The rest of each family:
   over the plate, and the spine leans further over the cymbal (`EdgeDamp`). The wrist lifts the mallet, so that it points a
   little up over the plate and its ball stays away from the bell (`EdgeDamp.share`), as a real
   player stops the cymbal with the hand on the edge. Reason: a steeper mallet pointed up to the
-  chest, and a lower one put its ball near the bell. The plate of the suspended cymbal is a piece on the `slide`
+  chest, and a lower one put its ball near the bell. The move takes the time of `EdgeDamp.speed`
+  for its length, because a move in 0.06 s after a short note moved the head of the mallet 7 cm
+  in one frame. The plate of the suspended cymbal is a piece on the `slide`
   bone with its pivot at the bell, and it rocks after each strike: the sum of a damped sine of the
   time since each strike (`cymbalSwingAt()`, `CYMBAL_SWING`), with a limit for a roll. The damp
   stops it. The window ends before the next lift of each paw. Reason
@@ -825,7 +841,7 @@ The rest of each family:
   timpanist that struck the note moves toward the player with its mallet in the strike direction,
   as far toward the playing spot as the short arm reaches, and the lowest point of the paw goes to
   the head, while the spine leans (`FingersDamp`). The paw keeps the roll of the mallet of its
-  place before the muffle, and on the way, a paw under the head goes up to it at once, and the
+  playing spot (`steadyRoll()`), and on the way, a paw under the head goes up to it at once, and the
   paw lifts in the middle of its move (`FingersDamp.arc`), so that it passes over the hoop. The move
   takes the time of `FingersDamp.speed` for its length (`DampWish.minInSec`), so a short rest has
   no muffle. Reason: a move in 0.06 s jumped the paw 25 cm, the turn of the upper body twisted the
@@ -861,12 +877,16 @@ The rest of each family:
 - **Fast rolls.** A roll is a run of single strikes on one target, faster than the visible stroke
   rate. It keeps its first strike and then each `k`-th strike (`thinRolls()`), so the kept strikes
   stay on the note grid and follow the tempo. Two hands in turn strike at most 12 times each
-  second (`STRIKE_MOTION.rollSec`), and one hand at most 6 times (`handRollSec`). The sound plays
+  second (`STRIKE_MOTION.rollSec`), also the two paws of the timpanist, and one hand at most 6
+  times (`handRollSec`). The sound plays
   each note. Reason: a hand that struck each note of a roll of 20 notes each second moved as a
   buzz, and a real roll of 32nd notes at 80 beats each minute has about 11 strokes each second
   (percussion 4). A stroke in a roll of one hand lifts by `StrikeSizes.roll`.
 - **Triangle.** A single note strikes the outer face of the right side. The beater turns past its
-  rest direction before a louder note (`MalletAcross.peak` above 1). A roll, a run of notes each
+  rest direction before a louder note (`MalletAcross.peak` above 1). The lift of the loudest note
+  is the peak share of the rest height (`StrikeSizes.lift`), so the beater turns through the
+  whole down stroke. Reason: with a higher lift, the beater waited at its peak and made the whole
+  turn in the last part of the stroke, 46° in one frame. A roll, a run of notes each
   within `TRIANGLE_ROLL.rollSec`, strikes the two sides of the closed lower corner in turn from
   inside, with a small lift (`triangleRolls()`), as a real player rolls in a closed corner
   (percussion 8). The roll targets lift toward the player, so the beater goes in and out in front
