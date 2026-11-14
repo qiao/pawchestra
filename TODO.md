@@ -462,8 +462,9 @@ passes.
       A violin 0.03 H or 0.06 H higher on the shoulder, and a left elbow in under the violin,
       (0.3, -1, -0.5), also keep 2.3 cm in 81%. The middle of the thick forearm (4 cm) lies under
       the back of the violin. The paw reaches the fingerboard only from 0.64, near the upper bout.
-- [ ] Hippo bassist: the left forearm goes 2.9 cm into the contrabass in 50% of the play (limit
-      2.3 cm). A higher left elbow, (-1, 0.3, 0), lowers it to 6%, but the left paw swing fails
+- [ ] Hippo bassist: the left forearm goes 3.3 cm into the contrabass in 90% of the play (limit
+      2.3 cm). These trials are from the grip before "Left paw on the neck" (5.3), with 2.9 cm in
+      50%. A higher left elbow, (-1, 0.3, 0), lowers it to 6%, but the left paw swing fails
       (77°, limit 70) and the folds grow from 29 to 42 (`pnpm arm-check bassist`). An elbow further
       back, (-1, -0.3, 0.3) to (-1, -0.1, 1), lowers it to 26% to 4%, and a bass 0.03 H further
       from the belly (`fit.gap` 0.25) to 31%, but each change moves the paw swing from 68° to 70°
@@ -512,16 +513,25 @@ passes.
       29° to 46° to the side, but a violin student turns it 16° to 25° in (string-technique).
 - [ ] Bowed strings: near the end of the lift and in the lowering, the arms go up to 2.5 cm into the
       instrument (limit 1.5 cm), and up to 2.8 cm for the standing soloists.
-- [ ] Rabbit violinist: `pnpm body-clip violinist` (limit 0.045 H, 1.3 cm) in bach-bwv1047: the
-      left forearm goes 2.2 cm and the left paw 2.1 cm into the violin in 100 % of the play, and
-      67 % to 87 % of the lift and the lowering. The chest goes 2.1 cm (lift) and the head 1.9 cm
-      (lowering) into the violin, and the right paw 1.5 cm (6.5 % of the play). Similar values
-      show in `pachelbel-p37`. Check in 2x crops if the neck of the violin goes through the paw.
-- [ ] Red fox violinist: with the violin of 0.83, the left paw goes 1.6 cm into the violin in
-      0.4% of the play (limit 1.6 cm, `pnpm body-clip fox-red:violin`, bach-bwv1047), and no
-      other row is over the limit. Check the smaller violin beside the rabbit in the hall view.
-- [ ] Dog cellist: `pnpm body-clip --demo pachelbel-p37` (limit 0.045 H, 1.9 cm): the left paw goes
-      2.1 cm into the cello in the lowering (16.7 %) and the lift (9.7 %).
+- [ ] Rabbit violinist: `pnpm body-clip violinist` (limit 0.045 H, 1.4 cm) in bach-bwv1047: the
+      left forearm goes 2.3 cm into the violin in 80 % of the play and 60 % of the lowering. The
+      head goes 2.0 cm into the violin in 7 % of the lowering, the left upper arm 1.8 cm in 5 % of
+      the play, and the right paw 1.6 cm in 2 % of the play. The left paw passes (0.4 cm).
+- [ ] Red fox violinist: the heel of the left paw goes 2.0 cm into the upper bout beside the neck
+      heel in 91 % of the play, and 1.9 cm at rest (limit 1.6 cm, `pnpm body-clip fox-red:violin`,
+      bach-bwv1047). The paw is 15 cm wide along the neck, and the neck is free for 8 cm from the
+      nut to its heel. No turn, tilt, or gap of the paw changes the depth. Options: a paw place
+      nearer to the nut with the nut in the paw, or a larger violin for the fox.
+- [ ] Rabbit violinist: in the middle of the lift and of the lowering, the tip of the bow goes
+      through the left paw (`reports/2026-11-13-fix-left-paw/pairs/row3-*.png`). The cause is the
+      path of the bow (`RABBIT_HOLD.restBow.via`), and not the place of the left paw.
+- [ ] Left paw on the neck (5.3): the finger block curls about 75° to 85°, so more faces of the
+      knuckles fold (`pnpm arm-check`, folds p95 of the left arm, limit 8): the rabbit 7 (3
+      before), the red fox 5 (0), the dog 17 (3), and the hippo 47 (29). Check the knuckles in 2x
+      crops, and add a knuckle ring or a bent-finger shape to the hand chains.
+- [ ] Violin and viola (5.3): the paw turns 20° to 25° toward the forearm, so the end of the finger
+      block on the side of the scroll goes a little into the strings. A lift of the contact by the
+      turn can remove it.
 - [ ] Layout: it knows only the bind footprints, so only a piano case keeps the reach of a player in
       play. A hold that reaches further can clip (a bassist beside a clarinet in `beethoven-8`).
 - [ ] Layout (4.5): in `mozart-k191`, the back desk of the second violins (seat 1, player 3) sits
@@ -990,9 +1000,8 @@ passes.
       2.0), and the violin goes 1.0 cm into the body. In the lowering it goes 4.0 cm into the body
       (4.4 cm before). The upper arms go 3.9 cm into the body in the play (3.8 cm before), and
       into the violin 0.8 cm in the lift (0.1 cm before) (`pnpm hold-fit violinist`).
-- [ ] Fourth Tripo rabbit: in `pnpm body-clip violinist` 7 of 11 rows clip (8 of 16 before): the
-      left forearm and the left paw 2.3 cm and 1.9 cm into the violin in about 80 % of the play,
-      the chest 2.0 cm, as on the third rabbit.
+- [ ] Fourth Tripo rabbit: in `pnpm body-clip violinist` 6 of 15 rows clip: the left forearm
+      2.3 cm into the violin in about 80 % of the play, as on the third rabbit.
 - [ ] Fourth Tripo rabbit: only 2 faces keep the gloss nose (27 on the third rabbit), because the
       face colors of the nose box fail the pink test of `nose_trim()`. Check the shine of the nose.
 - [ ] Fourth Tripo rabbit face: the mouth of the source reads only a little happy in the front
@@ -1065,8 +1074,9 @@ passes.
 - [ ] Tripo hippo: the gray-pink skin of the FBX reads as a light peach in the app light, and the
       snout casts a dark band over the mouth line. Ask the user before any change of the light.
 - [ ] Tripo hippo bassist: the left forearm goes 3.3 cm into the neck heel of the lower bass in
-      each play sample, and the left claws touch the pegbox (2.8 cm) in the first position.
-      With a left paw tilt of 30°, the claws went 4.2 cm into the upper bout.
+      90 % of the play, and 2.5 cm at rest (limit 2.3 cm, `pnpm body-clip bassist`). The forearm
+      comes from behind the neck to the paw beside it. The paw swing is now 47° (limit 70), so
+      an elbow further back, (-1, -0.3, 0.4), is possible: it lowers the share to 29 % of the play.
 - [ ] Tripo hippo bassist: the bow plays near the end of the fingerboard (`soundingPoint` 0.3 in
       piano and in forte), because the cello sounding point on the lower bass flips the bow paw
       on the lowest string, and the arm reaches less hair nearer to the bridge. Show the user the
@@ -1174,8 +1184,9 @@ scene of each demo has its seats and stage size with no overlap.
 - [ ] `pnpm pose-depth violist` stops on the working tree and on c03179672: the bones of the cat
       have 20 open loops, and the caller expects 25.
 - [ ] Cat violist: in the 5th position, the left wrist under the neck keeps a twisted band.
-- [ ] Cat violist: the left wrist bends about 30° from the forearm in the low positions, but a real
-      violist keeps it straight (string-technique).
+- [ ] Cat violist: the left wrist bends about 25° toward the palm in the low positions, but a real
+      violist keeps it straight (string-technique). The forearm comes from under the middle of
+      the viola (`CAT_HOLD.poleL`).
 - [ ] Red fox: the bow grip is 2.2 cm from the middle of the paw for the standing soloist.
 - [ ] Bowed strings: the change to pizzicato takes the bow hair 28.5 mm off the strings at one
       stroke of `boulanger-matin` (18.96 s).
