@@ -273,6 +273,11 @@ export interface BowedHold {
    */
   readonly pluckSide: number;
   /**
+   * The start of the part of the fingerboard that the left hand stops, from 0 at the nut
+   * (`stopRangeOf()`), so that a wide paw stays off the pegs of the pegbox. 0 keeps the nut.
+   */
+  readonly stopStart: number;
+  /**
    * The end of the part of the fingerboard that the left hand stops, from 0 at the nut to 1 at
    * the end (`stopRangeOf()`). A thick arm that comes from behind the upper bout cannot reach the
    * fingerboard over the bout without going through it. 1 keeps the whole fingerboard.
@@ -536,6 +541,7 @@ const CHIN_HOLD = {
   restPlace: 0.4,
   pluckPlace: 0.9,
   pluckSide: 0,
+  stopStart: 0,
   stopEnd: 1,
   rest: {
     axis: [-0.17, 0.95, -0.26],
@@ -625,6 +631,7 @@ const FLOOR_HOLD = {
   restPlace: 0.4,
   pluckPlace: 0.3,
   pluckSide: 0,
+  stopStart: 0,
   stopEnd: 1,
   rest: null,
   liftReach: [0, 0, 0],
@@ -1507,6 +1514,8 @@ const CAT_HOLD = {
  * - At rest, the left paw holds the cello at 0.25 of the fingerboard (`restPlace`): at 0.6, the
  *   paw went 4.4 cm into the upper bout at rest and in the moves, and at 0.3, 2.1 cm in 10% of
  *   the lowering (`pnpm body-clip cellist`, limit 1.9 cm).
+ * - The left paw stops the strings from 0.12 of the fingerboard (`stopStart`), so that it stays
+ *   off the pegs: from the nut, two pegs went through the back of the paw.
  * - The bow paw turns in the plane of its palm around the grip on the stick, so that the forearm
  *   stays on the line of the palm in that plane (`stickTurnR`), as on the hippo. With no turn, the
  *   bow paw flipped by about 180° on its forearm in 1.4% of the play samples in front of the
@@ -1527,6 +1536,7 @@ const DOG_HOLD = {
   pluckSide: 0.600629,
   restPoleR: [0.8, -1, 0.4],
   slant: -5 * MathUtils.DEG2RAD,
+  stopStart: 0.12,
   poleL: [-1, -0.25, 0],
   highElbow: 15 * MathUtils.DEG2RAD,
   restPoleL: [-2, -1, 0],
@@ -1597,7 +1607,8 @@ const DOG_HOLD = {
  * (1, -0.7, 0.2), so that the bow arm bows near level in front of the belly: with the elbow down
  * and back, the forearm lay on the belly at the tip. The string planes are 4° apart, below the
  * 25° of a real contrabass, so that the arm reaches the hair on the two outer strings. The left
- * paw stops the strings only up to 0.9 of the fingerboard (`stopEnd`).
+ * paw stops the strings from 0.15 of the fingerboard (`stopStart`), so that the wide paw stays
+ * off the machine heads, and only up to 0.9 of the fingerboard (`stopEnd`).
  *
  * In the rest pose, the contrabass stays at its playing place, and the left paw holds the neck at
  * 0.3 of the fingerboard (`restPlace`), above the upper bout, as the fingers of a bassist hold the
@@ -1635,6 +1646,7 @@ const HIPPO_HOLD = {
   stringTurn: 4 * MathUtils.DEG2RAD,
   soundingPoint: [0.3, 0.3],
   frogHair: 0.12,
+  stopStart: 0.15,
   gapL: 0.029859,
   restPlace: 0.3,
   poleL: [-1, -0.3, 0],
@@ -2110,8 +2122,9 @@ function bowRangeOf(rig: RigPoints): BowReach {
 const STOP_STEP = 0.01;
 
 /**
- * Finds the part of the fingerboard that the left arm reaches in the playing pose, up to the end of
- * the hold (`BowedHold.stopEnd`). The neck of a contrabass goes high above the shoulder, so a small
+ * Finds the part of the fingerboard that the left arm reaches in the playing pose, from the start
+ * of the hold (`BowedHold.stopStart`) up to its end (`BowedHold.stopEnd`). The neck of a
+ * contrabass goes high above the shoulder, so a small
  * player cannot reach the nut.
  *
  * @param rig The points of the player.
@@ -2139,9 +2152,10 @@ function stopRangeOf(rig: RigPoints): readonly [low: number, high: number] {
     turn: rig.hold.turnL,
     gap: rig.gapL,
   };
+  const first = Math.round(rig.hold.stopStart / STOP_STEP);
   const steps = Math.round(rig.hold.stopEnd / STOP_STEP);
-  let nearest = 0;
-  for (let k = 0; k <= steps; k++) {
+  let nearest = first * STOP_STEP;
+  for (let k = first; k <= steps; k++) {
     const stop = k * STOP_STEP;
     const distance = stopHandAt(
       rig,
