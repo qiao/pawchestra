@@ -1313,8 +1313,6 @@ scene of each demo has its seats and stage size with no overlap.
       `PULSE_TEMPO`.
 - [ ] Conductor: the last bar of 7/8 of `bach-bwv1048` is beaten at 200 BPM, and the count-in beat
       of its first bar of 1/8 is 0.3 s. A fold needs an uneven grouping, such as 2+2+3.
-- [ ] Conductor: the sway stops at the last pulse, so a file can stop its sway up to 0.5 s before
-      its end.
 - [ ] Docs: cut `docs/agents/commands.md` to about 3,000 words (writing.md).
 - [ ] Tool: let `pnpm arm-check --views` render a `--midi` file and the percussion test score, so
       that the snare drummer and the xylophonist get crops.
