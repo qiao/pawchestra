@@ -1546,10 +1546,19 @@ each control.
 
 - [ ] Take frames of each kind of shot of each demo at both sizes, and the GIF, and check them
       against 5.6 (9.8).
-- [ ] The solo shot of the bassoon soloist of `mozart-k191` (36.8 s) shows the legs of the
-      conductor and the podium in the right quarter of the frame (report
-      `2026-11-13-fix-layout-solo`, `k191-shot-beaver/play-shot-beaver.png`). The solo shots of
-      the K. 315 flute keep the bear out of the frame.
+- [ ] The body cover and the face rule of 5.6 cut the section shots of the 18 demos from 169 to
+      146, and the conductor shots went from 64 to 73. Check the film for too few section shots.
+- [ ] A sharp neighbor behind the subject can still fill the look room of a solo: the pig beside
+      the wolf of `beethoven-9` at 70.6 s, the panda beside the rhino of `brahms-2` at 429.7 s
+      (report `2026-11-13-fix-shot-foreground`). The body cover reads only points with a blur
+      below `FOREGROUND.dirtyBlur`. A stricter limit on the look side can help (5.6).
+- [ ] Run `pnpm plan-time --base bd536c670` on a quiet machine. The round of the body cover and the
+      face rule measured 1.50 times at a load of 11 to 15, before the body test moved in front
+      of the clearance tests, and a rough 1.76 times in one run at a load of 38. The extra time
+      comes from more refused cameras (5.6, 9.7).
+- [ ] Tool: `pnpm shot-trace --rules` gives the nearest animal of a main shot with its inserts.
+      A solo of `boulanger-matin` (211.45 s) shows 0.93 m, the `INSERT_FLOOR` of its harp insert,
+      under the row `solo`. Give the inserts their own row.
 - [ ] Check the title in the frame at 844 × 390: it covers about 30% of the frame height at the
       left. A smaller title in Cinematic mode, or a fade some seconds after a piece starts, can
       help (2.3).
