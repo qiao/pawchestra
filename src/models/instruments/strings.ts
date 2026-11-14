@@ -517,7 +517,7 @@ function bodyBands(
  * left paw of the hippo goes through the board in a high position, and a top 4 mm higher or a
  * thicker end put it 2.4 cm or 1.9 cm deep in place of 1.5 cm.
  */
-const FINGERBOARD = {
+export const FINGERBOARD = {
   /** The width at the nut. */
   nutWidth: 0.0165,
   /** The width at the end over the body. */

@@ -89,3 +89,39 @@ export function wristGirth(model: PlayerModel, side: 'L' | 'R'): number {
   }
   return shareOf(distances, GIRTH_SHARE);
 }
+
+/** The depth of the pads of a paw below its bones ({@link pawPads}), in meters. */
+export interface PawPads {
+  /** The pads of the palm, from the line of the `hand` bone. */
+  readonly palm: number;
+  /** The pads of the finger block, from the line of the `fingers` bone. */
+  readonly fingers: number;
+}
+
+/**
+ * Gives the depth of the pads of a paw in the bind pose (design 5.3, "Left paw on the neck"): the
+ * distance of the corners of the palm and of the finger block from their bones along the normal of
+ * the palm, within which {@link GIRTH_SHARE} of the corners of each part lie. The paw of the bind
+ * pose hangs, with the palm inward. A grip puts the pads on a surface, so it holds the bones this
+ * far off the surface.
+ *
+ * @param model The player model.
+ * @param side The arm.
+ * @returns The depths, in meters.
+ */
+export function pawPads(model: PlayerModel, side: 'L' | 'R'): PawPads {
+  const inward = side === 'L' ? 1 : -1;
+  const { positions, bones } = model.mesh;
+  const depthOf = (bone: 'hand' | 'fingers'): number => {
+    const index = boneIndex(`${bone}${side}`);
+    const line = model.skeleton.positions[index]?.[0] ?? 0;
+    const depths: number[] = [];
+    for (let c = 0; c < bones.length; c++) {
+      if (bones[c] === index) {
+        depths.push(inward * ((positions[c * 3] ?? 0) - line));
+      }
+    }
+    return Math.max(0, shareOf(depths, GIRTH_SHARE));
+  };
+  return { palm: depthOf('hand'), fingers: depthOf('fingers') };
+}
