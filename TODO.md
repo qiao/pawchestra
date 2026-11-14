@@ -1313,8 +1313,13 @@ scene of each demo has its seats and stage size with no overlap.
       `move`, with one pause point, in its own child process.
 - [ ] Tool: give `pnpm hold-scan` the spare reach of a wind grip, the strikes of a percussion hold,
       and the lift and lowering samples.
-- [ ] Tool: add `pnpm close-views --camera-at <bone>`, crop pairs from four directions around a
-      bone.
+- [ ] Tool: give `pnpm close-views parts` a part of named bones (`--bones <bone,...>`). The gallery
+      query `part` takes each bone of the player, and the mode has only the parts of `BODY_PARTS`.
+- [ ] Tool: the `back` views of `arm-L` and `arm-R` of `pnpm close-views parts` show only the back
+      of the shoulder when the arm reaches forward on a wide trunk, as on the mouse oboist. Find a
+      view that shows the arm root from behind on each wind player.
+- [ ] Tool: a full run of `pnpm close-views parts` writes about 2.5 GB of PNG cells, because the
+      page encodes each cell fast. Decide if the cells become lossless WebP.
 - [ ] Tool: let `pnpm close-views` use the build again when the tree hash is the same, and take more
       than one `--glb` in one run.
 - [ ] Tool: let `--at` of `pnpm close-views play` and `--views` of `pnpm arm-check` take the
