@@ -554,7 +554,7 @@ The app follows these facts:
   the lap with the left elbow near the side. Its right paw rests at the top of the right thigh near
   the hip and holds the bow at the frog in a closed paw, with the tip up, out, and
   forward, away from the music desk and the face (`RABBIT_HOLD`, [86]). In a move, its bow tip
-  turns out to the right, so that the bow does not cross the eyes. The cat stands the viola on the
+  turns to the left below the chin, so that the bow does not cross the face. The cat stands the viola on the
   top of the left thigh, leaned a little forward, so that its short arm holds the neck in front of
   the chest with the elbow bent near the side (`CAT_HOLD.rest`), and closes its paw around the
   neck, a little off it, so that the thick wrist stays out of the viola.

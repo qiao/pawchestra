@@ -1678,9 +1678,15 @@ const HIPPO_HOLD = {
  * twists 44° at rest (`pnpm hold-fit violinist --sets rest`): with the hair to the back and out,
  * (1, 0, 1), the forearm twisted 8° at rest, but the bow turned about 150° in a move,
  * and the paw flipped early in each lift (`pnpm arm-check violinist`). In the lift and the
- * lowering, the bow tip turns out to the right through the front, (0.7, 0.05, -1), with the hair
- * to the front, and the grip moves 0.3 H out and 0.1 H to the front (`restBow.via`), so that the
- * bow keeps at least 20 cm from the music desk. With the tip (0.3, 0.6, -1), the bow tip stood
+ * lowering, the bow tip turns to the left through the front, (-0.8, 0, -0.6), with the hair back
+ * and down, (0, -0.5, 1), and the grip moves 0.4 H out and 0.15 H to the front (`restBow.via`), so
+ * that the stick comes to the strings from the left, below the chin, as on the cat. The bow keeps
+ * 30 cm from the music desk, the bow paw twists 42° on its forearm at most in a move, and the
+ * right upper arm keeps out of the belly: with the grip 0.3 H out and 0.1 H to the front, it goes
+ * 2.3 cm into the belly in a lowering. With the tip out to the right through the front,
+ * (0.7, 0.05, -1), and the hair to the front, the bow stood in front of the left cheek in the
+ * last quarter of the lift, 5.2 cm from the left eye in the front view (13.1 cm with this via),
+ * and the bow paw twisted 65° in a move. With the tip (0.3, 0.6, -1), the bow tip stood
  * over the right eye in the front view in the middle of the lift, and the stick crossed the mouth
  * in the lowering. With the tip (0.7, 0.3, -1), the tip came to the right eye in the lowering.
  * With the tip (1, 0.2, -0.5), the right paw turned at 17,169°/s in a lowering (limit 3,000,
@@ -1728,7 +1734,7 @@ const RABBIT_HOLD = {
     ...SHOULDER_HOLD.restBow,
     tip: [0.45, 1, -0.45],
     hair: [-1, 0, -1],
-    via: { tip: [0.7, 0.05, -1], hair: [0, 0, -1], reach: [0.3, 0, -0.1] },
+    via: { tip: [-0.8, 0, -0.6], hair: [0, -0.5, 1], reach: [0.4, 0, -0.15] },
   },
 } as const satisfies BowedHold;
 

@@ -299,10 +299,11 @@ The rest of each family:
   straight forward. The rabbit holds its violin upright on the lap with the left elbow near the
   side. Its right paw rests at the top of the right thigh near the hip, with the elbow bent near
   the side, and holds the bow at the frog with the tip up, out, and forward
-  (`RABBIT_HOLD.restArms`, `restBow`). In a move, its bow tip turns out to the right through the
-  front (`restBow.via`). Reason: a seated violinist rests the bow pointing up, with a fist around
-  the frog (strings 2.9). A tip only a little out stood in front of the cheek, and a tip that
-  turned up through the front crossed the right eye in the front view. The paw grips the stick across the palm, so the stick rises from the thumb
+  (`RABBIT_HOLD.restArms`, `restBow`). In a move, its bow tip turns to the left through the
+  front, below the chin (`restBow.via`). Reason: a seated violinist rests the bow pointing up,
+  with a fist around the frog (strings 2.9). A tip only a little out stood in front of the cheek,
+  a tip that turned up through the front crossed the right eye in the front view, and a tip out
+  to the right stood in front of the left cheek near the play. The paw grips the stick across the palm, so the stick rises from the thumb
   side of the closed paw, and a tip down twists the forearm. The hair of the rest bow faces the
   front and in, so that the bow turns little from the rest to the move and the paw does not flip. The cat stands the viola on the top of the left thigh, leaned a little forward, and
   holds its neck in front of the chest with the elbow bent near the side (`CAT_HOLD.rest`,
