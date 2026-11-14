@@ -1163,11 +1163,27 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
 - At each beat, the baton tip is at the point of the beat (`BEAT_PATTERNS`). Between two beats,
   the tip rises in an arc and comes down at full speed. The size follows the loudness and the
   level of the passage (Expression).
-- **Beat height.** At beat 1 the right wrist is at the chest, a little below the shoulder joint,
-  in front of the shoulder (`CONDUCTOR_HOLD.beatPoint`, `batonPivot`). Thus the beat stays below
-  the chin, and the baton passes under the long muzzle of the Tripo bear. Reason: real
-  conductors keep most gestures below the chin. With the wrist above the shoulder joint, the
-  paw went to the chin, and the baton crossed the muzzle in the views from the front right.
+- **Beat height.** At beat 1 the right wrist is in front of the chest, below the shoulder joint,
+  with a bent elbow (`CONDUCTOR_HOLD.beatPoint`, `batonPivot`). The arcs and the loud
+  passages move the wrist up to about the shoulder joint in the median, and the largest loud
+  beats to about the chin. Reason: a real conductor beats between the waist and the chest, and
+  keeps most gestures below the chin. With beat 1 above the shoulder joint, the median of the
+  play was at the chin, and from the stage camera the paws stood at the height of the ears. A
+  lower beat brought the baton within 2 cm of the desk of the conductor stand.
+- **Beat plane in a lean.** The beat plane follows only a part of the forward lean of the
+  expression (`BATON_LEAN`). Reason: the tip of the baton is far in front of the spine, so a full
+  lean of a soft passage moved it down onto the desk of the conductor stand.
+- **Elbows.** Both elbows point down and out (`poleL`, `poleR`), so that they hang a little away
+  from the body. Reason: an elbow further out stood the upper arm out to the side and twisted it,
+  and an elbow forward went into the side of the round belly.
+- **Beat plane in a cue.** The beat plane turns with the whole turn of the upper body, so that
+  the paw beats in front of the turned chest. Reason: with half of a turn to the left, the low
+  right paw reached out to the side of the chest, and the upper arm twisted.
+- **Baton in the lift.** In the lift and in the lowering (5.2), the right paw turns from the
+  hanging paw to the paw of the beat on an ease (`LIFT_HAND_EASE`), so that the tip points
+  forward from about a third of the lift, and forward and up from the middle, as a conductor
+  raises the baton. The tip passes the height of the desk out at the right of the desk. Reason:
+  a swing out and down pointed the baton down and in across the belly.
 - **Count-in.** A click on play does not start the music at once: the conductor first signals the
   players to get ready. The transport starts before the start point (6.5), so the count-in is a
   set of poses at those song times (`COUNT_IN`): a ready pause, then one preparatory beat.
@@ -1194,8 +1210,8 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   elbows and the elbows down and back (`restArm`, `restPoleL`, `restPoleR`). The baton of the
   hanging paw hangs down beside the leg, a little forward (`restBaton`), as the baton hangs in the
   relaxed hand of a conductor with the arms down. The paw turns with no twist on its forearm, so
-  the baton comes only near to its direction. A baton nearer to the vertical turns the right wrist
-  too fast at the start of a lift (`move turn` of the arm gate). The ready gesture keeps a loose
+  the baton comes only near to its direction. In the ready gesture the left paw points level
+  (`readyLift`), so that it waits at the height of the right paw. The ready gesture keeps a loose
   left fist below the curl at which the knuckle crease folds (`readyCurl`), and a nearly straight
   arm (`readyReach`). The elbow of a nearly
   straight hanging arm is ill defined, so the conductor gives it a fixed direction. The search of
@@ -1286,7 +1302,7 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
   time (s)    -1.1        -0.5      0           0.6         1.2
   head, body  |--- turn --|--- on the section --|--- back --|
   left hand     |-- rise -|-- down -|-hold|--- down --|
-  baton       the beat pattern goes on in a beat plane that turns half as far as the upper body
+  baton       the beat pattern goes on in a beat plane that turns with the upper body
   ```
 
   ```typescript
@@ -1342,15 +1358,18 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
     turn goes from the twist of the paw with no wrap. Reason: a roll toward the palm of the place
     asked for a twist near 180°, and the limit turned the paw 90° in one frame, from +45° to -45°.
   - The places of the hands lean, sway, move, and drop with the body (`followBody()`), so the
-    paws keep their clearance to the head.
+    paws keep their clearance to the head. The beat plane takes only a part of the lean
+    (`BATON_LEAN`), so that the baton stays above the desk of the stand.
   - On a held final chord, the baton leaves the beat, holds, makes one circle before the end of
     the sound, and stops a little lower. The left palm holds the chord and closes at the end. On a
     short final chord, the baton stops at its beat with no rebound. The bow follows.
 
 - **Left hand between the cues** (`pose/conductor-left.ts`). A real conductor uses the left hand
   for the dynamics, for held notes, and for a mirror of the beat (`LEFT_HAND_PLACES`). The mirror
-  stays outside of the torso (`MIRROR_IN`). The places
-  stand at the left of the head, so the hand shows from behind. The places turn with the upper
+  stays outside of the torso (`MIRROR_IN`), and starts at the mirror point of the right wrist at
+  beat 1. The quiet place rests low at the left of the lower chest with a relaxed elbow, and the
+  lowered palm of a soft passage is at the chest, as a real conductor rests the left hand between
+  its gestures. The places turn with the upper
   body to each side. Reason: places that stayed in a turn to the right made the left arm reach
   back across the turned chest, and the left forearm stretched past the limit of the arm gate.
   The paw of each place stays near the line of its forearm, and the left elbow points down and
