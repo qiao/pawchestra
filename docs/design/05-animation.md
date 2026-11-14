@@ -450,8 +450,8 @@ The rest of each family:
   forward when the arm reaches forward. A grip nearer to the shoulder bends the elbow, so each
   degree of the turn moves the upper arm further from the trunk. When the forearm and not the upper
   arm lies on the trunk, a nearer grip pushes the forearm in. A grip away from the shoulder frees
-  the forearm, but moves the paw off its keys, so the pig keeps the left grip of the play and moves only the grip of the
-  rest (`restGripShiftL`). The right hoof of the pig lies in the bell of the horn near its axis,
+  the forearm, but moves the paw off its keys, so the pig keeps the left grip of the play at
+  rest. The right hoof of the pig lies in the bell of the horn near its axis,
   and points more along the bell than the line from its shoulder (`aimAcross` below 0), with its
   back to the axis (`faceTube`). Reason: the hoof is long and thick, so off the axis it went
   through the wall of the bell, and with the palm to the axis it twisted 166° on its forearm. The grip turn of the arm gate counts from the posed forearm, so the turn
