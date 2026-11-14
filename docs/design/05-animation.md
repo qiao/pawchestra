@@ -434,7 +434,7 @@ The rest of each family:
   source gives a rest place, and a marching method holds the plates at the sides (percussion 7).
 - **Choir.** The penguin keeps the folder in front of the chest, as a choir between two pieces.
   The flat flippers of the Tripo penguin start at the back half of the sides, so the folder hangs
-  within their reach (`CHOIR_FOLDER.forward`), and the flipper tips curl over its outer edges.
+  within their reach (`CHOIR_FOLDER.forward`), and the flipper tips touch its outer edges.
 
 ## 5.3 Instrument motion
 
@@ -1193,18 +1193,21 @@ rest, the beak closes fully when the rest gives the time, and else as far as it 
 again. In a legato, it closes a part of the way (`dip`), so that each note shows. The head lifts a
 little over each phrase and keeps still on each note, as a real choir singer opens the mouth and
 keeps the head still. Neighbor voices sway to opposite sides, so that the choir does not move as one
-block. The flippers hold the outer edges of the folder with the elbows down and out (`CHOIR_HOLD`). As a
-hand holds a book, the outer third of each flipper curls around the outer edge of the cover: each
-grip lies just outside the edge and a little in front of the cover (`CHOIR_FOLDER.gripIn`,
-`gripFront`), the paw bends toward the palm at the wrist with the palm on its grip
-(`CHOIR_HOLD.flex`), and the fingers curl far, so that the flipper tip lies on the front of the
-cover, inside its edge (`CHOIR_HOLD.curl`). The covers are about as wide as an A4 page
+block. The flippers hold the outer edges of the folder with the elbows down and out (`CHOIR_HOLD`). A
+flipper is a flat stiff paddle, so it bends only in one gentle curve of about 50° over its outer
+half: each grip lies just outside the lower outer edge, in the plane of the cover
+(`CHOIR_FOLDER.gripIn`, `gripFront`), the paw bends toward the palm at the wrist with the palm on
+its grip (`CHOIR_HOLD.flex`), and the fingers curl a little more (`CHOIR_HOLD.curl`). The wrist
+and knuckle blends of the rig spread the two bends, so that the flipper lies beside the edge and
+its tip touches the edge of the cover. The covers are about as wide as an A4 page
 (`CHOIR_FOLDER.width`), so that the grips stay in the reach of the flippers. Reason: with the
 grips inside the edges, each flipper went through the cover, and the cover cut the flipper in the
-side view. With a small curl, the flipper tips stood off the cover beside its edges. A larger bend
-at the wrist moves the wrist away from the shoulder, and the palms missed their grips. Reason:
-the rebuilt flippers are free round arms, and with the elbows of the old flippers the upper arms
-went into the chest. A larger turn of the elbows turns the grips off the accepted grip.
+side view. A far curl that put the tip on the front of the cover bent the outer third in one sharp
+kink, with a pointed corner and stretched feathers. With the grips farther out or in front of the
+cover, the curved tips stood off the folder. A larger bend at the wrist moves the wrist away
+from the shoulder, and the palms missed their grips. Reason: the rebuilt flippers are free round
+arms, and with the elbows of the old flippers the upper arms went into the chest. A larger turn
+of the elbows turns the grips off the accepted grip.
 
 ## 5.4 Conductor
 
