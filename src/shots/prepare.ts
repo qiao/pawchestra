@@ -28,6 +28,7 @@ import type { StageBody } from './foreground.ts';
 import {
   ANIMAL_FLOOR,
   animalTooNear,
+  foregroundBody,
   foregroundHead,
   foregroundObject,
   inFrame,
@@ -1170,17 +1171,27 @@ function composeMove(planner: Planner, move: MoveCameras): ComposedMove {
 }
 
 /**
- * Tells if a head or another object stands in the foreground of a close move, at its start or at
- * its end, in the frame of its composition at the aspect of Cinematic mode (design 5.6).
+ * Tells if a head, another object, or the body of another animal stands in the foreground of a
+ * close move, at its start or at its end, in the frame of its composition at the aspect of
+ * Cinematic mode (design 5.6). A choir subject has no body test, because the bodies of the
+ * orchestra in front of the risers stand under the singers (the floor of the head test).
  *
  * @param planner The planner.
  * @param move The cameras of the move.
- * @param test The test of one camera: the heads, or the cover of the other objects.
- * @returns True if a head or an object stands in the foreground.
+ * @param test The test of one camera: the heads, the cover of the other objects, or the cover of
+ *   the other bodies.
+ * @returns True if a head, an object, or a body stands in the foreground.
  */
-function moveForeground(planner: Planner, move: ComposedMove, test: 'heads' | 'objects'): boolean {
+function moveForeground(
+  planner: Planner,
+  move: ComposedMove,
+  test: 'heads' | 'objects' | 'bodies',
+): boolean {
   const { members, focus, outside, floor } = move.subject;
   const aspect = CINEMA_ASPECT;
+  if (test === 'bodies' && floor.length > 0) {
+    return false;
+  }
   if (test === 'heads' && outside) {
     // The point stays out of the frame for the full move.
     for (const i of MOVE_INDICES) {
@@ -1196,21 +1207,34 @@ function moveForeground(planner: Planner, move: ComposedMove, test: 'heads' | 'o
     const { camera, look, middle } = endComposed(planner, move, end);
     // The depth of field of the frame blurs a near head or box at a side edge: a dirty frame.
     const lens = lensScale(camera, look, key.fov, planner.stageSide);
-    const found =
-      test === 'heads'
-        ? foregroundHead(
-            planner.subjects.heads,
-            members,
-            focus,
-            camera,
-            look,
-            key.fov,
-            aspect,
-            floor,
-            middle,
-            lens,
-          )
-        : foregroundObject(planner.clearance, members, focus, camera, look, key.fov, aspect, lens);
+    let found: boolean;
+    if (test === 'heads') {
+      found = foregroundHead(
+        planner.subjects.heads,
+        members,
+        focus,
+        camera,
+        look,
+        key.fov,
+        aspect,
+        floor,
+        middle,
+        lens,
+      );
+    } else if (test === 'objects') {
+      found = foregroundObject(
+        planner.clearance,
+        members,
+        focus,
+        camera,
+        look,
+        key.fov,
+        aspect,
+        lens,
+      );
+    } else {
+      found = foregroundBody(planner.bodies, members, focus, camera, look, key.fov, aspect);
+    }
     if (found) {
       return true;
     }
@@ -1328,7 +1352,8 @@ function blendNear(
 
 /**
  * Runs the tests of a close move that the planner keeps for each camera, because they do not
- * depend on the cut (design 5.6). The cheap tests come first, and the cover of the objects last.
+ * depend on the cut (design 5.6). The cheap tests come first, and the cover of the objects and of
+ * the bodies last.
  *
  * @param planner The planner.
  * @param move The cameras of the move.
@@ -1346,7 +1371,10 @@ function keptRefusal(planner: Planner, move: ComposedMove): KeptRefusal | null {
   if (moveNear(planner, move)) {
     return 'near';
   }
-  return moveForeground(planner, move, 'objects') ? 'object' : null;
+  if (moveForeground(planner, move, 'objects')) {
+    return 'object';
+  }
+  return moveForeground(planner, move, 'bodies') ? 'body' : null;
 }
 
 /**

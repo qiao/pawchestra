@@ -25,8 +25,13 @@ export interface BodyPart {
   readonly end: number;
 }
 
-/** The body of an animal on the stage in the bind pose, for the distance floor of a close shot. */
+/**
+ * The body of an animal on the stage in the bind pose, for the distance floor and the foreground
+ * body of a close shot.
+ */
 export interface StageBody {
+  /** The index of the player in `SceneLayout.players`, or `CONDUCTOR_OWNER`. */
+  readonly owner: number;
   /**
    * The points of the body with no instrument and no repeats, as x, y, z in the axes of the model,
    * in the order of the parts.
@@ -111,6 +116,14 @@ const FOREGROUND = {
    * 45% of the shots of the first violins.
    */
   objectShare: 0.15,
+  /**
+   * The largest part of the frame that the points of the body of one other animal cover in front
+   * of the depth of the focus. The rule also holds in a dirty frame, because the lens leaves such a
+   * body almost sharp. A red fox in a sixth of the frame read as the subject of a shot of the tan
+   * fox, and a pig beside a wolf at the same depth read as the subject of a shot of the wolf. A
+   * thin strip of a body at the edge stays.
+   */
+  bodyShare: 0.08,
   /** The cells on each side of the grid of the frame that measures the cover. */
   cells: 20,
   /**
@@ -459,6 +472,119 @@ function placePart(body: StageBody, part: BodyPart): void {
     points[i + 2] = pz - x * sin + z * cos;
   }
   body.placed[part.start] = 1;
+}
+
+/** The first column of the points of a body in each row of the grid of the frame. */
+const rowStarts = new Int32Array(FOREGROUND.cells);
+
+/** The last column of the points of a body in each row of the grid of the frame. */
+const rowEnds = new Int32Array(FOREGROUND.cells);
+
+/**
+ * The points of a body outside each side edge of the frame in each row: bit 1 for the left edge,
+ * bit 2 for the right edge.
+ */
+const rowEdges = new Uint8Array(FOREGROUND.cells);
+
+/**
+ * Tells if the body of another animal covers more than 8% of the frame of a close camera in front
+ * of its subject (design 5.6). The points of a body count when they are nearer to the camera than
+ * the depth of the focus. Each row of a grid of 20 × 20 over the frame counts the cells from the
+ * first to the last column of its points, and a row with points beyond a side edge reaches that
+ * edge. The rule also holds in a dirty frame, because the lens leaves a near body almost sharp.
+ *
+ * @param bodies The bodies of the players and of the conductor.
+ * @param members The owners of the subject players. Their bodies do not count.
+ * @param focus The point of the subject that sets the depth.
+ * @param camera The camera.
+ * @param target The point that the camera looks at.
+ * @param fov The vertical field of view, in degrees.
+ * @param aspect The width of the frame divided by its height.
+ * @returns True if a body covers too much of the frame.
+ */
+export function foregroundBody(
+  bodies: readonly StageBody[],
+  members: readonly number[],
+  focus: Vec3,
+  camera: Vec3,
+  target: Vec3,
+  fov: number,
+  aspect: number,
+): boolean {
+  const a = cameraAxes(camera, target);
+  const tanV = Math.tan(((fov / 2) * Math.PI) / 180);
+  const tanH = tanV * aspect;
+  const [cx, cy, cz] = camera;
+  const limit = (focus[0] - cx) * a.fx + (focus[1] - cy) * a.fy + (focus[2] - cz) * a.fz;
+  const n = FOREGROUND.cells;
+  const most = FOREGROUND.bodyShare * n * n;
+  // Tells if a sphere has a part in front of the depth limit and in the frame.
+  const ahead = (center: Vec3, radius: number): boolean => {
+    const dx = center[0] - cx;
+    const dy = center[1] - cy;
+    const dz = center[2] - cz;
+    const depth = dx * a.fx + dy * a.fy + dz * a.fz;
+    if (depth - radius >= limit || depth + radius <= 0) {
+      return false;
+    }
+    const far = Math.max(depth, 0) + radius;
+    return (
+      Math.abs(dx * a.rx + dz * a.rz) - radius <= far * tanH &&
+      Math.abs(dx * a.ux + dy * a.uy + dz * a.uz) - radius <= far * tanV
+    );
+  };
+  for (const body of bodies) {
+    if (members.includes(body.owner) || !ahead(body.center, body.radius)) {
+      continue;
+    }
+    rowStarts.fill(n);
+    rowEnds.fill(-1);
+    rowEdges.fill(0);
+    const p = body.points;
+    for (const part of body.parts) {
+      if (!ahead(part.center, part.radius)) {
+        continue;
+      }
+      placePart(body, part);
+      for (let i = part.start * 3; i < part.end * 3; i += 3) {
+        const dx = (p[i] ?? 0) - cx;
+        const dy = (p[i + 1] ?? 0) - cy;
+        const dz = (p[i + 2] ?? 0) - cz;
+        const depth = dx * a.fx + dy * a.fy + dz * a.fz;
+        if (depth <= NEAR_DEPTH || depth >= limit) {
+          continue;
+        }
+        const y = (dx * a.ux + dy * a.uy + dz * a.uz) / (depth * tanV);
+        if (Math.abs(y) >= 1) {
+          continue;
+        }
+        const x = (dx * a.rx + dz * a.rz) / (depth * tanH);
+        const row = Math.floor(((y + 1) * n) / 2);
+        if (Math.abs(x) >= 1) {
+          rowEdges[row] = (rowEdges[row] ?? 0) | (x < 0 ? 1 : 2);
+          continue;
+        }
+        const column = Math.floor(((x + 1) * n) / 2);
+        rowStarts[row] = Math.min(rowStarts[row] ?? n, column);
+        rowEnds[row] = Math.max(rowEnds[row] ?? -1, column);
+      }
+    }
+    let covered = 0;
+    for (let row = 0; row < n; row++) {
+      const end = rowEnds[row] ?? -1;
+      if (end < 0) {
+        continue;
+      }
+      const edges = rowEdges[row] ?? 0;
+      const first = edges & 1 ? 0 : (rowStarts[row] ?? 0);
+      const last = edges & 2 ? n - 1 : end;
+      covered += last - first + 1;
+    }
+    if (covered > most) {
+      return true;
+    }
+  }
+  return false;
 }
 
 /**

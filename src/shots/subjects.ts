@@ -509,9 +509,14 @@ function sphereAround(points: ArrayLike<number>): Pick<BodyPart, 'center' | 'rad
  *
  * @param model The model.
  * @param place The place of the model.
+ * @param owner The index of the player in `SceneLayout.players`, or `CONDUCTOR_OWNER`.
  * @returns The body.
  */
-function bodyAt(model: PlayerModel, place: Pick<PlayerPlace, 'position' | 'facing'>): StageBody {
+function bodyAt(
+  model: PlayerModel,
+  place: Pick<PlayerPlace, 'position' | 'facing'>,
+  owner: number,
+): StageBody {
   const local = modelBodyOf(model);
   const cos = Math.cos(place.facing);
   const sin = Math.sin(place.facing);
@@ -524,6 +529,7 @@ function bodyAt(model: PlayerModel, place: Pick<PlayerPlace, 'position' | 'facin
   // A turn and a move keep each sphere: only its middle moves.
   const parts = local.parts.map((part) => ({ ...part, center: move(...part.center) }));
   return {
+    owner,
     local: local.points,
     points: new Float64Array(local.points.length),
     placed: new Uint8Array(local.points.length / 3),
@@ -715,12 +721,13 @@ export function prepareSubjects(
  * @returns The bodies.
  */
 export function prepareBodies(layout: SceneLayout, models: ModelCache): StageBody[] {
-  const bodies = layout.players.map((place) => {
+  const bodies = layout.players.map((place, index) => {
     const { species, instrument, kettles, support } = place.cast;
-    return bodyAt(models.get(species, instrument, kettles, support), place);
+    return bodyAt(models.get(species, instrument, kettles, support), place, index);
   });
   if (layout.conductor) {
-    bodies.push(bodyAt(models.get(CONDUCTOR.species, CONDUCTOR.instrument), layout.conductor));
+    const bear = models.get(CONDUCTOR.species, CONDUCTOR.instrument);
+    bodies.push(bodyAt(bear, layout.conductor, CONDUCTOR_OWNER));
   }
   return bodies;
 }

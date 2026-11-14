@@ -1727,6 +1727,10 @@ copy these numbers of the design:
   except the blurred head of a dirty frame.
 - No other object nearer than 0.9 of the focus depth covers more than 15% of a 20 × 20 grid,
   except the blurred boxes of a dirty frame.
+- The points of the body of no other animal in front of the focus depth cover more than
+  `FOREGROUND.bodyShare` of that grid, also in a dirty frame (`foregroundBody()`). Each row of the
+  grid counts the cells from the first to the last point of the body. A choir shot has no such
+  test, because the orchestra stands under the singers.
 - Each camera keeps 0.6 m from each box, 1.0 m from the podium and the conductor, and 0.6 m above
   the stage top.
 - A camera stays on one side of the beam cone for a full shot, because a crossing darkens the
@@ -1740,7 +1744,8 @@ another object can stand at one side edge of the frame, when the depth of field 
 subject always counts. Thus a solo camera can stay low behind the front rows. The lens blurs a
 near point only a little (4.5), so a dirty head stays almost sharp. Thus the part is a fifth, less
 than the third of a soft shoulder in a film: with a third, the sharp head of another player took
-the eye from the subject.
+the eye from the subject. For the same reason, a dirty body still keeps the limit of the body
+cover: only a thin strip of it stays at the edge.
 
 **The distance to the animals.** No point of an animal body in the frame of a close camera comes
 nearer than `ANIMAL_FLOOR` at a sample of the move (`NEAR_SAMPLES`). The rule holds for each
