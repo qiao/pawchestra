@@ -840,6 +840,38 @@ def ear_rows(body):
     log('ear rows:', count, 'normal', np.round(n, 3).tolist(), 'offset', round(rule['offset'], 4))
 
 
+def face_rows(body):
+    """Face rows (faceRows of the params), after the ear rows: each vertex in a box of
+    faceRows.boxes (y above y0 and z above z0, in the units of the source) with a head and ear share
+    of at least faceRows.share keeps its ear shares above y faceRows.earFloor and gives each other
+    share to head. Bone heat gave the muzzle, the horns, and the cheeks shares of the ears and the
+    neck, because the long muzzle lies as far from the head bone as from the ear bones, so the
+    muzzle moved with the ears, and studio-body found no muzzle vertex with the row head 1 (the tip
+    of the nose and the mouth)."""
+    rule = P.get('faceRows')
+    if not rule:
+        return
+    me = body.data
+    S = studio_points(me)
+    names = {g.index: g.name for g in body.vertex_groups}
+    keep = set(loose_vertices(me))
+    count = 0
+    for v in me.vertices:
+        p = S[v.index]
+        if v.index in keep or not any(p[1] > y0 and p[2] > z0 for y0, z0 in rule['boxes']):
+            continue
+        row = {names[g.group]: g.weight for g in v.groups if g.weight > 0}
+        ears = ('ear_L', 'ear_R') if p[1] >= rule['earFloor'] else ()
+        share = sum(w for k, w in row.items() if k in ('head', 'ear_L', 'ear_R'))
+        if share < rule['share'] or set(row) <= {'head', *ears}:
+            continue
+        new = {k: w for k, w in row.items() if k in ears}
+        new['head'] = sum(w for k, w in row.items() if k not in new)
+        sa.set_weight_row(body, v.index, new)
+        count += 1
+    log(f'face rows: {count} vertices in the boxes {rule["boxes"]}')
+
+
 def thicken_trunk(body):
     """Scales each horizontal section of the trunk about its middle in x (width) and z (depth) by the
     factors of trunk.table of the params, by the place u from the hips joint (0) to the neck joint
@@ -1809,6 +1841,7 @@ def main():
         tail_rows(body, rig)
     thicken_trunk(body)
     ear_rows(body)
+    face_rows(body)
     if P.get('smooth'):
         region_colors(body)
         relax(body)

@@ -1,5 +1,5 @@
 {
- "sha256": "561ac05f1f8b204898eb4831e334912bf8b6c22b15d5bbe046258cf4e91376b1",
+ "sha256": "18f34f3459033b4d6d0c3c7f17328070f2b85123e367ed44edc85298f4325898",
  "bindSupination": {
   "L": 0.0,
   "R": 0.0
@@ -56,8 +56,8 @@
     0.6,
     -0.125
    ],
-   "vertices": 1514,
-   "weights": "d36c490a4aeb12ff"
+   "vertices": 436,
+   "weights": "9d0a446718bdf5cb"
   },
   "head": {
    "head": [
@@ -65,8 +65,8 @@
     0.665,
     -0.1
    ],
-   "vertices": 2360,
-   "weights": "823008e0f2c66920"
+   "vertices": 2250,
+   "weights": "02838bfdc86b6db1"
   },
   "ear_L": {
    "head": [
@@ -74,8 +74,8 @@
     0.885,
     -0.015
    ],
-   "vertices": 1449,
-   "weights": "d16900f10c624e62"
+   "vertices": 252,
+   "weights": "9a7a933f71570041"
   },
   "ear_R": {
    "head": [
@@ -83,8 +83,8 @@
     0.885,
     -0.015
    ],
-   "vertices": 1448,
-   "weights": "ffbd1598feafa556"
+   "vertices": 252,
+   "weights": "04aed431c0ef6e44"
   },
   "clavicle_L": {
    "head": [
@@ -92,8 +92,8 @@
     0.588,
     -0.11
    ],
-   "vertices": 516,
-   "weights": "40035b9c5356cd61"
+   "vertices": 484,
+   "weights": "56c39733e97c7225"
   },
   "upper_arm_L": {
    "head": [
@@ -146,8 +146,8 @@
     0.588,
     -0.11
    ],
-   "vertices": 516,
-   "weights": "3b05635b9cebe121"
+   "vertices": 483,
+   "weights": "336410d096e59ad5"
   },
   "upper_arm_R": {
    "head": [
@@ -290,8 +290,8 @@
     0.588,
     -0.092
    ],
-   "vertices": 205,
-   "weights": "190cbdb6b12f3840"
+   "vertices": 203,
+   "weights": "b0d16248f2b24609"
   },
   "upper_arm_seg1_L": {
    "head": [
@@ -380,8 +380,8 @@
     0.588,
     -0.092
    ],
-   "vertices": 197,
-   "weights": "a460609936fe24d5"
+   "vertices": 196,
+   "weights": "28453bbd165bbf7a"
   },
   "upper_arm_seg1_R": {
    "head": [
@@ -1298,7 +1298,9 @@
   },
   "body": {
    "height": 0.947268,
-   "crease": 180
+   "crease": 180,
+   "noseTop": 0.775,
+   "mouthHeight": 0.669
   },
   "texture": "assets/models/rhino/tripo-hand/rhino-color.webp"
  }

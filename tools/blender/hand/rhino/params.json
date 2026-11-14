@@ -219,5 +219,54 @@
  "hingeTurn": {
   "L": 0.0,
   "R": 0.0
- }
+ },
+ "earPlane": {
+  "points": [
+   [
+    0.05,
+    0.9,
+    -0.015
+   ],
+   [
+    0.105,
+    0.875,
+    -0.015
+   ],
+   [
+    0.078,
+    0.888,
+    -0.045
+   ],
+   [
+    0.078,
+    0.888,
+    0.02
+   ]
+  ],
+  "band": 0.008,
+  "xmin": 0.002
+ },
+ "faceRows": {
+  "boxes": [
+   [
+    0.625,
+    0.09
+   ],
+   [
+    0.7,
+    -0.03
+   ],
+   [
+    0.8,
+    -0.1
+   ]
+  ],
+  "share": 0.5,
+  "earFloor": 0.8
+ },
+ "rigFacts": {
+  "noseTop": 0.775,
+  "mouthHeight": 0.669
+ },
+ "rigFactsNote": "The tip of the nose is the front of the muzzle under the large horn (noseTop, the horn starts at y 0.79 at the front), and the mouth is the crease between the lips on the middle plane at y 0.669, far below the tip of the nose (mouthHeight, design 4.4)."
 }
