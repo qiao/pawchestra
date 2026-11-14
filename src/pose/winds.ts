@@ -636,7 +636,9 @@ export const WIND_HOLDS = {
  *
  * In the rest pose, the flute stands nearly upright at the right side with the foot joint down on
  * the top of the right thigh, as a real flutist rests it vertically on the right leg with the right
- * hand on the right-hand keys (George, `docs/reference/wind-technique.md` 2.4). The closed right
+ * hand on the right-hand keys (George, `docs/reference/wind-technique.md` 2.4). The foot touches
+ * the skin of the thigh top, 0.8 cm deep at most (`pnpm hold-fit flutist`). With the rest move
+ * (0.668, -0.758, 0.313), the foot hung beside the right thigh at the seat edge. The closed right
  * paw holds it 0.376 H nearer to the lip plate than in the play, about 0.2 m below the lip plate on
  * the upper body of the flute, with its fingers on the tube (`restGripShiftR`, `restAim` 0). The
  * lift moves the right grip around the flute (`gripAround`): on a straight line, the grip crosses
@@ -703,7 +705,7 @@ const FOX_FLUTE = {
   poleL: [-1, -1, -0.3],
   poleR: [1.2, -1.4, -0.3],
   rest: holdTurn(0, -15, fluteTurn(0, 80, [0, 0, -1])),
-  restShift: [0.668, -0.758, 0.313],
+  restShift: [0.62, -0.5, 0.32],
   restPoleL: [-0.5, -1, 0.6],
   restPoleR: [0.8, -1, 0.3],
   restFreeL: {
