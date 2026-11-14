@@ -334,7 +334,7 @@ the facts of its body in its `.blend` ("Hand rig").
   app do not move the eye places. A test of the oval of the app pushed single eyes out, and it
   closed no notch, because the fur covers a notch at the rim, which the push leaves in the head.
 - A notch of the fur in a bead eye, or a crease beside it, comes from a few faces of the old eye
-  socket. A body fixes it with `eyeShift` when a move of both eyes clears it (the rhino), else with a point edit of its rig file (`<s>-edits.json`, the elephant) or
+  socket. A body fixes it with `eyeShift` when a move of both eyes clears it, else with a point edit of its rig file (`<s>-edits.json`, the elephant) or
   of its `.blend` (the polar bear).
 - A bead eye is an oval of `EYE_SEGMENTS` faces around its long axis and `EYE_RINGS` steps up, and
   its light has the faces of `LIGHT_BALL`. Fewer steps showed an octagon and a hexagon in a close
@@ -520,12 +520,12 @@ in Blender before the export. A pose in Blender skins from the T-pose and the ap
 `pnpm pose-preview` and `tools/blender/studio_preview.py` show the app pose of each moment on an
 export of the open `.blend`, with the bind as its rest.
 
-Seventeen species have the hand rig of a Tripo P2 mesh (`assets/models/<s>/tripo-hand/<s>.blend`).
-A chain of `tools/blender/hand/<s>/` makes each one (`pnpm hand-chain <s>`). The
-rhino and the mannequin come from `rig-mesh`. The rhino source has a ledge around the neck and
-around the top of each thigh, and boxes of `smooth` in its config relax them before the weights.
-Reason: the ledges showed as hard step rings, and the shapes `legs_straight` of the standing rhino
-give the source form back, so a relax of the seated bind does not reach them. In the arm rows of
+Eighteen species have the hand rig of a Tripo P2 mesh (`assets/models/<s>/tripo-hand/<s>.blend`).
+A chain of `tools/blender/hand/<s>/` makes each one (`pnpm hand-chain <s>`). Only the mannequin
+comes from `rig-mesh`. A long muzzle that lies as far from the head bone as from the ear bones
+takes face rows after the ear rows (`faceRows` of the params of the rhino): each other share of the
+muzzle goes to the head. Reason: bone heat gave the muzzle of the rhino shares of the ears, so the
+muzzle moved with the ears, and the export found no tip of the nose. In the arm rows of
 each hand chain, the elbow helper share rises from 0 to 1 at the elbow joint and falls to 0 on
 each side (`rows.control` of its params), so that the bend share grows linearly over the elbow.
 Reason: a helper share of 0.75 at the joint put 0.25 of each row on the upper arm before the joint
