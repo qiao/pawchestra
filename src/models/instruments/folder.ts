@@ -45,22 +45,21 @@ export const CHOIR_FOLDER = {
   /**
    * The distance of each grip of a palm inside the outer edge of its cover, in meters. A value
    * below 0 puts the grip outside the edge. The palm of the Tripo penguin then lies beside the
-   * outer edge, and the outer third of the flipper curls around the edge to the front of the
-   * cover, as a hand holds a book. With the grip 3 cm inside the edge of a cover of 0.26 m, each
-   * flipper went through the cover 4.2 cm inside its edge, and the cover cut the outer third of
-   * the flipper in the side view. With 2 cm outside, the flipper still touches the cover at the
-   * edge. A wider cover with the grips outside its edges put the grips out of the reach of the
-   * flippers: the palms missed them by up to 18 mm.
+   * outer edge, and the gentle curve of the outer half of the flipper (`CHOIR_HOLD.curl`) turns
+   * the flipper tip onto the edge of the cover. With the grip 3 cm outside the edge and 1 cm in
+   * front of the cover, the curved tip stood off the folder. With the grip 3 cm inside the edge
+   * of a cover of 0.26 m, each flipper went through the cover 4.2 cm inside its edge. A wider
+   * cover with the grips outside its edges put the grips out of the reach of the flippers: the
+   * palms missed them by up to 18 mm.
    */
-  gripIn: -0.03,
+  gripIn: -0.02,
   /**
-   * The distance of each grip of a palm in front of its cover, away from the singer, in meters.
-   * With the curl of the flipper tip (`CHOIR_HOLD.curl`), the digits wrap the outer edge onto the
-   * front of the cover, 0.3 cm off it. With 2 cm, the palms missed their grips by 5.5 mm, and the
-   * curled digits stood 1.2 cm or more off the cover. With 0.8 cm, the curled tip went through
-   * the cover.
+   * The distance of each grip of a palm in front of the middle plane of its cover, away from the
+   * singer, in meters. With 0, the flipper tip touches the edge of the cover, 0.1 cm to 0.4 cm off
+   * it, and the flipper does not go through the folder. With 2 cm, the palms missed their grips
+   * by 5.5 mm.
    */
-  gripFront: 0.01,
+  gripFront: 0,
 };
 
 /**

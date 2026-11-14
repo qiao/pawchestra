@@ -21,21 +21,23 @@ export const CHOIR_HOLD = {
   poleL: [-1, -1, 0.1],
   poleR: [1, -1, 0.1],
   /**
-   * The curl of the fingers around the outer edges of the folder. With {@link CHOIR_HOLD.flex}
-   * and the grip 1 cm in front of the cover (`CHOIR_FOLDER.gripFront`), the flipper tip of the
-   * Tripo penguin curls around the outer edge onto the front of the cover. The digits then come 3.0
-   * cm inside the edge, 0.3 cm off the cover, and no flipper edge crosses the folder. With 15°, the
-   * digits stood 2.7 cm off the cover beside its edge. With 85°, they lay 0.1 cm off it, and with
-   * 90°, the flipper went through the cover. A larger flex in place of the curl moves the wrist
-   * away from the shoulder: with 45°, the palms missed their grips by 10.7 mm.
+   * The curl of the fingers around the outer edges of the folder. A flipper is a flat stiff
+   * paddle, so the curl and {@link CHOIR_HOLD.flex} together bend the outer half of each flipper
+   * by about 50° in one smooth curve. With the grips of `CHOIR_FOLDER`, each flipper lies beside
+   * the lower outer edge of the folder, and its tip turns onto the edge of the cover, 0.1 cm to
+   * 0.4 cm off it. With a curl of 80° and a flex of 30°, the outer third bent 110° in one sharp
+   * kink around the lower corner of the folder: the outer corner of the bend was a point, and the
+   * feather pattern stretched across it.
    */
-  curl: 80 * MathUtils.DEG2RAD,
+  curl: 30 * MathUtils.DEG2RAD,
   /**
    * The bend of each paw toward the palm at the wrist. The palm keeps its grip, and the arm
-   * follows. The wrist of the Tripo penguin is at two thirds of the flipper, so the bend starts
-   * the curl of the outer third.
+   * follows. The wrist of the Tripo penguin is at two thirds of the flipper. The wrist blend of
+   * the rig and the knuckle blend after it spread this bend and the curl over the outer half. A
+   * larger flex in place of the curl moves the wrist away from the shoulder: with 45°, the palms
+   * missed their grips by 10.7 mm.
    */
-  flex: 30 * MathUtils.DEG2RAD,
+  flex: 20 * MathUtils.DEG2RAD,
 } as const;
 
 /** One hand of a singer in the bind pose: its arm and its grip on the folder. */
