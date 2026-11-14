@@ -385,14 +385,13 @@ The rest of each family:
   belly with the paws beside the thighs, as the arms of a pianist hang before a performance. Paws
   on the front of the belly looked held at the chest, and paws nearer to the middle put the arms
   into the belly.
-  The deer sits up with the elbows bent and the hooves on the lap, on the front of the belly where
-  it meets the thighs, as a pianist rests the hands on the lap before a performance. Reason: with
-  each hand near a string, the rest looked the same as the play, and the thighs lie out of the
-  reach of the short arms. Paws beside the knees lie out of reach, so the arms lock straight and
-  the elbows snap where the lift leaves the reach limit. The right rest elbow points down and
-  forward (`restR.pole`), so the right arm lies in front of the soundbox. Reason: with the elbow
-  back, the right forearm lay behind the soundbox and crossed it at rest, in the lift, and in the
-  lowering.
+  The deer sits up with the arms hanging at its sides, the elbows a little bent and pointing back,
+  and each hoof on the outer side of its thigh (`restL`, `restR`), as the arms of a harpist hang
+  loose at the sides (harp 5). The wrists stay near straight, and the palms face the thighs.
+  Reason: the deep belly covers the tops of the thighs, and the knees lie out of the reach of the
+  arms. With the hooves on the front of the belly, they hung in the air in front of it with bent
+  wrists. With the right elbow forward in front of the soundbox, the right paw twisted far on
+  its forearm. The hanging right arm passes behind and outside the top of the soundbox.
 - **Percussion.** A ready player keeps its mallets over the instrument (`PercussionHold.ready`),
   because a lift from hanging arms sweeps them through the body or the kettles. At rest, the
   timpanist lays the felt balls on the heads (`PercussionHold.restPitch`). No source gives the
