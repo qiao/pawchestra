@@ -682,15 +682,16 @@ export const WIND_HOLDS = {
  * The arms of the hand rig of the Tripo P2 fox (design 4.4, "Hand rig") take each turn of the paw
  * on two parts: the roll of the upper arm and the twist of the forearm. Each part takes 39°
  * or less in each moment of the flutist and the violinist, so that the skin does not twist into a
- * thin neck. The right paw points half up past the back of the flute (`aimSide` -0.5, with the side
- * sign -1 of `aimSigns`), and the right elbow points out and a little down in the play,
- * (1.2, -0.4, -0.3), as the right elbow of a flutist stays out from the side. The palm then faces
- * the audience behind the flute, the paw points up, and the digits curl over the top onto the keys
- * (`pnpm wind-grip flutist`: the palm 45° from the axis, a grasp in 78 % of the play samples). The
- * forearm twists 38° and the paw 78° on its forearm (p95 of `pnpm arm-check flutist`). With the
- * side sign 1 and the share -0.3, the palm faced up, the forearm twisted 50°, and the paw 100°.
- * With the share -0.6, the paw swing p95 reached 70°, the limit. The elbow (1.2, -1.4, -0.3)
- * twisted the forearm 48°.
+ * thin neck. The right paw points a part of the way up past the back of the flute (`aimSide`
+ * -0.45, with the side sign -1 of `aimSigns`), and the right elbow points out and a little down in
+ * the play, (1.2, -0.4, -0.3), as the right elbow of a flutist stays out from the side. The palm
+ * then faces the audience behind the flute, the paw points up, and the digits curl over the top
+ * onto the keys (`pnpm wind-grip flutist`: the palm 52° from the axis, a grasp in 74 % of the play
+ * samples). The forearm twists 39°, and the paw twists 79° and bends 51° on its forearm (p95 of
+ * `pnpm arm-check flutist`). With the side sign 1 and the share -0.3, the palm faced up, the
+ * forearm twisted 50°, and the paw 100°. With the share -0.5, the paw bent 57°, and with -0.6, 70°,
+ * the limit. With -0.4, the palm turned 58° from the axis. The elbow (1.2, -1.4, -0.3) twisted the
+ * forearm 48°.
  * The fingers curl 90° and 85° around the flute (`gripCurl`):
  * with 115° and 106°, the short paws of the mesh fold 13 to 23 faces in each play sample. The right
  * rest elbow points back, (0.8, -1, 0.3), so
@@ -731,7 +732,7 @@ const FOX_FLUTE = {
   },
   faceTube: ['palm', 'palm'],
   aimAcross: 1,
-  aimSide: [0.5, -0.5],
+  aimSide: [0.5, -0.45],
   aimSigns: [-1, -1],
   gripShiftL: [-0.04, 0, 0.08],
   gripShiftR: [0, 0, -0.14],
