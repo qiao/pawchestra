@@ -528,7 +528,9 @@ const BOOT: readonly OutlinePoint[] = stadium(0.034, 0.0325, 3);
 
 /**
  * Gives the outline of a stadium in the x-z plane: two half circles at z = ±`half`, joined by
- * straight sides, counterclockwise when seen from +y.
+ * straight sides, counterclockwise when seen from +y. The first half circle goes around the
+ * middle at -`half` through -z, and the second around the middle at +`half` through +z, so each
+ * half circle bulges away from the origin.
  *
  * @param radius The radius of the half circles.
  * @param half The distance of the middle of each half circle from the origin.
@@ -537,9 +539,9 @@ const BOOT: readonly OutlinePoint[] = stadium(0.034, 0.0325, 3);
  */
 function stadium(radius: number, half: number, steps: number): OutlinePoint[] {
   const out: OutlinePoint[] = [];
-  for (const side of [1, -1]) {
+  for (const side of [-1, 1]) {
     for (let i = 0; i <= steps; i++) {
-      const angle = (i / steps) * Math.PI + (side > 0 ? 0 : Math.PI);
+      const angle = (i / steps) * Math.PI + (side < 0 ? 0 : Math.PI);
       out.push([radius * Math.cos(angle), side * half - radius * Math.sin(angle)]);
     }
   }
