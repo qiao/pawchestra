@@ -805,8 +805,9 @@ function moveAll(positions: Float32Array, move: Vector3): void {
 
 /**
  * Gives the places of a studio body in a new stance: the head of each bone in a chain pose, and the
- * points of the holds, which move with their bones: the head center and the nose with the head,
- * and each finger tip and palm with its fingers. Each place then takes one more move.
+ * points of the holds, which move with their bones: the head center, the nose, and the mouth of a
+ * body with a mouth of its own with the head, and each finger tip and palm with its fingers. Each
+ * place then takes one more move.
  *
  * @param body The studio body in its bind pose.
  * @param pose The chain pose of the stance.
@@ -817,13 +818,13 @@ function stancePlaces(
   body: StudioBody,
   pose: ChainPose,
   lift: Vector3,
-): Pick<StudioBody, 'heads' | 'palms' | 'fingerTips' | 'headCenter' | 'nose' | 'eyes'> {
+): Pick<StudioBody, 'heads' | 'palms' | 'fingerTips' | 'headCenter' | 'nose' | 'mouth' | 'eyes'> {
   const lifted = (p: Vec3): Vec3 => toVec3(new Vector3(...p).add(lift));
   const moved = (bone: StudioBone, p: Vec3): Vec3 =>
     lifted(toVec3(new Vector3(...p).applyMatrix4(boneMatrix(pose, bone))));
   const turned = (bone: StudioBone, d: Vec3): Vec3 =>
     toVec3(new Vector3(...d).applyQuaternion(pose.turns.get(bone) ?? new Quaternion()));
-  return {
+  const places = {
     // SAFETY: the entries hold each bone of the body one time: each bone of STUDIO_BONES with a
     // head.
     heads: Object.fromEntries(
@@ -849,6 +850,8 @@ function stancePlaces(
         }
       : null,
   };
+  // With the mouth of the bind pose, the mouthpiece of the standing pig hornist was below its chin.
+  return body.mouth ? { ...places, mouth: moved('head', body.mouth) } : places;
 }
 
 /**
