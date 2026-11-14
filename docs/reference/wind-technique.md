@@ -558,9 +558,9 @@ The app follows these facts:
   the valve tops, and the left paw grips the main branch at its back left side, with the back of
   the paw out to the left and the finger tips on the branch (`gripShiftL`, `aimSide`). The branch is
   about 15 cm wide, so the paw does not close around it. Both elbows point down and out, away from the rib cage. The bell stands at the
-  left of the head, with the eye and the cheek free (`play`, `TUBA_BELL_LEAN`). At rest, the tuba
-  stays on the body: its top turns forward about its bottom bow, the bottom bow rests against the
-  belly, and the mouthpiece leaves the lips (`rest`, `restShift`). The rim rests on the lips with its top on the upper lip, and the lead
+  left of the head, with the eye and the cheek free, and the tuba stands upright in front of the
+  round belly (`play`, `TUBA_BELL_LEAN`). At rest, the tuba stays on the body: its top turns
+  forward about its bottom bow, and the mouthpiece leaves the lips (`rest`, `restShift`). The rim rests on the lips with its top on the upper lip, and the lead
   pipe starts at the end of the mouthpiece shank, in front of the chin (`lipShift`, `tuba()` of
   `src/models/instruments/brass.ts`).
 - **The size rule of the winds (2.1, 2.4, 3).** A recast trumpeter, clarinetist, or flutist plays

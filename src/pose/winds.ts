@@ -1279,26 +1279,26 @@ const MONKEY_TRUMPET = {
  * The tuba hold of the rhino (design 5.3), the hold of a real tubist who stands with the tuba on a
  * strap (`docs/reference/wind-technique.md` 3): the tuba stands against the body, the bell at the
  * left of the head, the left paw on the main branch, and the right paw on the valves. The long
- * muzzle puts the mouthpiece 0.51 m in front of the shoulder joints, so the lead pipe of the tuba
+ * muzzle puts the mouthpiece 0.56 m in front of the shoulder joints, so the lead pipe of the tuba
  * is longer (`SpeciesParams.tubaPipe`), the right shoulder turns 45° forward, and the left shoulder
  * 40°, as the shoulder blades of a real player slide forward. The lower end of the tuba turns 25°
- * to the right, so that the bell stands at the left of the horn on the muzzle, and 7° forward, so
- * that the body of the tuba stays off the round belly and the valves stay in front of the paws.
- * With 4°, faces of the right elbow fold in the play (arm gate folds 5, base 1), and with no
- * forward turn, the tuba goes 1.5 cm into the belly. The elbows point down and out, a little more
- * down than out (`poleL`, `poleR`, `restPoleL`, `restPoleR`), as the arms of a real player stay
- * away from the rib cage (`docs/reference/wind-technique.md` 1.8) and each forearm stays in its
- * range of turn. With the palms on their tubes, the elbows out turn the left forearm 84° and the
- * right forearm 57° from neutral, near the end of the turn of a real forearm, and the skin of each
- * forearm twists. With these elbows, the left forearm turns 67° and the right forearm 15°. With the
- * elbows straight down, the thick upper arms go into the round belly. At rest, the tuba stays on
- * the body, as the tuba of a real player on a strap. Its top turns 15° forward about its bottom
- * bow (`rest`), so that the mouthpiece leaves the lips by about 10 cm, to the front and below the
- * mouth, as a real player takes the tuba off the mouth between two entrances. The tuba also moves
- * 9 cm back, so that its bottom bow rests against the belly (`restShift`). With a move of 0.25 H
- * down and 0.12 H forward, the tuba hung in the air in front of the belly, with straight arms.
- * With the small move of {@link WIND_HOLDS}, the mouthpiece stayed on the lips, and the rest
- * looked the same as the play.
+ * to the right, so that the bell stands at the left of the horn on the muzzle. The tuba stands
+ * upright in front of the round belly (`play`). With its lower end turned 7° forward, the bottom
+ * bow stood farther from the belly, and the left paw reached its grip with 1.7 cm to spare in place
+ * of 6.2 cm (`pnpm hold-fit tubist`). The elbows point down and out, a little more down than out
+ * (`poleL`, `poleR`, `restPoleL`, `restPoleR`), as the arms of a real player stay away from the rib
+ * cage (`docs/reference/wind-technique.md` 1.8). The thick upper arms of the Tripo rhino still lie
+ * against its round belly, and the left arm goes about 5.5 cm into it at the elbow in each sample.
+ * Elbows further out (-1.2, -1, 0) changed this depth by 0.5 cm or less. The left paw of the body
+ * turns five ring steps in its rig (`assets/models/rhino/README.md`), so the left forearm twists
+ * at most 7° from the bind, and the right forearm at most 26°. At rest, the tuba stays on the
+ * body, as the tuba of a real player on a strap. Its top turns 8° forward about its bottom bow
+ * (`rest`), so that the mouthpiece leaves the lips, to the front and below the mouth, as a real
+ * player takes the tuba off the mouth between two entrances. The tuba also moves 0.1 H back and
+ * 0.04 H down (`restShift`), so that each paw reaches its grip at rest with 6.5 cm (left) and 3.7
+ * cm (right) to spare. With 0.26 H back, the right paw missed its grip by 3.9 cm, and the left
+ * claws went 4.7 cm into the tuba. With the small move of {@link WIND_HOLDS}, the mouthpiece
+ * stayed on the lips, and the rest looked the same as the play.
  *
  * The right palm faces the valve tops, and the left palm faces the main branch (`faceTube`,
  * `InstrumentGrips.tubeL` of `models/instruments/brass.ts`), as the left hand of a real tubist
@@ -1314,16 +1314,14 @@ const MONKEY_TRUMPET = {
  * the near side of the branch, the finger tips stood 1.9 cm off it, and the paw went 2.1 cm into
  * it. With 0.03 H toward the shoulder or 0.09 H, the tips stood 0.7 cm off the branch. The branch
  * is about 15 cm wide at the grip, so no paw closes around it. The left paw keeps the grip of the
- * play at rest, so that its finger tips touch the branch in the lift and the rest. At rest, the
- * left paw goes 1.3 cm into the branch (`pnpm body-clip tubist`), and each paw reaches its grip
- * with 9.0 cm (left) and 6.0 cm (right) to spare. Both paws keep the aim and the
- * roll of the play at rest (`restAim`): with the roll of the shoulder at rest, the left paw flips
- * in the lowering (the wrist turns 17960° each second). The right fingers curl 80°. The right grip
- * moves 0.15 H along the row of the valves toward the front and 0.1 H toward the right shoulder
- * (`gripShiftR`), so that the right paw lies on the valve tops at the front right of the valve
- * branch, where it shows from the front and from the right front. On the grip of the instrument,
- * the valve branch hides it from both views. A grip further forward is out of the reach of the arm.
- * The mouthpiece rim rests on the lips, as the rim of a real tubist
+ * play at rest, so that its finger tips touch the branch in the lift and the rest. Both paws keep
+ * the aim and the roll of the play at rest (`restAim`): with the roll of the shoulder at rest, the
+ * left paw flips in the lowering (the wrist turns 17960° each second). The right fingers curl 80°.
+ * The right grip moves 0.15 H along the row of the valves toward the front and 0.1 H toward the
+ * right shoulder (`gripShiftR`), so that the right paw lies on the valve tops at the front right
+ * of the valve branch, where it shows from the front and from the right front. On the grip of the
+ * instrument, the valve branch hides it from both views. The mouthpiece rim rests on the lips, as
+ * the rim of a real tubist
  * (`docs/reference/wind-technique.md` 3): it moves 0.013 H up and 0.022 H back from the mouth of
  * the body (`lipShift`), so that its top lies on the upper lip and the rim presses the lips 0.2 cm.
  */
@@ -1331,11 +1329,11 @@ const RHINO_TUBA = {
   ...WIND_HOLDS.tuba,
   reach: 45 * MathUtils.DEG2RAD,
   reachL: 40 * MathUtils.DEG2RAD,
-  play: holdTurn(7, 25),
+  play: holdTurn(0, 25),
   poleL: [-0.75, -1, 0],
   poleR: [0.75, -1, 0],
   rest: holdTurn(-8, 25),
-  restShift: [0, -0.04, -0.26],
+  restShift: [0, -0.04, -0.1],
   restPoleL: [-0.75, -1, 0],
   restPoleR: [0.75, -1, 0],
   faceTube: ['palm', 'palm'],

@@ -352,8 +352,9 @@ The rest of each family:
   thighs. So these instruments stay in front of the belly. The pig lowers the horn in front of
   its belly, with the bell beside the right thigh and the mouthpiece below the chin
   (`HORN_REST_TURN`), as a hornist rests the horn on the lap with the bell to the right (winds
-  2.2). The tuba of the rhino stays on its body: its top turns forward about its bottom bow, and
-  the bottom bow rests against the belly (`RHINO_TUBA`). Reason: with a move down and forward,
+  2.2). The tuba of the rhino stands upright in front of its round belly in the play, and stays
+  on its body at rest: its top turns forward about its bottom bow, and it moves a little back and
+  down, so that each paw keeps its grip (`RHINO_TUBA`). Reason: with a move down and forward,
   the tuba hung in the air. The beaver lowers the bassoon across its belly, flatter
   than in the play, with the reed to the left below the chin (`BEAVER_BASSOON`). Reason: its short
   arms reach no lower rest with both paws on the bassoon, and with the right paw alone on the
