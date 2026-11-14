@@ -470,10 +470,10 @@ The app follows these facts:
 - **The seated rest and the lift (2.9).** The instrument stands upright on the left thigh, and the
   left paw holds the neck. In the lift, the instrument turns with the paw the short way: the
   scroll stays up, and the body swings in and up to the jaw (`carryLift()`,
-  `BowedHold.liftPoleL`). The viola of the cat stands on the thigh in front of the chest, and the
-  left elbow keeps a bend on the way. The viola leads on a via, and the paw follows it
-  (`BowedHold.carryVia`): the scroll swings up and to the left with the strings to the front,
-  then the top plate turns up to the jaw. Thus the scroll never swings in toward the chest.
+  `BowedHold.liftPoleL`). The cat rests and lifts its viola as the red fox does its violin: the
+  paw carries the upright viola out and forward with the elbow bent, and the viola tips onto the
+  shoulder at the end of the lift. Thus the scroll never swings in toward the chest, and the arm
+  does not roll.
 
 The app does not follow these facts:
 

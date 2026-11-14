@@ -310,11 +310,13 @@ The rest of each family:
   swings in and up to the jaw. The elbow in the middle of the move (`BowedHold.liftPoleL`) sets
   the way, because the paw supinates on the arm, and the frame of the arm turns with the elbow. An
   instrument can lead on a via (`BowedHold.carryVia`): it turns near a middle turn, and the paw
-  follows it by its grip. The viola of the cat has a via, with its lift elbow up and in. Reason:
-  its paw holds the neck in front of the chest along a nearly upright forearm, so with no via, the
-  supination swung the scroll in toward the chest and around through the front. A rest turn near
-  180° from the play makes the short arc unclear, so the rest turn of a carried instrument stays
-  well below 180° (`CAT_HOLD.rest`). `pnpm carry-check` gives the detour of each move from the short arc. A
+  follows it by its grip. No hold has a via. The cat rests and lifts its viola as the red fox
+  rests and lifts its violin: the top plate to the front, the left elbow out and back, and the paw
+  turned on the neck (`BowedHold.restYawL`). The paw carries the upright instrument out and
+  forward, and it tips onto the shoulder at the end of the lift. Reason: with the paw in front of
+  the chest and the top plate to the left, the supination swung the scroll in toward the chest and
+  around through the front, and a via that kept the scroll up rolled the whole upper arm a full
+  turn. `pnpm carry-check` gives the detour of each move from the short arc. A
   standing player hangs the bow with the tip down (`HANGING_BOW`). In the shared violin hold and
   the hold of the rabbit, the arms at rest hang out to the sides until they clear the body, with a forward swing and an elbow
   bend of each arm (`BowedHold.restArms`, `hangingArm()`). The left paw holds the upright violin at
