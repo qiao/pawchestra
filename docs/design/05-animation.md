@@ -322,7 +322,10 @@ The rest of each family:
   the end of the reach, the arm locked straight down to the neck, and the paw bent about 60° off
   the forearm over the neck. Its bow tip turns to the left below the snout in a move
   (`FOX_HOLD.restBow.via`), so that the bow does not cross the snout. The grip also moves out and to the front in the move, and
-  the elbows keep a bend ("Bent elbows in the moves").
+  the elbows keep a bend ("Bent elbows in the moves"). A hold can lift the head at rest
+  (`BowedHold.restHeadLift`). The cat keeps the head lift of its play at rest. Reason: from the
+  height of the stage camera, the brow of the cat hid the top of each eye, and the face read as
+  angry.
 - **Cello and contrabass.** The instrument stays at its playing place. The dog holds the bow over
   the right knee with the tip up, as a cellist does. Its grip lies low and out, and both elbows
   point out, so that the round upper arms stay off the chest (5.3, "Free round arms"). The hippo

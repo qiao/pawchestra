@@ -225,6 +225,12 @@ export interface BowedHold {
    */
   readonly headDrop: number;
   /**
+   * The lift of the head in the rest pose, in radians, or none for the head of the bind pose
+   * (design 5.2). A head whose brow hides the top of the eyes from the height of the stage camera
+   * lifts at rest, as a seated player looks up at the conductor.
+   */
+  readonly restHeadLift?: number;
+  /**
    * The turn of the head to the left around the neck while the player plays, in radians, as a
    * violinist turns the head to the left over the chin rest (`docs/reference/string-technique.md`,
    * section 1.10). A long snout then points over the neck of the violin and away from the bow paw
@@ -1182,7 +1188,9 @@ export const BOWED_HOLDS = {
  * jaw: from the height of the stage camera, 40° above the floor, the brow hid the top of each eye
  * with a lift of 5°, and the face read as angry. With the lift of 12°, the stick also keeps 2 cm
  * or more off the left cheek in each play sample of `mozart-k525` and `bach-bwv1048`. With a lift
- * of 15°, the cat looked up over the viola. The left
+ * of 15°, the cat looked up over the viola. At rest, the head keeps the lift of 12°
+ * (`restHeadLift`), so that the eyes show from the stage camera, and the head does not nod
+ * between the rest and the play. The left
  * shoulder bone turns 25° forward in the play (`reachL`), so that the left paw reaches the
  * fingerboard from 0.52 of its length (0.20 with the viola under the middle of the jaw): with 35°
  * and the viola tilted 5°, the back of the left arm
@@ -1362,6 +1370,7 @@ const CAT_HOLD = {
   playTurn: violinTurn(-25, 5, 25),
   reachL: 25 * MathUtils.DEG2RAD,
   headDrop: -12 * MathUtils.DEG2RAD,
+  restHeadLift: 12 * MathUtils.DEG2RAD,
   slant: -12 * MathUtils.DEG2RAD,
   tiltL: 25 * MathUtils.DEG2RAD,
   poleL: [-2, -0.8, -0.71],

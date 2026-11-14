@@ -576,8 +576,9 @@ function poseAnimal(
       const { bow } = scratch;
       const { hold } = note.rig;
       body.lean = hold.lean * weight;
-      // A violinist rests the jaw on the chin rest while it plays (`BowedHold.headDrop`).
-      body.lift = -hold.headDrop * weight;
+      // A violinist rests the jaw on the chin rest while it plays (`BowedHold.headDrop`). A hold
+      // can lift the head at rest (`BowedHold.restHeadLift`).
+      body.lift = -hold.headDrop * weight + (hold.restHeadLift ?? 0) * (1 - weight);
       body.headTurn = hold.headTurn * weight;
       writeBody(pose, player, scratch);
       bowStateAt(note.strokes, note.starts, noteTime, bow);
