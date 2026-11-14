@@ -1240,7 +1240,7 @@ function moveForeground(
         lens,
       );
     } else {
-      found = foregroundBody(planner.bodies, members, focus, camera, look, key.fov, aspect);
+      found = foregroundBody(planner.bodies, members, focus, camera, look, key.fov, aspect, lens);
     }
     if (found) {
       return true;

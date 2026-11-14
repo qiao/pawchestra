@@ -117,11 +117,11 @@ const FOREGROUND = {
    */
   objectShare: 0.15,
   /**
-   * The largest part of the frame that the points of the body of one other animal cover in front
-   * of the depth of the focus. The rule also holds in a dirty frame, because the lens leaves such a
-   * body almost sharp. A red fox in a sixth of the frame read as the subject of a shot of the tan
-   * fox, and a pig beside a wolf at the same depth read as the subject of a shot of the wolf. A
-   * thin strip of a body at the edge stays.
+   * The largest part of the frame that the sharp points of the body of one other animal cover: in
+   * front of the focus, or behind it with a blur disc below `dirtyBlur`. The rule also holds in a
+   * dirty frame, because the lens leaves a near body almost sharp. A red fox in a sixth of the
+   * frame read as the subject of a shot of the tan fox, and a pig beside a wolf at the same depth
+   * read as the subject of a shot of the wolf. A thin strip of a body at the edge stays.
    */
   bodyShare: 0.08,
   /** The cells on each side of the grid of the frame that measures the cover. */
@@ -487,11 +487,12 @@ const rowEnds = new Int32Array(FOREGROUND.cells);
 const rowEdges = new Uint8Array(FOREGROUND.cells);
 
 /**
- * Tells if the body of another animal covers more than 8% of the frame of a close camera in front
- * of its subject (design 5.6). The points of a body count when they are nearer to the camera than
- * the depth of the focus. Each row of a grid of 20 × 20 over the frame counts the cells from the
- * first to the last column of its points, and a row with points beyond a side edge reaches that
- * edge. The rule also holds in a dirty frame, because the lens leaves a near body almost sharp.
+ * Tells if the sharp part of the body of another animal covers more than 8% of the frame of a
+ * close camera (design 5.6). The points of a body count when they are in front of the focus, or
+ * behind it with a blur disc below {@link FOREGROUND}.dirtyBlur. A frame with no blur counts each
+ * point. Each row of a grid of 20 × 20 over the frame counts the cells from the first to the last
+ * column of its points, and a row with points beyond a side edge reaches that edge. The rule also
+ * holds in a dirty frame, because the lens leaves a near body almost sharp.
  *
  * @param bodies The bodies of the players and of the conductor.
  * @param members The owners of the subject players. Their bodies do not count.
@@ -500,6 +501,7 @@ const rowEdges = new Uint8Array(FOREGROUND.cells);
  * @param target The point that the camera looks at.
  * @param fov The vertical field of view, in degrees.
  * @param aspect The width of the frame divided by its height.
+ * @param lens The blur scale of the frame ({@link lensScale}), or 0 for a frame with no blur.
  * @returns True if a body covers too much of the frame.
  */
 export function foregroundBody(
@@ -510,15 +512,20 @@ export function foregroundBody(
   target: Vec3,
   fov: number,
   aspect: number,
+  lens: number,
 ): boolean {
   const a = cameraAxes(camera, target);
   const tanV = Math.tan(((fov / 2) * Math.PI) / 180);
   const tanH = tanV * aspect;
   const [cx, cy, cz] = camera;
-  const limit = (focus[0] - cx) * a.fx + (focus[1] - cy) * a.fy + (focus[2] - cz) * a.fz;
+  const focusDepth = (focus[0] - cx) * a.fx + (focus[1] - cy) * a.fy + (focus[2] - cz) * a.fz;
+  // Behind the focus, the blur disc `lens × (1 - focusDepth / d)` reaches the blur of a dirty frame at
+  // this depth. A nearer point is sharp.
+  const blur = FOREGROUND.dirtyBlur;
+  const limit = lens > blur ? focusDepth / (1 - blur / lens) : Infinity;
   const n = FOREGROUND.cells;
   const most = FOREGROUND.bodyShare * n * n;
-  // Tells if a sphere has a part in front of the depth limit and in the frame.
+  // Tells if a sphere has a part nearer than the depth limit and in the frame.
   const ahead = (center: Vec3, radius: number): boolean => {
     const dx = center[0] - cx;
     const dy = center[1] - cy;

@@ -188,9 +188,9 @@ The app follows these facts:
   stays in the outer fifth of the frame width (`FOREGROUND.dirtyShare`), and the dirty heads of a
   frame stay at one side. A head over the subject always counts. Thus a solo camera can stay low
   behind the heads of the front rows. The head stays almost sharp (see "The soft shoulder"
-  below), so it takes less of the frame than the third of a soft shoulder. The body of another
-  animal in front of the focus covers at most `FOREGROUND.bodyShare` of the frame, also in a
-  dirty frame, so that the eye goes to the subject.
+  below), so it takes less of the frame than the third of a soft shoulder. The sharp part of the
+  body of another animal, in front of the focus or near behind it, covers at most
+  `FOREGROUND.bodyShare` of the frame, also in a dirty frame, so that the eye goes to the subject.
 - **The distance to the animals (section 3).** Each animal in the frame of a close shot, also a
   head of a dirty frame, stays at least `ANIMAL_FLOOR` from the camera, because the low-poly
   animals show their facets and the seams of their meshes from near. A blend between two close

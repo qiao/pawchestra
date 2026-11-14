@@ -1727,10 +1727,12 @@ copy these numbers of the design:
   except the blurred head of a dirty frame.
 - No other object nearer than 0.9 of the focus depth covers more than 15% of a 20 × 20 grid,
   except the blurred boxes of a dirty frame.
-- The points of the body of no other animal in front of the focus depth cover more than
-  `FOREGROUND.bodyShare` of that grid, also in a dirty frame (`foregroundBody()`). Each row of the
-  grid counts the cells from the first to the last point of the body. A choir shot has no such
-  test, because the orchestra stands under the singers.
+- The sharp points of the body of no other animal cover more than `FOREGROUND.bodyShare` of
+  that grid, also in a dirty frame (`foregroundBody()`). A point is sharp in front of the focus,
+  and behind it while its blur disc stays below `FOREGROUND.dirtyBlur`. Thus a neighbor at the
+  depth of the subject counts too: a pig beside the wolf read as the subject of a solo of the wolf.
+  Each row of the grid counts the cells from the first to the last point of the body. A choir shot
+  has no such test, because the orchestra stands under the singers.
 - A section camera sees the face of each subject player whose head is nearer than the target:
   the line from the head to the camera turns at most `FACE_TURN` (a profile) from the front of the
   player (`Subject.faces`). A camera behind the first desk showed the back of the head of the
