@@ -455,18 +455,22 @@ function bassoonParts(piece: PieceBuilder): void {
   ] as const) {
     piece.rod(at([0, y - 0.008, z]), at([0, y + 0.008, z]), radius, TUBE_SEGMENTS, metal, 'metal');
   }
-  // The silver key rods along the front of the long joint and the boot, and the cups of the
-  // tone holes of the boot.
+  // The silver key rods along the front of the long joint and the boot, and the cups of two tone
+  // holes: one on the side of the boot, and one on the side of the wing joint. Each cup sits on
+  // the wood. At (0.03, 0.27) between the two joints, the upper cup floated 1.8 cm off both.
   for (const [x, from, to] of [
     [0.027, 0.07, 0.62],
     [0.02, 0.1, 0.78],
   ] as const) {
     piece.rod(at([x, from, -0.012]), at([x, to, -0.012]), 0.0018, ROD_SEGMENTS, metal, 'metal');
   }
-  for (const y of [0.11, 0.27]) {
+  for (const [x, y, z] of [
+    [0.03, 0.11, wing / 2],
+    [0.0205, 0.27, wing],
+  ] as const) {
     turned(
       piece,
-      at([0.03, y, wing / 2]),
+      at([x, y, z]),
       [1, 0, 0],
       [
         [0.007, 0],
