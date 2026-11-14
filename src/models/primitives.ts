@@ -95,6 +95,22 @@ export function lathe(profile: readonly ProfilePoint[], segments: number): numbe
 }
 
 /**
+ * Makes a solid of revolution around the y axis with no flat caps at its end rings: a band, such
+ * as a hoop, whose ends meet other parts. Bands that share their end rings make one closed solid,
+ * each in its own color.
+ *
+ * @param profile The profile ({@link lathe}).
+ * @param segments The number of faces around the axis.
+ * @returns 2 triangles for each segment of each profile step, less the triangles at a radius of
+ *   0.
+ */
+export function latheBand(profile: readonly ProfilePoint[], segments: number): number[] {
+  const corners = lathe(profile, segments);
+  const caps = [profile[0], profile.at(-1)].filter((p) => (p?.[0] ?? 0) > 0).length;
+  return corners.slice(0, corners.length - caps * segments * 9);
+}
+
+/**
  * Makes a closed cylinder or cone on the y axis, from y = 0 to y = `height`.
  *
  * @param bottomRadius The radius at y = 0.

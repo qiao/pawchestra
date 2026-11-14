@@ -4,7 +4,7 @@ import { toQuat, toVec3 } from '../tuples.ts';
 import type { Quat, Vec3 } from '../tuples.ts';
 import { splitByFacing, transform } from '../mesh.ts';
 import type { Finish, Rgb, Transform } from '../mesh.ts';
-import { ball, box, cylinder, icosphere, lathe, sweep } from '../primitives.ts';
+import { ball, box, cylinder, icosphere, lathe, latheBand, sweep } from '../primitives.ts';
 import type { ProfilePoint } from '../primitives.ts';
 import { PieceBuilder, hold, pieceSize, placeCorners, pointing } from './piece.ts';
 import type { PartSink } from './piece.ts';
@@ -643,21 +643,6 @@ function openBox(
 }
 
 /**
- * Makes a solid of revolution around the y axis with no flat caps at its end rings: a band, such
- * as a hoop, whose ends meet other parts.
- *
- * @param profile The profile ({@link lathe}).
- * @param segments The number of faces around the axis.
- * @returns 2 triangles for each segment of each profile step, less the triangles at a radius of
- *   0.
- */
-function band(profile: readonly ProfilePoint[], segments: number): number[] {
-  const corners = lathe(profile, segments);
-  const caps = [profile[0], profile.at(-1)].filter((p) => (p?.[0] ?? 0) > 0).length;
-  return corners.slice(0, corners.length - caps * segments * 9);
-}
-
-/**
  * Adds a flat strut from one point to another: a box with its outer face and its two sides, and
  * no ends and no inner face, which the parts at its ends and behind it hide.
  *
@@ -928,7 +913,7 @@ function addDrum(
     ],
   ];
   for (const [profile, color, finish] of steps) {
-    piece.add(band(profile, DRUM_SEGMENTS), color, at, finish);
+    piece.add(latheBand(profile, DRUM_SEGMENTS), color, at, finish);
   }
   const [lugWidth, lugLength, lugDepth] = lugs.size;
   const rodLength = depth - 2 * hoop.down;
@@ -1043,7 +1028,7 @@ function addKettle(piece: PieceBuilder, center: Vec3, r: number): void {
     ],
   ];
   for (const [profile, color, finish] of steps) {
-    piece.add(band(profile, KETTLE_SEGMENTS), color, at, finish);
+    piece.add(latheBand(profile, KETTLE_SEGMENTS), color, at, finish);
   }
   // The tension rods run from the counter hoop down outside the bowl to the base ring. Each rod
   // stands at the middle of a face of the bowl, where the bowl is nearest to the axis.
@@ -1080,7 +1065,7 @@ function addKettle(piece: PieceBuilder, center: Vec3, r: number): void {
   const inner = base.radius * head;
   // The base ring shows its outer wall and its top. Only a camera on the floor sees its bottom.
   piece.add(
-    band(
+    latheBand(
       [
         [inner + ringWidth, low - ringHeight / 2],
         [inner + ringWidth, low + ringHeight / 2],
@@ -1666,7 +1651,7 @@ interface Cymbal extends HandTool {
 function addCymbalPlate(piece: PieceBuilder, at: Vec3, scale: number): void {
   for (const [profile, color] of CYMBAL_RINGS) {
     const scaled = profile.map(([r, y]): ProfilePoint => [r * scale, y * scale]);
-    piece.add(band(scaled, CYMBAL_SEGMENTS), color, transform(at), 'metal');
+    piece.add(latheBand(scaled, CYMBAL_SEGMENTS), color, transform(at), 'metal');
   }
 }
 
@@ -1885,7 +1870,7 @@ function addTambourine(piece: PieceBuilder, at: Transform): void {
     DRUM_SEGMENTS,
   );
   piece.add(placeCorners(head, at), INSTRUMENT_COLORS.drumHead);
-  const frame = band(
+  const frame = latheBand(
     [
       [r, 0],
       [r, top],
@@ -2322,7 +2307,7 @@ function addResonator(piece: PieceBuilder, key: number, top: Vec3): void {
   const length = f.sound / (4 * pitch);
   const mouth = top[1] - 0.02 - f.gap;
   piece.add(
-    band(
+    latheBand(
       [
         [f.tube, mouth - length],
         [f.tube, mouth],
