@@ -397,6 +397,12 @@ The rest of each family:
   (`restAim`), and the left paw slides down its tubes (`restGripShiftL`). Reason: with a rest grip
   of its own, the right hand turned about 180° from the rest to the play, and each mix of the move
   turned the right paw past 180° on its forearm. The elbows point out and down.
+  The monkey trumpeter rests from its hanging arms with square shoulders (`MONKEY_TRUMPET`): the
+  trumpet hangs from the right paw in front of the right thigh with its bell down, and the left
+  paw leaves the valves and hangs beside the body, as a player holds the trumpet in one hand
+  between two entrances. Reason: with both paws on the trumpet in front of the belly, the upper
+  arms stood out to the side and the forearms crossed the chest, and with both paws at the
+  hanging arms, the elbows went into the belly.
 - **Piano and harp.** The polar bear sits tall with a small lean to the piano and the head up, as
   a pianist before a performance (`restLean`). The paws rest on the front of the belly with the
   palms back, because the belly covers the thighs and the thighs lie out of the reach of the arms.
