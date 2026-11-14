@@ -61,6 +61,18 @@ const HANG = {
   step: 1 * MathUtils.DEG2RAD,
 } as const;
 
+/**
+ * The angles of the free left arm of the bass drum player at rest (design 5.2): it hangs relaxed
+ * at the side, with a small bend of the elbow. The spine of the player leans 13° over the drum
+ * (`PercussionHold.lean`), and the shoulder bone carries the lean, so the upper arm swings forward
+ * by {@link HANG} less the lean. With {@link HANG}, the forearm stood level and forward, and the
+ * open paw stayed in the air beside the hoop.
+ */
+export const FREE_HANG: HangAngles = {
+  forward: 7 * MathUtils.DEG2RAD,
+  bend: 20 * MathUtils.DEG2RAD,
+};
+
 /** The parts of the body that a hanging arm keeps clear of. */
 const BODY: readonly BoneName[] = ['hips', 'spine', 'chest', 'thighL', 'thighR', 'shinL', 'shinR'];
 

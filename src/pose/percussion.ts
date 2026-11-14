@@ -1450,14 +1450,18 @@ function poseHand(
     );
   }
   // A paw goes to its place at a damp of its hand (`PalmDamp`, `EdgeDamp`) while the player
-  // plays. The free paw else hangs.
+  // plays. The free paw else rests on the instrument while the player plays, or hangs.
   const index = left ? 0 : 1;
   const damped = rig.dampHands[index];
   // The muffle of the timpani does not follow the lift and the lowering: the paws of the ready
   // hold stay at the kettles, and a muffle that grew with the lift turned a paw 540° each second.
   const steady = rig.hold.damp?.kind === 'fingers' ? 1 : weight;
   const muffle = damped && state.damp.key === index ? state.damp.weight * steady : 0;
-  const play = side.kind === 'free' ? muffle : rig.hold.ready ? 1 : weight;
+  // The free paw on the instrument goes there in the lift, also in a ready hold, and hangs at rest.
+  let play = rig.hold.ready ? 1 : weight;
+  if (side.kind === 'free') {
+    play = side.steady ? weight : muffle;
+  }
 
   head.fromArray(hand.point);
   turnedPole.fromArray(pole).applyQuaternion(chest.rotation);
@@ -1524,6 +1528,14 @@ function poseHand(
   } else if (side.kind === 'hold') {
     wrist.fromArray(side.wrist);
     turn.fromArray(side.hand);
+  } else if (side.kind === 'free' && side.steady) {
+    // The free paw goes from its rest on the hoop to the far head at a damp.
+    wrist.fromArray(side.steady.wrist);
+    turn.fromArray(side.steady.hand);
+    if (damped?.kind === 'palm' && muffle > 0) {
+      wrist.lerp(offset.fromArray(damped.wrist), muffle);
+      turn.slerp(swing.fromArray(damped.hand), muffle);
+    }
   } else if (damped?.kind === 'palm') {
     wrist.fromArray(damped.wrist);
     turn.fromArray(damped.hand);

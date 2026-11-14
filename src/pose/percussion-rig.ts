@@ -23,7 +23,7 @@ import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
 import { X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import type { InstrumentOf } from './family.ts';
-import { hangingArm } from './hang.ts';
+import { FREE_HANG, hangingArm } from './hang.ts';
 import type { HangingArm } from './hang.ts';
 import { trunkFront } from './cello-place.ts';
 import { armRig, solveTwoBone } from './ik.ts';
@@ -415,6 +415,20 @@ interface DrumFit {
 }
 
 /**
+ * The free left paw of the bass drum player while it plays (design 5.3), in the terms of
+ * {@link PalmDamp}: the palm lies on the near top of the hoop of the far head, and the fingers
+ * reach over the hoop onto the head, as a real player steadies the drum with the free hand. At a
+ * damp, the paw goes from there to the far head (`PalmDamp`). The claws touch the hoop, at most
+ * 1.3 cm into it (limit 1.5 cm), and the paw bends 18° on the forearm at p95
+ * (`pnpm hold-fit bass-drummer`).
+ */
+const HOOP_PAW = {
+  wrist: [0.25, 0.55, 0.83],
+  fingers: 0.5,
+  yaw: 0.65,
+} as const satisfies Pick<PalmDamp, 'wrist' | 'fingers' | 'yaw'>;
+
+/**
  * The elbows of a percussion player point down and out. A hold turns them nearer to the body
  * where the arms permit (design 5.3).
  */
@@ -546,8 +560,10 @@ export const PERCUSSION_HOLDS = {
   // rim with the longer beater, and the arm stretches to 0.84 of its length. With a spot 12 cm
   // from the middle, the upper arm slanted 33° back, and with 6 cm, the arm stretched to 0.88. The
   // paw holds the beater at the drum and the spine keeps its lean also at rest
-  // (ready). The left arm hangs while the badger plays, because a single note often needs no
-  // muffling. In a rest after a note, the left palm lies on the near part of the far head (damp),
+  // (ready). While the badger plays, the free left paw rests on the near top of the hoop of the
+  // far head (`HOOP_PAW`), as a real player steadies the drum with the free hand, and at rest the
+  // left arm hangs relaxed at the side (`FREE_HANG`). A single note often needs no muffling. In a
+  // rest after a note, the left palm lies on the near part of the far head (damp),
   // and the upper body turns 26° so that the left shoulder comes forward: with 20°, the left
   // forearm of the Tripo badger went 2.2 cm into the belly at the drum place of now plus 2 cm to
   // the right. With no turn, the left upper arm of the old badger went 4.8 cm into the body, and
@@ -1108,7 +1124,8 @@ export const TAMBOURINE_HOLD = {
  * - `mallet`: the hand strikes with the head of a mallet, a stick, or a beater.
  * - `plate`: the hand holds a cymbal. Its inner face moves along the normal of the crash.
  * - `hold`: the hand keeps one place: the left hand with the triangle.
- * - `free`: the arm hangs, as the left arm of the bass drum player.
+ * - `free`: the hand holds no instrument, as the left hand of the bass drum player. It rests on
+ *   the instrument while the player plays, or the arm hangs.
  */
 export type PercussionSide =
   | {
@@ -1164,7 +1181,23 @@ export type PercussionSide =
        */
       readonly piece: Quat;
     }
-  | { readonly kind: 'free'; readonly arm: ArmRig };
+  | {
+      readonly kind: 'free';
+      readonly arm: ArmRig;
+      /**
+       * The paw on the instrument while the player plays, or `null` for an arm that hangs also
+       * while the player plays.
+       */
+      readonly steady: PawPlace | null;
+    };
+
+/** A place of a paw: its wrist and its rotation. */
+export interface PawPlace {
+  /** The wrist, in the model axes. */
+  readonly wrist: Vec3;
+  /** The world rotation of the hand from the bind pose. */
+  readonly hand: Quat;
+}
 
 /** The points of a percussion player in the bind pose that the pose needs. */
 export interface PercussionRig {
@@ -1691,7 +1724,10 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
         findTarget(model, (t) => t.kind === 'head'),
       );
       targets.set(0, head);
-      sides = [{ kind: 'free', arm: left }, mallet(right, 'malletR')];
+      sides = [
+        { kind: 'free', arm: left, steady: palmOnFarHead(head, HOOP_PAW, h) },
+        mallet(right, 'malletR'),
+      ];
       if (hold.damp?.kind === 'palm') {
         dampHands = [palmOnFarHead(head, hold.damp, h), null];
       }
@@ -1845,7 +1881,7 @@ export function percussionRig(model: PlayerModel, instrument: PercussionInstrume
     targets,
     restL: offsetTarget(restL, hold.offsetL),
     restR: offsetTarget(restR, hold.offsetR),
-    hangL: hangingArm(model, left),
+    hangL: hangingArm(model, left, sides[0].kind === 'free' ? FREE_HANG : undefined),
     hangR: hangingArm(model, right),
     legs: hold.side ? plantedLegs(model) : null,
     lever: left.bind.shoulder[1] - (model.skeleton.positions[boneIndex('spine')]?.[1] ?? 0),
@@ -1983,7 +2019,11 @@ function headAxes(normal: Vec3): readonly [normal: Vector3, up: Vector3, toward:
  * @param h The head height `H` of the body, in meters: the unit of `rule.wrist`.
  * @returns The wrist and the rotation of the hand from the bind pose.
  */
-function palmOnFarHead(near: StrikeTarget, rule: PalmDamp, h: number): DampHand {
+function palmOnFarHead(
+  near: StrikeTarget,
+  rule: Pick<PalmDamp, 'wrist' | 'fingers' | 'yaw'>,
+  h: number,
+): Extract<DampHand, { kind: 'palm' }> {
   const [n, up, toward] = headAxes(near.normal);
   const middle = new Vector3(...near.point).addScaledVector(n, -BASS_DRUM.depth);
   const wrist = middle
