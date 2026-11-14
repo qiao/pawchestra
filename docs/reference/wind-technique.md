@@ -378,14 +378,14 @@ The panda plays with `PANDA_TROMBONE` and `PANDA_PLAY`. The trombone is `trombon
 
 The app follows these facts:
 
-- **The grips (1.1).** The left paw holds the weight, with the palm on the inner slide tubes near
-  the mouthpiece brace (`faceTube`, `gripShiftL`). The right paw closes around the slide brace from
-  the right, with the palm to the left and a little toward the player, and the thumb up the brace.
+- **The grips (1.1).** The left paw holds the weight, with the palm on the inner slide tubes at
+  the hand brace, a hand width in front of the mouth (`faceTube`, `gripShiftL`,
+  `TROMBONE_HAND_BRACE`), so the mouthpiece and its receiver show between the lips and the paw.
+  The right paw closes around the slide brace from the right, with the palm to the left and a
+  little toward the player, and the thumb up the brace.
   Its middle lies just below the lower slide tube, so the brace and the two slide tubes go through
   the closed paw, as two fingers of a real player go beneath the lower tube [61] (`gripShiftR`,
-  `aimSide`). The left grip lies a little away from the
-  mouthpiece, so that the left forearm stays out of the head (`gripShiftL`). Both paws keep this
-  hold at rest (`restAim`).
+  `aimSide`). Both paws keep this hold at rest (`restAim`).
 - **The left arm (1.1).** The left elbow points down, forward, and a little out (`reachL`,
   `poleL`).
 - **The elbows (1.8).** The elbows stay away from the sides, so that the free round arms stay out
@@ -397,9 +397,8 @@ The app follows these facts:
   16° forward of the vertical, as a seated player holds the slide vertical in front of the knee
   [70]. The top of the instrument stays below the mouth, and the slide end and the bell stay off
   the floor [6] [70] (`rest`, `restShift`). Both paws keep the grip of the play on the instrument
-  (`restAim`), and the left paw slides down the inner slide tubes, away from the
-  mouthpiece, and a little toward the left shoulder, so that its finger tips stay on the tubes
-  (`restGripShiftL`).
+  (`restAim`), and the left paw moves a little toward the left shoulder, so that its finger tips
+  stay on the tubes (`restGripShiftL`).
 - **The head (1.1).** The head stays square and upright at the mouthpiece (`headTurn`).
 - **The mouthpiece (1.1).** The rim rests on the lips, with its middle 0.5 cm below the crease
   between the lips, and presses the lips 0.2 cm (`lipShift`).
@@ -529,8 +528,9 @@ The app follows these facts:
   below the face. The horn lies across the body: the lead pipe goes from the mouthpiece along the
   hoop, the coil stands in front of the right side of the chest with its top at the height of the
   chin, and the bell opens back and to the right, beside the right side of the belly, off the leg
-  (`HORN`, `HORN_PLANE` of `src/models/instruments/brass.ts`). The right hoof lies in the bell
-  near its axis and points into the bell (`HORN.palm`, `aimAcross`). The mouthpiece rests on the
+  (`HORN`, `HORN_PLANE` of `src/models/instruments/brass.ts`). The left hoof lies beside the
+  valve casings with its toes on the levers (`gripShiftL`). The right hoof lies in the bell near its
+  axis and points into the bell (`HORN.palm`, `aimAcross`). The mouthpiece rests on the
   lips under the snout disc, at the mouth line of the body (`mouthHeight`, design 4.4). The Tripo
   pig has short arms, so the form of the horn puts the valves and the bell in their reach. The
   valves follow the double horn chart, with the B♭ side above the written G4 (7.3,
@@ -546,15 +546,18 @@ The app follows these facts:
   their hold (`restAim`).
 - **The trumpet (2.1, `MONKEY_TRUMPET`).** The right paw presses the valves, and the left paw
   holds the trumpet around the upright casings (`faceTube`). The right palm lies above the valves
-  and faces down, with the fingers arched down onto them (`gripShiftR`, `aimSide`). The trumpet
-  points straight ahead and "slightly down" [19]: the line from the mouthpiece to the bell points
-  about 10° below the level (`play`). The big head puts the mouth of the Tripo monkey farther
+  and faces down, with the fingers arched down onto them (`gripShiftR`, `aimSide`). The right paw
+  points up along its forearm and a part of the way across the valves, so that the right wrist
+  stays nearly straight, as the wrists of a brass player stay in line with the arms (1.1). The
+  trumpet points straight ahead and "slightly down" [19]: the line from the mouthpiece to the bell
+  points about 10° below the level (`play`). The big head puts the mouth of the Tripo monkey farther
   than its arm from the shoulders. Thus the monkey plays a smaller trumpet
   (`SpeciesParams.trumpetScale`), both shoulders turn forward (`reach`, `reachL`), and the head
   bows a little on the chest, with the trumpet (`farMouth`), so that the trumpet keeps its angle
   to the face [22]. The spine turns 5° back in the play (`lean`), so the head stays upright, about
-  1° from the vertical, as a player stands erect with the head up (1.8). At rest, the trumpet
-  stays in front of the belly with the elbows a little bent (`restShift`). The valves follow the
+  1° from the vertical, as a player stands erect with the head up (1.8). At rest, the arms hang
+  from square shoulders, and the trumpet hangs from the right paw in front of the right thigh,
+  with the left paw free (`restArms`, `restFreeL`). The valves follow the
   trumpet chart (7.3). The rim presses the lips 0.2 cm (`lipShift`). The monkey stands erect with
   the shoulders over the hips (1.8).
 - **The tuba (3, `RHINO_TUBA`).** The rhino stands, and the tuba stands against its body, so the
@@ -649,8 +652,8 @@ The app does not follow these facts:
 - **The trumpet size and rest (2.1).** The monkey plays a trumpet of 0.75 of the trumpet of the
   app, 0.31 m long, between a pocket trumpet and the standard trumpet of the app. With the
   trumpet of the app, its paws reach the valves only with the trumpet 27° below the level. No
-  source gives the rest. At rest, the trumpet turns down in front of the belly (`restShift`), and
-  both paws keep the hold of the play (`restAim`, `restGripShiftL`).
+  source gives the rest. At rest, the trumpet hangs from the right paw, which keeps the hold of
+  the play (`restArms`, `restAim`).
 - **The trumpet from the front (2.1).** The right paw lies on the valves, and its top is above
   the mouthpiece, so in the view from the front, it covers the mouth.
 - **The tuba (3).** The app draws no strap. The lead pipe is longer (`SpeciesParams.tubaPipe`),
