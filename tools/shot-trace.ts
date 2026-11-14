@@ -149,6 +149,7 @@ const REFUSAL_TEXTS: Readonly<Record<CameraRefusal, string>> = {
   look: 'look to the other side',
   jump: 'jump cut',
   repeat: 'repeat of the last framing',
+  turned: 'back of a near player',
   head: 'head in the foreground',
   near: 'animal too near',
   beamEdge: 'beam edge at the start',

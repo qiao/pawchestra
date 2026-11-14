@@ -180,6 +180,9 @@ The app follows these facts:
   group (a group-shot of five or six players or more). The eyes and the look of these players set
   the headroom and the look room. A head of another player in front of the group counts in the
   foreground rule, and the side camera stays low (`KEY_SEARCH.sideCeiling`).
+- **The faces of a section (sections 3 and 5).** The remote cameras film the players from the
+  hall, so a section shot sees the face of each player in front of its target, at most in profile
+  (`FACE_TURN`). A camera behind the first desk showed the back of the nearest head.
 - **The dirty frame (section 3).** A near head or a near box of another object that the depth of
   field blurs can stand at one side edge of a close shot (`FOREGROUND.dirtyBlur`). Its inner edge
   stays in the outer fifth of the frame width (`FOREGROUND.dirtyShare`), and the dirty heads of a

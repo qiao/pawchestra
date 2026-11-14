@@ -183,6 +183,14 @@ export interface StageSubjects {
   readonly soloist: number | null;
 }
 
+/** The head of a subject player and the direction that it faces, for the face rule. */
+export interface SubjectFace {
+  /** The middle of the head in the bind pose. */
+  readonly head: Vec3;
+  /** The azimuth of the front of the player. */
+  readonly front: number;
+}
+
 /** The subject of a shot: the target, the extent that the frame holds, and the front. */
 export interface Subject {
   /** The point that the camera looks at. */
@@ -230,6 +238,12 @@ export interface Subject {
    * filled a third of a solo of the soloist.
    */
   readonly outside: readonly Vec3[];
+  /**
+   * The faces of the players of a section shot that a close camera must see (design 5.6). The
+   * other subjects and the pianists have none, because the camera of a piano shot stands at the
+   * side of the keys.
+   */
+  readonly faces: readonly SubjectFace[];
   /**
    * The chests of the singers of a choir subject, or none for the other subjects. A head of
    * another player under them on the screen does not cover a singer (design 5.6).
@@ -895,6 +909,7 @@ export function soloSubject(subjects: StageSubjects, seatIndex: number): Subject
       seatIndex === subjects.soloist && subjects.conductor
         ? [subjects.conductor.body, subjects.conductor.feet]
         : [],
+    faces: [],
     floor: [],
     ...extentOf([principal], target),
   };
@@ -961,6 +976,11 @@ export function sectionSubject(
   const piano = kept.every((seat) => subjects.seats[seat]?.group === 'piano');
   const choir = kept.every((seat) => subjects.seats[seat]?.group === 'choir');
   const members = choir ? playersOf(kept) : players;
+  const pianists = new Set(
+    playersOf(kept.filter((seat) => subjects.seats[seat]?.group === 'piano')).map(
+      (p) => p.sights.owner,
+    ),
+  );
   return {
     target: sphere.target,
     front: piano ? meanFront(players) + KEYBOARD_VIEW.turn : meanFront(players),
@@ -976,6 +996,9 @@ export function sectionSubject(
     members: members.map((p) => p.sights.owner),
     focus: sphere.target,
     outside: [],
+    faces: players
+      .filter((p) => !pianists.has(p.sights.owner))
+      .map((p) => ({ head: p.sights.head, front: p.front })),
     floor: choir ? players.map((p) => p.chest) : [],
     ...extentOf(players, sphere.target),
   };
@@ -1008,6 +1031,7 @@ export function conductorCloseSubject(conductor: ConductorSubjects): Subject {
     members: [CONDUCTOR_OWNER],
     focus: head,
     outside: [],
+    faces: [],
     floor: [],
     outline: conductor.outline,
     reach: 0,
@@ -1061,6 +1085,7 @@ export function conductorBackSubject(
     members: subjects.heads.map((h) => h.owner),
     focus: target,
     outside: [],
+    faces: [],
     floor: [],
     outline: [target],
     reach: SUBJECT_SIZES.conductorBackRadius * subjects.stageSide,
@@ -1157,6 +1182,7 @@ export function sideSubject(
     members,
     focus: target,
     outside: [],
+    faces: [],
     floor: [],
     // The frame holds the heads and the hands of the players in the sphere, and it cuts the rest.
     ...extentOf(framed, target),

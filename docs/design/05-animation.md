@@ -1731,6 +1731,11 @@ copy these numbers of the design:
   `FOREGROUND.bodyShare` of that grid, also in a dirty frame (`foregroundBody()`). Each row of the
   grid counts the cells from the first to the last point of the body. A choir shot has no such
   test, because the orchestra stands under the singers.
+- A section camera sees the face of each subject player whose head is nearer than the target:
+  the line from the head to the camera turns at most `FACE_TURN` (a profile) from the front of the
+  player (`Subject.faces`). A camera behind the first desk showed the back of the head of the
+  nearest player in the middle of the frame. The pianists do not count, because the camera of a
+  piano shot stands at the side of the keys.
 - A solo of the soloist keeps the middle of the body and the feet of the bear out of the frame
   (`Subject.outside`), because the soloist stands beside the podium (3.8). With the middle of the
   body alone, the legs of the bear and the podium filled a third of the frame.

@@ -335,6 +335,13 @@ const KEY_SEARCH = {
   bandMargin: 1,
 } as const;
 
+/**
+ * The largest angle between the front of a near player of a section shot and the line from its
+ * head to the camera (design 5.6): a profile. A section camera behind the first desk showed the
+ * back of the head of the nearest player in the middle of the frame.
+ */
+const FACE_TURN = 90 * DEG;
+
 /** The samples of a move that the planner tests, as parts of the move. */
 const MOVE_SAMPLES = [0, 0.25, 0.5, 0.75, 1] as const;
 
@@ -1243,6 +1250,34 @@ function moveForeground(
 }
 
 /**
+ * Tells if a near player of a section turns its back to the camera of a close move, at its start
+ * or at its end (design 5.6). A player is near when its head is nearer to the camera than the
+ * target. Its face shows when the line from its head to the camera turns at most
+ * {@link FACE_TURN} from its front.
+ *
+ * @param planner The planner.
+ * @param move The cameras of the move.
+ * @returns True if a near player shows the back of its head.
+ */
+function moveTurned(planner: Planner, move: ComposedMove): boolean {
+  const { faces, target } = move.subject;
+  if (faces.length === 0) {
+    return false;
+  }
+  for (const end of ['from', 'to'] as const) {
+    const { camera } = endComposed(planner, move, end);
+    const reach = Math.hypot(target[0] - camera[0], target[1] - camera[1], target[2] - camera[2]);
+    for (const { head, front } of faces) {
+      const near = Math.hypot(head[0] - camera[0], head[1] - camera[1], head[2] - camera[2]);
+      if (near < reach && Math.abs(angleDifference(azimuthFrom(camera, head), front)) > FACE_TURN) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+/**
  * Gives the bodies near the cameras of a path, each with only its near parts. A body or a part
  * whose sphere stays farther than `ANIMAL_FLOOR` from a sphere around the cameras is far from
  * each camera of the path, so its points need no test.
@@ -1360,6 +1395,9 @@ function blendNear(
  * @returns The first test that fails, or `null` for a clear move.
  */
 function keptRefusal(planner: Planner, move: ComposedMove): KeptRefusal | null {
+  if (moveTurned(planner, move)) {
+    return 'turned';
+  }
   if (moveForeground(planner, move, 'heads')) {
     return 'head';
   }
