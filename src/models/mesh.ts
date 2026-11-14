@@ -22,8 +22,18 @@ export type Rgb = readonly [number, number, number];
  * - `string`: the strings in the open piano, as `metal`. The shader fades a string to the color
  *   of the plate below it when the string is thinner than a pixel, so the strings make no moiré
  *   (design 4.5).
+ * - `felt`: the felt and the yarn of the mallet heads, with no gloss, as `matte`. The normals
+ *   are smooth, so a round head shades as a ball and shows no facets (design 4.5).
  */
-export type Finish = 'matte' | 'varnish' | 'lacquer' | 'metal' | 'eye' | 'polish' | 'string';
+export type Finish =
+  | 'matte'
+  | 'varnish'
+  | 'lacquer'
+  | 'metal'
+  | 'eye'
+  | 'polish'
+  | 'string'
+  | 'felt';
 
 /**
  * The shading values of a finish: the roughness and the metalness, each 0 to 1 (the values of
@@ -58,6 +68,7 @@ export const FINISHES = {
   eye: { roughness: 0.16, metalness: 0, reflection: 2.2, crease: 60 },
   polish: { roughness: 0.08, metalness: 0, reflection: 1.1, crease: 60 },
   string: { roughness: 0.26, metalness: 0.6, reflection: 2.4, crease: 60 },
+  felt: { roughness: 0.9, metalness: 0, reflection: 1, crease: 60 },
 } as const satisfies Readonly<Record<Finish, FinishValues>>;
 
 /**

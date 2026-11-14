@@ -1324,6 +1324,7 @@ of three.js in the same order, so each bit stays (`FrameSkeleton` of `scene/play
 | `eye`     | The eyeballs of a hand rig.                               | The gloss of `lacquer`, and the only finish that the eye light reaches. |
 | `polish`  | The case, the lid, the desk, the legs, and the lyre of the grand piano. | A mirror gloss with a weak reflection. With the reflection of `lacquer`, the warm lamps turned the black case brown. |
 | `string`  | The strings in the open piano.                            | The values of `metal`. A string thinner than a pixel fades toward the color of the plate below it (`STRING_FADE`), because the strings made a moiré at the pixel ratio 1. The plate shows between the strings, so the area is a little darker than the true mean. |
+| `felt`    | The felt and the yarn heads of the mallets and the beater. | No gloss, as `matte`, with smooth normals. With `matte`, each face of a small round head shaded flat, and the head looked as a cut stone. |
 
 Each finish also has a factor of the reflection of the environment (`reflection`). The red
 channel of the finish table holds it, and the player shader scales the reflection by it
@@ -2108,7 +2109,8 @@ grips keep their places, so the holds and the strikes do not change with the det
 - **Mallets.** Each mallet has a look of its own (`MalletLook`): a felt ball on the timpani
   mallets and the bass drum beater, a yarn ball on the cymbal mallets, a rubber head on the
   xylophone mallets, a hickory snare stick with a taper and a bead, and a steel triangle beater
-  with a grip sleeve.
+  with a grip sleeve. The felt and the yarn heads take the finish `felt` (4.5), so that each
+  head shades round.
 
 These rules hold for the models:
 

@@ -682,11 +682,13 @@ const SHAFT = 0.0055;
  *
  * @param head The radius of the head.
  * @param headColor The color of the head.
+ * @param headFinish The finish of the head: `felt` for felt and yarn, so that the head shades
+ *   round.
  * @param segments The faces around the axis of the head. The head has half as many rings, at
  *   least 4.
  * @returns The look.
  */
-function roundMallet(head: number, headColor: Rgb, segments = 6): MalletLook {
+function roundMallet(head: number, headColor: Rgb, headFinish: Finish, segments = 6): MalletLook {
   return (piece, length, butt) => {
     piece.rod(
       [-butt, 0, 0],
@@ -700,6 +702,7 @@ function roundMallet(head: number, headColor: Rgb, segments = 6): MalletLook {
       ball(head, segments, Math.max(4, segments / 2)),
       headColor,
       transform([length, 0, 0], ALONG_X),
+      headFinish,
     );
   };
 }
@@ -1212,7 +1215,7 @@ export function buildTimpani(kettles: KettleCount): InstrumentModel {
     tilt,
     spot: t.malletSpotL,
     butt: t.malletButt,
-    look: roundMallet(0.025, INSTRUMENT_COLORS.felt, 8),
+    look: roundMallet(0.025, INSTRUMENT_COLORS.felt, 'felt', 8),
     space: 0.025,
   };
   const [left, right] = malletPair(timpaniMallet, { ...timpaniMallet, spot: t.malletSpotR });
@@ -1397,7 +1400,7 @@ export function buildBassDrum(): InstrumentModel {
     tilt: BASS_DRUM.malletTilt,
     spot: BASS_DRUM.malletSpot,
     butt: BASS_DRUM.malletButt,
-    look: roundMallet(BASS_DRUM.ball, INSTRUMENT_COLORS.felt, 8),
+    look: roundMallet(BASS_DRUM.ball, INSTRUMENT_COLORS.felt, 'felt', 8),
     space: BASS_DRUM.ball,
   });
   const instrument = piece.build('instrument', hold('floor'));
@@ -1828,7 +1831,7 @@ export function buildSuspendedCymbal(scale: number): InstrumentModel {
     tilt: c.malletTilt,
     spot: c.malletSpot,
     butt: MALLET_BUTT,
-    look: roundMallet(c.ball, INSTRUMENT_COLORS.yarn),
+    look: roundMallet(c.ball, INSTRUMENT_COLORS.yarn, 'felt'),
     space: c.ball,
   });
   const instrument = piece.build('instrument', hold('floor'));
@@ -2485,7 +2488,7 @@ export function buildXylophone(): InstrumentModel {
     tilt,
     spot: x.malletSpot,
     butt: MALLET_BUTT,
-    look: roundMallet(x.head, INSTRUMENT_COLORS.malletRubber),
+    look: roundMallet(x.head, INSTRUMENT_COLORS.malletRubber, 'matte'),
     space: x.head,
   });
   const instrument = piece.build('instrument', hold('floor'));
