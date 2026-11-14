@@ -1017,11 +1017,33 @@ passes.
 - [ ] Tripo hippo bassist: the left forearm goes 3.3 cm into the neck heel of the lower bass in
       each play sample, and the left claws touch the pegbox (2.8 cm) in the first position.
       With a left paw tilt of 30°, the claws went 4.2 cm into the upper bout.
-- [ ] Tripo hippo bassist: the bow plays near the end of the fingerboard (`soundingPoint` 0.3 to
-      0.25), because the cello sounding point on the lower bass flips the bow paw on the lowest
-      string. Show the user the frog and tip views (`reports/2026-11-11-cont/hippo/`).
-- [ ] Tripo hippo bassist: the right upper arm goes up to 5.0 cm into the right shoulder in 64% of
-      the play samples of `boulanger-matin` (24% with the higher bass, the same depth).
+- [ ] Tripo hippo bassist: the bow plays near the end of the fingerboard (`soundingPoint` 0.3 in
+      piano and in forte), because the cello sounding point on the lower bass flips the bow paw
+      on the lowest string, and the arm reaches less hair nearer to the bridge. Show the user the
+      frog and tip views (`reports/2026-11-13-fix-bows-low/`).
+- [ ] Tripo hippo bassist: the right upper arm goes up to 4.4 cm into the body in the play of
+      `boulanger-matin` (5.1 cm with the bow shoulder turn of 48°, `pnpm hold-fit bassist`).
+- [ ] Hippo bassist bow stroke (5.3): the bow arm reaches 0.15 m of 0.39 m of hair
+      (`bowRangeOf()`), with the string planes 4° apart (real: about 25°) and the sounding point
+      fixed. A longer reach needs a larger change: arms of 1.3 times the source in the hand rig
+      (1.2 now), a German bow hold with the paw behind the frog, or a higher bass with a new fit
+      of the left arm.
+- [ ] Hippo bassist right arm folds: the right arm folds 40 faces in the play (p95, limit 8,
+      `pnpm arm-check bassist`), 30 with the bow shoulder turn of 48° in place of 56°. The 2x
+      crops show a deeper crease at the inner elbow and no twist
+      (`reports/2026-11-13-fix-bows-low/`). A shoulder turn of 48° keeps 30 folds and 0.13 m of
+      hair.
+- [ ] Hippo bassist: the lower bout presses 2.3 cm into the left thigh in the lowering (1.1 cm
+      with the top plate turned 8° in place of 16°, `pnpm hold-fit bassist --sets lower`). An end
+      pin 0.01 H nearer to the middle (`fit.side` -0.25) takes it to 2.0 cm and the hair to
+      0.145 m. The left claws go 2.8 cm into the bass in the play (2.5 cm before).
+- [ ] Bow range search (5.3): `bowRangeOf()` uses the hand of the pose (`steadyHand()`) and the
+      sounding points only for a hold with `stickTurnR` (the dog and the hippo). The violin and
+      viola holds keep the bind grip with one roll at the contact point of the model. Move them
+      to the hand of the pose in a round that fits their bow ranges again.
+- [ ] Shared cello hold: the recast cellists take the new via of the rest bow
+      (`LAP_CELLO_BOW.via`, the tip up and to the left). Check the lift of the recast cells
+      (`pnpm cast-matrix --roles cellist`, report only).
 - [ ] Tripo cat violist: the left arm twists 55° in the lift (target 45°), the left paw swings
       72° at rest (limit 70), and the play grip turn is 64°. Each elbow that cut the swing turned
       the viola off its short arc. Lift elbows (`liftPoleL`, arm-check twist p95 / carry-check
@@ -1050,8 +1072,11 @@ scene of each demo has its seats and stage size with no overlap.
 
 ## Step 5. Motion (5, 4.7, 9.7)
 
-- [ ] Dog cellist: the left ear touches the cello, and the bow reach is 69% (goal 70%). Move the
-      cello.
+- [ ] Dog cellist: the scroll of the cello touches the left ear (pose audit 3, row 15). Move the
+      cello, and keep the reached bow hair (0.22 m of 0.46 m, `bowRangeOf()`).
+- [ ] Dog cellist: the bow plays only the upper half of the hair (0.215 m to 0.433 m). A right
+      shoulder turn of 40° reaches 0.23 m but folds face 1889 of the right shoulder in 27% of the
+      play, and a lean of the trunk of 10° puts the left forearm 2.1 cm into the neck.
 - [ ] Dog cellist: the knees stay about 21 cm from the leaned cello.
 - [ ] Dog cellist: in `boulanger-matin` (121 s to 127 s), the third cellist puts one paw 2.4 cm into
       the other, where pizzicato on the low strings meets a held arco note (`pnpm clip-probe`).
