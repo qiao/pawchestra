@@ -361,9 +361,9 @@ mean at 2048 pixels, and the tilt of the normal map at 1024 pixels):
 | Normal: tilt, median | 0.006 | 0.006 | 0.028 | 0.023 |
 | Normal: tilt, mean | 0.018 | 0.018 | 0.044 | 0.052 |
 
-So the maps tool adds the strands of `strands()` (`STRANDS`, seed 7): the RMS tilt 0.03, the luma
-factor 0.08, and the half length 11 texels at 2048 pixels. The strand contrast of the web color
-map is 0.065 by the same measure over the fur faces of the rig file.
+So the maps tool adds the strands of `strands()` of `tools/fur_maps.py` (`STRANDS`, seed 7): the RMS
+tilt 0.03, the luma factor 0.08, and the half length 11 texels at 2048 pixels. The strand contrast
+of the web color map is 0.065 by the same measure over the fur faces of the rig file.
 
 The first strands had the tilt 0.06, the luma factor 0.16, and the half length 22 texels (the
 strand contrast 0.128 by the same measure). In the hall they read as deep carved grooves, as in

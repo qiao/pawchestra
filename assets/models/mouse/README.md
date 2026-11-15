@@ -207,14 +207,13 @@ finds no row. The pink of the paws is the pink of the source: the mean color of 
 RGB (231, 155, 135) in the source map and (229, 156, 136) in `mouse-color.webp`.
 
 **Maps** (`tools/mouse-maps.py`). The tool scales the color map of the source to 2048 pixels
-(Lanczos), adds the soft fur strands of `tools/fox-maps.py` (`strands()`, tilt 0.03, luma 0.08, half
-length 11 texels) to the fur, and writes WebP quality 60, method 6 (Pillow 13.0.0). The pink skin
-(Oklab C from 0.06, h near 35 degrees: 24 % of the texels) and the eyeballs take no strands. It
-writes `mouse-normal.webp` from the normal map of the FBX with the slope of the same strands: each
-x, y tilt limited to 0.2 (4.27 % of the texels), a box scale to 1024 pixels, the tilts times 4 in
-red and green, 255 in blue, and `cwebp -q 60
--sharp_yuv -m 6` (libwebp 1.5.0). The eye mask comes from the rig file, so run the tool after the
-chain.
+(Lanczos), adds the soft fur strands of `tools/fox-maps.py` (`strands()` of `tools/fur_maps.py`,
+tilt 0.03, luma 0.08, half length 11 texels) to the fur, and writes WebP quality 60, method 6
+(Pillow 13.0.0). The pink skin (Oklab C from 0.06, h near 35 degrees: 24 % of the texels) and the
+eyeballs take no strands. It writes `mouse-normal.webp` from the normal map of the FBX with the
+slope of the same strands: each x, y tilt limited to 0.2 (4.27 % of the texels), a box scale to 1024
+pixels, the tilts times 4 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp
+1.5.0). The eye mask comes from the rig file, so run the tool after the chain.
 
 **Differences from the source.** The app light is warm and comes from above, so the fur reads
 lighter and more beige than in the even gray light of an FBX viewer.

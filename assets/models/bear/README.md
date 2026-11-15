@@ -184,10 +184,10 @@ steps of the blink, no point of the side edges or of the back edge leaves the he
 ### Maps
 
 `tools/bear-maps.py` writes both maps, as `tools/badger-maps.py` does: the color map of the source
-at 2048 pixels, with the soft fur strands of `strands()` (tilt 0.03, luma 0.08, half length 11
-texels: a luma step along the strands), and the normal map of the source with the limit 0.2, at 1024
-pixels, with the slope of the same strands. The source normal map is smooth: its median tilt at 1024
-pixels is 0.020, against 0.026 on the cat and 0.024 on the wolf.
+at 2048 pixels, with the soft fur strands of `strands()` of `tools/fur_maps.py` (tilt 0.03, luma
+0.08, half length 11 texels: a luma step along the strands), and the normal map of the source with
+the limit 0.2, at 1024 pixels, with the slope of the same strands. The source normal map is smooth:
+its median tilt at 1024 pixels is 0.020, against 0.026 on the cat and 0.024 on the wolf.
 
 Each texel of the color map, except the eyeballs, takes 0.87 times its Oklab lightness
 (`LIGHTNESS`). The chroma and the hue stay. In the hall view with no fill light (`close-views play

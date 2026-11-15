@@ -200,18 +200,17 @@ the old badger, the crown stood 0.905 m high, because the head of the source is 
 body.
 
 **Maps** (`tools/badger-maps.py`). The tool scales the color map of the source to 2048 pixels
-(Lanczos), adds the soft fur strands of `tools/fox-maps.py` (`strands()`, the same values: tilt
-0.03, luma 0.08, half length 11 texels), and writes
-WebP quality 60, method 6 (Pillow 13.0.0). The eyeball texels and 4 texels around them keep their
-colors. The normal map of the source is smooth (median tilt 0.012 at 1024 pixels, against 0.023
-to 0.028 on the cat, the wolf, and the rabbit), so the strands also go into `badger-normal.webp`:
-each x, y tilt of the source limited to 0.2 (0.61 % of the texels), a box scale to 1024 pixels,
-the slope of the strands added, the tilts times 4 in red and green, 255 in blue, and
-`cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0). On the back of the neck and the top of the back
-(`FLAT`: 124 triangles that face back, at |x| below 0.13 and y from 0.5 to 0.86, grown by 2
-texels with an edge of 1.5 texels), the normal map keeps only the tilt of the strands. Reason: the
-source paints a crumpled pattern of small bumps there, which showed as red and brown dots behind a
-raised left arm.
+(Lanczos), adds the soft fur strands of `tools/fox-maps.py` (`strands()` of `tools/fur_maps.py`, the
+same values: tilt 0.03, luma 0.08, half length 11 texels), and writes WebP quality 60, method 6
+(Pillow 13.0.0). The eyeball texels and 4 texels around them keep their colors. The normal map of
+the source is smooth (median tilt 0.012 at 1024 pixels, against 0.023 to 0.028 on the cat, the wolf,
+and the rabbit), so the strands also go into `badger-normal.webp`: each x, y tilt of the source
+limited to 0.2 (0.61 % of the texels), a box scale to 1024 pixels, the slope of the strands added,
+the tilts times 4 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
+On the back of the neck and the top of the back (`FLAT`: 124 triangles that face back, at |x| below
+0.13 and y from 0.5 to 0.86, grown by 2 texels with an edge of 1.5 texels), the normal map keeps
+only the tilt of the strands. Reason: the source paints a crumpled pattern of small bumps there,
+which showed as red and brown dots behind a raised left arm.
 
 **Differences from the source.** The app light is warm and comes from above, so the dark brown fur
 reads lighter and warmer than in the even gray light of an FBX viewer. The fold relax moves the
