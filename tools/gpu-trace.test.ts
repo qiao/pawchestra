@@ -13,7 +13,6 @@ import {
   gpuSpanMs,
   otherGpuShare,
   parseTraceTable,
-  webglFrameTimes,
   webglFrames,
 } from './gpu-trace.ts';
 import type { GpuInterval } from './gpu-trace.ts';
@@ -163,7 +162,7 @@ function firstBuffer(
   return clearLabel ? encoders : encoders.filter((encoder) => !encoder.label.includes('(Clear)'));
 }
 
-describe('webglFrameTimes', () => {
+describe('webglFrames', () => {
   it('splits the WebGL work at each clear of the drawing buffer, without the compositor', () => {
     const intervals = [
       // The end of a frame that started before the trace.
@@ -185,7 +184,7 @@ describe('webglFrameTimes', () => {
       ...firstBuffer(30, 'f3'),
     ];
     // Each first buffer is busy for 27 * 0.01 = 0.27 ms.
-    const times = webglFrameTimes(intervals, '(7)', CANVAS);
+    const times = webglFrames(intervals, '(7)', CANVAS).map((frame) => busyMs(frame));
     expect(times).toHaveLength(2);
     expect(times[0]).toBeCloseTo(0.27 + 3.5, 6);
     expect(times[1]).toBeCloseTo(0.27 + 3, 6);
@@ -198,7 +197,7 @@ describe('webglFrameTimes', () => {
       interval(3, 0.5, 'r1', 'Blit Command 0', 'Compute', 'Read Surface: 9(2880×1800:ARGB)'),
       ...firstBuffer(10, 'f2'),
     ];
-    const times = webglFrameTimes(intervals, '(7)', CANVAS);
+    const times = webglFrames(intervals, '(7)', CANVAS).map((frame) => busyMs(frame));
     expect(times).toHaveLength(1);
     expect(times[0]).toBeCloseTo(0.27 + 2.5, 6);
   });
@@ -214,7 +213,7 @@ describe('webglFrameTimes', () => {
       ...firstBuffer(20, 'f3'),
     ];
     // The first buffer with no label has 26 encoders: 0.26 ms busy.
-    const times = webglFrameTimes(intervals, '(7)', CANVAS);
+    const times = webglFrames(intervals, '(7)', CANVAS).map((frame) => busyMs(frame));
     expect(times).toHaveLength(2);
     expect(times[0]).toBeCloseTo(0.27 + 3, 6);
     expect(times[1]).toBeCloseTo(0.26 + 3.5, 6);
@@ -248,7 +247,7 @@ describe('webglFrameTimes', () => {
       ),
       ...firstBuffer(20, 'f3'),
     ];
-    const times = webglFrameTimes(intervals, '(7)', CANVAS);
+    const times = webglFrames(intervals, '(7)', CANVAS).map((frame) => busyMs(frame));
     expect(times).toHaveLength(2);
     expect(times[0]).toBeCloseTo(0.27 + 3, 6);
     expect(times[1]).toBeCloseTo(0.27 + 0.1 + 3.5, 6);

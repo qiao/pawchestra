@@ -332,22 +332,6 @@ export function webglFrames(
   return frames;
 }
 
-/**
- * Gives the GPU time of each WebGL frame of the GPU process of Chrome ({@link webglFrames}).
- *
- * @param intervals The GPU intervals of the trace.
- * @param process The text that the process column of the GPU process holds, such as its pid.
- * @param canvas The width and the height of the drawing buffer of the canvas, in device pixels.
- * @returns The busy time of each complete frame, in milliseconds ({@link busyMs}).
- */
-export function webglFrameTimes(
-  intervals: readonly GpuInterval[],
-  process: string,
-  canvas: readonly [number, number],
-): number[] {
-  return webglFrames(intervals, process, canvas).map((frame) => busyMs(frame));
-}
-
 /** The time and the count of command buffers that a filter dropped. */
 export interface DroppedBuffers {
   /** The count of the command buffers. */
