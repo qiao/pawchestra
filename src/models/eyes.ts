@@ -62,9 +62,9 @@ export interface EyeColors {
 /**
  * The bend of an eye: the move of each point of the oval along the axis of the eye, as a function
  * of its place `u` (across) and `v` (up) in the plane of the eye, from the middle:
- * `k0 u + k1 v + k2 u² + k3 u v + k4 v²`. The places and the move are in `H`. A studio body bends
+ * `k0 u + k1 v + k2 u² + k3 u v + k4 v²`. The places and the move are in `H`. A body bends
  * each eye to the form of its head surface, so that the rim of the oval lies in the fur (design
- * 4.5, `StudioEyes.bends` of `models/studio-format.ts`).
+ * 4.5, `BodyEyes.bends` of `models/body-format.ts`).
  */
 export type EyeBend = readonly [u: number, v: number, uu: number, uv: number, vv: number];
 

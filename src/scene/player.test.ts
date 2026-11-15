@@ -6,9 +6,9 @@ import { ModelCache } from '../models/model-cache.ts';
 import { INSTRUMENT_SUPPORTS, buildPlayer } from '../models/player.ts';
 import { boneIndex } from '../models/rig.ts';
 import type { BoneName } from '../models/rig.ts';
-import { STUDIO_BONES } from '../models/studio-format.ts';
-import { studioNormals } from '../models/studio-normals.ts';
-import { CLOSED_EYE_SCALE } from '../models/studio-rig.ts';
+import { BODY_BONES } from '../models/body-format.ts';
+import { bodyNormals } from '../models/body-normals.ts';
+import { CLOSED_EYE_SCALE } from '../models/body-rig.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import { BIND_ROTATIONS } from '../pose/frames.ts';
 import { poseSkeleton } from '../pose/test-kinematics.ts';
@@ -63,7 +63,7 @@ describe('createPlayerGeometry', () => {
       return [bone, blendBones[v], 0, 0, Math.fround(1 - w), w, 0, 0];
     });
     expect(actual).toEqual(expected);
-    // The studio body blends some vertices, and each rigid vertex has the weights 1 and 0.
+    // The body blends some vertices, and each rigid vertex has the weights 1 and 0.
     expect(blendWeights.some((w) => w > 0.2)).toBe(true);
     expect(actual.every(([, , , , a = 0, b = 0]) => Math.abs(a + b - 1) < 1e-6)).toBe(true);
   });
@@ -128,7 +128,7 @@ describe('createPlayerMesh', () => {
     }
   });
 
-  describe('a studio body (design 4.4)', () => {
+  describe('a body (design 4.4)', () => {
     const model = buildPlayer('bear', 'baton');
     const geometry = createPlayerGeometry(model);
 
@@ -178,15 +178,15 @@ describe('createPlayerMesh', () => {
     });
 
     it('draws the body with the shared material and the smooth normals of its crease angle', () => {
-      const rig = model.studio;
+      const rig = model.bodyRig;
       if (!rig) {
-        throw new Error('The bear has no studio body.');
+        throw new Error('The bear has no body.');
       }
-      const smoothModel = { ...model, studio: { ...rig, body: { ...rig.body, crease: 30 } } };
+      const smoothModel = { ...model, bodyRig: { ...rig, body: { ...rig.body, crease: 30 } } };
       const smooth = createPlayerGeometry(smoothModel);
       const normals = smooth.getAttribute('normal');
       expect(smooth.morphAttributes['normal']).toHaveLength(2);
-      const expected = studioNormals(rig.mesh, 30);
+      const expected = bodyNormals(rig.mesh, 30);
       const bodyCorners = rig.mesh.corners.length;
       for (let c = 0; c < bodyCorners; c += 97) {
         expect(normals.getY(c)).toBeCloseTo(expected[c * 3 + 1] ?? 2, 6);
@@ -217,7 +217,7 @@ describe('createPlayerMesh', () => {
   });
 });
 
-describe('a studio body with the shape of a raised arm (design 4.4)', async () => {
+describe('a body with the shape of a raised arm (design 4.4)', async () => {
   // The bow arm of the first red fox of K. 525 at 3.1 s, which gives the shape its full weight.
   const scene = await demoSceneOf('mozart-k525.mid');
   const index = scene.layout.players.findIndex((p) => p.cast.species === 'fox-red');
@@ -301,13 +301,13 @@ describe('applyScenePose', () => {
       return { rotations, rootOffset: [0, 0, 0], slideOffset: [0, 0, 0], blink: 0 };
     };
     applyScenePose(meshes, { players: [turned(0.1), turned(0.2)], conductor: turned(0.3) });
-    // The studio bear of the conductor gets the matrix of each bone from the pose (design 4.4).
-    const studioHead = meshes[2]?.skeleton.bones[STUDIO_BONES.indexOf('head')]?.matrix;
+    // The bear of the conductor gets the matrix of each bone from the pose (design 4.4).
+    const bodyHead = meshes[2]?.skeleton.bones[BODY_BONES.indexOf('head')]?.matrix;
     const angles = [
       ...meshes
         .slice(0, 2)
         .map((mesh) => 2 * Math.asin(mesh.skeleton.bones[head]?.quaternion.x ?? 0)),
-      new Euler().setFromRotationMatrix(studioHead ?? new Matrix4()).x,
+      new Euler().setFromRotationMatrix(bodyHead ?? new Matrix4()).x,
     ];
     expect(angles[0]).toBeCloseTo(0.1, 6);
     expect(angles[1]).toBeCloseTo(0.2, 6);

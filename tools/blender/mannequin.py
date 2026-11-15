@@ -89,7 +89,7 @@ COLOR_ORDER = tuple(PALETTE)
 
 
 # Each preset gives its places in H, the height from the soles to the top of the head, in the axes
-# of the studio: y up, +z forward, and +x the left side. The right side mirrors the left side.
+# of the body: y up, +z forward, and +x the left side. The right side mirrors the left side.
 
 
 def human_preset():
@@ -210,7 +210,7 @@ def scaled(p, v):
 
 
 def to_blender(v):
-    """Gives a place of the studio axes (y up, +z forward) in the axes of Blender (z up, -y
+    """Gives a place of the body axes (y up, +z forward) in the axes of Blender (z up, -y
     forward)."""
     return Vector((v[0], -v[2], v[1]))
 
@@ -221,7 +221,7 @@ def mirror(v):
 
 
 def landmarks(p):
-    """Gives the places of the left side and of the middle in meters (studio axes, T-pose): the arm
+    """Gives the places of the left side and of the middle in meters (body axes, T-pose): the arm
     joints along +x, the thumb, the leg joints, the foot, and the head."""
     h = p['height']
     s = scaled(p, p['shoulder'])
@@ -255,7 +255,7 @@ def landmarks(p):
 
 
 def skin_graph(p):
-    """Gives the graph of the Skin modifier: the points in meters (studio axes), the radius of each
+    """Gives the graph of the Skin modifier: the points in meters (body axes), the radius of each
     point (across the bone, as two values of the Skin modifier), and the edges. The first point is
     the root, in the pelvis. The left side comes first, and the right side mirrors it."""
     points, radii, edges = [], [], []
@@ -397,7 +397,7 @@ STRIPE = math.cos(math.radians(28))
 
 
 def face_color(p, at, c):
-    """Gives the palette name of the face with the middle c (studio axes, T-pose, meters).
+    """Gives the palette name of the face with the middle c (body axes, T-pose, meters).
 
     - Each upper arm, forearm, thigh, and shin has a band around its middle, in the color of the
       segment on the front half and in a dark color on the back half, and a stripe along its
@@ -567,7 +567,7 @@ def is_end(name):
 
 
 def mixamo_joints(p):
-    """Gives the head of each Mixamo bone in meters (studio axes, T-pose). The spine bones split the
+    """Gives the head of each Mixamo bone in meters (body axes, T-pose). The spine bones split the
     line from the hips to the neck as in `Xbot.glb` (0.22, 0.44, and 0.64 of the line). The
     fingers lie side by side in the paw, which has no gaps between them."""
     at = landmarks(p)
@@ -959,7 +959,7 @@ def add_clips(p, rig):
 
 #: The angle of each arm below the level in the A-pose, in degrees, near the 43 degrees of the
 #: upper arm of the wolf mesh (`tools/mesh-rigs/wolf.json` at cbc8db5e4). An angle of 45 degrees
-#: gives the arm direction 0.707107 in the studio module, which the lint refuses as an approximate
+#: gives the arm direction 0.707107 in the body module, which the lint refuses as an approximate
 #: `Math.SQRT1_2`.
 A_POSE = 40.0
 

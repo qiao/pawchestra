@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the badger (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/badger.ts`, which this chain writes:
+`src/models/bodies/badger.ts`, which this chain writes:
 
 ```text
 tripo-p2/badger.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/badger.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export badger    the same run
    v
 tripo-hand/badger.rig.glb       rigged mesh, with its summary badger.rig.json
-   │  pnpm studio-body badger   the same run
+   │  pnpm body-module badger   the same run
    v
-src/models/studio/badger.ts     studio body of the app
+src/models/bodies/badger.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -31,7 +31,7 @@ made by one build script in a headless Blender 5.2, by the route of the Tripo be
 colors, the eye paint, and the eyes of the source, with a crease angle of 180° and only a scale to
 the crown of the old badger. The upper arms and the forearms are 1.2 times longer than in the
 source ("Arms"), with no cut and no split from the trunk. The
-`ANIMALS` entry of the badger in `tools/studio-body.ts` points to `tripo-hand/badger.rig.glb`.
+`ANIMALS` entry of the badger in `tools/body-module.ts` points to `tripo-hand/badger.rig.glb`.
 
 | File | Origin | Rebuild |
 |---|---|---|
@@ -54,7 +54,7 @@ haunch.
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,281 vertices and 3,700 faces: 2,827 quads and 873 triangles, no n-gon. One UV layer |
 | Parts | 2 parts: the body with the head, the left eyeball, and the tail (3,216 vertices), and the right eyeball (65 vertices). 33 open edges in 3 loops: the socket of the right eye (16 edges), the rim of the right eyeball (13 edges), and a hole of 4 edges at the root of the left ear. No edge has more than two faces |
-| Box | In the studio units (1 unit from the soles to the top of the ears): x ±0.470 (the paw tips), z -0.322 (the tail tip) to 0.322 (the nose). The badger faces -y in Blender, with its left side at +x, so the import needs no turn |
+| Box | In the body units (1 unit from the soles to the top of the ears): x ±0.470 (the paw tips), z -0.322 (the tail tip) to 0.322 (the nose). The badger faces -y in Blender, with its left side at +x, so the import needs no turn |
 
 The folder `badger.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness
 and the metallic maps are not kept.
@@ -83,13 +83,13 @@ scripts are those of the Tripo beaver with the changes below. `make_config.py` w
 |---|---|
 | Size | 392,523 bytes (each run writes other bytes) |
 | SHA-256 | `3efe93bc56ff4360a955af7b4e86c27480125ba17572ead0752b904715ffcc2c` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the badger faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the badger faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `badger`: 3,765 vertices and 4,132 faces (3,259 quads and 873 triangles, 7,391 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the nose takes the slot `fur` and the color map. The 114 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/badger/tripo-hand/badger-color.webp`) |
 | Armature | `badger_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.636469 (the shoulder joints at 1.038285 m for each unit, so that the crown stands 1.038 m high, as on the badger of `aa8af0dd8`, and H is 0.27948 m), `crease` 180, and `seatWidth` 0.07 ("Stance and seat") |
 | Eyes | The eyeballs of the source, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/badger/tripo-p2/badger.fbx', 1e-5)`. No vertex
@@ -161,8 +161,8 @@ The weights, in the rest pose:
 
 **Stance and seat.** The badger stands at each percussion instrument (`stand` of design 4.5). Its
 bind keeps the legs, the trunk, and the tail of the source: the leg turns are none
-(`studio.legTurns`), the trunk takes no recline (`studio.trunk.open` 0), and the tail bones keep the
-directions of the source (`studio.tailBind`). The property `seat` is {`prop` `chair`, `front`
+(`bind.legTurns`), the trunk takes no recline (`bind.trunk.open` 0), and the tail bones keep the
+directions of the source (`bind.tailBind`). The property `seat` is {`prop` `chair`, `front`
 0.05, `back` -0.1, `halfWidth` 0.04}, inside the inner sides of the legs, and the fact `seatWidth`
 0.07 m gives the app seat the same width. So the seat height is the height of the crotch between
 the legs, 0.124 m. The old badger had the seat of its seated bind (0.059 m). The app reads neither,

@@ -1,6 +1,6 @@
-# Output: the `studio.legTurns` value of a rig config of `tools/mesh-rigs/`.
+# Output: the `bind.legTurns` value of a rig config of `tools/mesh-rigs/`.
 """Gives the leg turns of a seat with the thighs sloped down, the shins slanted forward, and the
-soles flat, for a config of `pnpm rig-mesh` (`studio.legTurns`): the world turn of each left leg
+soles flat, for a config of `pnpm rig-mesh` (`bind.legTurns`): the world turn of each left leg
 bone from the seated bind pose to the source, as a quaternion (x, y, z, w). The thigh points
 forward, `down` degrees below the level and `out` degrees out to the left. The shin points down
 and `slant` degrees forward of vertical, in the plane of y and z, so that the knee angle from the

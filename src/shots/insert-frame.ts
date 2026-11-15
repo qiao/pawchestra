@@ -1,9 +1,9 @@
 import type { PlayerPlace } from '../models/layout.ts';
 import type { PlayerModel } from '../models/player.ts';
-import { STUDIO_BONES } from '../models/studio-format.ts';
-import { createStudioPose, poseStudioBones, studioOffsets } from '../models/studio-rig.ts';
-import type { StudioPose } from '../models/studio-rig.ts';
-import type { StudioMesh } from '../models/studio-format.ts';
+import { BODY_BONES } from '../models/body-format.ts';
+import { createBodyPose, poseBodyBones, bodyOffsets } from '../models/body-rig.ts';
+import type { BodyPose } from '../models/body-rig.ts';
+import type { BodyMesh } from '../models/body-format.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import type { AnimalPose } from '../pose/types.ts';
 import { blurAt, heroFocusDepth } from '../scene/focus.ts';
@@ -80,8 +80,8 @@ const NEAR_DEPTH = 0.1;
 export interface PosedPlayer {
   /** The player model. */
   readonly model: PlayerModel;
-  /** The pose of the bones of the studio body and of the player. */
-  readonly pose: StudioPose;
+  /** The pose of the bones of the body and of the player. */
+  readonly pose: BodyPose;
   /** The middle of the head in the stage axes. */
   readonly head: Vec3;
   /** The middles of the two eyes in the stage axes. */
@@ -123,37 +123,37 @@ export function posePlayer(
   pose: AnimalPose,
   place: Pick<PlayerPlace, 'position' | 'facing'>,
 ): PosedPlayer {
-  const { skeleton, studio } = model;
-  const studioPose = poseStudioBones(
-    studio,
+  const { skeleton, bodyRig } = model;
+  const bodyPose = poseBodyBones(
+    bodyRig,
     skeleton,
     pose.rotations,
-    studioOffsets(pose),
+    bodyOffsets(pose),
     1,
-    createStudioPose(),
+    createBodyPose(),
   );
-  const m = studioPose.matrices;
-  const { heads, headCenter } = studio.body;
-  const studioPoint = (name: (typeof STUDIO_BONES)[number], point: Vec3): Vec3 =>
-    onStage(moveByBone(m, STUDIO_BONES.indexOf(name), point), place);
+  const m = bodyPose.matrices;
+  const { heads, headCenter } = bodyRig.body;
+  const bodyPoint = (name: (typeof BODY_BONES)[number], point: Vec3): Vec3 =>
+    onStage(moveByBone(m, BODY_BONES.indexOf(name), point), place);
   return {
     model,
-    pose: studioPose,
-    head: studioPoint('head', headCenter),
-    eyes: [studioPoint('eye_L', heads.eye_L), studioPoint('eye_R', heads.eye_R)],
+    pose: bodyPose,
+    head: bodyPoint('head', headCenter),
+    eyes: [bodyPoint('eye_L', heads.eye_L), bodyPoint('eye_R', heads.eye_R)],
     place,
   };
 }
 
 /**
- * Moves the vertices of a studio mesh to a pose, as `skinStudioMesh()` of `models/studio-rig.ts`
+ * Moves the vertices of a body mesh to a pose, as `skinBodyMesh()` of `models/body-rig.ts`
  * does, with index loops: an iterator for each vertex made most of the time of the cover test.
  *
- * @param mesh The studio mesh.
+ * @param mesh The body mesh.
  * @param pose The pose of the bones.
  * @returns The posed places, three numbers for each vertex, in the model axes.
  */
-function skinBody(mesh: StudioMesh, pose: StudioPose): Float32Array {
+function skinBody(mesh: BodyMesh, pose: BodyPose): Float32Array {
   const out = new Float32Array(mesh.positions.length);
   const m = pose.matrices;
   // The corrective moves with a weight, so that each vertex skips the others.
@@ -198,7 +198,7 @@ function skinBody(mesh: StudioMesh, pose: StudioPose): Float32Array {
 
 /** The mesh of a posed player in the stage axes. */
 interface PosedMesh {
-  /** x, y, z of each vertex of the studio body. */
+  /** x, y, z of each vertex of the body. */
   readonly body: Float32Array;
   /**
    * x, y, z of each corner of the mesh of the model after the corners of the body: the
@@ -212,7 +212,7 @@ const meshCache = new WeakMap<PosedPlayer, PosedMesh>();
 
 /**
  * Poses the mesh of a player as the scene draws it (design 4.4): the body with the skin of the
- * studio, and the instrument and the seat on the bones of the player.
+ * body, and the instrument and the seat on the bones of the player.
  *
  * @param posed The posed player.
  * @returns The posed mesh in the stage axes.
@@ -223,9 +223,9 @@ function posedMesh(posed: PosedPlayer): PosedMesh {
     return known;
   }
 
-  const { mesh, studio } = posed.model;
+  const { mesh, bodyRig } = posed.model;
   const m = posed.pose.matrices;
-  const body = skinBody(studio.mesh, posed.pose);
+  const body = skinBody(bodyRig.mesh, posed.pose);
   const cos = Math.cos(posed.place.facing);
   const sin = Math.sin(posed.place.facing);
   const [px, py, pz] = posed.place.position;
@@ -238,9 +238,9 @@ function posedMesh(posed: PosedPlayer): PosedMesh {
   }
 
   // The other corners follow one or two bones of the player, as the GPU skin does.
-  const bodyCorners = studio.mesh.corners.length;
+  const bodyCorners = bodyRig.mesh.corners.length;
   const extra = new Float32Array(mesh.positions.length - bodyCorners * 3);
-  const studioCount = STUDIO_BONES.length;
+  const bodyCount = BODY_BONES.length;
   const { positions, bones, blendBones, blendWeights } = mesh;
   for (let c = bodyCorners; c < bones.length; c++) {
     const lx = positions[c * 3] ?? 0;
@@ -249,12 +249,12 @@ function posedMesh(posed: PosedPlayer): PosedMesh {
     const bone = bones[c] ?? 0;
     const blend = blendBones[c] ?? bone;
     const w = blend === bone ? 0 : (blendWeights[c] ?? 0);
-    const i = (studioCount + bone) * 16;
+    const i = (bodyCount + bone) * 16;
     let x = (m[i] ?? 0) * lx + (m[i + 4] ?? 0) * ly + (m[i + 8] ?? 0) * lz + (m[i + 12] ?? 0);
     let y = (m[i + 1] ?? 0) * lx + (m[i + 5] ?? 0) * ly + (m[i + 9] ?? 0) * lz + (m[i + 13] ?? 0);
     let z = (m[i + 2] ?? 0) * lx + (m[i + 6] ?? 0) * ly + (m[i + 10] ?? 0) * lz + (m[i + 14] ?? 0);
     if (w !== 0) {
-      const j = (studioCount + blend) * 16;
+      const j = (bodyCount + blend) * 16;
       const bx = (m[j] ?? 0) * lx + (m[j + 4] ?? 0) * ly + (m[j + 8] ?? 0) * lz + (m[j + 12] ?? 0);
       const by =
         (m[j + 1] ?? 0) * lx + (m[j + 5] ?? 0) * ly + (m[j + 9] ?? 0) * lz + (m[j + 13] ?? 0);
@@ -283,7 +283,7 @@ function posedMesh(posed: PosedPlayer): PosedMesh {
  * @returns The posed point on the stage.
  */
 export function posedPoint(posed: PosedPlayer, bone: number, point: Vec3): Vec3 {
-  return onStage(moveByBone(posed.pose.matrices, STUDIO_BONES.length + bone, point), posed.place);
+  return onStage(moveByBone(posed.pose.matrices, BODY_BONES.length + bone, point), posed.place);
 }
 
 /**
@@ -333,22 +333,22 @@ export interface InsertCover {
   readonly soft: number;
 }
 
-/** The studio bones of the paws: a part on them near the detail is the detail. */
+/** The body bones of the paws: a part on them near the detail is the detail. */
 const PAW_BONES: ReadonlySet<number> = new Set(
-  STUDIO_BONES.flatMap((name, i) => (/^(hand|fingers|digit|thumb)/.test(name) ? [i] : [])),
+  BODY_BONES.flatMap((name, i) => (/^(hand|fingers|digit|thumb)/.test(name) ? [i] : [])),
 );
 
-/** The paw flag of each vertex of each studio mesh, made on the first read. */
-const pawCache = new WeakMap<StudioMesh, Uint8Array>();
+/** The paw flag of each vertex of each body mesh, made on the first read. */
+const pawCache = new WeakMap<BodyMesh, Uint8Array>();
 
 /**
- * Gives a flag for each vertex of a studio mesh: 1 when its bone with the largest weight is a
+ * Gives a flag for each vertex of a body mesh: 1 when its bone with the largest weight is a
  * bone of a paw.
  *
- * @param mesh The studio mesh.
+ * @param mesh The body mesh.
  * @returns The flags.
  */
-function pawVerticesOf(mesh: StudioMesh): Uint8Array {
+function pawVerticesOf(mesh: BodyMesh): Uint8Array {
   const known = pawCache.get(mesh);
   if (known) {
     return known;
@@ -373,7 +373,7 @@ function pawVerticesOf(mesh: StudioMesh): Uint8Array {
 interface TriangleGroup {
   /**
    * The corner whose posed place is the middle of the sphere of the group: a vertex of the
-   * studio body, or a corner after the body corners as `-1 - index` of the extra corners.
+   * body, or a corner after the body corners as `-1 - index` of the extra corners.
    */
   readonly anchor: number;
   /** The radius of the sphere around the anchor, in meters, with `INSERT_FRAME.reachMargin`. */
@@ -402,10 +402,10 @@ function triangleGroups(model: PlayerModel): readonly TriangleGroup[] {
     return known;
   }
 
-  const { mesh, studio } = model;
-  const bodyCorners = studio.mesh.corners.length;
+  const { mesh, bodyRig } = model;
+  const bodyCorners = bodyRig.mesh.corners.length;
   const cornerOf = (c: number): [source: Float32Array, index: number] =>
-    c < bodyCorners ? [studio.mesh.positions, studio.mesh.corners[c] ?? 0] : [mesh.positions, c];
+    c < bodyCorners ? [bodyRig.mesh.positions, bodyRig.mesh.corners[c] ?? 0] : [mesh.positions, c];
   const cells = new Map<string, number[]>();
   for (let tri = 0; tri < mesh.bones.length / 3; tri++) {
     const middle = [0, 0, 0];
@@ -617,10 +617,10 @@ export function insertCover(
   }
 
   const { body, extra } = posedMesh(posed);
-  const { studio } = posed.model;
-  const corners = studio.mesh.corners;
+  const { bodyRig } = posed.model;
+  const corners = bodyRig.mesh.corners;
   const bodyCorners = corners.length;
-  const paws = pawVerticesOf(studio.mesh);
+  const paws = pawVerticesOf(bodyRig.mesh);
   const groups = triangleGroups(posed.model);
   // The focus of the scene: the nearer eye in the frame, else the detail (design 4.5, 5.6).
   const focus =

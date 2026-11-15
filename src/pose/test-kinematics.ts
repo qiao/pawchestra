@@ -19,7 +19,7 @@ import type { AnimalPose, Transport } from './types.ts';
 export interface PosedSkeleton {
   readonly model: PlayerModel;
   readonly frames: readonly Frame[];
-  /** The pose of the frames. A studio body reads it for its own skin (`test-skin.ts`). */
+  /** The pose of the frames. A body reads it for its own skin (`test-skin.ts`). */
   readonly pose: AnimalPose;
 }
 

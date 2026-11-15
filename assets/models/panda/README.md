@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the panda (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/panda.ts`, which this chain writes:
+`src/models/bodies/panda.ts`, which this chain writes:
 
 ```text
 tripo-p2/panda.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/panda.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export panda    the same run
    v
 tripo-hand/panda.rig.glb       rigged mesh, with its summary panda.rig.json
-   │  pnpm studio-body panda   the same run
+   │  pnpm body-module panda   the same run
    v
-src/models/studio/panda.ts     studio body of the app
+src/models/bodies/panda.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Hand rig" below gives the
@@ -30,7 +30,7 @@ by one build script in headless Blender 5.2, by the route of the Tripo wolf (`..
 "Tripo hand rig"). The body keeps the form, the colors, and the eye paint of the source. Two point
 edits change the form: the upper arms and the forearms are 1.2 times longer ("Arm stretch"), and the
 front paws are smaller ("Paw size"). The arms have no cut and no split from the trunk. The `ANIMALS`
-entry of the panda in `tools/studio-body.ts` points to `tripo-hand/panda.rig.glb`. The files of the
+entry of the panda in `tools/body-module.ts` points to `tripo-hand/panda.rig.glb`. The files of the
 old panda above do not change.
 
 | File | Origin | Rebuild |
@@ -79,7 +79,7 @@ on the wolf).
 |---|---|
 | Size | 403,098 bytes |
 | SHA-256 | `744e9123c828de23771036129b04db2989e2f442b08aaf7fe45b97ac292f0378` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the panda faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the panda faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `panda`, with the shape key `bind_belly` ("Belly"): 3,767 vertices and 4,047 faces (3,343 quads and 704 triangles, 7,390 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the nose takes the color map. The 91 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids `lid`. The UV map of the FBX, and the property `texture` (`assets/models/panda/tripo-hand/panda-color.webp`) |
 | Armature | `panda_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 1.133145 (the shoulder joints at 1.807249 m for each unit, so that H is 0.499711 m, the H of the panda of `panda.rig.glb` at cbc8db5e4), `crease` 180, `seatWidth` 0.66 |
@@ -90,7 +90,7 @@ The chain of the body is in `tools/blender/hand/panda/` (`build.py`, `make_confi
 hand-chain panda` runs it (`tools/blender/hand/README.md`). Its scripts follow the scripts of the
 Tripo cat and of the Tripo wolf. `make_config.py` writes `tools/mesh-rigs/simple/panda-tripo.json`:
 the joints of the source, mapped by the paw turns, the arm stretch, and the paw edit. The edits, in
-the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the left side, y
+the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the left side, y
 the height, in the source):
 
 - **Import.** `sa.import_source('assets/models/panda/tripo-p2/panda.fbx', 1e-5)`. No vertex merges,

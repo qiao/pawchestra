@@ -124,7 +124,7 @@ export function defaultDemoFile(
 }
 
 /**
- * Lists the output files of the studio bodies that the default demo casts (design 7.2). The app
+ * Lists the output files of the bodies that the default demo casts (design 7.2). The app
  * loads these chunks before the layout of the first piece, so they count as a part of the first
  * download. A build that has the bodies in a static chunk has no chunk for a body, and gives none.
  *
@@ -139,7 +139,7 @@ export function castBodyFiles(manifest: Manifest, demo: Uint8Array): string[] {
     throw new Error(`The default demo ${DEFAULT_DEMO} is not valid: ${result.error}.`);
   }
   return castBodies(result.score)
-    .map((name) => `src/models/studio/${name.replace(/^studio-/, '')}.ts`)
+    .map((name) => `src/models/bodies/${name}.ts`)
     .filter((key) => manifest[key] !== undefined)
     .flatMap((key) => staticChunkFiles(manifest, key));
 }

@@ -28,7 +28,7 @@ interface RoleFacts {
   readonly part: string;
   readonly species: SpeciesId;
   /**
-   * The species whose studio bodies load before the build: the species of the role, and the
+   * The species whose bodies load before the build: the species of the role, and the
    * species that the score rules cast in the seats of the phrase (`speciesOf()`). The layout
    * builds the models of the seats before the role takes its place.
    */

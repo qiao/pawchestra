@@ -1,7 +1,7 @@
 import { MathUtils, Quaternion, Vector3 } from 'three';
 
-import { palmTurnAngle, studioForearmTurn, twistAngle } from '../models/studio-rig.ts';
-import type { PawBind } from '../models/studio-rig.ts';
+import { palmTurnAngle, bodyForearmTurn, twistAngle } from '../models/body-rig.ts';
+import type { PawBind } from '../models/body-rig.ts';
 import { boneIndex } from '../models/rig.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import type { PlayerNote } from '../score/types.ts';
@@ -1006,8 +1006,8 @@ function holdTurn(
 
 /**
  * Gives the roll of a mallet in its paw that removes the side bend of the paw on the forearm at
- * a strike (design 5.3). The retarget turns each studio paw in the plane of its palm toward the
- * forearm (`PAW_TURN` of `models/studio-rig.ts`), but the mallet follows the hand of the player.
+ * a strike (design 5.3). The retarget turns each body paw in the plane of its palm toward the
+ * forearm (`PAW_TURN` of `models/body-rig.ts`), but the mallet follows the hand of the player.
  * With a side bend, the shaft thus moves in the visible paw and leaves it along the fingers. The
  * hand turns around the shaft until its thumb
  * axis is normal to the forearm: then the retarget turns no paw, and the shaft stays where the
@@ -1428,7 +1428,7 @@ function lowestPoint(paw: Float32Array, at: Vector3, hand: Quaternion): number {
  * @param rotations The rotations of the pose to write.
  * @returns The turn of the paw in the plane of its palm (`pawTurnL`, `pawTurnR` of `AnimalPose`):
  *   0 for a paw that a hold with `keepPaw` keeps on the hand of the player, the mixed turn of the
- *   left paw or of a kept paw at a switch, or `null` for the turn of the studio body.
+ *   left paw or of a kept paw at a switch, or `null` for the turn of the body.
  */
 function poseHand(
   rig: PercussionRig,
@@ -1622,9 +1622,9 @@ function poseHand(
   return pawTurn;
 }
 
-/** The turn of a studio paw at one place of a switch (design 5.3). */
+/** The turn of a body paw at one place of a switch (design 5.3). */
 interface PawKey {
-  /** The turn of the studio paw on its forearm from its bind (`studioForearmTurn()`). */
+  /** The turn of the body paw on its forearm from its bind (`bodyForearmTurn()`). */
   readonly paw: Quaternion;
   /** The turn of the paw in the plane of its palm, in radians (`palmTurnAngle()`). */
   palm: number;
@@ -1644,14 +1644,14 @@ const twistAxis = new Vector3();
  * Writes the wrist and the hand of a paw at a switch (design 5.3) into the module values `wrist`
  * and `turn`, which hold the play place. The paw goes from the play place to the place of the
  * piece that it puts down, then to the place of the piece that it takes, and back to the play
- * place. The turn of the paw mixes in the frame of the studio forearm ({@link mixPawKeys}), as the
+ * place. The turn of the paw mixes in the frame of the body forearm ({@link mixPawKeys}), as the
  * arm gate measures it, so that the twist of the paw changes on a straight line between its places
  * and the twist bones do not turn over. The turn in the plane of the palm mixes too. The left
- * studio paw takes it from the pose (`pawTurnL` of `AnimalPose`), so it takes exactly the mixed
+ * body paw takes it from the pose (`pawTurnL` of `AnimalPose`), so it takes exactly the mixed
  * turn. The elbow points to the module values `playPole` at the play place, `tablePole` at the
  * table, and `nowPole` at this time.
  *
- * @param bind The bind of the studio paw of the arm.
+ * @param bind The bind of the body paw of the arm.
  * @param arm The arm.
  * @param joint The posed shoulder joint.
  * @param from The place of the piece that the paw puts down.
@@ -1687,9 +1687,9 @@ function tablePaw(
   wrist.z -= arc * Math.sin(Math.PI * table);
   limitReach(arm, joint, wrist);
   armJoints(arm, joint, wrist, nowPole);
-  // The hand of the player that gives the mixed studio paw: the studio paw is the hand times the
-  // turn in the plane of the palm times the bind of the paw (`poseStudioBones()`).
-  studioForearmTurn(bind, joint, joints.elbow, joints.wrist, turn)
+  // The hand of the player that gives the mixed body paw: the body paw is the hand times the
+  // turn in the plane of the palm times the bind of the paw (`poseBodyBones()`).
+  bodyForearmTurn(bind, joint, joints.elbow, joints.wrist, turn)
     .multiply(keyNow.paw)
     .multiply(keyTurn.fromArray(bind.paw).invert())
     .multiply(keyTurn.setFromAxisAngle(X_AXIS, -keyNow.palm));
@@ -1713,16 +1713,16 @@ function armJoints(arm: ArmRig, joint: Vector3, at: Vector3, pole: Vector3): voi
 }
 
 /**
- * Finds the turn of a studio paw on its forearm for a wrist and a hand of the player.
+ * Finds the turn of a body paw on its forearm for a wrist and a hand of the player.
  *
- * @param bind The bind of the studio paw of the arm.
+ * @param bind The bind of the body paw of the arm.
  * @param arm The arm.
  * @param joint The posed shoulder joint.
  * @param at The wrist. A wrist out of reach comes in ({@link limitReach}).
  * @param pole The direction to which the elbow points, in the model axes.
  * @param hand The world rotation of the hand of the player.
  * @param out The key to write.
- * @param keep True: the studio paw keeps the turn of the hand, with no turn in the plane of its
+ * @param keep True: the body paw keeps the turn of the hand, with no turn in the plane of its
  *   palm (`PercussionHold.keepPaw`).
  */
 function pawKey(
@@ -1738,7 +1738,7 @@ function pawKey(
   armJoints(arm, joint, limitReach(arm, joint, along.copy(at)), pole);
   forearm.subVectors(joints.wrist, joints.elbow).normalize();
   out.palm = keep ? 0 : palmTurnAngle(arm.side, hand, forearm);
-  studioForearmTurn(bind, joint, joints.elbow, joints.wrist, out.paw)
+  bodyForearmTurn(bind, joint, joints.elbow, joints.wrist, out.paw)
     .invert()
     .multiply(hand)
     .multiply(keyTurn.setFromAxisAngle(X_AXIS, out.palm))
@@ -1746,7 +1746,7 @@ function pawKey(
 }
 
 /**
- * Mixes two turns of the studio paw: the twist around the bind forearm goes on a straight line
+ * Mixes two turns of the body paw: the twist around the bind forearm goes on a straight line
  * from its first angle to its second angle, between -π and π, and the bend of the wrist mixes on
  * its own. The twist of the mix around the bind forearm is then exactly the mixed angle, because a
  * mix of two bends has no twist.
@@ -1837,7 +1837,7 @@ function fingerHand(rig: PercussionRig, hand: StrikeState, small: SmallState): v
  * @param weight The eased weight of the playing pose: 0 is the rest pose (5.2, 5.5).
  * @param rotations The rotations of the pose to write.
  * @param turns Gets the turn of each paw in the plane of its palm (`pawTurnL`, `pawTurnR` of
- *   `AnimalPose`), or `null` for the turn of the studio body.
+ *   `AnimalPose`), or `null` for the turn of the body.
  */
 export function posePercussion(
   rig: PercussionRig,
@@ -1853,8 +1853,8 @@ export function posePercussion(
 
 /** The turns of the paws in the planes of their palms that a percussion pose writes. */
 export interface PawTurns {
-  /** The turn of the left paw, or `null` for the turn of the studio body. */
+  /** The turn of the left paw, or `null` for the turn of the body. */
   pawTurnL: number | null;
-  /** The turn of the right paw, or `null` for the turn of the studio body. */
+  /** The turn of the right paw, or `null` for the turn of the body. */
   pawTurnR: number | null;
 }

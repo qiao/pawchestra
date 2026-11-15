@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the bear (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/bear.ts`, which this chain writes:
+`src/models/bodies/bear.ts`, which this chain writes:
 
 ```text
 tripo-p2/bear.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/bear.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export bear    the same run
    v
 tripo-hand/bear.rig.glb       rigged mesh, with its summary bear.rig.json
-   │  pnpm studio-body bear   the same run
+   │  pnpm body-module bear   the same run
    v
-src/models/studio/bear.ts     studio body of the app
+src/models/bodies/bear.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -32,7 +32,7 @@ eye paint, the eyes, the claws, the round belly, and the tail bump of the source
 angle of 180°. The edits are a scale to the eye height of the older bear, smaller front paws, a
 paw turn, a small move of the upper lids, and a lower lightness of the color map. The arms and
 the legs keep the length of the source, with no cut and no split from the trunk. The `ANIMALS`
-entry of the bear in `tools/studio-body.ts` points to `tripo-hand/bear.rig.glb`.
+entry of the bear in `tools/body-module.ts` points to `tripo-hand/bear.rig.glb`.
 
 | File | Origin | Rebuild |
 |---|---|---|
@@ -56,7 +56,7 @@ muzzle, a dark brown nose, dark claws on the paws and the feet, and a small tail
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,113 vertices and 3,397 faces: 2,729 quads and 668 triangles (6,126 triangles), no n-gon. One UV layer |
 | Parts | 3 parts: the body with the head, the claws, and the tail (3,031 vertices), and the two eyeballs (41 vertices each). Each eyeball is a cap of a sphere of radius 0.0413 units, open at the back. 116 open edges in 13 loops: the rims of the 2 eyeballs (17 edges), the 2 eye sockets (18 edges), a slit at the left corner of the mouth (10 edges), a slit across the tail (7 edges), and 7 holes of 4 edges (on the paws, beside the mouth, and on the left upper arm). No edge has more than two faces |
-| Box | In the studio units (1 unit from the soles to the top of the ears): x ±0.477 (the claw tips of the paws), z -0.2255 (the tail) to 0.2259 (the nose). The bear faces -y in Blender, with its left side at +x, so the import needs no turn |
+| Box | In the body units (1 unit from the soles to the top of the ears): x ±0.477 (the claw tips of the paws), z -0.2255 (the tail) to 0.2259 (the nose). The bear faces -y in Blender, with its left side at +x, so the import needs no turn |
 
 The folder `bear.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness and
 the metallic maps are not kept.
@@ -84,7 +84,7 @@ the joints of the source, mapped by the point edits.
 |---|---|
 | Size | 372,325 bytes (each run writes other bytes) |
 | SHA-256 | `a1b3ae46bbe840f3105de08ff8eb8aa1c59ba719feeede92a8d9f7b033744d9a` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `bear`: 3,477 vertices and 3,716 faces (3,048 quads and 668 triangles, 6,764 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the nose takes the slot `fur` and the color map. The 92 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/bear/tripo-hand/bear-color.webp`) |
 | Armature | `bear_rig`: the 30 body bones and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the standing bind of the older bear: no leg turn, no trunk recline, straight arms, and no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 1.121989 (the shoulder joints at y 0.669, 1.677114 m for each unit), `crease` 180, and the cue facts `cueHeadLeft` 35, `cueHeadRight` 30, and `cueLift` 12 of the older bear (design 5.4, `rigFacts` of the params) |
@@ -96,7 +96,7 @@ H goes from 0.357761 m to 0.346565 m, the crown from 1.659 m to 1.677 m. The bat
 conductor stand, and the podium keep their sizes in meters. The feet stand on the podium (1.05 m
 wide), at most 0.35 m from its middle.
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/bear/tripo-p2/bear.fbx', 1e-5)`. No vertex merges,

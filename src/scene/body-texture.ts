@@ -4,7 +4,7 @@ import type { MeshStandardMaterial, WebGLProgramParametersWithUniforms } from 't
 import { addFurShading, createFurUniforms, furNormalScale } from './fur.ts';
 
 /**
- * The anisotropic filter of a color map or a normal map of a studio body: the fur of a seated
+ * The anisotropic filter of a color map or a normal map of a body: the fur of a seated
  * player slopes away from the stage camera.
  */
 const BODY_MAP_ANISOTROPY = 4;
@@ -16,12 +16,12 @@ const BODY_MAP_ANISOTROPY = 4;
 const BODY_MAP_CHANNEL = 1;
 
 /**
- * The kind of an image of a studio body: the color map (`StudioTexture`), or the normal map of
+ * The kind of an image of a body: the color map (`BodyTexture`), or the normal map of
  * the fur (`<name>-normal.webp` beside `<name>-color.webp`, design 4.5).
  */
 type BodyMapKind = 'color' | 'normal';
 
-/** A color map or a normal map of a studio body (design 4.5) and the state of its load. */
+/** A color map or a normal map of a body (design 4.5) and the state of its load. */
 interface BodyMap {
   /** The texture. It has no image until the load ends. */
   readonly texture: Texture;
@@ -90,7 +90,7 @@ async function decodeMap(blob: Blob, scale: number): Promise<ImageBitmap> {
 const materials = new WeakMap<MeshStandardMaterial, Map<string, MeshStandardMaterial>>();
 
 /**
- * Gives a loader of the URL of each color map and normal map of a studio body, by its path
+ * Gives a loader of the URL of each color map and normal map of a body, by its path
  * relative to this module. Each image is an asset of a lazy chunk of Vite, so the first download
  * holds none of them (design 7.2). The call runs only in the browser: Node has no
  * `import.meta.glob`.
@@ -231,7 +231,7 @@ function addBodyMap(shader: WebGLProgramParametersWithUniforms, on: { value: num
 }
 
 /**
- * Gives the material of a player whose studio body has a color map (design 4.5): a copy of the
+ * Gives the material of a player whose body has a color map (design 4.5): a copy of the
  * shared material with the map, made once for each shared material and image. The copy keeps the
  * shader patch of the shared material, and adds {@link addBodyMap} and the fur shading
  * (`addFurShading()`): the sheen, and the normal map beside the color map ({@link normalFileOf}),
@@ -239,9 +239,9 @@ function addBodyMap(shader: WebGLProgramParametersWithUniforms, on: { value: num
  * colors of its faces and the normals of its mesh in the first frame and until the load ends.
  *
  * @param shared The shared material (`createMaterials()`).
- * @param file The image, relative to the repository (`StudioTexture.file`).
+ * @param file The image, relative to the repository (`BodyTexture.file`).
  * @param normalOf The color map whose normal map the fur takes: the map of the body for a map of a
- *   palette (`StudioTexture.palettes`), because the UVs and the strands of both maps are the same.
+ *   palette (`BodyTexture.palettes`), because the UVs and the strands of both maps are the same.
  * @returns The material.
  */
 export function bodyMapMaterial(

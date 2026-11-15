@@ -22,7 +22,7 @@ import type { PlantedLegs } from './side-move.ts';
 
 /**
  * The hold of the baton and of the left hand of the conductor (design 5.4). The places are in
- * head heights `H` of the bear of the cast, the studio bear (0.313 m), in the model axes of the
+ * head heights `H` of the bear of the cast, the bear (0.313 m), in the model axes of the
  * bind pose: the bear faces -z, and its left is -x. The places of the left hand and the elbows
  * keep their values in `H`. The butt of the baton lies in the palm ({@link BATON_ALONG}), and
  * its point and pivot keep the direction of the hold of the mesh bear at 0.93 of its meters.
@@ -456,7 +456,7 @@ const hangFrame = createFrame();
 
 /**
  * The part of the turn of the upper body that a hanging arm follows. In the bow at the song end,
- * arms that follow the whole bend swing the paws into the belly of the studio bear (2.8 cm at a
+ * arms that follow the whole bend swing the paws into the belly of the bear (2.8 cm at a
  * bend of 32°).
  */
 const HANG_FOLLOW = 0.5;

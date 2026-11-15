@@ -1,5 +1,5 @@
 /**
- * Fits the hold of a role of a studio body in one run (`docs/agents/rigging.md`, "Holds and
+ * Fits the hold of a role of a body in one run (`docs/agents/rigging.md`, "Holds and
  * reach"): for the base and for each variant of `--set`, it gives the folds of `pnpm fold-probe`
  * with the most folded faces of one rest sample by side, the deepest point of each sample set of
  * the sweep of `pnpm pose-depth` with the note-target errors, and, for a violin role, the reach of
@@ -47,7 +47,7 @@
  * first demo of the run. It goes with `--set`, `--grid` (up to {@link SCAN_GRID_LIMIT} variants),
  * and `--demo`.
  *
- * `--glb <file>` fits the hold on the studio body that the export makes from another GLB file, such
+ * `--glb <file>` fits the hold on the body that the export makes from another GLB file, such
  * as a GLB file of `pnpm rig-mesh --check --keep`: the tool runs again in a child process, in a copy
  * of `src/` with the module of the file (`withGlbBody()` of `tools/glb-swap.ts`). The files of
  * `assets/` and `src/` do not change, also after a stop or a failure. It goes with each option
@@ -116,11 +116,11 @@ import {
   sweepDemos,
 } from './pose-depth.ts';
 import type { DemoResult, GapsOf, StoredDepth, StoredResult } from './pose-depth.ts';
-import { STUDIO_BONES } from '../src/models/studio-format.ts';
-import type { Side } from '../src/models/studio-format.ts';
+import { BODY_BONES } from '../src/models/body-format.ts';
+import type { Side } from '../src/models/body-format.ts';
 import { probeBeside, shortHash, withoutOptions } from './ref-tree.ts';
-import { twistAngle } from '../src/models/studio-rig.ts';
-import type { StudioRig } from '../src/models/studio-rig.ts';
+import { twistAngle } from '../src/models/body-rig.ts';
+import type { BodyRig } from '../src/models/body-rig.ts';
 import type { Quat } from '../src/models/tuples.ts';
 import type { SpeciesId } from '../src/models/species.ts';
 import type { TestScene } from '../src/pose/test-scene.ts';
@@ -1021,7 +1021,7 @@ interface PawAngles {
 
 /**
  * Gives the angles of the mean turn of a paw from its forearm: the whole turn, the twist around
- * the forearm, and the swing with no twist (`twistAngle()` of `src/models/studio-rig.ts`).
+ * the forearm, and the swing with no twist (`twistAngle()` of `src/models/body-rig.ts`).
  *
  * @param turn The mean turn of the paw from the forearm.
  * @param axis The bind axis of the forearm, from the elbow to the wrist, as a unit vector.
@@ -1039,13 +1039,13 @@ export function pawAngles(turn: Quat, axis: Vector3): PawAngles {
 }
 
 /**
- * Gives the bind axis of a forearm of a studio rig, from the elbow to the wrist.
+ * Gives the bind axis of a forearm of a body rig, from the elbow to the wrist.
  *
- * @param rig The studio rig.
+ * @param rig The body rig.
  * @param side The arm.
  * @returns The unit vector, in the axes of the skin matrices.
  */
-function forearmAxis(rig: StudioRig, side: 'L' | 'R'): Vector3 {
+function forearmAxis(rig: BodyRig, side: 'L' | 'R'): Vector3 {
   const { heads } = rig.body;
   return new Vector3(...heads[`hand_${side}`])
     .sub(new Vector3(...heads[`forearm_${side}`]))
@@ -1062,17 +1062,17 @@ interface ArmKeys {
 
 /**
  * Gives the turns of one arm from the skin matrices of a pose: the turn of the upper arm from the
- * bind pose in the axes of the chest, and of the paw from the forearm (`poseStudioBones()` of
- * `src/models/studio-rig.ts`).
+ * bind pose in the axes of the chest, and of the paw from the forearm (`poseBodyBones()` of
+ * `src/models/body-rig.ts`).
  *
- * @param matrices The skin matrices, 16 numbers for each bone of `STUDIO_BONES`.
+ * @param matrices The skin matrices, 16 numbers for each bone of `BODY_BONES`.
  * @param side The arm.
  * @returns The turns, in the model axes.
  */
 function armKeys(matrices: ArrayLike<number>, side: Side): ArmKeys {
   const m = new Matrix4();
   const turnOf = (name: string): Quaternion => {
-    const at = STUDIO_BONES.findIndex((bone) => bone === name) * 16;
+    const at = BODY_BONES.findIndex((bone) => bone === name) * 16;
     return new Quaternion().setFromRotationMatrix(
       m.fromArray(Array.from({ length: 16 }, (...[, k]) => matrices[at + k] ?? 0)),
     );
@@ -1101,14 +1101,14 @@ function armKeys(matrices: ArrayLike<number>, side: Side): ArmKeys {
 export function armTurns(): ArmTurnProbe {
   const samples: TurnSamples = new Map();
   let axes: Readonly<Record<'L' | 'R', Vector3>> | null = null;
-  const visit: FoldVisit = (...[rig, studio, , , set]) => {
+  const visit: FoldVisit = (...[rig, bodyPose, , , set]) => {
     axes ??= { L: forearmAxis(rig, 'L'), R: forearmAxis(rig, 'R') };
     const sides = samples.get(set) ?? [
       { upper: [], paw: [] },
       { upper: [], paw: [] },
     ];
     for (const [k, side] of (['L', 'R'] as const).entries()) {
-      const keys = armKeys(studio.matrices, side);
+      const keys = armKeys(bodyPose.matrices, side);
       sides[k]?.upper.push(keys.upper);
       sides[k]?.paw.push(keys.wrist);
     }
@@ -1638,7 +1638,7 @@ export interface ScanRow {
   readonly variant: string;
   /** The rest sample ({@link ScanSample.sample}). */
   readonly sample: string;
-  /** The folded faces of the studio skin by the side of their main bone. */
+  /** The folded faces of the body skin by the side of their main bone. */
   readonly folds: SideSplit;
   /** The lap rest of the sample, as the largest values of one sample, or `null` for none. */
   readonly lap: LapWorsts | null;
@@ -1663,7 +1663,7 @@ function scanMisses(row: ScanRow, bow: boolean): number {
 
 /**
  * Writes the table of a scan: one row for each variant and rest sample, with the folded faces of
- * the studio skin by side, the goals that the row misses ({@link scanMisses}), for a wind hold the
+ * the body skin by side, the goals that the row misses ({@link scanMisses}), for a wind hold the
  * instrument in the body and the spare reach of each grip ({@link spareCells}), and the cells of
  * the lap rest of the rest columns of a run ({@link lapCells}). A wind hold with no lap rest has
  * no lap columns. A run with one sample has no column of the sample.
@@ -2113,7 +2113,7 @@ function scanSamplesOf(options: FitOptions, demos: readonly DemoFile[]): ScanSam
  * Scans the variants of the rest of a role with a lap rest or a wind hold (`--scan`). For each
  * variant, it builds only the rig of the player of each rest sample again (`scanRest()` of
  * `tools/lap-rest.ts`), in place of the scenes of each demo, and writes one row for each variant
- * and sample: the folded faces of the studio skin by side, the cells of the lap rest of the rest
+ * and sample: the folded faces of the body skin by side, the cells of the lap rest of the rest
  * columns, and for a wind hold the instrument in the body and the spare reach of each grip
  * ({@link windSpare}). With a
  * grid, the rows are sorted by {@link sortScanRows}. It prints its samples and its time.
@@ -2180,7 +2180,7 @@ async function scanHolds(options: FitOptions): Promise<void> {
 }
 
 /**
- * Fits the hold on the studio body of another GLB file (`--glb <file>`): the tool runs again with
+ * Fits the hold on the body of another GLB file (`--glb <file>`): the tool runs again with
  * the other arguments in a copy of `src/` with the module of the file (`withGlbBody()` of
  * `tools/glb-swap.ts`).
  *
@@ -2199,7 +2199,7 @@ function fitGlb(options: FitOptions, glb: string, args: readonly string[]): Prom
 
 /**
  * Runs the tool: `node tools/hold-fit.ts <role> [options]`. With `--glb <file>`, the fit runs on
- * the studio body of the file ({@link fitGlb}).
+ * the body of the file ({@link fitGlb}).
  */
 async function main(): Promise<void> {
   const { glb, rest } = takeGlb(process.argv.slice(2));

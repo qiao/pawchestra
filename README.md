@@ -159,7 +159,7 @@ The app includes the third-party files below. The build writes all their license
 ## License
 
 - **Code:** the [Apache License 2.0](LICENSE).
-- **Animal models:** the files in `assets/models/` and `src/models/studio/` are under
+- **Animal models:** the files in `assets/models/` and `src/models/bodies/` are under
   [CC BY-NC 4.0](assets/models/LICENSE). You can use, change, and share
   them, but not for commercial purposes.
 - **Your output:** you own the videos, images, and audio that you make with Pawchestra. You can use

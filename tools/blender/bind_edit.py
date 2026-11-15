@@ -23,7 +23,7 @@ import bpy
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import studio_eyes as se  # noqa: E402
+import body_eyes as se  # noqa: E402
 
 
 def objects():
@@ -270,7 +270,7 @@ def sit_move(body, rig, rule):
     """Gives the move of the key `bind_sit` (design 4.4, "Hand rig"): it puts the underside of the
     haunch behind the hip joints onto the plane of the thigh underside, so that the haunch rests on
     the seat. Call it after `pose_bind()`. The seat top of the app is the lowest body point over
-    the seat (`seatHeightOf()` of `tools/studio-body.ts`), so a drop to that plane keeps the seat
+    the seat (`seatHeightOf()` of `tools/body-module.ts`), so a drop to that plane keeps the seat
     height.
 
     The rule (units of the file): `band` the height above the column bottom over which the drop

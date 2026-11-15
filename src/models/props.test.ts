@@ -14,8 +14,8 @@ import {
   seatHeights,
 } from './props.ts';
 import { buildPianoBench } from './instruments/piano.ts';
-import { STUDIO_POLAR_BEAR } from './studio/polar-bear.ts';
-import { STUDIO_RABBIT } from './studio/rabbit.ts';
+import { BODY_POLAR_BEAR } from './bodies/polar-bear.ts';
+import { BODY_RABBIT } from './bodies/rabbit.ts';
 import { SCENE_COLORS } from './colors.ts';
 import type { PlayerPlace, SceneLayout } from './layout.ts';
 import { SPECIES } from './species.ts';
@@ -146,10 +146,10 @@ describe('seatHeights (design 4.5)', () => {
     );
   });
 
-  it('gives a studio body on a chair the depth of the chair of the studio (design 4.4)', () => {
+  it('gives a body on a chair the depth of the chair of the body (design 4.4)', () => {
     const seat = seatHeights('chair', SPECIES.rabbit);
-    expect(seat?.seatDepth).toBe(STUDIO_RABBIT.chairDepth);
-    expect(seat?.seatHeight).toBeCloseTo(STUDIO_RABBIT.seatHeight, 6);
+    expect(seat?.seatDepth).toBe(BODY_RABBIT.chairDepth);
+    expect(seat?.seatHeight).toBeCloseTo(BODY_RABBIT.seatHeight, 6);
   });
 
   it('keeps the back of a chair with a short seat, and moves its front edge back', () => {
@@ -161,15 +161,15 @@ describe('seatHeights (design 4.5)', () => {
       }
       return [front, back];
     };
-    const [front, back] = depthOf(buildChair(0.13, STUDIO_RABBIT.chairDepth));
+    const [front, back] = depthOf(buildChair(0.13, BODY_RABBIT.chairDepth));
     const [, standardBack] = depthOf(buildChair(0.13));
     expect(back).toBeCloseTo(standardBack, 6);
-    expect(back - front).toBeCloseTo(STUDIO_RABBIT.chairDepth, 6);
+    expect(back - front).toBeCloseTo(BODY_RABBIT.chairDepth, 6);
   });
 
-  it('fits the piano bench to the legs of the studio polar bear (design 4.4)', () => {
+  it('fits the piano bench to the legs of the polar bear (design 4.4)', () => {
     const seat = seatHeights('bench', SPECIES['polar-bear']);
-    expect(seat?.seatHeight).toBeCloseTo(STUDIO_POLAR_BEAR.seatHeight, 9);
+    expect(seat?.seatHeight).toBeCloseTo(BODY_POLAR_BEAR.seatHeight, 9);
   });
 });
 

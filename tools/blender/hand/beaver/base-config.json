@@ -1,6 +1,6 @@
 {
   "source": "assets/models/cat/tripo-p2/cat.fbx",
-  "sourceNote": "The Tripo P2 cat mesh with its quads (assets/models/cat/README.md). The hand rig assets/models/cat/tripo-hand/cat.blend starts from it in headless Blender with the calls of tools/blender/studio_armature.py (design 4.4, \"Hand rig\").",
+  "sourceNote": "The Tripo P2 cat mesh with its quads (assets/models/cat/README.md). The hand rig assets/models/cat/tripo-hand/cat.blend starts from it in headless Blender with the calls of tools/blender/body_armature.py (design 4.4, \"Hand rig\").",
   "name": "Cat",
   "weld": 1e-05,
   "joints": {
@@ -237,7 +237,7 @@
     -0.9151,
     0.0815
   ],
-  "studio": {
+  "bind": {
     "trunk": {
       "open": 3,
       "shares": {
@@ -262,7 +262,7 @@
         0.571719
       ]
     },
-    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the bent bind of the violin hold, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (Body.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the bent bind of the violin hold, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
@@ -376,7 +376,7 @@
     "points": 12,
     "reach": 1,
     "darkReach": 2,
-    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm body-module drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
   },
   "chair": {
     "halfWidth": 0.13,
@@ -388,14 +388,14 @@
     "helper": 0.03,
     "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies."
   },
-  "jointsNote": "The places are the places of the source, mapped by the point edits of the hand rig (assets/models/cat/README.md: the paw turns, the head size, the paw size, and the longer shins). The source places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from cuts of the mesh and from its edge loops (scratch scripts of the round). Arm (axis y 0.651 to 0.637, z 0.068 to 0.085, radius 0.033 to 0.029, closed loops of 8 vertices): the shoulder joint at x 0.072, inside the arm root loop of 15 vertices at x 0.082 to 0.087; the elbow at x 0.172, between the loops at x 0.168 and 0.179, where the arm is narrowest before the small swell at x 0.18 to 0.195; the wrist at x 0.245, where the outline starts to widen into the paw; the knuckles at x 0.295, where the four digits part; the tip at x 0.337. Leg: the crotch is at y 0.27. The hip joint at y 0.32 in the middle of the haunch; the knee at y 0.165, at the corner of the back outline and the notch of the front outline, where the thick thigh meets the thin shin; the ankle at y 0.05, where the foot widens; the ball of the foot at z 0.11, and the toe tips at z 0.148. Trunk: the back lies at z 0 to 0.03 and the front at z 0.15, and the spine bones lie at about 0.4 of the depth from the back. The neck is narrowest at y 0.70 to 0.73, and the chin is at y 0.745. Ears: the root at y 0.888, the tips at (0.125, 0.997, 0.085). Tail: the root leaves the back at y 0.43, the tail hangs down behind the legs to y 0.215, and its tip curls back to (0.03, 0.17, -0.205). The bend of the two tail bones lies at (0.005, 0.33, -0.045), 0.1 units below the root, so that the root bone goes down the back of the haunch to the seat. The palm is the true palm of the source: the normal of the plane of the paw vertices (x 0.262 to 0.337) is (-0.395, -0.915, 0.082). It faces down, and the digit tips curl down toward it. The knee joint lies 3 mm in and 3 mm forward of the middle of its leg loop (x 0.060, z 0.050), so that the bind frame of each thigh has an error below 1e-5 in Blender (float32), which the export checks (scratch joint_search.py: 2.3e-5 at the middle, 6.8e-6 here).",
+  "jointsNote": "The places are the places of the source, mapped by the point edits of the hand rig (assets/models/cat/README.md: the paw turns, the head size, the paw size, and the longer shins). The source places are in the body units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from cuts of the mesh and from its edge loops (scratch scripts of the round). Arm (axis y 0.651 to 0.637, z 0.068 to 0.085, radius 0.033 to 0.029, closed loops of 8 vertices): the shoulder joint at x 0.072, inside the arm root loop of 15 vertices at x 0.082 to 0.087; the elbow at x 0.172, between the loops at x 0.168 and 0.179, where the arm is narrowest before the small swell at x 0.18 to 0.195; the wrist at x 0.245, where the outline starts to widen into the paw; the knuckles at x 0.295, where the four digits part; the tip at x 0.337. Leg: the crotch is at y 0.27. The hip joint at y 0.32 in the middle of the haunch; the knee at y 0.165, at the corner of the back outline and the notch of the front outline, where the thick thigh meets the thin shin; the ankle at y 0.05, where the foot widens; the ball of the foot at z 0.11, and the toe tips at z 0.148. Trunk: the back lies at z 0 to 0.03 and the front at z 0.15, and the spine bones lie at about 0.4 of the depth from the back. The neck is narrowest at y 0.70 to 0.73, and the chin is at y 0.745. Ears: the root at y 0.888, the tips at (0.125, 0.997, 0.085). Tail: the root leaves the back at y 0.43, the tail hangs down behind the legs to y 0.215, and its tip curls back to (0.03, 0.17, -0.205). The bend of the two tail bones lies at (0.005, 0.33, -0.045), 0.1 units below the root, so that the root bone goes down the back of the haunch to the seat. The palm is the true palm of the source: the normal of the plane of the paw vertices (x 0.262 to 0.337) is (-0.395, -0.915, 0.082). It faces down, and the digit tips curl down toward it. The knee joint lies 3 mm in and 3 mm forward of the middle of its leg loop (x 0.060, z 0.050), so that the bind frame of each thigh has an error below 1e-5 in Blender (float32), which the export checks (scratch joint_search.py: 2.3e-5 at the middle, 6.8e-6 here).",
   "body": {
     "crease": 55,
     "seatWidth": 0.46
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 55, because the arm loops of the source have 8 vertices, 45 degrees apart, and the seat width 0.46 m of the cat of main, because the haunch is 0.25 units (0.43 m) wide, more than the chair of design 4.5 (0.42 m).",
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/body-module.ts) beside the height: the crease angle 55, because the arm loops of the source have 8 vertices, 45 degrees apart, and the seat width 0.46 m of the cat of main, because the haunch is 0.25 units (0.43 m) wide, more than the chair of design 4.5 (0.42 m).",
   "eyeSize": 0.197362,
-  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
+  "eyeSizeNote": "The head height H of the body in units, as body-module measures it on the export. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
   "metersPerUnit": 1.71956,
   "metersPerUnitNote": "The scale of the app: H (0.197362 units before the head size) is 0.339375 m, the H of the cat of assets/models/cat/cat.rig.glb at cbc8db5e4. The fact height of the armature is the shoulder joints (0.68705 units after the longer shins) at this scale: 1.181424 m. The head size makes H 0.374868 m.",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/cat.blend holds it.",

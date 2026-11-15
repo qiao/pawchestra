@@ -31,7 +31,7 @@ import {
 import { createRenderer } from '../scene/renderer.ts';
 import { gradeUniforms } from '../scene/post.ts';
 import { GRADE_FUNCTION } from '../scene/post-shaders.ts';
-import { loadStudioBodies } from '../app/body-loads.ts';
+import { loadBodies } from '../app/body-loads.ts';
 import { demoUrl } from '../app/demos.ts';
 import { fetchPlainBytes } from '../audio/plain-bytes.ts';
 import { layoutScene } from '../models/layout-scene.ts';
@@ -207,7 +207,7 @@ function viewPose(
 }
 
 // The page shows each species (design 7.2).
-await loadStudioBodies();
+await loadBodies();
 const demo = await fetchPlainBytes(demoUrl(PAGE.poseDemo, import.meta.env.BASE_URL));
 const result = buildScore(demo, 'auto');
 if (!result.ok) {
@@ -277,7 +277,7 @@ if (SHEET) {
   addSheet(SHEET);
 }
 
-// The studio light of the model sheets: a warm key light from the left, above, and the front, a
+// The body light of the model sheets: a warm key light from the left, above, and the front, a
 // soft warm fill light, and a rim light from behind. The stage keeps its own light.
 const key = new DirectionalLight(VIEW_LIGHT.keyColor, VIEW_LIGHT.key * (SHEET?.light.key ?? 1));
 key.position.set(pageWidth / 2 - 1100, -pageHeight / 2 + 1300, 1000);

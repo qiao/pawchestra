@@ -26,7 +26,7 @@ declare module 'three' {
  *
  * three.js keeps one current program for each material. When meshes of two variants share a
  * material, each draw after a change of variant looks up the program again
- * (`WebGLRenderer.getProgram()`). The studio bodies have different counts of morph targets, so
+ * (`WebGLRenderer.getProgram()`). The bodies have different counts of morph targets, so
  * one shared material looks up its program at about each player, in each pass of a frame: 1.1 ms
  * of main-thread time on the development Mac.
  *

@@ -21,7 +21,7 @@ export interface ScoreScene {
 
 /**
  * Calculates the layout, the pose plan, and the shot plan of a score in steps (design 7.2). The
- * first step loads the studio bodies that the score casts. The layout, the plans, and the scene
+ * first step loads the bodies that the score casts. The layout, the plans, and the scene
  * share one model cache.
  *
  * @param score The score.

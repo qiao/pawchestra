@@ -131,13 +131,13 @@ interface HandsHold {
   readonly curlClosed: number;
   /**
    * The bend of the thumb of a fist after its pluck, in radians: digit 1 of `AnimalPose.digits`
-   * (`poseThumb()` of `models/studio-rig.ts`). 0 for a hold whose thumb does not close alone.
+   * (`poseThumb()` of `models/body-rig.ts`). 0 for a hold whose thumb does not close alone.
    */
   readonly thumbClosed: number;
   /**
    * The move of each wrist away from the straight line from its rest place to its playing place,
    * at the middle of the change, in head heights: out to the side of the hand, up, and forward. A
-   * paw of the round studio polar bear goes up over the front of the keys.
+   * paw of the round polar bear goes up over the front of the keys.
    */
   readonly restArc: Vec3;
   /** The left hand in the rest pose, in the lap (design 5.3). */
@@ -164,7 +164,7 @@ interface HighPalm {
 
 /** The holds of the piano and the harp. */
 export const HANDS_HOLDS = {
-  // The paw of the studio polar bear is longer than a white key, so the palm is 0.039 m (0.092 H)
+  // The paw of the polar bear is longer than a white key, so the palm is 0.039 m (0.092 H)
   // in front of the front edge of the keys (`pianoKeyFront()`), and the curled claws lie on the
   // key tops. The left palm is 0.0572 m (0.135 H) above the keys and the right palm 0.0657 m
   // (0.155 H), because the two paws of the mesh differ. The offsets are in H, so they grow with
@@ -279,7 +279,7 @@ export const HANDS_HOLDS = {
     // down, and 0.4 back put the forearms 3.5 cm and the upper arms 0.4 cm into the belly. At rest,
     // the right shoulder folds no face (13 before), and the left paw swings 57° from the straight
     // paw of the source (73° before, `pnpm arm-check pianist`, limit 70°). The right paw turns in the
-    // plane of its palm only toward a baton (`palmTurnAngle()` of `models/studio-rig.ts`), so its
+    // plane of its palm only toward a baton (`palmTurnAngle()` of `models/body-rig.ts`), so its
     // rest fingers take the turn that the left paw gets there: they point down and back, 70° from
     // the mirror of the left fingers in the plane of the palm. With the mirror, the right paw of the
     // Tripo polar bear swings 65° from its bind and folds 17 faces of the inner wrist at rest, and

@@ -20,16 +20,16 @@ import { Matrix4, Vector3 } from 'three';
 
 import { roleDemos } from './pose-depth.ts';
 import { probeBeside, shortHash, withoutOptions } from './ref-tree.ts';
-import { STUDIO_BONES } from '../src/models/studio-format.ts';
-import type { StudioMesh } from '../src/models/studio-format.ts';
+import { BODY_BONES } from '../src/models/body-format.ts';
+import type { BodyMesh } from '../src/models/body-format.ts';
 import {
   CLOSED_EYE_SCALE,
-  createStudioPose,
-  poseStudioBones,
-  skinStudioMesh,
-  studioOffsets,
-} from '../src/models/studio-rig.ts';
-import type { StudioRig } from '../src/models/studio-rig.ts';
+  createBodyPose,
+  poseBodyBones,
+  skinBodyMesh,
+  bodyOffsets,
+} from '../src/models/body-rig.ts';
+import type { BodyRig } from '../src/models/body-rig.ts';
 import { poseSkeleton } from '../src/pose/test-kinematics.ts';
 import { sceneOf } from '../src/pose/test-scene.ts';
 import type { RoleSweep, SweepPlayer, SweepSample } from '../src/pose/test-sweep.ts';
@@ -113,7 +113,7 @@ interface TrunkMesh {
   readonly length: number;
 }
 
-/** The trunk mask and the Oklab lightness of each triangle of a studio mesh. */
+/** The trunk mask and the Oklab lightness of each triangle of a body mesh. */
 interface TriangleFacts {
   /** 1 for a triangle with more than half of its weight on {@link TRUNK_BONES}, else 0. */
   readonly trunk: Uint8Array;
@@ -226,12 +226,12 @@ function oklabLightness(r: number, g: number, b: number): number {
 }
 
 /**
- * Gives the trunk mask and the lightness of each triangle of a studio mesh.
+ * Gives the trunk mask and the lightness of each triangle of a body mesh.
  *
  * @param mesh The mesh.
  * @returns The trunk mask and the lightness.
  */
-function triangleFacts(mesh: StudioMesh): TriangleFacts {
+function triangleFacts(mesh: BodyMesh): TriangleFacts {
   const count = mesh.corners.length / 3;
   const trunk = new Uint8Array(count);
   const lightness = new Float64Array(count);
@@ -240,7 +240,7 @@ function triangleFacts(mesh: StudioMesh): TriangleFacts {
     for (let k = 0; k < 3; k++) {
       const v = mesh.corners[t * 3 + k] ?? 0;
       for (let j = 0; j < 4; j++) {
-        if (TRUNK_BONES.has(STUDIO_BONES[mesh.joints[v * 4 + j] ?? 0] ?? '')) {
+        if (TRUNK_BONES.has(BODY_BONES[mesh.joints[v * 4 + j] ?? 0] ?? '')) {
           share += (mesh.weights[v * 4 + j] ?? 0) / 3;
         }
       }
@@ -259,12 +259,12 @@ function triangleFacts(mesh: StudioMesh): TriangleFacts {
  * Puts the vertices of a mesh into the frame of the trunk: the hips joint, the line to the neck
  * joint, and the forward direction of the nose square to it.
  *
- * @param rig The rig of the studio body, with its bind joints.
+ * @param rig The rig of the body, with its bind joints.
  * @param positions The places of the vertices, in the bind frame of the hips bone, in meters.
  * @param facts The trunk mask and the lightness of each triangle.
  * @returns The mesh in the frame.
  */
-function trunkMesh(rig: StudioRig, positions: Float32Array, facts: TriangleFacts): TrunkMesh {
+function trunkMesh(rig: BodyRig, positions: Float32Array, facts: TriangleFacts): TrunkMesh {
   const hips = new Vector3(...rig.body.heads.hips);
   const up = new Vector3(...rig.body.heads.neck).sub(hips);
   const length = up.length();
@@ -503,22 +503,22 @@ function worstOf(
  * Poses the mesh of a player at a sample, and moves it into the bind frame of its hips bone.
  *
  * @param player The player.
- * @param rig The rig of its studio body.
+ * @param rig The rig of its body.
  * @param sample The sample.
  * @returns The places of the vertices.
  */
-function posedInHips(player: SweepPlayer, rig: StudioRig, sample: SweepSample): Float32Array {
+function posedInHips(player: SweepPlayer, rig: BodyRig, sample: SweepSample): Float32Array {
   const posed = poseSkeleton(player.model, player.poseAt(sample));
-  const pose = poseStudioBones(
+  const pose = poseBodyBones(
     rig,
     posed.model.skeleton,
     posed.pose.rotations,
-    studioOffsets(posed.pose),
+    bodyOffsets(posed.pose),
     Math.max(CLOSED_EYE_SCALE, 1 - posed.pose.blink),
-    createStudioPose(),
+    createBodyPose(),
   );
-  const out = skinStudioMesh(rig.mesh, pose);
-  const back = new Matrix4().fromArray(pose.matrices, STUDIO_BONES.indexOf('hips') * 16).invert();
+  const out = skinBodyMesh(rig.mesh, pose);
+  const back = new Matrix4().fromArray(pose.matrices, BODY_BONES.indexOf('hips') * 16).invert();
   const p = new Vector3();
   for (let v = 0; v < out.length / 3; v++) {
     p.fromArray(out, v * 3)
@@ -534,7 +534,7 @@ function posedInHips(player: SweepPlayer, rig: StudioRig, sample: SweepSample): 
  *
  * @param options The options.
  * @returns The rows.
- * @throws Error if no demo has the role, or the player has no studio body.
+ * @throws Error if no demo has the role, or the player has no body.
  */
 async function measureRows(options: Options): Promise<FormRow[]> {
   const demos = await roleDemos(options.demo ? [options.demo] : [], [], options.role);
@@ -547,7 +547,7 @@ async function measureRows(options: Options): Promise<FormRow[]> {
   if (!player) {
     throw new Error(`The first ${options.role.role} of ${demo.file} has no player.`);
   }
-  const rig = player.model.studio;
+  const rig = player.model.bodyRig;
   const facts = triangleFacts(rig.mesh);
   const rows: FormRow[] = [
     {

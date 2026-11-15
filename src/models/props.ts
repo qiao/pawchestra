@@ -11,7 +11,7 @@ import type { MeshData, Rgb, Transform } from './mesh.ts';
 import { box, quad } from './primitives.ts';
 import { SPECIES } from './species.ts';
 import type { SpeciesParams } from './species.ts';
-import { studioBodyOf } from './studio-body.ts';
+import { bodyOf } from './body.ts';
 
 /**
  * The colors of the stage, the steps, the podium, and the choir risers (design 4.5, scene
@@ -86,22 +86,22 @@ export interface SeatHeights {
   /** The height of the top of the seat above the floor, in meters. */
   readonly seatHeight: number;
   /**
-   * The depth of the seat of a chair or of the stool of the harp under a studio body, in meters
-   * (`StudioBody.chairDepth`). The seat keeps the back of the chair, and its front edge is further
-   * back. The piano bench under a studio body takes its depth from the haunch and the thighs
-   * (`StudioBody.benchDepth`), at least `PIANO_BENCH.studioDepth`. The other seats keep their own
+   * The depth of the seat of a chair or of the stool of the harp under a body, in meters
+   * (`Body.chairDepth`). The seat keeps the back of the chair, and its front edge is further
+   * back. The piano bench under a body takes its depth from the haunch and the thighs
+   * (`Body.benchDepth`), at least `PIANO_BENCH.bodyDepth`. The other seats keep their own
    * depth.
    */
   readonly seatDepth?: number;
   /**
-   * The reach of the front edge of the piano bench under a studio body in front of the floor
+   * The reach of the front edge of the piano bench under a body in front of the floor
    * point, in meters: half the depth of its fit, so a deeper bench grows back. The other seats
    * stand around the floor point.
    */
   readonly seatFront?: number;
   /**
-   * The width of the seat of a chair or of the stool of the harp under a studio body with a wide
-   * haunch, in meters (`StudioBody.chairWidth`). The legs and the back posts stay at the side edges
+   * The width of the seat of a chair or of the stool of the harp under a body with a wide
+   * haunch, in meters (`Body.chairWidth`). The legs and the back posts stay at the side edges
    * of the seat.
    */
   readonly seatWidth?: number;
@@ -263,41 +263,41 @@ export const CHAIR_LEG = 0.035;
 
 /**
  * Gives the heights of the chair or of the stool of the harp under a body (design 4.5, props): the
- * seat at the legs of the species, as deep as the chair of the studio body (design 4.4,
- * `StudioBody.chairDepth`), and wider under a wide studio body (`chairWidth`).
+ * seat at the legs of the species, as deep as the chair of the body (design 4.4,
+ * `Body.chairDepth`), and wider under a wide body (`chairWidth`).
  *
  * @param species The species of the body.
  * @param legs The height of the seat above the floor, in meters.
  * @returns The heights.
  */
 function chairHeights(species: SpeciesParams, legs: number): SeatHeights {
-  const studio = studioBodyOf(species.body);
-  const depth = studio.chairDepth;
+  const animalBody = bodyOf(species.body);
+  const depth = animalBody.chairDepth;
   if (depth === null) {
     return { seatHeight: legs };
   }
   const seat = { seatHeight: legs, seatDepth: depth };
-  return studio.chairWidth === undefined ? seat : { ...seat, seatWidth: studio.chairWidth };
+  return animalBody.chairWidth === undefined ? seat : { ...seat, seatWidth: animalBody.chairWidth };
 }
 
 /**
  * Gives the heights of the piano bench under a body (design 4.5, props): the seat at the legs of
- * the species, and the depth that fits the haunch and the thighs of the studio body
- * (`StudioBody.benchDepth`), with the front edge of the fit and at least
- * `PIANO_BENCH.studioDepth` of depth behind it, so the whole haunch sits on the bench.
+ * the species, and the depth that fits the haunch and the thighs of the body
+ * (`Body.benchDepth`), with the front edge of the fit and at least
+ * `PIANO_BENCH.bodyDepth` of depth behind it, so the whole haunch sits on the bench.
  *
  * @param species The species of the body.
  * @param legs The height of the seat above the floor, in meters.
  * @returns The heights.
  */
 function benchHeights(species: SpeciesParams, legs: number): SeatHeights {
-  const studio = studioBodyOf(species.body);
+  const animalBody = bodyOf(species.body);
   const seat = { seatHeight: legs };
-  if (studio.benchDepth === undefined) {
+  if (animalBody.benchDepth === undefined) {
     return seat;
   }
-  const depth = Math.max(studio.benchDepth, PIANO_BENCH.studioDepth);
-  return { ...seat, seatDepth: depth, seatFront: studio.benchDepth / 2 };
+  const depth = Math.max(animalBody.benchDepth, PIANO_BENCH.bodyDepth);
+  return { ...seat, seatDepth: depth, seatFront: animalBody.benchDepth / 2 };
 }
 
 /**
@@ -383,8 +383,8 @@ function addBox(builder: MeshBuilder, part: Bounds, color: Rgb): void {
 /**
  * Builds a chair: a seat, four legs, two back posts, and a wide top rail (design 4.5). The seat
  * center of the chair of design 4.5 is above the origin, and the back is at +z. A shorter seat
- * keeps the back, and its front edge is further back (`StudioBody.chairDepth`). A wider seat keeps
- * its legs and its back posts at its side edges (`StudioBody.chairWidth`).
+ * keeps the back, and its front edge is further back (`Body.chairDepth`). A wider seat keeps
+ * its legs and its back posts at its side edges (`Body.chairWidth`).
  *
  * @param seatHeight The height of the seat, in meters.
  * @param seatDepth The depth of the seat, in meters.
@@ -518,7 +518,7 @@ export function addDesk(builder: MeshBuilder, plate: readonly number[], at: Tran
 
 /**
  * Builds the stool of the harp: four legs and no back (design 4.5). The seat center is above the
- * origin. Under a studio body, the seat has the width and the depth of the seat of the chair of
+ * origin. Under a body, the seat has the width and the depth of the seat of the chair of
  * the body (`SeatHeights.seatWidth`, `seatDepth`), with its back at the back of the chair and its
  * legs at its corners, so that the knees, the shins, and the hooves stay out of it.
  *
@@ -529,7 +529,7 @@ export function buildStool(seat: SeatHeights): MeshData {
   const { seatHeight } = seat;
   const width = seat.seatWidth ?? STOOL.seatSize;
   const depth = seat.seatDepth ?? STOOL.seatSize;
-  // A seat as deep as the seat of a studio body keeps the back of the chair, as the chair does
+  // A seat as deep as the seat of a body keeps the back of the chair, as the chair does
   // (`chairSeat()`): its front edge ends where the thighs leave it, behind the knees and the shins.
   const center = seat.seatDepth === undefined ? 0 : (CHAIR.seatDepth - depth) / 2;
   const builder = new MeshBuilder();

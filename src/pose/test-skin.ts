@@ -1,14 +1,14 @@
 import { Vector3 } from 'three';
 
-import { STUDIO_BONES } from '../models/studio-format.ts';
+import { BODY_BONES } from '../models/body-format.ts';
 import {
   CLOSED_EYE_SCALE,
-  createStudioPose,
-  poseStudioBones,
-  skinStudioMesh,
-  studioOffsets,
-} from '../models/studio-rig.ts';
-import type { StudioRig } from '../models/studio-rig.ts';
+  createBodyPose,
+  poseBodyBones,
+  skinBodyMesh,
+  bodyOffsets,
+} from '../models/body-rig.ts';
+import type { BodyRig } from '../models/body-rig.ts';
 import { toVec3 } from '../models/tuples.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import { posePoint } from './frames.ts';
@@ -20,33 +20,33 @@ const onMain = new Vector3();
 /** The place of a corner on its second bone. Each call writes it before it reads it. */
 const onBlend = new Vector3();
 
-/** The posed corners of each posed skeleton of a studio body, made on the first read. */
-const studioCorners = new WeakMap<PosedSkeleton, Float32Array>();
+/** The posed corners of each posed skeleton of a body, made on the first read. */
+const bodyCorners = new WeakMap<PosedSkeleton, Float32Array>();
 
 /**
- * Poses all corners of the mesh of a player with a studio body as the GPU does (design 4.4): the
- * body with the skin of the studio, and the instrument on the bones of the player.
+ * Poses all corners of the mesh of a player with a body as the GPU does (design 4.4): the
+ * body with the skin of the body, and the instrument on the bones of the player.
  *
  * @param posed The posed skeleton.
- * @param rig The rig of the studio body of its model.
+ * @param rig The rig of the body of its model.
  * @returns x, y, z of each corner of the mesh data, in the model axes.
  */
-function posedStudioCorners(posed: PosedSkeleton, rig: StudioRig): Float32Array {
-  const known = studioCorners.get(posed);
+function posedBodyCorners(posed: PosedSkeleton, rig: BodyRig): Float32Array {
+  const known = bodyCorners.get(posed);
   if (known) {
     return known;
   }
 
   const { mesh, skeleton } = posed.model;
-  const pose = poseStudioBones(
+  const pose = poseBodyBones(
     rig,
     skeleton,
     posed.pose.rotations,
-    studioOffsets(posed.pose),
+    bodyOffsets(posed.pose),
     Math.max(CLOSED_EYE_SCALE, 1 - posed.pose.blink),
-    createStudioPose(),
+    createBodyPose(),
   );
-  const vertices = skinStudioMesh(rig.mesh, pose);
+  const vertices = skinBodyMesh(rig.mesh, pose);
   const out = new Float32Array(mesh.positions.length);
   const m = pose.matrices;
   for (let c = 0; c < mesh.bones.length; c++) {
@@ -61,7 +61,7 @@ function posedStudioCorners(posed: PosedSkeleton, rig: StudioRig): Float32Array 
       [mesh.bones[c] ?? 0, 1 - w],
       [mesh.blendBones[c] ?? 0, w],
     ] as const) {
-      const b = (STUDIO_BONES.length + bone) * 16;
+      const b = (BODY_BONES.length + bone) * 16;
       for (let k = 0; k < 3; k++) {
         out[c * 3 + k] =
           (out[c * 3 + k] ?? 0) +
@@ -73,15 +73,15 @@ function posedStudioCorners(posed: PosedSkeleton, rig: StudioRig): Float32Array 
       }
     }
   }
-  studioCorners.set(posed, out);
+  bodyCorners.set(posed, out);
   return out;
 }
 
 /**
  * Moves a corner of the mesh of a posed player to its posed place with its two bones, as the
  * GPU skin does (design 4.4, 4.7): `(1 - w) × M(bone) p + w × M(blendBone) p`. The frames hold no
- * scale, so the helper ignores the blink of the eyes. A studio body takes the skin of the studio
- * of up to four bones (`skinStudioMesh()`), with the blink. Only tests use this function, so it
+ * scale, so the helper ignores the blink of the eyes. A body takes the skin of the body
+ * of up to four bones (`skinBodyMesh()`), with the blink. Only tests use this function, so it
  * does not enter the first download.
  *
  * @param posed The posed skeleton. Its model gives the mesh.
@@ -90,9 +90,9 @@ function posedStudioCorners(posed: PosedSkeleton, rig: StudioRig): Float32Array 
  * @throws Error if a bone of the corner has no frame.
  */
 export function posedCorner(posed: PosedSkeleton, corner: number): Vec3 {
-  const { mesh, skeleton, studio } = posed.model;
-  if (studio) {
-    const corners = posedStudioCorners(posed, studio);
+  const { mesh, skeleton, bodyRig } = posed.model;
+  if (bodyRig) {
+    const corners = posedBodyCorners(posed, bodyRig);
     return [corners[corner * 3] ?? 0, corners[corner * 3 + 1] ?? 0, corners[corner * 3 + 2] ?? 0];
   }
   const point: Vec3 = [

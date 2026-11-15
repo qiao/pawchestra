@@ -9,7 +9,7 @@ step arguments as text. Before the call, the file is open, and the rig and the m
 bind of the export (`pose_bind()` of `tools/blender/bind_edit.py`). The step changes the data of
 the open file, such as a shape key `bind*`, a vertex, or a weight. It does not save, open, or
 close a file, because this script saves the file after the call. It can import the modules of
-`tools/blender/`, such as `bind_edit` and `studio_armature`. The step prints its own lines, and
+`tools/blender/`, such as `bind_edit` and `body_armature`. The step prints its own lines, and
 this script gives each one the prefix `step: `. An exception stops the script with the exit
 code 1, before the save.
 

@@ -20,7 +20,7 @@ import redits as ce  # noqa: E402
 
 P = json.load(open(os.path.join(HERE, 'params.json')))
 
-#: The joints of the source (studio units and axes: 1 unit from the soles to the ear tips, the
+#: The joints of the source (body units and axes: 1 unit from the soles to the ear tips, the
 #: soles at y 0, +z forward, +x the left side), measured on sections of the mesh and its loops.
 SOURCE = {
     'root': ([0, 0, 0], [0, 0, 0.1]),
@@ -106,12 +106,12 @@ def main():
     cfg['sourceNote'] = (
         'The Tripo P2 polar bear mesh with its quads (assets/models/polar-bear/README.md). The hand '
         'rig assets/models/polar-bear/tripo-hand/polar-bear.blend starts from it in headless Blender with the calls '
-        'of tools/blender/studio_armature.py (design 4.4, "Hand rig").'
+        'of tools/blender/body_armature.py (design 4.4, "Hand rig").'
     )
     cfg['palm'] = P['palm']
     cfg['texture'] = P['sourceTexture']
     cfg['sourceNote'] = cfg['sourceNote']
-    st = cfg['studio']
+    st = cfg['bind']
     st.pop('legTurns', None)
     cfg['chair'] = P['chair']
     cfg['chairNote'] = (
@@ -131,7 +131,7 @@ def main():
     cfg['metersPerUnitNote'] = P['metersPerUnitNote']
     cfg['eyeSize'] = P['eyeSize']
     cfg['eyeSizeNote'] = (
-        'The head height H of the body in units, as studio-body measures it on the export, before '
+        'The head height H of the body in units, as body-module measures it on the export, before '
         'the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.'
     )
     cfg['jointsNote'] = P['jointsNote']

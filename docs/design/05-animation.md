@@ -201,7 +201,7 @@ demo shows the same motion on each visit.
   `max(CLOSED_EYE_SCALE, 1 - blink)` about its eye bone. A body with lids (4.4, "Hand rig") turns
   each eye bone about the hinge axis of its lid, through the middle of the eyeball, by the share
   of the way of a bead eye from open to closed, times the angle of the lids
-  (`poseStudioBones()`). So the lid closes when a bead eye closes, at the same seeded times.
+  (`poseBodyBones()`). So the lid closes when a bead eye closes, at the same seeded times.
 
 ## 5.2 Rest pose
 
@@ -259,10 +259,10 @@ count-in (5.4, 6.5), and lower them when the hold of `transport.holdSec` after a
   lift would start before the lowering ends keeps the playing pose. The rest pose is the pose of a
   muted seat (5.5).
 - **No wrist flip.** A paw does not turn past 180° on its forearm in a move, because the twist
-  bone (`TWIST_SHARE` of `models/studio-rig.ts`) then turns over in one frame. The arm gate checks
+  bone (`TWIST_SHARE` of `models/body-rig.ts`) then turns over in one frame. The arm gate checks
   each move (`probeMoves()` of `tools/arm-check.ts`). The carried left paw of a violin or a viola
-  turns on the way on which its twist from the bind of the studio body stays between -180° and 180°
-  (`studioPawTwist()`). On a supinated bind paw, this way is a supination, as a real forearm turns.
+  turns on the way on which its twist from the bind of the body stays between -180° and 180°
+  (`bodyPawTwist()`). On a supinated bind paw, this way is a supination, as a real forearm turns.
   On a pronated bind paw, the playing grip lies past 180° in the supination, so the paw turns the
   other way, through the direction of no paw twist. Reason: the change of the hold cannot change
   the bind of the body, and the other way flips the paw on six recast bodies.
@@ -967,10 +967,10 @@ The rest of each family:
   around it, the paws go to the trap table: the left paw hangs the triangle on its stand and takes
   the tambourine, and the right paw puts down the beater, and the reverse after the run. The pose
   shows one copy of each switched piece, on the table or in a paw (`AnimalPose.held`), from the
-  score alone. The turn of each paw on its forearm mixes in the frame of the studio forearm
+  score alone. The turn of each paw on its forearm mixes in the frame of the body forearm
   (`tablePaw()`): the twist goes on a straight line between the places, and the bend of the wrist
   mixes on its own. The left paw also gives the turn in the plane of its palm (`pawTurnL`), so the
-  studio paw takes exactly the mixed turn. The right wrist goes on an arc in front of the belly
+  body paw takes exactly the mixed turn. The right wrist goes on an arc in front of the belly
   (`TAMBOURINE_HOLD.beaterArc`). Reason: a mix in the frame of `acrossAxes()` twisted the left paw
   through 180° in 0.05 s, and on a straight line the beater went into the belly. The right paw strikes the held head with the fingers, nearer to the rim and with
   less curl for a softer note. A roll of the held tambourine is a shake of the left forearm when

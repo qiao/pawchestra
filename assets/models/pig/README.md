@@ -1,7 +1,7 @@
 # Pig model
 
 This folder holds the Tripo P2 source mesh of the pig (`tripo-p2/`) and its hand rig
-(`tripo-hand/`). The app does not serve these files. It loads the module `src/models/studio/pig.ts`,
+(`tripo-hand/`). The app does not serve these files. It loads the module `src/models/bodies/pig.ts`,
 which this chain writes:
 
 ```text
@@ -12,9 +12,9 @@ tripo-hand/pig.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export pig    the same run
    v
 tripo-hand/pig.rig.glb       rigged mesh, with its summary pig.rig.json
-   │  pnpm studio-body pig   the same run
+   │  pnpm body-module pig   the same run
    v
-src/models/studio/pig.ts     studio body of the app
+src/models/bodies/pig.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -54,7 +54,7 @@ the arms and the legs, and a curly tail.
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,278 vertices and 3,656 faces: 2,891 quads and 765 triangles, no n-gon. One UV layer |
 | Parts | One part with the tail. No eyeball: the map paints each eye on faces of the head. 11 open edges in 3 small loops at the roots of the ears, and no edge with more than two faces |
-| Box | In the studio units (1 unit from the soles to the top of the head): x ±0.427 (the hoof tips), z ±0.263 (the tail and the snout disc). The pig faces -y in Blender, with its left side at +x, so the import needs no turn |
+| Box | In the body units (1 unit from the soles to the top of the head): x ±0.427 (the hoof tips), z ±0.263 (the tail and the snout disc). The pig faces -y in Blender, with its left side at +x, so the import needs no turn |
 
 The folder `pig.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness and
 the metallic maps are not kept.
@@ -83,13 +83,13 @@ of the source.
 |---|---|
 | Size | 386,111 bytes |
 | SHA-256 | `2e245e56c3cb2c6c901858204b15ac5d1d81f85b310ecbf69425413c469a48fe` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the pig faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the pig faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `pig`: 3,642 vertices and 3,968 faces (3,203 quads and 765 triangles, 7,171 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the snout disc takes the slot `fur` and the color map. The 93 faces of the two painted eyes have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/pig/tripo-hand/pig-color.webp`) |
 | Armature | `pig_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.851151 (the shoulder joints at 1.402226 m for each unit, so that H is 0.411693 m, the H of the pig of main), `crease` 180, and `mouthHeight` 0.75 ("Mouth") |
 | Eyes | The painted eye faces of the mesh, with the finish `eye` and the eye light, and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/pig/tripo-p2/pig.fbx', 1e-5)`. No vertex merges,
@@ -150,7 +150,7 @@ The weights, in the rest pose:
 5. Face rows: each vertex above y 0.70 with a head share keeps its ear shares and gives each other
    share to `head` (467 vertices). Bone heat gave the chin and the snout disc shares of the
    clavicles and the neck, because the head hangs over the shoulders. The face then moved with the
-   shoulders, and `pnpm studio-body` found the tip of the nose and the mouth at the back of the head.
+   shoulders, and `pnpm body-module` found the tip of the nose and the mouth at the back of the head.
 6. The eye faces take {`head` 1}. The tail (the flood from its farthest point back through z below
    -0.186, 167 vertices) takes {`hips` 1 - a, `tail` a}, with a = smoothstep(0, 0.02) of the length
    of the shortest edge path from the root of the tail. `tail_tip` takes no share, as on the Tripo
@@ -183,7 +183,7 @@ normal of the faces at its vertex, as the smooth shading of an FBX viewer.
 **Mouth.** The snout disc stands far in front of the lips, so the body gives the height of its
 mouth line (`mouthHeight` 0.75, a fact of the armature, design 4.4). On a cut of the bind head with
 the middle plane, the front of the lower lip lies at y 0.745 and z 0.214, and the crease under the
-disc at y 0.753. The mouth of the studio body is 6.1 cm behind the tip of the nose.
+disc at y 0.753. The mouth of the body is 6.1 cm behind the tip of the nose.
 
 **Seat.** The thighs slope 25 degrees down and 15 degrees out in the bind, the shins are vertical,
 and each foot keeps the turn of the source (`tools/rig/leg_turns.py <config> 25 15 0 0`), so that
@@ -225,9 +225,9 @@ contact, and they lowered the seat to 0.141 m.
 The pig sits on the front half of its chair: the hip joints lie about 5 cm behind the front edge,
 and the back of the haunch about 11 cm in front of the back posts. The round back reaches about
 10 cm further back than the haunch, 21 cm over the seat, and it sets the depth of the chair
-(`chairDepthOf()` of `tools/studio-body.ts`, 1 cm from the back posts). The `back` of the property
+(`chairDepthOf()` of `tools/body-module.ts`, 1 cm from the back posts). The `back` of the property
 `seat` (-0.17) gives a shallower chair, so it sets nothing. Only a trunk that leans forward in the
-bind (`studio.trunk`) would put the haunch nearer to the chair back, and that moves each hold.
+bind (`bind.trunk`) would put the haunch nearer to the chair back, and that moves each hold.
 
 **Lids.** A lid on each eye: 14 × 13 points from psi -50 to 40 degrees and lam from -75 to 80
 degrees on the left (the mirror on the right), with the lower strip as the first row. Each row lies

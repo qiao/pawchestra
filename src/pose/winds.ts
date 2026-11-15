@@ -1124,7 +1124,7 @@ const BEAVER_BASSOON = {
  * (`docs/reference/wind-technique.md` 2.2): the left hoof on the valve levers at the middle of the
  * body, below the face, the right hoof in the bell, and the horn across the body from the mouth to
  * the bell at the right of the torso. The mouthpiece rests on the lips under the snout disc
- * (`StudioBody.mouth`). The snout puts the mouth 0.31 m in front of the shoulder joints and 0.2 m
+ * (`Body.mouth`). The snout puts the mouth 0.31 m in front of the shoulder joints and 0.2 m
  * above them, and the arms of the Tripo pig are 0.3 m long. So the horn is the horn of
  * {@link WIND_HOLDS}, whose form fits these arms (`HORN`, `HORN_PLANE` of
  * `models/instruments/brass.ts`): the top of the coil is 7 cm below the mouth, at the height of the
@@ -1200,7 +1200,7 @@ const WOLF_CLARINET_FORWARD = 10;
  * quarter put each paw half behind the tube, 45° from the palm to the tube, with the finger tips
  * 2.2 cm to 2.6 cm off it, so no paw grasps the tube. The left grip moves 0.15 H down the tube,
  * because 8.5 cm above the shoulder joint, the forearm rises steeply and the retarget turns the paw
- * up along the tube (`PAW_TURN` of `models/studio-rig.ts`).
+ * up along the tube (`PAW_TURN` of `models/body-rig.ts`).
  *
  * The muzzle puts the tip of the nose in front of the mouth, so the mouthpiece sits 0.1 H lower and
  * 0.21 H further back than the mouth of the bind pose (`lipShift`), at the dark lips under the
@@ -1294,7 +1294,7 @@ const WOLF_CLARINET = {
  * 1.3 cm off the valves. The top of the right paw is 6.1 cm above the mouthpiece, so in
  * the view from the front, the paw covers the mouth, as the right hand of a real player on the
  * valve buttons. The left paw takes no side aim: the retarget turns the paw back to its forearm in
- * the plane of its palm (`PAW_TURN` of `models/studio-rig.ts`).
+ * the plane of its palm (`PAW_TURN` of `models/body-rig.ts`).
  *
  * At rest, the arms hang from square shoulders (`restArms`), and the trumpet hangs from the
  * right paw in front of the right thigh with its bell down, as a player holds the trumpet in one
@@ -2123,7 +2123,7 @@ function aroundTube(
  * of the paw faces the tube: the direction from the grip to the axis of the tube, square to the
  * tube ({@link WindHold.faceTube}). The palm faces +x of the hand of the player on the left hand
  * and -x on the right hand: a curl of the fingers (`writeCurl()` of `pose/ik.ts`) moves the
- * finger tips of the skin to that side, and `PALMS` of `models/studio-rig.ts` gives the same
+ * finger tips of the skin to that side, and `PALMS` of `models/body-rig.ts` gives the same
  * sides. The back faces the other way.
  *
  * The roll grows with the given share, the weight of the playing pose by default

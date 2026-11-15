@@ -14,8 +14,8 @@ A row gives the main options. The head comment of `tools/<name>.ts` gives each o
   `tools/hold-sets.ts`.
 - **`--base <ref>`.** Runs a commit in a child process (`tools/ref-tree.ts`), and compares it with
   the working tree. A cache by tree keeps the result. `PROBE_NO_CACHE=1` runs the commit again.
-- **`--glb <file>`.** Gives the animal the studio body of another GLB file, in a copy of `src/`
-  (`tools/glb-swap.ts`), with no `pnpm studio-body`. With `--base`, only the working tree takes it.
+- **`--glb <file>`.** Gives the animal the body of another GLB file, in a copy of `src/`
+  (`tools/glb-swap.ts`), with no `pnpm body-module`. With `--base`, only the working tree takes it.
 - **Recast role `<role>@<species>`.** The role tools take a role with another species, such as
   `violinist@wolf`, with the size rule of `tools/recast-scale.ts`. `close-views play --recast`
   puts it into the app.
@@ -74,7 +74,7 @@ variants as `--set` options of one run.
 | Command | Action |
 |---|---|
 | `pnpm pose-probe <sheet> [--time <s>]...` | Prints the posed elbow, wrist, and palm of each arm of a sheet pose (design 7.1), and the tip direction of the instrument. |
-| `pnpm pose-preview <role> [--moments <list>] [--skin] [--glb <file>]` | Writes the app pose of the first player of a role for `tools/blender/studio_preview.py` into `scratch/pose-preview/<role>.json` at the moments of `ROLE_VIEWS`. `--skin` adds the skins of its `--check`. |
+| `pnpm pose-preview <role> [--moments <list>] [--skin] [--glb <file>]` | Writes the app pose of the first player of a role for `tools/blender/body_preview.py` into `scratch/pose-preview/<role>.json` at the moments of `ROLE_VIEWS`. `--skin` adds the skins of its `--check`. |
 | `pnpm pose-depth <role> [--demo <id>]... [--every <n>] [--base <ref>]`, or `<role> --where <bone> <demo>:<time>` | The clearance sweep of a role (design 9.3): the deepest point and the share over the limit of each moving part in each obstacle. In the work loop, sweep one demo with `--every 4`, and run one full sweep at the end of a round. The row `tree` is the working tree. `--where` gives the corners of a bone in the axes of the instrument. |
 | `pnpm hold-scan <role> [--grid <path>=<a>:<b>:<step>]...` | Scores the grids and the moves of a bowed instrument around its end, on 12 play samples of one demo. The hair cell of a bow arm that reaches no hair, or less than 0.1 m, has the mark `no reach` or `short` (`tools/bow-warning.ts`). `pair-scan` marks it too, and `pose-depth` and `hold-fit` print a warning. |
 | `pnpm pair-scan <role> --pairs <set>:<part>:<obstacle>,...` | Scores the base and named variants on chosen pairs of parts. |
@@ -83,7 +83,7 @@ variants as `--set` options of one run.
 | `pnpm hold-reach <species> [--instrument <id>]` | Measures the reach of the arms to the instrument (design 4.6). `--instrument harp` gives the spare reach of each arm to each string (`tools/harp-reach.ts`). |
 | `pnpm hold-fit <role> [--set <changes>]... [--base <ref>]`, or `--scan` | Fits a hold of a role, one row for each variant: the folds, the depths, the note-target errors, and the play turns of the arms. |
 | `pnpm wind-grip <role>...` | Measures each paw on its tube over each sample set, and tells if it grasps the tube. |
-| `pnpm fold-probe <role> [--faces <n>] [--base <ref>]` | Gives the share of the samples of each set in which a face of the studio skin folds. |
+| `pnpm fold-probe <role> [--faces <n>] [--base <ref>]` | Gives the share of the samples of each set in which a face of the body skin folds. |
 | `pnpm arm-shape <role> [--rings]` | Measures the twist along the upper arm, the flat and girth shares of four rings, and the shoulder spikes. |
 | `pnpm arm-check <role>... \| --all [--base <ref>] [--views <dir>]`, or `--world --base <ref>` | The arm gate (design 4.4): the `ARM_LIMITS` of each arm over the fold samples and the moves, with `FAIL` (exit code 1), `OPEN`, `WORSE`, `REBIND`, or `PASS`. A value worse than the base fails only past `NEAR_LIMIT` of its limit. `--world` gives the largest move of the arm joints and turn of the palms against the commit, with `SAME` or `MOVED` (exit code 1). |
 | `pnpm cast-matrix [--roles <list>] [--species <list>] [--quick] [--base <ref>]` | Recasts each species into each role with the shared hold and the size rule (design 4.4), and writes a table of `PASS`, `OPEN`, or `FAIL` with the worst arm gate value and the deepest clip. |
@@ -106,16 +106,16 @@ Blender 5.2 or later comes from the variable `BLENDER`, or from the path.
 | Command | Action |
 |---|---|
 | `pnpm rig-export <animal> [--blend <file>] [--out <file.glb>]` | Exports the hand rig `assets/models/<animal>/tripo-hand/<animal>.blend` (design 4.4, "Hand rig") into `<animal>.rig.glb` and the summary `<animal>.rig.json` with headless Blender. It stops at the first fault of the layout (exit code 1). |
-| `blender -b --factory-startup --python tools/blender/simple_rig.py -- <config.json> --out <file.blend>` | Rigs a clean quad source by the simple route (design 4.4) with the config of `tools/mesh-rigs/simple/`, into the `.blend` of a hand rig. Then run `pnpm rig-export` and `pnpm studio-body`. |
-| `pnpm hand-chain <species> [--build]` | Rebuilds the hand rig of a Tripo body from its chain in `tools/blender/hand/<species>/` (`tools/hand-chain.sh`): the rig config, the `.blend` in headless Blender, `rig-export`, and `studio-body`. `--build` then runs `pnpm build`. It stops at the first fault with the tail of its log in `scratch/hand/<species>/`, and prints the head height and the seat height. |
+| `blender -b --factory-startup --python tools/blender/simple_rig.py -- <config.json> --out <file.blend>` | Rigs a clean quad source by the simple route (design 4.4) with the config of `tools/mesh-rigs/simple/`, into the `.blend` of a hand rig. Then run `pnpm rig-export` and `pnpm body-module`. |
+| `pnpm hand-chain <species> [--build]` | Rebuilds the hand rig of a Tripo body from its chain in `tools/blender/hand/<species>/` (`tools/hand-chain.sh`): the rig config, the `.blend` in headless Blender, `rig-export`, and `body-body`. `--build` then runs `pnpm build`. It stops at the first fault with the tail of its log in `scratch/hand/<species>/`, and prints the head height and the seat height. |
 | `pnpm rig-trial <animal> <role> <tag> <step.py\|-> [--base <tag>] [--probes fold,depth] [--pair <tag>]`, or `<animal> --apply <tag>` | Tries a scripted edit of a hand rig on the copy `scratch/trials/<animal>/<tag>.blend` (contract: `tools/blender/rig_trial.py`), exports it, and renders the close views into `reports/trials/<animal>/<tag>/`. The default base and the target of `--apply` are `assets/models/<animal>/tripo-hand/<animal>.blend`. `--apply` runs the steps on that file, and keeps the result only when its GLB file equals the GLB file of the trial. |
 | `pnpm bind-view <file.blend> [--box <box>] [--view <axis>] [--pose <file> --moment <name>]` | Draws a part of the seated bind with its vertex ids (`tools/blender/bind_view.py`), and prints its thin faces and sharp edges. `--pose` draws the app pose of a file of `pose-preview --glb`. |
-| `blender -b --factory-startup --python tools/blender/studio_armature.py -- --drive <file.blend>`, or `--rolls <file.blend>` | Keys the arm segments of the Action `bind` of a hand rig by the rule of the app (`--drive`), or gives each bone the roll of its hint (`--rolls`). A chain or a live Blender imports the module for `add_surface()` and the armature steps. |
-| `blender -b --factory-startup <copy.blend> --python tools/blender/studio_preview.py -- --check <pose.json>` | Prints for each moment of a file of `pose-preview --skin` the largest gap of the preview from the GLB skin and from the app skin. |
+| `blender -b --factory-startup --python tools/blender/body_armature.py -- --drive <file.blend>`, or `--rolls <file.blend>` | Keys the arm segments of the Action `bind` of a hand rig by the rule of the app (`--drive`), or gives each bone the roll of its hint (`--rolls`). A chain or a live Blender imports the module for `add_surface()` and the armature steps. |
+| `blender -b --factory-startup <copy.blend> --python tools/blender/body_preview.py -- --check <pose.json>` | Prints for each moment of a file of `pose-preview --skin` the largest gap of the preview from the GLB skin and from the app skin. |
 | `blender -b --factory-startup --python tools/blender/mannequin.py -- <human\|animal> --out <dir>` | Writes the test mannequin of a preset (design 4.4) as GLB and FBX files, with the test clips (`assets/models/mannequin/README.md`). |
 | `pnpm mixamo-import <file> --out <dir>` | Converts a Mixamo file into a GLB file in meters with one animation for each take (design 4.4). The folder must be one that git ignores (design 8.1). |
-| `pnpm studio-body <animal> [--inspect]`, or `--heights` | Writes `src/models/studio/<animal>.ts` from `glb` of `ANIMALS`, with no Blender, and then `src/models/studio-heights.ts`. `--heights` writes only the heights file. `--inspect` prints the joints and the clips. |
-| `pnpm regen-studio [<animal>...]`, or `--heights` | Runs `studio-body` for each animal (default: all) and `--heights`, and prints `same`, `DIFF`, `NEW`, or `FAIL` for each file against `HEAD`. Code: `tools/regen-studio.sh`. |
+| `pnpm body-module <animal> [--inspect]`, or `--heights` | Writes `src/models/bodies/<animal>.ts` from `glb` of `ANIMALS`, with no Blender, and then `src/models/body-heights.ts`. `--heights` writes only the heights file. `--inspect` prints the joints and the clips. |
+| `pnpm regen-bodies [<animal>...]`, or `--heights` | Runs `body-body` for each animal (default: all) and `--heights`, and prints `same`, `DIFF`, `NEW`, or `FAIL` for each file against `HEAD`. Code: `tools/regen-bodies.sh`. |
 | `pnpm view-point [<x>,<y>,<z>]...` | Projects each point into the default view with no render, and prints its pixel and its depth. |
 
 ## Tests and scripts

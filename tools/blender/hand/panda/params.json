@@ -70,7 +70,7 @@
   "crease": 180,
   "seatWidth": 0.66
  },
- "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/body-module.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
  "metersPerUnit": 1.807249,
  "eyeSize": 0.276502,
  "rings": {

@@ -3,7 +3,7 @@
 # of the product. The images of a report go into the folder `reports/`, which git ignores (design
 # 9.8), because report images made most of the size of the git history. The texture folder of an
 # FBX source mesh (`assets/models/<s>/**/<name>.fbm/`) is a source file. The web color map and the
-# web normal map of a studio body (`assets/models/<s>/**/<name>-color.webp` and `-normal.webp`,
+# web normal map of a body (`assets/models/<s>/**/<name>-color.webp` and `-normal.webp`,
 # design 4.5) are images of the product.
 # `pnpm install` sets `core.hooksPath` to this folder.
 set -euo pipefail

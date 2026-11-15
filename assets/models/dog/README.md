@@ -1,7 +1,7 @@
 # Dog model
 
 This folder holds the Tripo P2 source mesh of the dog (`tripo-p2/`) and its hand rig
-(`tripo-hand/`). The app does not serve these files. It loads the module `src/models/studio/dog.ts`,
+(`tripo-hand/`). The app does not serve these files. It loads the module `src/models/bodies/dog.ts`,
 which this chain writes:
 
 ```text
@@ -12,9 +12,9 @@ tripo-hand/dog.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export dog    the same run
    v
 tripo-hand/dog.rig.glb       rigged mesh, with its summary dog.rig.json
-   │  pnpm studio-body dog   the same run
+   │  pnpm body-module dog   the same run
    v
-src/models/studio/dog.ts     studio body of the app
+src/models/bodies/dog.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -53,7 +53,7 @@ A friendly beagle in a T-pose with quad faces, made with Tripo P2 from the sheet
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,224 vertices and 3,526 faces: 2,888 quads and 638 triangles, no n-gon. One UV layer |
 | Parts | 3 parts: the body with the ears and the tail (3,150 vertices), and one eyeball on each side: a dome of 37 vertices and 36 faces, open at its rim, a sphere of radius 0.0332 units about (±0.0383, 0.8997, 0.1132). 28 open edges (24 at the rims of the domes, 4 at a small hole of the left foot), and no edge with more than two faces |
-| Box | In the studio units (1 unit from the soles to the top of the head): x ±0.428 (the paw tips), z -0.261 (the tail) to 0.261 (the nose). The beagle faces -y in Blender, with its left side at +x, so the import needs no turn |
+| Box | In the body units (1 unit from the soles to the top of the head): x ±0.428 (the paw tips), z -0.261 (the tail) to 0.261 (the nose). The beagle faces -y in Blender, with its left side at +x, so the import needs no turn |
 
 The folder `dog.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness and
 the metallic maps are not kept.
@@ -79,13 +79,13 @@ scripts are those of the Tripo wolf with the values of the beagle. `make_config.
 | Item | Value |
 |---|---|
 | Size | 393,883 bytes. A new build gives the same export, but not the same `.blend` bytes |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the beagle faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the beagle faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `dog`: 3,770 vertices and 4,020 faces (3,382 quads and 638 triangles, 7,402 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 115 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 72 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/dog/tripo-hand/dog-color.webp`) |
 | Armature | `dog_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, `lids`, and `headFactor` come from the steps below |
 | Facts | `height` 0.977184 (the shoulder joints at 1.508 m for each unit, so that H is 0.41623 m, 1.27 times the H of the dog of main: "Size" below), `crease` 180 |
 | Eyes | The eyeballs of the source, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/dog/tripo-p2/dog.fbx', 1e-5)`. No vertex merges,
@@ -149,7 +149,7 @@ normal of the faces at its vertex, as the smooth shading of an FBX viewer.
 smooth normals of the fur. As flat gloss faces in one color, the nose showed facets and no nostrils.
 The weights do not change: the nose vertices keep the row {`head` 1}. The armature property
 `headShift` (0, 0, -0.007327586) moves the head center of the holds back to the head center of the
-gloss nose, because the head box of `pnpm studio-body` now holds the nose. Thus no hold moves. The
+gloss nose, because the head box of `pnpm body-module` now holds the nose. Thus no hold moves. The
 nose keeps the colors of the source map. In the hall light it reads as the nose of the FBX file, so
 the map tool does not change it.
 
@@ -230,7 +230,7 @@ joint goes to (0, 0.704, 0.029), and each ear joint to (±0.099, 0.884, 0.002) w
 not change. The lids are made after the scale, so they fit the scaled balls.
 
 This is the head growth of `pnpm rig-mesh` (`headFactor`) with the factor 0.9. Thus the armature
-has the property `headFactor` 0.9, the export writes it, and `pnpm studio-body` measures H and the
+has the property `headFactor` 0.9, the export writes it, and `pnpm body-module` measures H and the
 head center before the factor (design 4.4). H stays 0.41623 m, the head center moves 0.05 mm, and
 each hold in units of H keeps its place. The measures, with `scratch/beagle/head_measure.py` (the
 fur vertices that follow the head most, in the rest, and the seated bind):

@@ -1,6 +1,6 @@
 {
   "source": "assets/models/polar-bear/tripo-p2/polar-bear.fbx",
-  "sourceNote": "The Tripo P2 polar bear mesh with its quads (assets/models/polar-bear/README.md). The hand rig assets/models/polar-bear/tripo-hand/polar-bear.blend starts from it in headless Blender with the calls of tools/blender/studio_armature.py (design 4.4, \"Hand rig\").",
+  "sourceNote": "The Tripo P2 polar bear mesh with its quads (assets/models/polar-bear/README.md). The hand rig assets/models/polar-bear/tripo-hand/polar-bear.blend starts from it in headless Blender with the calls of tools/blender/body_armature.py (design 4.4, \"Hand rig\").",
   "name": "Polar bear",
   "weld": 1e-05,
   "joints": {
@@ -206,14 +206,14 @@
       ]
     }
   },
-  "jointsNote": "The places are the places of the source, mapped by the point edits of the hand rig (assets/models/polar-bear/README.md). The source places are in the studio units and axes of the source pose: 1 unit from the soles to the top of the head, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (axis y 0.67, z -0.01 to 0.02, height 0.21 at the root to 0.134 at x 0.31): the shoulder joint at x 0.125 inside the arm root (the armpit at x 0.16), the elbow at x 0.245 (0.52 of the arm from the shoulder to the wrist, as on the main polar bear), the wrist at x 0.355 where the paw widens, the knuckles at x 0.425 where the claws start, the tip at x 0.463. Leg: the hip joint at y 0.29, the knee at y 0.165 above the narrow shin, the ankle at y 0.062 above the heel, the ball of the foot at z 0.075, and the toe tips at z 0.14. Trunk: the joints on the middle line of the trunk sections. Head: the chin at y 0.79 and the top of the skull at y 1.0. Tail: the short tail at the back of the haunch at y 0.355. The palm faces down: the paws of the source lie flat with the claws at their front edge.",
+  "jointsNote": "The places are the places of the source, mapped by the point edits of the hand rig (assets/models/polar-bear/README.md). The source places are in the body units and axes of the source pose: 1 unit from the soles to the top of the head, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (axis y 0.67, z -0.01 to 0.02, height 0.21 at the root to 0.134 at x 0.31): the shoulder joint at x 0.125 inside the arm root (the armpit at x 0.16), the elbow at x 0.245 (0.52 of the arm from the shoulder to the wrist, as on the main polar bear), the wrist at x 0.355 where the paw widens, the knuckles at x 0.425 where the claws start, the tip at x 0.463. Leg: the hip joint at y 0.29, the knee at y 0.165 above the narrow shin, the ankle at y 0.062 above the heel, the ball of the foot at z 0.075, and the toe tips at z 0.14. Trunk: the joints on the middle line of the trunk sections. Head: the chin at y 0.79 and the top of the skull at y 1.0. Tail: the short tail at the back of the haunch at y 0.355. The palm faces down: the paws of the source lie flat with the claws at their front edge.",
   "palm": [
     0,
     -1,
     0
   ],
   "palmNote": "The paws of the source lie flat with the claws curled down, so the palm faces down.",
-  "studio": {
+  "bind": {
     "trunk": {
       "open": 1,
       "shares": {
@@ -343,7 +343,7 @@
     "front": -0.045,
     "back": -0.2,
     "backHeight": 0.01,
-    "note": "The piano bench of the pianist, as on the earlier Tripo polar bear (benchFitOf() of tools/studio-body.ts)."
+    "note": "The piano bench of the pianist, as on the earlier Tripo polar bear (benchFitOf() of tools/body-module.ts)."
   },
   "armSegments": {
     "helper": 0.03,
@@ -356,9 +356,9 @@
   "body": {
     "crease": 55
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 55, because the limb rings of the source have 15 or 17 vertices, and the Tripo mesh has many poles.",
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/body-module.ts) beside the height: the crease angle 55, because the limb rings of the source have 15 or 17 vertices, and the Tripo mesh has many poles.",
   "metersPerUnit": 2.00323,
   "metersPerUnitNote": "The scale of the app: H of the main polar bear (0.422795 m). The polar bear is the largest player.",
   "eyeSize": 0.21106,
-  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye."
+  "eyeSizeNote": "The head height H of the body in units, as body-module measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye."
 }

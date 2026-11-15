@@ -29,14 +29,14 @@ first download                                lazy, after the first frame
 | `midi/` | Parse the bytes of a Standard MIDI File into tracks of events in ticks. | yes | first download |
 | `score/` | Apply the rules of section 3, and build the `Score` with `buildScore()` (3.2). | yes | first download |
 | `pose/` | `poseAt()` (5.1). | yes | first download |
-| `models/` | The species, the studio bodies, the instruments, and `layoutScene()`. | yes | first download; each body with the piece that casts it (7.2) |
+| `models/` | The species, the bodies, the instruments, and `layoutScene()`. | yes | first download; each body with the piece that casts it (7.2) |
 | `shots/` | The camera shots of 5.6: `prepareShots()` and `cameraAt()`. | yes | first download |
 | `scene/` | Three.js: stage, lights, camera, quality tiers, poses applied to bones. | no | first download |
 | `audio/` | The `Player`, the Worker, and the worklet processor. | no (the block scheduler is pure) | lazy |
 | `app/`, `ui/` | Load flow, transport, seat list, URL hash, settings. | no | first download |
 | `gallery/` | The development pages `gallery.html` and `views.html`. | no | own entry |
 | `test-page/` | The development page `test.html`, at `/test`. | no | own build pass |
-| `tools/` | The build scripts, the tools of a studio body (4.4), the probes, and the image tools (`docs/agents/commands.md`). | no | build only |
+| `tools/` | The build scripts, the tools of a body (4.4), the probes, and the image tools (`docs/agents/commands.md`). | no | build only |
 
 ### Pure modules
 
@@ -111,7 +111,7 @@ posed head of each bone.
 
 `views.html` shows the animals with the rows, the places, and the labels of
 `docs/reference/animals.webp`, so that a person can put the two images side by side.
-`?page=bears` shows the bear family. The page has an orthographic camera, its own studio light
+`?page=bears` shows the bear family. The page has an orthographic camera, its own body light
 (`VIEW_LIGHT`), and the tone mapping and the grade of the stage (`GRADE_FUNCTION`, 4.5). One
 light serves all pages of `views.html`, and the stage keeps its own light.
 
@@ -230,38 +230,38 @@ owner. A change that moves the size by more than 5 KB states the reason in its c
 
 `pnpm size` (`tools/size.ts`) sums the gzip sizes of `index.html`, the CSS, the entry chunk with
 its static imports and their assets, the MIDI file of the default demo (`DEFAULT_DEMO`, 8.2), and
-the chunks of the studio bodies that the default demo casts. It does not count the audio code, the SF3 files, the development pages, and the other demos. The
+the chunks of the bodies that the default demo casts. It does not count the audio code, the SF3 files, the development pages, and the other demos. The
 app loads the audio code after the first frame, and another demo when the user selects it. A
 file that is gzip data already counts with its own size, because the host sends it with no
 second gzip. `--base <ref>` also builds a commit, and prints both totals.
 
-The packed meshes of the studio bodies are the largest part of the app. Thus each body module
+The packed meshes of the bodies are the largest part of the app. Thus each body module
 is a chunk of its own, and the app loads only the bodies that a piece casts. The first step of
 the scene plan loads the bodies of the score (`castBodiesSteps()` of `app/body-loads.ts`): the
 bear conductor and the species of each seat with players. A body loads one time, so a piece
 change loads only its new species. The layout needs the head height and the seat height of each
-species before the load, so `pnpm studio-body` writes these two values into
-`models/studio-heights.ts`, and `species.ts` reads them from there.
+species before the load, so `pnpm body-module` writes these two values into
+`models/body-heights.ts`, and `species.ts` reads them from there.
 
-The pure core reads each body from a registry (`studioBodyOf()` of `models/studio-body.ts`). In
-Node, the registry holds all bodies of `models/studio-bodies.ts`, so the tools and the tests load
-nothing. The plugin `BROWSER_STUDIO_BODIES` of `vite.config.ts` gives the browser code an empty
+The pure core reads each body from a registry (`bodyOf()` of `models/body.ts`). In
+Node, the registry holds all bodies of `models/bodies.ts`, so the tools and the tests load
+nothing. The plugin `BROWSER_BODIES` of `vite.config.ts` gives the browser code an empty
 record in place of that module, in the dev server and in the build. The app and the gallery thus
-fill the registry with `loadStudioBodies()`, which loads each module with `import()`.
+fill the registry with `loadBodies()`, which loads each module with `import()`.
 
 ```typescript
 /** Loads the body modules that are not loaded. All bodies when no names are given. */
-export function loadStudioBodies(names?: readonly StudioBodyName[]): Promise<void>;
+export function loadBodies(names?: readonly BodyName[]): Promise<void>;
 /** Gives the bodies that a score casts: the conductor and each seat with players. */
-export function castBodies(score: Score): StudioBodyName[];
+export function castBodies(score: Score): BodyName[];
 ```
 
-Each packed mesh has a gzip budget (`STUDIO_MESH_GZIP_BUDGET` of `tools/studio-budgets.ts`), and
-the bodies of the default demo count against the limit. `packStudioMesh()` writes one stream for
+Each packed mesh has a gzip budget (`BODY_MESH_GZIP_BUDGET` of `tools/body-budgets.ts`), and
+the bodies of the default demo count against the limit. `packBodyMesh()` writes one stream for
 each kind of number, so that gzip finds the repeats.
 
 The texture points of a body with a color map (4.5) are in its module, so they count. An atlas of
-Tripo has about two points for each vertex, so `packStudioUvs()` predicts each new point from two
+Tripo has about two points for each vertex, so `packBodyUvs()` predicts each new point from two
 known corners of its triangle and the places of the vertices, as the parallelogram rule of a mesh
 codec does, and writes only the miss. The image itself is not in the first download: the first
 draw of the body starts its load in the next animation frame, from a lazy URL chunk of Vite
@@ -353,7 +353,7 @@ holds the two hall impulse responses (CC BY 4.0, 6.8), the GitHub mark (MIT, Pri
 `dependencies` is not in its list, and when a package of the list is not installed. Thus a new
 dependency that the site ships gets an entry in the same commit. A tool that the site does not
 ship gets no entry, such as `wasm-media-encoders` and the FLAC writer of `tools/hall-flac.py`.
-The meshes of the studio bodies (4.4) are made for this project by its owner, who holds their
+The meshes of the bodies (4.4) are made for this project by its owner, who holds their
 rights, so they need no entry.
 
 - CC0 1.0 has no condition. The entries of VSCO 2 CE and VCSL still give the credit that the

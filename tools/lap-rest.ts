@@ -15,11 +15,11 @@ import { BONE_NAMES, boneIndex } from '../src/models/rig.ts';
 import type { BoneName } from '../src/models/rig.ts';
 import type { SpeciesId } from '../src/models/species.ts';
 import {
-  createStudioPose,
-  poseStudioBones,
-  skinStudioMesh,
-  studioOffsets,
-} from '../src/models/studio-rig.ts';
+  createBodyPose,
+  poseBodyBones,
+  skinBodyMesh,
+  bodyOffsets,
+} from '../src/models/body-rig.ts';
 import { bowedRig, holdOf } from '../src/pose/bowed-rig.ts';
 import { countInAt } from '../src/pose/count-in.ts';
 import { isInFamily } from '../src/pose/family.ts';
@@ -52,7 +52,7 @@ const REST_WALLS: readonly number[] = [10, 13.7, 21.1, 29.3];
 const LAP_BONES: readonly BoneName[] = ['thighL', 'thighR', 'hips'];
 
 /**
- * The bones of the top of the lap of a studio body under the lower end of a violin and under the
+ * The bones of the top of the lap of a body under the lower end of a violin and under the
  * frog of the bow: the bones of `lapPoint()` of `pose/lap.ts`. The skin blends the thighs into the
  * hips, and the round belly of the rabbit covers the top of its thighs with triangles of the
  * spine: the triangles of the thighs over the middle of its thighs are their underside.
@@ -368,7 +368,7 @@ function sectionPoints(triangles: readonly Triangle[], height: number): Vector3[
 
 /**
  * Gives the triangles of the trunk of a posed player, each moved by its main bone alone: the bone
- * of its first corner, one of {@link TRUNK_BONES}. The skin of a studio body gives the side of the
+ * of its first corner, one of {@link TRUNK_BONES}. The skin of a body gives the side of the
  * trunk under the armpit a part of the weight of the upper arm, so a raised arm drags that skin
  * out. In a rest of the rabbit, the posed skin of the trunk can reach 26 cm out from the middle at
  * the height of the right elbow, and the trunk moved by its main bones alone reaches 14 cm.
@@ -687,7 +687,7 @@ export interface ScanSample {
   readonly scene: TestScene;
   /** The index of the player in the layout. */
   readonly index: number;
-  /** The player model, with its studio rig. */
+  /** The player model, with its body rig. */
   readonly model: PlayerModel;
   /** The species of the player. */
   readonly species: SpeciesId;
@@ -810,25 +810,27 @@ function rebuiltRig(
 }
 
 /**
- * Counts the folded faces of the studio skin of a posed player by the side of their main bone, as
+ * Counts the folded faces of the body skin of a posed player by the side of their main bone, as
  * `countPose()` of `pnpm fold-probe` finds them (`foldedFaces()`).
  *
  * @param model The player model.
  * @param pose The pose of the player.
- * @returns The folded faces by side, or none for a model with no studio rig.
+ * @returns The folded faces by side, or none for a model with no body rig.
  */
-function studioFolds(model: PlayerModel, pose: AnimalPose): SideSplit {
-  const rig = model.studio;
-  const studio = poseStudioBones(
+function bodyFolds(model: PlayerModel, pose: AnimalPose): SideSplit {
+  const rig = model.bodyRig;
+  const bodyPose = poseBodyBones(
     rig,
     model.skeleton,
     pose.rotations,
-    studioOffsets(pose),
+    bodyOffsets(pose),
     1,
-    createStudioPose(),
+    createBodyPose(),
   );
-  const posed = skinStudioMesh(rig.mesh, studio);
-  return sideSplit(foldedFaces(rig.mesh, studio.matrices, posed).map((f) => mainBone(rig.mesh, f)));
+  const posed = skinBodyMesh(rig.mesh, bodyPose);
+  return sideSplit(
+    foldedFaces(rig.mesh, bodyPose.matrices, posed).map((f) => mainBone(rig.mesh, f)),
+  );
 }
 
 /** The rest of one scan sample with the holds of now. */
@@ -837,7 +839,7 @@ interface ScanRest {
   readonly sample: string;
   /** The lap rest of the sample ({@link lapRest}), or `null` for a player with no instrument. */
   readonly lap: LapRest | null;
-  /** The folded faces of the studio skin by the side of their main bone ({@link studioFolds}). */
+  /** The folded faces of the body skin by the side of their main bone ({@link bodyFolds}). */
   readonly folds: SideSplit;
   /**
    * The depth of the instrument in the body, in meters: the deepest corner of the bones of
@@ -892,7 +894,7 @@ export function scanRest(sample: ScanSample, body: SweepObstacle): ScanRest {
   return {
     sample: sample.sample,
     lap: lapRest(posed, surface),
-    folds: studioFolds(model, pose),
+    folds: bodyFolds(model, pose),
     held: instrumentDepth(posed, surface),
   };
 }

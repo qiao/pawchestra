@@ -8,7 +8,7 @@
 #   1. make_config.py writes tools/mesh-rigs/simple/<species>-tripo.json.
 #   2. build.py writes assets/models/<species>/tripo-hand/<species>.blend in headless Blender.
 #   3. pnpm rig-export writes <species>.rig.glb and <species>.rig.json.
-#   4. pnpm studio-body writes src/models/studio/<species>.ts and src/models/studio-heights.ts.
+#   4. pnpm body-module writes src/models/bodies/<species>.ts and src/models/body-heights.ts.
 #   5. With --build, pnpm build builds the app.
 #
 # The logs go into scratch/hand/<species>/. Blender comes from the variable BLENDER, or from the
@@ -45,9 +45,9 @@ step config uv run -q --no-project --with numpy python -I "$chain/make_config.py
 step blender "$BLENDER" -b --factory-startup --python-exit-code 1 --python "$chain/build.py" -- \
   --out "$rig.blend"
 step export pnpm rig-export "$species" --blend "$rig.blend" --out "$rig.rig.glb"
-step studio pnpm studio-body "$species"
+step body pnpm body-module "$species"
 if [[ "${2:-}" == "--build" ]]; then
   step app-build pnpm build
 fi
 
-command grep -oE '(headHeight|seatHeight): [0-9.]+' "src/models/studio/$species.ts"
+command grep -oE '(headHeight|seatHeight): [0-9.]+' "src/models/bodies/$species.ts"

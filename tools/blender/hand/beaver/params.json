@@ -55,7 +55,7 @@
  "body": {
   "crease": 180
  },
- "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/body-module.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
  "metersPerUnit": 1.01029,
  "metersPerUnitNote": "The scale of the app: H of the beaver of main (assets/models/beaver/beaver.rig.glb at cbc8db5e4).",
  "eyeSize": 0.30728,
@@ -93,7 +93,7 @@
    "cuts": 1
   }
  ],
- "ringSeedsNote": "The two bands of the elbow, from x 0.234 to the ring through the poles at x 0.268 to 0.276, and from that ring to x 0.299. Each band is a clean ring of 12 quads, but the ring between them goes through two poles, so subdivide() finds no closed loop there. One cut halves each band, so that a ring stands each 0.015 units over the bend, as on the upper arm and the forearm. Each seed is the middle of one edge along the arm on the left side, in studio units of the source (seed_rings() of build.py).",
+ "ringSeedsNote": "The two bands of the elbow, from x 0.234 to the ring through the poles at x 0.268 to 0.276, and from that ring to x 0.299. Each band is a clean ring of 12 quads, but the ring between them goes through two poles, so subdivide() finds no closed loop there. One cut halves each band, so that a ring stands each 0.015 units over the bend, as on the upper arm and the forearm. Each seed is the middle of one edge along the arm on the left side, in body units of the source (seed_rings() of build.py).",
  "rows": {
   "start": 0.17,
   "reach": 0.08,

@@ -1,4 +1,4 @@
-"""Rigs a source mesh into the `.blend` of a studio body by the simple route: no cut, no cap, no
+"""Rigs a source mesh into the `.blend` of a body by the simple route: no cut, no cap, no
 remesh, and no rebuild of the arms. The only edits of the mesh are a plain stretch of the limbs
 and new rings on the quads of the arms, which keep the form of the surface.
 
@@ -6,7 +6,7 @@ and new rings on the quads of the arms, which keep the form of the surface.
         --out <dir>/<animal>.blend [--smooth <passes>]
 
 Then `pnpm rig-export <animal> --blend <dir>/<animal>.blend --out <dir>/<animal>.rig.glb` writes
-the GLB file of the body, and `pnpm studio-body <animal>` writes its module.
+the GLB file of the body, and `pnpm body-module <animal>` writes its module.
 
 The steps:
  1. Import the source mesh (a GLB file, or an FBX file that keeps its quads), weld its vertices,
@@ -39,8 +39,8 @@ import bpy
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import studio_armature as sa  # noqa: E402
-import studio_eyes as se  # noqa: E402
+import body_armature as sa  # noqa: E402
+import body_eyes as se  # noqa: E402
 
 #: The weight smooth of the test rig: the number of passes, and the share of the mean of the
 #: neighbors that each pass gives a vertex.
@@ -58,7 +58,7 @@ def smoothstep(x, low, high):
 
 def arm_axis(config, sign):
     """Gives the shoulder joint, the unit direction to the wrist joint, and the length to it of the
-    arm of one side (sign 1 for the left side, -1 for the right side), in the studio axes."""
+    arm of one side (sign 1 for the left side, -1 for the right side), in the body axes."""
     mirror = np.array([sign, 1.0, 1.0])
     shoulder = np.array(config['joints']['upper_arm_L']['head']) * mirror
     wrist = np.array(config['joints']['hand_L']['head']) * mirror
@@ -67,7 +67,7 @@ def arm_axis(config, sign):
 
 
 def limb_moves(points, config):
-    """Moves points (studio axes, n x 3) by the stretch of the limbs (`limbs` of the config).
+    """Moves points (body axes, n x 3) by the stretch of the limbs (`limbs` of the config).
 
     Each arm grows by `arm` along the line from the shoulder joint to the wrist joint, and the paw
     beyond the wrist moves with the wrist and keeps its size. Only a point near the line moves
@@ -107,7 +107,7 @@ def stretch_limbs(body, config, eyes):
     me = body.data
     co = np.empty(len(me.vertices) * 3)
     me.vertices.foreach_get('co', co)
-    moved = limb_moves(co.reshape(-1, 3) @ sa.TO_STUDIO.T, config) @ sa.TO_STUDIO
+    moved = limb_moves(co.reshape(-1, 3) @ sa.TO_BODY.T, config) @ sa.TO_BODY
     me.vertices.foreach_set('co', moved.ravel())
     me.update()
 
@@ -117,7 +117,7 @@ def stretch_limbs(body, config, eyes):
             if isinstance(spec.get(key), list):
                 spec[key] = limb_moves(np.array([spec[key]], float), config)[0].tolist()
     eyes = {
-        side: (limb_moves((middle @ sa.TO_STUDIO.T)[None], config)[0] @ sa.TO_STUDIO, facing)
+        side: (limb_moves((middle @ sa.TO_BODY.T)[None], config)[0] @ sa.TO_BODY, facing)
         for side, (middle, facing) in eyes.items()
     }
     return {**config, 'joints': joints}, eyes
@@ -165,7 +165,7 @@ def subdivide_rings(body, config):
     added, skipped = 0, []
     for sign in (1.0, -1.0):
         shoulder, along, length = arm_axis(config, sign)
-        co = np.array([v.co[:] for v in bm.verts]) @ sa.TO_STUDIO.T
+        co = np.array([v.co[:] for v in bm.verts]) @ sa.TO_BODY.T
         t = (co - shoulder) @ along
         r = np.linalg.norm(co - shoulder - np.outer(t, along), axis=1)
         arm = (r < rule['armRadius']) & (t > 0)
@@ -357,7 +357,7 @@ def old_eyes(body, config, rm):
     co = co.reshape(-1, 3)
     texture = sa.base_texture(os.path.join(sa.ROOT, config.get('texture', config['source'])))
     rgb, dark = sa.polygon_colors(me, texture, config['colors'], rm)
-    eyes, _ = rm['features'](co @ sa.TO_STUDIO.T, tris, rgb[owner], dark[owner], config['colors'])
+    eyes, _ = rm['features'](co @ sa.TO_BODY.T, tris, rgb[owner], dark[owner], config['colors'])
     out = {}
     for side, faces in eyes.items():
         corners = co[tris[faces]]

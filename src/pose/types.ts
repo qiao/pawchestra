@@ -22,7 +22,7 @@ export interface AnimalPose {
   readonly instrumentOffset?: readonly [number, number, number];
   /**
    * The turn of the left paw in the plane of its palm, in radians, in place of the turn of the
-   * retarget toward the forearm (`PAW_TURN` of `models/studio-rig.ts`, 4.4), or `null` for that
+   * retarget toward the forearm (`PAW_TURN` of `models/body-rig.ts`, 4.4), or `null` for that
    * turn. A violin or a viola at rest and in the lift and the lowering keeps the turn of the
    * playing grip, so that the instrument keeps its place in the paw (5.2). A percussion hold with
    * `keepPaw` gives 0 to each paw that holds a piece, so that the piece stays in the closed paw
@@ -46,14 +46,14 @@ export interface AnimalPose {
    * of the left paw first, from the thumb side (4.4, 5.3). On a paw with a digit bone for each
    * claw (`digitBendsAt()` of `pose/piano-digits.ts`), a positive bend turns the claw down toward
    * the palm. On a fist with a thumb bone, only digit 1 moves: a positive bend closes the thumb
-   * across the palm (`poseThumb()` of `models/studio-rig.ts`), and fingers 2 to 4 follow the
+   * across the palm (`poseThumb()` of `models/body-rig.ts`), and fingers 2 to 4 follow the
    * `fingers` bone. It is `null` or absent for a pose with no digit motion: then each digit keeps
    * the turn of its paw or of the fingers.
    */
   readonly digits?: Float32Array | null;
   /**
    * 0 is open eyes, 1 is closed eyes. The eye bones scale on y by `max(0.05, 1 - blink)`, or turn
-   * the lids of a body with lids (`StudioBody.lids`).
+   * the lids of a body with lids (`Body.lids`).
    */
   readonly blink: number;
   /**

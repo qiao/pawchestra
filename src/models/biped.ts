@@ -4,7 +4,7 @@ import type { MeshBuilder } from './mesh.ts';
 import type { BoneName } from './rig.ts';
 import type { SpeciesParams } from './species.ts';
 import type { Steps } from '../score/steps.ts';
-import { buildStudioBody, buildStudioBodySteps } from './studio-body.ts';
+import { buildBody, buildBodySteps } from './body.ts';
 
 /** The bones that the body places. The instrument generators place the other bones. */
 export type BodyBoneName = Exclude<
@@ -21,7 +21,7 @@ export interface BodyBones {
   /** The center of the head. */
   readonly headCenter: Vec3;
   /**
-   * The middle of the mouth, at the front of the lips or the beak (`StudioBody.mouth`, design 4.4,
+   * The middle of the mouth, at the front of the lips or the beak (`Body.mouth`, design 4.4,
    * 4.6).
    */
   readonly mouth: Vec3;
@@ -37,7 +37,7 @@ export interface BodyBones {
 
 /**
  * Builds the body of a species in its bind pose, and adds its parts to a mesh (design 4.4). Each
- * species has a body of its own (`SpeciesParams.body`): a studio body of `models/studio-body.ts`.
+ * species has a body of its own (`SpeciesParams.body`): a body of `models/body.ts`.
  * The animal faces -z, its left side is -x, and the floor is at y = 0.
  *
  * @param builder The mesh that gets the parts.
@@ -50,7 +50,7 @@ export function buildBiped(
   species: SpeciesParams,
   stance: Stance,
 ): BodyBones {
-  return buildStudioBody(builder, species.body, stance.kind === 'standing', species.palette);
+  return buildBody(builder, species.body, stance.kind === 'standing', species.palette);
 }
 
 /**
@@ -66,5 +66,5 @@ export function buildBipedSteps(
   species: SpeciesParams,
   stance: Stance,
 ): Steps<BodyBones> {
-  return buildStudioBodySteps(builder, species.body, stance.kind === 'standing', species.palette);
+  return buildBodySteps(builder, species.body, stance.kind === 'standing', species.palette);
 }

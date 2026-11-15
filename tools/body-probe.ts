@@ -26,8 +26,8 @@ import { INSTRUMENT_SUPPORTS, buildPlayer, stanceOn } from '../src/models/player
 import type { Support } from '../src/models/props.ts';
 import { BONE_NAMES } from '../src/models/rig.ts';
 import { SPECIES } from '../src/models/species.ts';
-import { studioRenderMesh, studioRigOf } from '../src/models/studio-body.ts';
-import type { SmoothNormals, StudioRenderMesh } from '../src/models/studio-body.ts';
+import { bodyRenderMesh, bodyRigOf } from '../src/models/body.ts';
+import type { SmoothNormals, BodyRenderMesh } from '../src/models/body.ts';
 import type { SpeciesId, SpeciesParams } from '../src/models/species.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
 import { countInAt } from '../src/pose/count-in.ts';
@@ -49,7 +49,7 @@ type JointTable = Record<string, Vec3 | number>;
 /**
  * The fields of a mesh that the probe hashes: the places, the colors, the bones, the blend
  * weights, and the finishes of each mesh, and the corrective shapes and the smooth normals of a
- * studio body (design 4.4, 4.5).
+ * body (design 4.4, 4.5).
  */
 export const MESH_FIELDS = [
   'positions',
@@ -66,7 +66,7 @@ export const MESH_FIELDS = [
 type MeshField = (typeof MESH_FIELDS)[number];
 
 /**
- * The hash of each field of a mesh, as 16 hex digits. A mesh with no studio skin has no
+ * The hash of each field of a mesh, as 16 hex digits. A mesh with no body skin has no
  * `correctives` and no `normals`.
  */
 type FieldHashes = Partial<Record<MeshField, string>>;
@@ -179,10 +179,10 @@ interface FieldValues {
  * Gives the values of each field of a mesh, in the order of {@link MESH_FIELDS}.
  *
  * @param mesh The mesh data.
- * @param studio The render mesh of a studio body, or `null` for a mesh with no studio skin.
+ * @param body The render mesh of a body, or `null` for a mesh with no body skin.
  * @returns The values of each field that the mesh has.
  */
-function fieldValues(mesh: MeshData, studio: StudioRenderMesh | null): FieldValues[] {
+function fieldValues(mesh: MeshData, bodyMesh: BodyRenderMesh | null): FieldValues[] {
   const fields: FieldValues[] = [
     { field: 'positions', lists: [mesh.positions], exact: false },
     { field: 'colors', lists: [mesh.colors], exact: false },
@@ -191,11 +191,11 @@ function fieldValues(mesh: MeshData, studio: StudioRenderMesh | null): FieldValu
     { field: 'blendWeights', lists: [mesh.blendWeights], exact: false },
     { field: 'finishes', lists: [mesh.finishes], exact: true },
   ];
-  if (studio) {
-    fields.push({ field: 'correctives', lists: studio.correctives, exact: false });
-    // `--base` runs this tool on the code of a commit. A studio body of an older commit can have
+  if (bodyMesh) {
+    fields.push({ field: 'correctives', lists: bodyMesh.correctives, exact: false });
+    // `--base` runs this tool on the code of a commit. A body of an older commit can have
     // no smooth normals.
-    const normals: SmoothNormals | undefined = studio.normals;
+    const normals: SmoothNormals | undefined = bodyMesh.normals;
     if (normals) {
       fields.push({ field: 'normals', lists: [normals.corners, ...normals.moves], exact: false });
     }
@@ -221,17 +221,17 @@ function addField(hash: Hash, values: FieldValues): void {
 
 /**
  * Gives a hash of the parts of a mesh that make its look and its motion: the places, the colors,
- * the bones, the blend weights, and the finishes, and for a studio body the corrective shapes and
- * the smooth normals. Each value is rounded to micrometers first. A mesh with no studio skin
- * keeps the hash of the tool before the studio fields.
+ * the bones, the blend weights, and the finishes, and for a body the corrective shapes and
+ * the smooth normals. Each value is rounded to micrometers first. A mesh with no body skin
+ * keeps the hash of the tool before the body fields.
  *
  * @param mesh The mesh data.
- * @param studio The render mesh of a studio body, or `null` for a mesh with no studio skin.
+ * @param body The render mesh of a body, or `null` for a mesh with no body skin.
  * @returns The hash, as 16 hex digits.
  */
-export function meshHash(mesh: MeshData, studio: StudioRenderMesh | null = null): string {
+export function meshHash(mesh: MeshData, bodyMesh: BodyRenderMesh | null = null): string {
   const hash = createHash('sha256');
-  for (const values of fieldValues(mesh, studio)) {
+  for (const values of fieldValues(mesh, bodyMesh)) {
     addField(hash, values);
   }
   return hash.digest('hex').slice(0, 16);
@@ -241,12 +241,12 @@ export function meshHash(mesh: MeshData, studio: StudioRenderMesh | null = null)
  * Gives a hash of each field of a mesh, so that a comparison names the fields that changed.
  *
  * @param mesh The mesh data.
- * @param studio The render mesh of a studio body, or `null` for a mesh with no studio skin.
+ * @param body The render mesh of a body, or `null` for a mesh with no body skin.
  * @returns The hash of each field that the mesh has, as 16 hex digits.
  */
-export function fieldHashes(mesh: MeshData, studio: StudioRenderMesh | null = null): FieldHashes {
+export function fieldHashes(mesh: MeshData, bodyMesh: BodyRenderMesh | null = null): FieldHashes {
   const hashes: FieldHashes = {};
-  for (const values of fieldValues(mesh, studio)) {
+  for (const values of fieldValues(mesh, bodyMesh)) {
     const hash = createHash('sha256');
     addField(hash, values);
     hashes[values.field] = hash.digest('hex').slice(0, 16);
@@ -255,23 +255,23 @@ export function fieldHashes(mesh: MeshData, studio: StudioRenderMesh | null = nu
 }
 
 /**
- * Gives the render mesh of a body with a studio skin (design 4.4), with its corrective shapes and
+ * Gives the render mesh of a body with a body skin (design 4.4), with its corrective shapes and
  * its smooth normals.
  *
  * @param species The species parameters.
  * @param standing True for a body that stands.
  * @param mesh The mesh of the body or of the player in its bind pose.
- * @returns The render mesh, or `null` for a body with no studio skin.
+ * @returns The render mesh, or `null` for a body with no body skin.
  */
-function studioMeshOf(
+function bodyMeshOf(
   species: SpeciesParams,
   standing: boolean,
   mesh: MeshData,
-): StudioRenderMesh | null {
+): BodyRenderMesh | null {
   if (!species.body) {
     return null;
   }
-  return studioRenderMesh(studioRigOf(species.body, standing), mesh);
+  return bodyRenderMesh(bodyRigOf(species.body, standing), mesh);
 }
 
 /**
@@ -302,12 +302,12 @@ function probeBody(species: SpeciesParams, support: Support): BodyProbe {
   const stance = stanceOn(support, species);
   const bones = buildBiped(builder, species, stance);
   const mesh = builder.build();
-  const studio = studioMeshOf(species, stance.kind === 'standing', mesh);
+  const bodyMesh = bodyMeshOf(species, stance.kind === 'standing', mesh);
   return {
     joints: jointsOf(bones),
     triangles: mesh.finishes.length,
-    mesh: meshHash(mesh, studio),
-    fields: fieldHashes(mesh, studio),
+    mesh: meshHash(mesh, bodyMesh),
+    fields: fieldHashes(mesh, bodyMesh),
   };
 }
 
@@ -346,7 +346,7 @@ export function probeBodies(): BodiesProbe {
   });
   for (const { key, id, instrument } of cast) {
     const player = buildPlayer(id, instrument, 4, INSTRUMENT_SUPPORTS[instrument]);
-    const studio = player.studio ? studioRenderMesh(player.studio, player.mesh) : null;
+    const bodyMesh = player.bodyRig ? bodyRenderMesh(player.bodyRig, player.mesh) : null;
     const skeleton: Record<string, Vec3> = {};
     BONE_NAMES.forEach((name, i) => {
       const point = player.skeleton.positions[i];
@@ -357,8 +357,8 @@ export function probeBodies(): BodiesProbe {
     players[key] = {
       skeleton,
       triangles: player.mesh.finishes.length,
-      mesh: meshHash(player.mesh, studio),
-      fields: fieldHashes(player.mesh, studio),
+      mesh: meshHash(player.mesh, bodyMesh),
+      fields: fieldHashes(player.mesh, bodyMesh),
     };
   }
   return { species, players };

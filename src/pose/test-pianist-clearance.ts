@@ -105,7 +105,7 @@ function pianistChecks(model: PlayerModel, set: string): RoleChecks {
 
 /**
  * The number of shard files of the test of the pianist clearance
- * (`pianist-clearance-<shard>.test.ts`, design 9.3). The skin of the studio polar bear takes
+ * (`pianist-clearance-<shard>.test.ts`, design 9.3). The skin of the polar bear takes
  * about 10 s for each demo, so each shard holds one of the two demos with a piano.
  */
 export const PIANIST_CLEARANCE_SHARDS = 2;

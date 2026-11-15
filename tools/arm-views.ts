@@ -54,14 +54,14 @@ import { toWebp } from './screenshots.ts';
 import { DEMOS, DEMO_IDS } from '../src/app/demos.ts';
 import type { DemoId } from '../src/app/demos.ts';
 import { bodyBoundsOf, speciesItems } from '../src/gallery/items.ts';
-import type { Side } from '../src/models/studio-format.ts';
+import type { Side } from '../src/models/body-format.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
 import {
-  createStudioPose,
-  poseStudioBones,
-  skinStudioMesh,
-  studioOffsets,
-} from '../src/models/studio-rig.ts';
+  createBodyPose,
+  poseBodyBones,
+  skinBodyMesh,
+  bodyOffsets,
+} from '../src/models/body-rig.ts';
 import { countInAt } from '../src/pose/count-in.ts';
 import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
 import { PLAYING, allAudible } from '../src/pose/test-scene.ts';
@@ -325,7 +325,7 @@ async function frameViews(
   if (!body) {
     return none;
   }
-  const rig = body.model.studio;
+  const rig = body.model.bodyRig;
   const start = -countInAt(scene.plan.beats, 0).lengthSec;
   const poses = poseAt(
     scene.plan,
@@ -339,15 +339,15 @@ async function frameViews(
   if (!pose) {
     return none;
   }
-  const studio = poseStudioBones(
+  const bodyPose = poseBodyBones(
     rig,
     body.model.skeleton,
     pose.rotations,
-    studioOffsets(pose),
+    bodyOffsets(pose),
     1,
-    createStudioPose(),
+    createBodyPose(),
   );
-  const posed = skinStudioMesh(rig.mesh, studio);
+  const posed = skinBodyMesh(rig.mesh, bodyPose);
   const target = await aimTarget(
     frame.demo,
     shotSubject(atText(source, species)),

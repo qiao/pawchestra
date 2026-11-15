@@ -38,7 +38,7 @@ interface ViewRow {
 export const VIEWS_PAGE_SIZE = 1024;
 
 /**
- * The studio light of the views page (design 7.1). The intensities are three.js units, and the
+ * The body light of the views page (design 7.1). The intensities are three.js units, and the
  * page has the tone mapping of the stage (AgX) and the grade of its final pass, so that the
  * species colors read as on the stage. The values give the lit fur of the four model sheets within
  * 10% of their value (fox, rabbit, dog, and polar bear). A cool fill (`#c8d4ff`) made the shaded

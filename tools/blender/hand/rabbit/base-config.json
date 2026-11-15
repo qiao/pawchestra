@@ -211,7 +211,7 @@
     -1,
     0.15
   ],
-  "studio": {
+  "bind": {
     "trunk": {
       "open": 4,
       "shares": {
@@ -236,7 +236,7 @@
         0.571719
       ]
     },
-    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the fox of main, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (Body.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the fox of main, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
@@ -337,27 +337,27 @@
     "points": 12,
     "reach": 1,
     "darkReach": 2,
-    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm body-module drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
   },
   "chair": {
     "halfWidth": 0.13,
     "front": -0.024,
     "back": -0.113,
     "backHeight": 0.12,
-    "note": "The seat is level, and its top is the lowest point of the seated body over the seat. Its front edge ends where the sloped thighs leave the seat top at the haunch. The chair of the app grows back until its back posts keep 1 cm behind the trunk (backRoom of ANIMALS of tools/studio-body.ts)."
+    "note": "The seat is level, and its top is the lowest point of the seated body over the seat. Its front edge ends where the sloped thighs leave the seat top at the haunch. The chair of the app grows back until its back posts keep 1 cm behind the trunk (backRoom of ANIMALS of tools/body-module.ts)."
   },
   "armSegments": {
     "helper": 0.03,
     "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies. Bone heat gives them their weights."
   },
-  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. Each joint comes from cuts of the mesh, and agrees with the joints of the Tripo armature of the FBX file within 0.02 units: the shoulder joint at the arm root (x 0.065), the elbow at x 0.16, the wrist at x 0.245 where the paw widens, the paw tip at x 0.306, the hip joint in the haunch, and the knee and the ankle at the middles of the leg sections. The palm is the true palm of the source: the mean normal of the pink pads of the paw faces down.",
+  "jointsNote": "The places are in the body units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. Each joint comes from cuts of the mesh, and agrees with the joints of the Tripo armature of the FBX file within 0.02 units: the shoulder joint at the arm root (x 0.065), the elbow at x 0.16, the wrist at x 0.245 where the paw widens, the paw tip at x 0.306, the hip joint in the haunch, and the knee and the ankle at the middles of the leg sections. The palm is the true palm of the source: the mean normal of the pink pads of the paw faces down.",
   "body": {
     "crease": 35,
     "backRoom": 0.04
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle and the back room of the rabbit of main.",
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/body-module.ts) beside the height: the crease angle and the back room of the rabbit of main.",
   "eyeSize": 0.177334,
-  "eyeSizeNote": "The size of each pea eye in units: the head height H of the body, as studio-body gives a rig-mesh body.",
+  "eyeSizeNote": "The size of each pea eye in units: the head height H of the body, as body-module gives a rig-mesh body.",
   "metersPerUnit": 1.474394,
   "metersPerUnitNote": "The scale of the app. params.json sets it over this value, and its metersPerUnitNote gives the reason.",
   "chairNote": "The seat of the rabbit of main in meters at the scale of this body: a half width of 0.219 m, the front edge at z -0.04 m, and the back edge at z -0.19 m, as on the rabbit of trial 2.",

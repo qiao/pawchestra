@@ -19,7 +19,7 @@ import {
 import type { SkinnedMesh } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-import { loadStudioBodies } from '../app/body-loads.ts';
+import { loadBodies } from '../app/body-loads.ts';
 import type { Bounds } from '../models/bounds.ts';
 import { CONDUCTOR } from '../models/cast.ts';
 import { SCENE_COLORS } from '../models/colors.ts';
@@ -28,7 +28,7 @@ import { buildPlayer } from '../models/player.ts';
 import type { PlayerModel } from '../models/player.ts';
 import { buildSupport } from '../models/props.ts';
 import { readSourceFile } from '../models/source-clips.ts';
-import { STUDIO_BONES } from '../models/studio-format.ts';
+import { BODY_BONES } from '../models/body-format.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import { clipDuration, clipPoseAt, createClipPose } from '../pose/clip-pose.ts';
 import type { PosePlan } from '../pose/plan.ts';
@@ -204,7 +204,7 @@ const renderer = createRenderer(canvas, 'high', window.devicePixelRatio);
 const scene = new Scene();
 const materials = createMaterials();
 // The gallery shows each species, also a test species such as the mannequin (design 7.2).
-await loadStudioBodies();
+await loadBodies();
 const items = selectItems(
   page === 'species' ? speciesItems() : instrumentItems(),
   search.get('only'),
@@ -628,7 +628,7 @@ function framePart(view: PartView): void {
   }
   const { mesh } = subject.player;
   const posed = (bone: number, point: Vec3): Vec3 => {
-    const matrix = mesh.skeleton.bones[STUDIO_BONES.length + bone]?.matrix;
+    const matrix = mesh.skeleton.bones[BODY_BONES.length + bone]?.matrix;
     posedPartPoint.set(...point);
     if (matrix) {
       posedPartPoint.applyMatrix4(matrix);

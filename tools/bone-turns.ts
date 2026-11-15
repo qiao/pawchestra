@@ -1,5 +1,5 @@
 /**
- * Reads the matrix and the turn of one bone from the packed bone matrices of a posed studio body
+ * Reads the matrix and the turn of one bone from the packed bone matrices of a posed body
  * (16 numbers for each bone), for the tools that measure the arms (`arm-check`, `arm-shape`, and
  * `carry-check`).
  */

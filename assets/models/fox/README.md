@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the fox (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The red fox and the tan fox share the rig. The app does not serve these files. It
-loads the module `src/models/studio/fox.ts`, which this chain writes:
+loads the module `src/models/bodies/fox.ts`, which this chain writes:
 
 ```text
 tripo-p2/fox.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/fox.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export fox    the same run
    v
 tripo-hand/fox.rig.glb       rigged mesh, with its summary fox.rig.json
-   │  pnpm studio-body fox   the same run
+   │  pnpm body-module fox   the same run
    v
-src/models/studio/fox.ts     studio body of the app
+src/models/bodies/fox.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -82,13 +82,13 @@ the joints of the source, mapped by the point edits.
 | Item | Value |
 |---|---|
 | Size | 382,254 bytes. A new build gives the same export, but not the same `.blend` bytes |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fox faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `fox`: 3,613 vertices and 3,805 faces (3,266 quads and 539 triangles, 7,071 triangles). Flat faces and the surface of `sa.add_surface()`. No face is gloss: the nose takes the slot `fur` and the color map. The 88 faces of the two eye domes have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/fox/tripo-hand/fox-color.webp`) |
 | Armature | `fox_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The legs and the right ear have joints of their own. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 1.058222 (the shoulder joints at 1.69045 m for each unit), `crease` 180 |
 | Eyes | The eye domes of the mesh, each on its own sphere, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side, y the height, in the source). Each edit is a need of the rig, the seat, the eyes, or the
 instruments:
 
@@ -181,7 +181,7 @@ the seat, as on the cat, the pig, the wolf, the dog, and the panda (0.30 to 0.31
 comes after the keys `bind_belly` and `bind_tail`. It puts the underside of the haunch behind the
 hip joints onto the plane of the thigh underside in the bind, and it changes no weight. Reason: a
 knob of 3 vertices at the back of the haunch behind the tail root (`hips` 1.0) lay 0.039 units
-(6.5 cm) below the thighs. `seatHeightOf()` of `tools/studio-body.ts` puts the seat top at the
+(6.5 cm) below the thighs. `seatHeightOf()` of `tools/body-module.ts` puts the seat top at the
 lowest body point over the seat, so the seat was 0.179 m high, the thighs floated 6.6 cm over it,
 and the haunch up to 12.7 cm. The rule, in the Blender axes of the bind (the fox faces -y):
 
@@ -249,7 +249,7 @@ vertices at (0, 0.329, -0.048) on the back, and the loop itself (185 vertices). 
 from the middle of that loop to the tip (0, 0.073, -0.231). The tube vertices take {`hips` 1 - a,
 `tail` a (1 - b), `tail_tip` a b}, with a = smoothstep(-0.01, 0.03) of the place along the line and
 b = smoothstep(-0.04, 0.04) about the head of `tail_tip`. The tail bones point (0, -0.35, -1) and
-(0, -1, -0.1) in the bind (`studio.tailBind`): the tail goes back and 19 degrees down over the back
+(0, -1, -0.1) in the bind (`bind.tailBind`): the tail goes back and 19 degrees down over the back
 edge of the seat and hangs down behind the chair. In the rest of the violinist and of the flutist
 (`node tools/tail-gap.ts <role>`) the tail root sits on the seat plane (0.0 cm), the tail keeps
 3.1 cm from each back post and 8.1 cm from the top rail, and its tip stands 1.5 cm over the floor.

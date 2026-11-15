@@ -206,14 +206,14 @@
       ]
     }
   },
-  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the skull top, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX file has no armature, so each joint comes from cuts of the mesh and from its edge loops: the trunk joints on the middle line of the trunk sections, the shoulder joint inside the arm root, the elbow at the arm loop at x 0.257 (0.52 of the arm from the shoulder to the wrist, as the upper arm and forearm of the main polar bear), the wrist at x 0.372 where the paw widens, the knuckles at x 0.44 where the toes part, the hip joint in the haunch, the knee at the leg loop at y 0.164, and the ankle above the heel.",
+  "jointsNote": "The places are in the body units and axes of the source pose: 1 unit from the soles to the skull top, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX file has no armature, so each joint comes from cuts of the mesh and from its edge loops: the trunk joints on the middle line of the trunk sections, the shoulder joint inside the arm root, the elbow at the arm loop at x 0.257 (0.52 of the arm from the shoulder to the wrist, as the upper arm and forearm of the main polar bear), the wrist at x 0.372 where the paw widens, the knuckles at x 0.44 where the toes part, the hip joint in the haunch, the knee at the leg loop at y 0.164, and the ankle above the heel.",
   "palm": [
     0,
     -1,
     0
   ],
   "palmNote": "The paws of the source lie flat with the claws curled down, so the palm faces down.",
-  "studio": {
+  "bind": {
     "legTurns": {
       "thigh": [
         0.591675,
@@ -342,7 +342,7 @@
     "front": -0.05,
     "back": -0.2,
     "backHeight": 0.01,
-    "note": "The piano bench of the pianist, as on the main polar bear (benchFitOf() of tools/studio-body.ts)."
+    "note": "The piano bench of the pianist, as on the main polar bear (benchFitOf() of tools/body-module.ts)."
   },
   "armSegments": {
     "helper": 0.03,

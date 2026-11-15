@@ -117,7 +117,7 @@ export interface CueSeat {
   readonly center: Vec3;
 }
 
-/** The limits of a cue that a body gives (`StudioBody.cueHeadLeft` and the others), in radians. */
+/** The limits of a cue that a body gives (`Body.cueHeadLeft` and the others), in radians. */
 export interface CueFacts {
   /**
    * The largest turn of the head to the left and to the right in a cue. With no value, the head

@@ -1,8 +1,8 @@
 /**
- * Sums the skin weights of a vertex of a studio mesh on some bones, for the tools that measure the
+ * Sums the skin weights of a vertex of a body mesh on some bones, for the tools that measure the
  * skin of a body (`arm-check`, `arm-shape`, and `body-shape`).
  */
-import type { StudioMesh } from '../src/models/studio-format.ts';
+import type { BodyMesh } from '../src/models/body-format.ts';
 
 /**
  * Gives the weight of a vertex on some bones.
@@ -13,7 +13,7 @@ import type { StudioMesh } from '../src/models/studio-format.ts';
  * @returns The sum of the weights of the vertex on the bones.
  */
 export function weightOn(
-  mesh: Pick<StudioMesh, 'joints' | 'weights'>,
+  mesh: Pick<BodyMesh, 'joints' | 'weights'>,
   v: number,
   bones: ReadonlySet<number> | readonly number[],
 ): number {

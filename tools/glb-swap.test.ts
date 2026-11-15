@@ -11,21 +11,20 @@ import { join, relative } from 'node:path';
 
 import { afterAll, describe, expect, it } from 'vitest';
 
-import { STUDIO_BODIES } from '../src/models/studio-bodies.ts';
-import { studioBodyOf } from '../src/models/studio-body.ts';
-import type { StudioBodyName } from '../src/models/studio-body.ts';
+import { BODIES } from '../src/models/bodies.ts';
+import { bodyOf } from '../src/models/body.ts';
+import type { BodyName } from '../src/models/body.ts';
 import {
   animalSpecies,
   copiedTool,
   glbModule,
   runTool,
   speciesAnimal,
-  studioAnimal,
   takeGlb,
   withGlbBody,
 } from './glb-swap.ts';
 import { ROOT } from './ref-tree.ts';
-import { ANIMALS, rigMeshSettings, studioGlbPath } from './studio-body.ts';
+import { ANIMALS, rigMeshSettings, bodyGlbPath } from './body-module.ts';
 
 describe('takeGlb', () => {
   it('gives no file and the same arguments with no option', () => {
@@ -49,16 +48,14 @@ describe('takeGlb', () => {
   });
 });
 
-describe('the animal of a studio body', () => {
+describe('the animal of a body', () => {
   it('names the entry of ANIMALS whose module exports the body', () => {
-    const names = Object.keys(STUDIO_BODIES).filter(
-      (name): name is StudioBodyName => name in STUDIO_BODIES,
-    );
+    const names = Object.keys(BODIES).filter((name): name is BodyName => name in BODIES);
     expect(names.length).toBeGreaterThan(0);
     for (const name of names) {
-      const animal = studioAnimal(name);
+      const animal = name;
       const settings = ANIMALS.get(animal);
-      const module = readFileSync(join(ROOT, 'src', 'models', 'studio', `${animal}.ts`), 'utf8');
+      const module = readFileSync(join(ROOT, 'src', 'models', 'bodies', `${animal}.ts`), 'utf8');
       expect(settings, name).toBeDefined();
       expect(module, name).toContain(`export const ${settings?.constant ?? '-'} = `);
     }
@@ -87,7 +84,7 @@ describe('copiedTool', () => {
 describe('glbModule', () => {
   it('takes the landmark height of the settings that it gets, else the height of ANIMALS', () => {
     const rabbit = rigMeshSettings('rabbit');
-    const file = studioGlbPath('rabbit', rabbit);
+    const file = bodyGlbPath('rabbit', rabbit);
     const bytes = new Uint8Array(readFileSync(file));
     const base = glbModule('rabbit', file, bytes).body;
     const settings = rabbit ? { ...rabbit, glb: relative(ROOT, file) } : null;
@@ -104,7 +101,7 @@ describe('withGlbBody', () => {
 
   it('runs a child on the body of another file, and removes the copy at the end', async () => {
     const file = join(parent, 'other.glb');
-    copyFileSync(studioGlbPath('rabbit', ANIMALS.get('rabbit')), file);
+    copyFileSync(bodyGlbPath('rabbit', ANIMALS.get('rabbit')), file);
     const out = join(parent, 'source.txt');
     let copy = '';
 
@@ -117,8 +114,8 @@ describe('withGlbBody', () => {
           join(dir, 'tools', 'print-source.ts'),
           [
             "import { writeFileSync } from 'node:fs';",
-            "import { studioBodyOf } from '../src/models/studio-body.ts';",
-            `writeFileSync(${JSON.stringify(out)}, studioBodyOf('studio-rabbit').source);`,
+            "import { bodyOf } from '../src/models/body.ts';",
+            `writeFileSync(${JSON.stringify(out)}, bodyOf('rabbit').source);`,
           ].join('\n'),
         );
         return runTool(dir, 'print-source.ts', []);
@@ -128,14 +125,14 @@ describe('withGlbBody', () => {
 
     expect(code).toBe(0);
     expect(readFileSync(out, 'utf8')).toBe(relative(ROOT, file));
-    expect(studioBodyOf('studio-rabbit').source).not.toBe(relative(ROOT, file));
+    expect(bodyOf('rabbit').source).not.toBe(relative(ROOT, file));
     expect(copy).not.toBe('');
     expect(existsSync(copy)).toBe(false);
   });
 
   it('writes the module of the copy with the settings that it gets', async () => {
     const rabbit = rigMeshSettings('rabbit');
-    const file = studioGlbPath('rabbit', rabbit);
+    const file = bodyGlbPath('rabbit', rabbit);
     const out = join(parent, 'scale.txt');
     const settings = rabbit ? { ...rabbit, height: rabbit.height * 1.1 } : undefined;
 
@@ -147,8 +144,8 @@ describe('withGlbBody', () => {
           join(dir, 'tools', 'print-scale.ts'),
           [
             "import { writeFileSync } from 'node:fs';",
-            "import { studioBodyOf } from '../src/models/studio-body.ts';",
-            `writeFileSync(${JSON.stringify(out)}, String(studioBodyOf('studio-rabbit').scale));`,
+            "import { bodyOf } from '../src/models/body.ts';",
+            `writeFileSync(${JSON.stringify(out)}, String(bodyOf('rabbit').scale));`,
           ].join('\n'),
         );
         return runTool(dir, 'print-scale.ts', []);
@@ -158,9 +155,6 @@ describe('withGlbBody', () => {
     );
 
     expect(code).toBe(0);
-    expect(Number(readFileSync(out, 'utf8')) / studioBodyOf('studio-rabbit').scale).toBeCloseTo(
-      1.1,
-      5,
-    );
+    expect(Number(readFileSync(out, 'utf8')) / bodyOf('rabbit').scale).toBeCloseTo(1.1, 5);
   });
 });

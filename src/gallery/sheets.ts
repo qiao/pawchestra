@@ -52,7 +52,7 @@ export interface ViewSheet {
   /** The angle of the camera above the floor, in degrees. */
   readonly elevationDeg: number;
   /**
-   * True when the key light casts shadows, as in most sheets. `bear-views.png` has a soft studio
+   * True when the key light casts shadows, as in most sheets. `bear-views.png` has a soft body
    * light with no cast shadow on the bear, and the shadow of the raised right arm made a dark band
    * across the chest of the page.
    */

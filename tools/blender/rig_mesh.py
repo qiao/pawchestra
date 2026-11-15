@@ -1,11 +1,11 @@
-"""The shared functions of the studio bodies (design 4.4): the bones and their parents, the
+"""The shared functions of the bodies (design 4.4): the bones and their parents, the
 joints of a config, the seated bind, the arm segments, the face colors, the eye shells, the
-corrective shapes, the seat, and the GLB writer of a studio body.
+corrective shapes, the seat, and the GLB writer of a body.
 
-The file has no command line. `rig_mesh_lib()` of `studio_armature.py` runs it into a new
+The file has no command line. `rig_mesh_lib()` of `body_armature.py` runs it into a new
 namespace for each caller, so that a caller can set `BONES`. `export_rig.py`, `simple_rig.py`,
-`studio_armature.py`, and `build.py` of each hand chain (`tools/blender/hand/`) use it. The math
-uses the axes of the studio: y up, +z forward, and +x the left side of the animal
+`body_armature.py`, and `build.py` of each hand chain (`tools/blender/hand/`) use it. The math
+uses the axes of the body: y up, +z forward, and +x the left side of the animal
 (`to_blender()`). The functions use numpy and the standard library of Python, and no module of
 Blender.
 """
@@ -17,8 +17,8 @@ import struct
 
 import numpy as np
 
-#: The body bones of a studio body, in parent order (`STUDIO_BONES` of
-#: `src/models/studio-format.ts`, with no eye bones).
+#: The body bones of a body, in parent order (`BODY_BONES` of
+#: `src/models/body-format.ts`, with no eye bones).
 BONES = (
     'root',
     'hips',
@@ -52,17 +52,17 @@ BONES = (
     'tail',
 )
 
-#: The optional bone of a tail of two bones (`OPTIONAL_STUDIO_BONES` of
-#: `src/models/studio-format.ts`). A config with a joint `tail_tip` adds it after the body bones.
+#: The optional bone of a tail of two bones (`OPTIONAL_BODY_BONES` of
+#: `src/models/body-format.ts`). A config with a joint `tail_tip` adds it after the body bones.
 TAIL_TIP = 'tail_tip'
 
-#: The optional bone of a jaw that opens a beak (`OPTIONAL_STUDIO_BONES` of
-#: `src/models/studio-format.ts`), a child of the head at the hinge of the beak. A config with a
+#: The optional bone of a jaw that opens a beak (`OPTIONAL_BODY_BONES` of
+#: `src/models/body-format.ts`), a child of the head at the hinge of the beak. A config with a
 #: joint `jaw` adds it after the body bones and the tail tip (`config_bones()` of
-#: `studio_armature.py`).
+#: `body_armature.py`).
 JAW = 'jaw'
 
-#: The parent of each body bone (`STUDIO_PARENTS` of `src/models/studio-format.ts`).
+#: The parent of each body bone (`BODY_PARENTS` of `src/models/body-format.ts`).
 PARENTS = {
     'root': None,
     'hips': 'root',
@@ -101,7 +101,7 @@ PARENTS = {
 #: The arm bones of each side, from the shoulder out. The clavicle does not move.
 ARM = ('upper_arm', 'forearm', 'forearm_twist', 'hand', 'fingers')
 
-#: The arm bones that keep the turn of the upper arm in the bind with `studio.straightArms`
+#: The arm bones that keep the turn of the upper arm in the bind with `bind.straightArms`
 #: (`bind_turns()`), so that the elbow and the wrist of the bind keep the angles of the source.
 STRAIGHT_ARM = ('forearm', 'hand')
 
@@ -111,16 +111,16 @@ LEG = ('thigh', 'shin', 'foot', 'toes')
 #: The largest number of bones of a vertex (design 4.4).
 INFLUENCES = 4
 
-#: The corrective shapes, in their order in the mesh (`tools/studio-body.ts`). The clip
+#: The corrective shapes, in their order in the mesh (`tools/body-module.ts`). The clip
 #: `reference` gives each one its full weight. The shapes `arm_raise_*` of a body follow them, with
 #: the weight 0 in that clip.
 SHAPES = ('arm_down_L', 'arm_down_R', 'legs_straight_L', 'legs_straight_R')
 
 #: The largest number of shapes `arm_raise_*` of one body: the shapes of a raised arm or of a bent
-#: wrist (`STUDIO_RAISES` of `src/models/studio-format.ts`).
+#: wrist (`BODY_RAISES` of `src/models/body-format.ts`).
 RAISE_LIMIT = 4
 
-#: The roughness of each material, as the materials of the studio rabbit.
+#: The roughness of each material, as the materials of the rabbit.
 MATERIALS = (('fur', 0.7), ('gloss', 0.42))
 
 
@@ -130,7 +130,7 @@ def log(text):
 
 
 def to_blender(v):
-    """Converts points from the axes of the studio (y up, z forward) to the axes of Blender."""
+    """Converts points from the axes of the body (y up, z forward) to the axes of Blender."""
     v = np.asarray(v, float)
     return np.stack([v[..., 0], -v[..., 2], v[..., 1]], axis=-1)
 
@@ -378,13 +378,13 @@ def joints_of(config):
 
 
 #: The number of deform segments of each upper arm and each forearm with `armSegments` of the
-#: config (`ARM_SEGMENTS` of `src/models/studio-rig.ts`).
+#: config (`ARM_SEGMENTS` of `src/models/body-rig.ts`).
 ARM_SEGMENTS = 4
 
 
 def segment_bones():
     """Gives the names of the arm segments and of the elbow and wrist helpers, the left side first
-    (`ARM_SEGMENT_BONES` of `src/models/studio-format.ts`). Each segment of a part is a deform bone
+    (`ARM_SEGMENT_BONES` of `src/models/body-format.ts`). Each segment of a part is a deform bone
     along the part, and each helper starts at its joint."""
     out = []
     for side in 'LR':
@@ -396,7 +396,7 @@ def segment_bones():
 
 def segment_parents():
     """Gives the parent of each arm segment and helper: the upper arm, the forearm, or, for the
-    wrist helper, the forearm twist bone (`STUDIO_PARENTS` of `src/models/studio-format.ts`)."""
+    wrist helper, the forearm twist bone (`BODY_PARENTS` of `src/models/body-format.ts`)."""
     out = {}
     for side in 'LR':
         for k in range(ARM_SEGMENTS):
@@ -439,7 +439,7 @@ def segment_joints(heads, ends, rolls, children, rule):
 
 def twist_of(m, axis):
     """Gives the angle of the twist of a rotation matrix around a unit axis (the swing and twist
-    split), from -pi to pi, as `twistAngle()` of `src/models/studio-rig.ts`."""
+    split), from -pi to pi, as `twistAngle()` of `src/models/body-rig.ts`."""
     x, y, z, w = matrix_quat(m)
     angle = 2 * np.arctan2(np.array([x, y, z]) @ axis, w)
     return float((angle + np.pi) % (2 * np.pi) - np.pi)
@@ -461,7 +461,7 @@ def half_turn(a, b):
 
 def driven_turns(turns, heads):
     """Gives the world turns of the arm segments and of the helpers from the world turns of the
-    body bones, as `poseArm()` of `src/models/studio-rig.ts` drives them. `heads` holds the joints
+    body bones, as `poseArm()` of `src/models/body-rig.ts` drives them. `heads` holds the joints
     of the pose from which the turns start. Each upper arm segment takes its share of the roll of
     the upper arm from the chest, and each forearm segment its share of the twist from the forearm
     to the paw (`segment_share()`). The elbow helper turns halfway from the upper arm to the
@@ -493,7 +493,7 @@ def arm_bones(side):
 
 def digit_bones():
     """Gives the names of the digit bones of a hand rig, the left side first
-    (`DIGIT_BONES` of `src/models/studio-format.ts`): one bone for each claw, from `digit1` at the
+    (`DIGIT_BONES` of `src/models/body-format.ts`): one bone for each claw, from `digit1` at the
     thumb side to `digit5`, each a child of the fingers of its side."""
     return tuple(f'digit{k}_{side}' for side in 'LR' for k in range(1, 6))
 
@@ -507,7 +507,7 @@ DIGIT_PARENTS = {name: f'fingers_{name[-1]}' for name in digit_bones()}
 PARENTS.update(DIGIT_PARENTS)
 
 #: The optional thumb bones of a paw that is one fist with a free thumb (`THUMB_BONES` of
-#: `src/models/studio-format.ts`), each a child of the paw of its side, after all other bones.
+#: `src/models/body-format.ts`), each a child of the paw of its side, after all other bones.
 THUMB_BONES = ('thumb_L', 'thumb_R')
 PARENTS.update({name: f'hand_{name[-1]}' for name in THUMB_BONES})
 
@@ -531,7 +531,7 @@ def taubin(points, tris, ids, share, rounds):
     return out
 
 
-#: The bones that turn with each trunk bone of the shares of `studio.trunk`: the clavicles with
+#: The bones that turn with each trunk bone of the shares of `bind.trunk`: the clavicles with
 #: the chest, and the ears with the head.
 TRUNK_FOLLOWERS = {
     'clavicle_L': 'chest',
@@ -544,7 +544,7 @@ TRUNK_FOLLOWERS = {
 
 def recline(angle):
     """Gives the turn around the x axis that moves the top of a trunk back by `angle` degrees: the
-    up direction goes toward -z, the back of the studio axes."""
+    up direction goes toward -z, the back of the body axes."""
     a = np.radians(angle)
     return np.array([[1, 0, 0], [0, np.cos(a), np.sin(a)], [0, -np.sin(a), np.cos(a)]])
 
@@ -561,12 +561,12 @@ def hip_angle(heads):
 
 
 def trunk_turn(config, heads, ends, rolls):
-    """Finds the recline of the seated bind pose (`studio.trunk`): the turn of the pelvis, in
+    """Finds the recline of the seated bind pose (`bind.trunk`): the turn of the pelvis, in
     degrees, that opens the hip angle (`hip_angle()`) by `open` degrees. A negative `open` closes
     the hip angle, so the trunk leans forward, as for the standing monkey, which brings its center
     of mass over its feet. Each trunk bone takes its share of the turn as its world turn, so that
     the counter turn of the upper trunk keeps the head about level. Gives 0 with no rule."""
-    rule = config['studio'].get('trunk')
+    rule = config['bind'].get('trunk')
     if not rule or rule['open'] == 0:
         return 0.0
     upright = hip_angle(posed_heads(heads, bind_turns(config, heads, ends, rolls)))
@@ -583,20 +583,20 @@ def trunk_turn(config, heads, ends, rolls):
 
 def bind_turns(config, heads, ends, rolls, turn=0.0):
     """Gives the world turn of each bone from the pose of the source to the seated bind pose. The
-    legs take the inverse of the turns of the studio from its bind pose to its clip `reference`.
+    legs take the inverse of the turns of the body from its bind pose to its clip `reference`.
     With a recline (`turn` degrees, `trunk_turn()`), each trunk bone of the shares of
-    `studio.trunk` takes its share of it (`recline()`), the clavicles turn with the chest, and the
+    `bind.trunk` takes its share of it (`recline()`), the clavicles turn with the chest, and the
     ears with the head. Each arm bone turns the least way onto its bind direction after the turn
-    of its parent, so that the arm does not twist. With `studio.straightArms`, the forearm and the
+    of its parent, so that the arm does not twist. With `bind.straightArms`, the forearm and the
     paw keep the turn of the upper arm, so that the elbow and the wrist keep the angles of the
     source (`bind_hinges()`). With `bindSupination`, the paw of a side then turns about its bind
     forearm toward supination by its angle in degrees, and the fingers turn with it
     (`paw_supination()`). The bones of a tail of two bones turn so onto the directions of
     `tailBind`. With a recline, the tip of the tail turns until its end is at the height of the
     upright bind. The other bones do not turn."""
-    studio = config['studio']
+    body = config['bind']
     turns = {name: np.eye(3) for name in BONES}
-    rule = studio.get('trunk')
+    rule = body.get('trunk')
     if rule and turn:
         for name, share in rule['shares'].items():
             turns[name] = recline(turn * share)
@@ -605,7 +605,7 @@ def bind_turns(config, heads, ends, rolls, turn=0.0):
                 turns[name] = turns[leader]
     for side in 'LR':
         for bone in LEG:
-            q = np.asarray(studio['legTurns'][bone], float)
+            q = np.asarray(body['legTurns'][bone], float)
             if side == 'R':
                 q = q * [1, -1, -1, 1]
             turns[f'{bone}_{side}'] = quat_matrix(q).T
@@ -616,21 +616,21 @@ def bind_turns(config, heads, ends, rolls, turn=0.0):
                 # The twist bone and the fingers keep the turn of their parent.
                 turns[name] = parent
                 continue
-            if bone in STRAIGHT_ARM and studio.get('straightArms', False):
+            if bone in STRAIGHT_ARM and body.get('straightArms', False):
                 turns[name] = parent
             else:
-                target = np.asarray(studio['bindArms'][bone], float)
+                target = np.asarray(body['bindArms'][bone], float)
                 if side == 'R':
                     target = mirrored(target)
                 now = parent @ unit(ends[name] - heads[name])
                 turns[name] = swing(now, target) @ parent
             if bone == 'hand':
-                turns[name] = paw_supination(studio, side, turns, heads) @ turns[name]
+                turns[name] = paw_supination(body, side, turns, heads) @ turns[name]
             parent = turns[name]
     if TAIL_TIP in BONES:
         # Each tail bone turns the least way onto its bind direction after the turn of its parent.
         parent = np.eye(3)
-        targets = studio['tailBind']
+        targets = body['tailBind']
         for name in ('tail', TAIL_TIP):
             now = parent @ unit(ends[name] - heads[name])
             turns[name] = swing(now, np.asarray(targets[name], float)) @ parent
@@ -655,15 +655,15 @@ def bind_turns(config, heads, ends, rolls, turn=0.0):
     return turns
 
 
-def paw_supination(studio, side, turns, heads):
+def paw_supination(body, side, turns, heads):
     """Gives the turn of the bind paw of one side about its bind forearm, from the elbow to the
     wrist, toward supination by the angle of the side in `bindSupination` (degrees, 0 with no
     value). The forearm of the app turns with its elbow hinge, so the bind paw sets the zero of
-    the paw twist (`poseArm()` of `src/models/studio-rig.ts`): this turn moves the zero toward
+    the paw twist (`poseArm()` of `src/models/body-rig.ts`): this turn moves the zero toward
     supination by the angle, and the forearm segments share it in the bind (`driven_turns()`).
-    The studio axes have the left side at +x, so the left paw supinates by a negative turn
+    The body axes have the left side at +x, so the left paw supinates by a negative turn
     about its forearm, and the right paw by a positive turn."""
-    angle = studio.get('bindSupination', {}).get(side, 0)
+    angle = body.get('bindSupination', {}).get(side, 0)
     if not angle:
         return np.eye(3)
     along = turns[f'forearm_{side}'] @ unit(heads[f'hand_{side}'] - heads[f'forearm_{side}'])
@@ -672,20 +672,20 @@ def paw_supination(studio, side, turns, heads):
 
 def bind_hinges(config, turns, heads, ends):
     """Gives the unit elbow axis of each arm in the bind pose for a config with
-    `studio.straightArms`, or `None` with no such rule. The app turns each elbow about this axis
-    (`StudioBody.hinges`, `poseArm()` of `src/models/studio-rig.ts`). A straight bind arm has no
-    plane of its own, so the axis is the axis of the bent bind of `studio.bindArms`: the bind
+    `bind.straightArms`, or `None` with no such rule. The app turns each elbow about this axis
+    (`Body.hinges`, `poseArm()` of `src/models/body-rig.ts`). A straight bind arm has no
+    plane of its own, so the axis is the axis of the bent bind of `bind.bindArms`: the bind
     upper arm × the bind forearm direction of the config. Thus the upper arm and the paw take the
     same world turns in each pose as with the bent bind. The forearm differs by the angle of the
     source forearm out of the plane of the bent bind."""
-    studio = config['studio']
-    if not studio.get('straightArms', False):
+    body = config['bind']
+    if not body.get('straightArms', False):
         return None
     out = {}
     for side in 'LR':
         name = f'upper_arm_{side}'
         upper = turns[name] @ unit(ends[name] - heads[name])
-        fore = np.asarray(studio['bindArms']['forearm'], float)
+        fore = np.asarray(body['bindArms']['forearm'], float)
         if side == 'R':
             fore = mirrored(fore)
         out[side] = unit(np.cross(upper, unit(fore)))
@@ -847,7 +847,7 @@ def add_eye_shells(verts, bind, tris, colors, dark, eyes, rule):
     """Adds a gloss shell over each eye: a fan from the middle of the eye to at most `points`
     points of the edge of the dark faces, lifted along the normal of the eye in the bind mesh. The
     fan needs fewer faces than a copy of the faces of the eye. The faces under it take the mean
-    fur color of their neighbors, as an input of the palette. `pnpm studio-body` finds the eye by
+    fur color of their neighbors, as an input of the palette. `pnpm body-module` finds the eye by
     its fan, drops the fan, and the app puts the bead eye at its place (design 4.5). Gives the new
     vertices of the source and of the bind mesh, the triangles, the colors, the materials, the
     faces of each old eye (`old_eye_faces()`), and the patches of the dark faces near each old eye
@@ -959,7 +959,7 @@ def clip_turns(turns, bind_heads):
 def split_shapes(moves, weights, bind):
     """Splits the corrective moves into the four shapes: the vertices with an arm weight give the
     arm shapes, and the others give the leg shapes. Each kind splits by side with a smooth ramp
-    across the middle plane, as the studio does."""
+    across the middle plane, as the body does."""
     arm = np.zeros(len(moves), bool)
     for side in 'LR':
         for name in arm_bones(side):
@@ -976,7 +976,7 @@ def split_shapes(moves, weights, bind):
 def seat_extras(rule, prop, top):
     """Gives the seat of the rule `chair` for the extras of the asset: the seat of the app that
     takes its place (`prop`), the seat top, the front and the back edges on z, and the half width
-    on x, in the units of the studio. `pnpm studio-body` fits the seat of the app to it. Each
+    on x, in the units of the body. `pnpm body-module` fits the seat of the app to it. Each
     number is a 32-bit float, as a vertex of the file, so that the export gives the same values as
     from the box of a chair mesh."""
 
@@ -1091,8 +1091,8 @@ def write_glb(
     generator='pawchestra tools/blender/rig_mesh.py',
     uvs=None,
 ):
-    """Writes the rig as a GLB file in the format of a studio body, with the extras of the asset
-    for `pnpm studio-body`. The file holds only the animal: the seat is numbers in the extras
+    """Writes the rig as a GLB file in the format of a body, with the extras of the asset
+    for `pnpm body-module`. The file holds only the animal: the seat is numbers in the extras
     (`seat_extras()`). The morph targets are the shapes, in their order. With `base`, the colors
     before `colors.shift`, the attribute `COLOR_1` holds them. With `uvs`, the texture point of
     each corner (`primitive_arrays()`), the attribute `TEXCOORD_0` holds them. `generator` names

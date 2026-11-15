@@ -18,7 +18,7 @@ the part.
 
 With `--pose` and `--moment`, the image and the lists show the part in the app pose of a moment of
 a file of `pnpm pose-preview <role> --glb <file>`, such as `lift50`. The part is still chosen in
-the bind. The preview of `tools/blender/studio_preview.py` skins the export of the pose file (or
+the bind. The preview of `tools/blender/body_preview.py` skins the export of the pose file (or
 `--glb`) from the bind as the app does, so the GLB file must be the export of the open `.blend`.
 
 The image shows the part in gray, the faces around it lighter, and a face seen from its back in
@@ -211,14 +211,14 @@ def write_png(path, img):
 
 def posed_points(bind, pose_json, moment, glb):
     """Gives the points of the app pose of a moment for each vertex of the open file: the
-    preview of `tools/blender/studio_preview.py` skins the export from the bind as the app does.
+    preview of `tools/blender/body_preview.py` skins the export from the bind as the app does.
     Each vertex of the preview finds its vertex of the file by its bind point.
 
     Raises:
         RuntimeError: if the pose file has no such moment, or if a vertex of the file has no
             vertex of the preview at its bind point.
     """
-    import studio_preview as sp
+    import body_preview as sp
 
     pose = sp.read_pose(pose_json)
     names = [m['name'] for m in pose['moments']]

@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the hippo (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/hippo.ts`, which this chain writes:
+`src/models/bodies/hippo.ts`, which this chain writes:
 
 ```text
 tripo-p2/hippo.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/hippo.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export hippo    the same run
    v
 tripo-hand/hippo.rig.glb       rigged mesh, with its summary hippo.rig.json
-   │  pnpm studio-body hippo   the same run
+   │  pnpm body-module hippo   the same run
    v
-src/models/studio/hippo.ts     studio body of the app
+src/models/bodies/hippo.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -54,7 +54,7 @@ around.
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,235 vertices and 3,507 faces: 2,875 quads and 632 triangles, no n-gon. One UV layer |
 | Parts | 5 parts: the body with the ears and the tail (3,059 vertices), one eyeball on each side (a dome of 43 vertices, open at its rim, a sphere of radius 0.0277 units about (±0.0645, 0.8885, 0.0928)), and one tooth on each side (45 vertices, at (±0.087, 0.712, 0.227)). The head has a hole under each eyeball. 80 open edges (32 at the holes under the eyeballs, 28 at the rims of the eyeballs, 20 at the teeth), and no edge with more than two faces |
-| Box | In the studio units (1 unit from the soles to the top of the ears): x ±0.451 (the paw tips), z -0.299 (the tail) to 0.299 (the snout). The hippo faces -y in Blender, with its left side at +x, so the import needs no turn |
+| Box | In the body units (1 unit from the soles to the top of the ears): x ±0.451 (the paw tips), z -0.299 (the tail) to 0.299 (the snout). The hippo faces -y in Blender, with its left side at +x, so the import needs no turn |
 
 The folder `hippo.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness
 and the metallic maps are not kept.
@@ -81,13 +81,13 @@ those of the Tripo beagle with the values of the hippo. `make_config.py` writes
 | Item | Value |
 |---|---|
 | Size | 412,179 bytes. A new build gives the same export, but not the same `.blend` bytes |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the hippo faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the hippo faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `hippo`: 3,887 vertices and 4,107 faces (3,475 quads and 632 triangles, 7,582 triangles), flat faces, and the surface of `sa.add_surface()` with no gloss face. The 84 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/hippo/tripo-hand/hippo-color.webp`) |
 | Armature | `hippo_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.920891 (the shoulder joints at 1.534818 m for each unit, so that H is 0.502359 m, the H of the old hippo), `crease` 180 |
 | Eyes | The eyeballs of the source, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/hippo/tripo-p2/hippo.fbx', 1e-5)`. No vertex
@@ -161,7 +161,7 @@ The weights, in the rest pose:
 normal of the faces at its vertex, as the smooth shading of an FBX viewer.
 
 **Stance.** The hippo stands at its contrabass in the pose of the source (`standingBody()` of
-`src/models/studio-rig.ts`). The bind keeps the legs of the source: the leg turns of the config are
+`src/models/body-rig.ts`). The bind keeps the legs of the source: the leg turns of the config are
 the turn from the source legs to the same legs (`tools/rig/leg_turns.py <config> 105.6 -10.1
 -6.1`). With the seated thighs of the old hippo (25 degrees down), the short thighs pushed into the
 round belly in the bind, and the normals of the export showed the dents and a fold on the belly in

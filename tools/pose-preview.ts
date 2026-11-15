@@ -1,8 +1,8 @@
 /**
  * Writes the pose that the app draws for the first player of a role into a JSON file for the
- * preview in Blender (`tools/blender/studio_preview.py`, design 4.4, "Hand rig"). Each moment
+ * preview in Blender (`tools/blender/body_preview.py`, design 4.4, "Hand rig"). Each moment
  * gives the turn and the head of each bone of the skin, the arm segments and the helpers too
- * (`poseStudioBones()`), and the weight of each morph target, in the axes and the units of the
+ * (`poseBodyBones()`), and the weight of each morph target, in the axes and the units of the
  * `.blend`. A moment of `ROLE_VIEWS` of `tools/close-views.ts` (`--moments`) poses the gallery
  * page of that moment, with the test notes of the role. A demo time (`--times`) poses the seat of
  * the first player of the role in the demo of `--demo`, or in the first demo with the role. With
@@ -12,11 +12,11 @@
  * A standing stance of the body (`standingBody()`) puts the stance matrices before the pose, and
  * sets the leg shapes to 1. The app skins such a body
  * twice, so the preview of that moment differs from the app at the joints of the legs. `--skin`
- * also writes, for `studio_preview.py --check`, the place of each vertex of the app in the bind of
- * the GLB file, its posed place in the app (`skinStudioMesh()` on the packed mesh), and its posed
+ * also writes, for `body_preview.py --check`, the place of each vertex of the app in the bind of
+ * the GLB file, its posed place in the app (`skinBodyMesh()` on the packed mesh), and its posed
  * place from the data of the GLB file with the same pose (the exact preview).
  *
- * `--glb <file>` takes the studio body of another GLB file, such as an export of
+ * `--glb <file>` takes the body of another GLB file, such as an export of
  * `refresh_preview()` (`tools/glb-swap.ts`). `--from <file>` is the GLB file of the module in such
  * a run.
  *
@@ -47,8 +47,8 @@ import {
   readSkeleton,
   settingsOf,
   weldMesh,
-} from './studio-body.ts';
-import type { Glb } from './studio-body.ts';
+} from './body-module.ts';
+import type { Glb } from './body-module.ts';
 import {
   galleryMove,
   gallerySupport,
@@ -67,18 +67,18 @@ import { buildPlayer } from '../src/models/player.ts';
 import type { PlayerModel } from '../src/models/player.ts';
 import { SPECIES } from '../src/models/species.ts';
 import type { SpeciesId } from '../src/models/species.ts';
-import { studioBodyOf } from '../src/models/studio-body.ts';
-import { STUDIO_BONES, STUDIO_PARENTS, unpackStudioMesh } from '../src/models/studio-format.ts';
-import type { StudioBody, StudioBone, StudioMesh } from '../src/models/studio-format.ts';
+import { bodyOf } from '../src/models/body.ts';
+import { BODY_BONES, BODY_PARENTS, unpackBodyMesh } from '../src/models/body-format.ts';
+import type { Body, BodyBone, BodyMesh } from '../src/models/body-format.ts';
 import {
   CLOSED_EYE_SCALE,
-  createStudioPose,
-  poseStudioBones,
-  skinStudioMesh,
+  createBodyPose,
+  poseBodyBones,
+  skinBodyMesh,
   standingBody,
-  studioOffsets,
-} from '../src/models/studio-rig.ts';
-import type { StudioPose } from '../src/models/studio-rig.ts';
+  bodyOffsets,
+} from '../src/models/body-rig.ts';
+import type { BodyPose } from '../src/models/body-rig.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
 import { countInAt } from '../src/pose/count-in.ts';
 import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
@@ -131,7 +131,7 @@ const DECIMALS = 7;
 
 /**
  * The turn from the axes of the app model to the axes of the `.blend`: the app animal faces -z
- * with its left side at -x (`toModelAxes()` of `tools/studio-body.ts`), and the Blender animal
+ * with its left side at -x (`toModelAxes()` of `tools/body-module.ts`), and the Blender animal
  * faces -y with its left side at +x and z up.
  */
 const MODEL_TO_BLEND = new Matrix3().set(-1, 0, 0, 0, 0, 1, 0, 1, 0);
@@ -166,7 +166,7 @@ interface PreviewBone {
   readonly head: Vec3;
 }
 
-/** The stance of the body in a moment: the bind of the export, or a stance of `studioRig()`. */
+/** The stance of the body in a moment: the bind of the export, or a stance of `bodyRig()`. */
 type Stance = 'bind' | 'standing';
 
 /** The stance of a model and its matrices of the bones, or `null` for the bind of the export. */
@@ -178,7 +178,7 @@ interface StanceMatrices {
 /** The mesh of the app from the data of the GLB file, and its bind in the `.blend`. */
 interface FileMesh {
   /** The mesh in the model axes, with the vertices in the order of the module. */
-  readonly mesh: StudioMesh;
+  readonly mesh: BodyMesh;
   /** X, y, z of each vertex in the bind pose of the GLB file, in the `.blend`. */
   readonly bind: number[];
 }
@@ -224,7 +224,7 @@ interface PosePreview {
   /** The meters for each unit of the `.blend`. */
   readonly scale: number;
   /** The bones of the GLB file, each after its parent. */
-  readonly bones: readonly StudioBone[];
+  readonly bones: readonly BodyBone[];
   /** The parent of each bone, or `null` for the root. */
   readonly parents: Readonly<Record<string, string | null>>;
   /**
@@ -247,9 +247,9 @@ interface BlendFrame {
   /** The inverse move. */
   readonly toModel: Matrix4;
   /** The bones of the GLB file, each after its parent. */
-  readonly bones: readonly StudioBone[];
+  readonly bones: readonly BodyBone[];
   /** The head of each bone in the bind pose of the GLB file, in the `.blend`. */
-  readonly heads: ReadonlyMap<StudioBone, Vector3>;
+  readonly heads: ReadonlyMap<BodyBone, Vector3>;
 }
 
 /** A pose of the player in one moment, with its model. */
@@ -525,7 +525,7 @@ function keyLight(seat: RoleSeat): Vec3 {
   const place = seat.index === null ? layout.conductor : layout.players[seat.index];
   const facing = place?.facing ?? 0;
   const up = new Vector3(0, 1, 0);
-  const chest = new Vector3(...seat.model.studio.body.heads.chest)
+  const chest = new Vector3(...seat.model.bodyRig.body.heads.chest)
     .applyAxisAngle(up, facing)
     .add(new Vector3(...(place?.position ?? [0, 0, 0])));
   const toLight = new Vector3(...keyLightPlace(layout.stageSide))
@@ -538,17 +538,17 @@ function keyLight(seat: RoleSeat): Vec3 {
 
 /**
  * Finds the move from the app model into the `.blend`: the scale and the offset of the export
- * (`sceneFrame()` of `tools/studio-body.ts`), fitted to the heads of the module and of the GLB
+ * (`sceneFrame()` of `tools/body-module.ts`), fitted to the heads of the module and of the GLB
  * file by least squares.
  *
- * @param body The studio body of the module.
+ * @param body The body of the module.
  * @param glb The GLB file of the module.
  * @returns The frame.
  * @throws Error if the module does not fit the file: the module comes from another export.
  */
-function blendFrame(body: StudioBody, glb: Glb): BlendFrame {
+function blendFrame(body: Body, glb: Glb): BlendFrame {
   const binds = readSkeleton(glb).binds;
-  const bones = STUDIO_BONES.filter((bone) => binds.has(bone));
+  const bones = BODY_BONES.filter((bone) => binds.has(bone));
   // The model point m = s D (p + o), with D = diag(-1, 1, -1): D m = s p + s o for each head.
   const pairs = bones.map((bone) => {
     const [x = 0, y = 0, z = 0] = body.heads[bone] ?? [];
@@ -577,11 +577,11 @@ function blendFrame(body: StudioBody, glb: Glb): BlendFrame {
   );
   if (gap > FIT_LIMIT) {
     throw new Error(
-      `The heads of the module are ${gap.toExponential(2)} m off the GLB file: the module comes from another export. Run pnpm studio-body, or give the file with --glb.`,
+      `The heads of the module are ${gap.toExponential(2)} m off the GLB file: the module comes from another export. Run pnpm body-module, or give the file with --glb.`,
     );
   }
 
-  // x of the .blend = B (D m / s - o), with B (x, y, z) = (x, -z, y) from the studio axes.
+  // x of the .blend = B (D m / s - o), with B (x, y, z) = (x, -z, y) from the body axes.
   const turn = new Matrix4().setFromMatrix3(MODEL_TO_BLEND);
   const toBlend = new Matrix4()
     .makeTranslation(-offset.x, offset.z, -offset.y)
@@ -599,7 +599,7 @@ function blendFrame(body: StudioBody, glb: Glb): BlendFrame {
 }
 
 /**
- * Gives the move from the axes of the studio (the GLB file) into the axes of the `.blend`.
+ * Gives the move from the axes of the body (the GLB file) into the axes of the `.blend`.
  *
  * @returns The matrix: (x, y, z) goes to (x, -z, y).
  */
@@ -612,32 +612,32 @@ function fileToBlend(): Matrix4 {
  * bind of the export.
  *
  * @param model The model.
- * @param bound The studio body of the module.
+ * @param bound The body of the module.
  * @returns The stance and its matrices.
  */
-function stanceOf(model: PlayerModel, bound: StudioBody): StanceMatrices {
-  if (model.studio.body === bound) {
+function stanceOf(model: PlayerModel, bound: Body): StanceMatrices {
+  if (model.bodyRig.body === bound) {
     return { stance: 'bind', matrices: null };
   }
-  return { stance: 'standing', matrices: standingBody(bound, unpackStudioMesh(bound.mesh)).stance };
+  return { stance: 'standing', matrices: standingBody(bound, unpackBodyMesh(bound.mesh)).stance };
 }
 
 /**
  * Gives the matrices that move each bone from the bind pose of the GLB file to a pose: the
  * stance, then the pose of the app.
  *
- * @param studio The pose of the app.
+ * @param body The pose of the app.
  * @param stance The stance matrices, or `null`.
- * @returns 16 numbers for each bone of `STUDIO_BONES`.
+ * @returns 16 numbers for each bone of `BODY_BONES`.
  */
-function exportMatrices(studio: StudioPose, stance: Float32Array | null): Float32Array {
-  const out = studio.matrices.slice(0, STUDIO_BONES.length * 16);
+function exportMatrices(bodyPose: BodyPose, stance: Float32Array | null): Float32Array {
+  const out = bodyPose.matrices.slice(0, BODY_BONES.length * 16);
   if (!stance) {
     return out;
   }
   const pose = new Matrix4();
   const move = new Matrix4();
-  for (let b = 0; b < STUDIO_BONES.length; b++) {
+  for (let b = 0; b < BODY_BONES.length; b++) {
     pose
       .fromArray(out, b * 16)
       .multiply(move.fromArray(stance, b * 16))
@@ -666,12 +666,12 @@ function fixed(value: number): number {
  * @throws Error if a matrix in the `.blend` is not a rigid move.
  */
 function previewBones(frame: BlendFrame, matrices: Float32Array): PreviewMoment['bones'] {
-  const turns = new Map<StudioBone, Quaternion>();
+  const turns = new Map<BodyBone, Quaternion>();
   const out: Record<string, PreviewBone> = {};
   const m = new Matrix4();
   const basis = new Matrix3();
   for (const bone of frame.bones) {
-    m.fromArray(matrices, STUDIO_BONES.indexOf(bone) * 16)
+    m.fromArray(matrices, BODY_BONES.indexOf(bone) * 16)
       .premultiply(frame.toBlend)
       .multiply(frame.toModel);
     basis.setFromMatrix4(m);
@@ -687,7 +687,7 @@ function previewBones(frame: BlendFrame, matrices: Float32Array): PreviewMoment[
       throw new Error(`The pose of the bone ${bone} is no rigid move in the .blend (gap ${gap}).`);
     }
     const world = new Quaternion().setFromRotationMatrix(m);
-    const parent = STUDIO_PARENTS[bone];
+    const parent = BODY_PARENTS[bone];
     const local = (parent ? turns.get(parent)?.clone().invert() : undefined) ?? new Quaternion();
     local.multiply(world);
     turns.set(bone, world);
@@ -704,19 +704,19 @@ function previewBones(frame: BlendFrame, matrices: Float32Array): PreviewMoment[
  * Gives the weight of each morph target of the GLB file in one moment: the corrective weights of
  * the app, and 1 for the leg shapes of a standing stance or the sit shapes of a seated stance.
  *
- * @param studio The pose of the app.
+ * @param body The pose of the app.
  * @param raises The morph target of each shape of a raised arm or of a bent wrist, in order.
  * @param stance The stance.
  * @returns The weights by name.
  */
 function targetWeights(
-  studio: StudioPose,
+  bodyPose: BodyPose,
   raises: readonly string[],
   stance: Stance,
 ): PreviewMoment['targets'] {
   const out: Record<string, number> = {};
   for (const [k, name] of [...CORRECTIVE_NAMES, ...raises].entries()) {
-    out[name] = fixed(studio.correctives[k] ?? 0);
+    out[name] = fixed(bodyPose.correctives[k] ?? 0);
   }
   for (const name of stance === 'standing' ? LEG_CORRECTIVE_NAMES : []) {
     out[name] = 1;
@@ -743,7 +743,7 @@ function blendPoints(frame: BlendFrame, points: ArrayLike<number>): number[] {
 
 /**
  * Makes the mesh of the app from the data of the GLB file, with no packing: the welded vertices
- * in the order of the module (`studioBody()` of `tools/studio-body.ts`), their places in the GLB
+ * in the order of the module (`glbBody()` of `tools/body-module.ts`), their places in the GLB
  * file, their weights, and the moves of the kept morph targets, in the model axes.
  *
  * @param glb The GLB file.
@@ -753,9 +753,9 @@ function blendPoints(frame: BlendFrame, points: ArrayLike<number>): number[] {
  * @returns The mesh, and the place of each vertex in the bind pose of the GLB file, in the `.blend`.
  * @throws Error if a vertex of the GLB file is not at the place of the vertex of the module.
  */
-function fileMesh(glb: Glb, kept: readonly string[], frame: BlendFrame, app: StudioMesh): FileMesh {
+function fileMesh(glb: Glb, kept: readonly string[], frame: BlendFrame, app: BodyMesh): FileMesh {
   const welded = weldMesh(glb, kept);
-  // The export drops the faces of the old eyes, as `studioBody()` does.
+  // The export drops the faces of the old eyes, as `glbBody()` does.
   const eyes = eyeVertices(welded);
   const inEye = (v: number): boolean => eyes.L.has(v) || eyes.R.has(v);
   const { vertices } = orderByFirstUse({
@@ -785,7 +785,7 @@ function fileMesh(glb: Glb, kept: readonly string[], frame: BlendFrame, app: Stu
     const inBlend = vertex.position.clone().applyMatrix4(toFile);
     bind.push(inBlend.x, inBlend.y, inBlend.z);
     for (const [k, [bone, weight]] of vertex.skin.slice(0, 4).entries()) {
-      joints[v * 4 + k] = STUDIO_BONES.findIndex((own) => own === bone);
+      joints[v * 4 + k] = BODY_BONES.findIndex((own) => own === bone);
       weights[v * 4 + k] = weight;
     }
     for (const [s, move] of vertex.moves.entries()) {
@@ -806,7 +806,7 @@ function fileMesh(glb: Glb, kept: readonly string[], frame: BlendFrame, app: Stu
  *
  * @param options The options.
  * @returns The file.
- * @throws Error for a role with no close view or no studio body.
+ * @throws Error for a role with no close view or no body.
  */
 async function preview(options: Options): Promise<PosePreview> {
   const cast = castRoleOf(options.role);
@@ -818,15 +818,15 @@ async function preview(options: Options): Promise<PosePreview> {
   const animal = speciesAnimal(species);
   const name = SPECIES[species].body;
   if (!animal || !name) {
-    throw new Error(`The ${species} has no studio body.`);
+    throw new Error(`The ${species} has no body.`);
   }
-  const bound = studioBodyOf(name);
+  const bound = bodyOf(name);
   const file = options.from ?? resolve(ROOT, bound.source);
   const bytes = new Uint8Array(readFileSync(file));
   const sha = sha256(bytes);
   if (sha !== bound.sha256) {
     throw new Error(
-      `The module of the ${species} comes from another export than ${relative(ROOT, file)}. Run pnpm studio-body ${animal}, or give the file with --glb.`,
+      `The module of the ${species} comes from another export than ${relative(ROOT, file)}. Run pnpm body-module ${animal}, or give the file with --glb.`,
     );
   }
   const glb = readGlb(bytes);
@@ -849,32 +849,32 @@ async function preview(options: Options): Promise<PosePreview> {
 
   const entry = ANIMALS.get(animal);
   if (!entry) {
-    throw new Error(`ANIMALS of tools/studio-body.ts has no animal ${animal}.`);
+    throw new Error(`ANIMALS of tools/body-module.ts has no animal ${animal}.`);
   }
   const settings = settingsOf(glb, entry);
   const kept = keptCorrectives(settings, raises);
-  const app = unpackStudioMesh(bound.mesh);
+  const app = unpackBodyMesh(bound.mesh);
   const exact = options.skin ? fileMesh(glb, kept, frame, app) : null;
   const appSkins: Record<string, number[]> = {};
   const exactSkins: Record<string, number[]> = {};
   const moments = posed.map((p): PreviewMoment => {
-    const studio = poseStudioBones(
-      p.model.studio,
+    const bodyPose = poseBodyBones(
+      p.model.bodyRig,
       p.model.skeleton,
       p.pose.rotations,
-      studioOffsets(p.pose),
+      bodyOffsets(p.pose),
       Math.max(CLOSED_EYE_SCALE, 1 - p.pose.blink),
-      createStudioPose(),
+      createBodyPose(),
     );
     const { stance, matrices: stanceMatrices } = stanceOf(p.model, bound);
-    const matrices = exportMatrices(studio, stanceMatrices);
-    const targets = targetWeights(studio, raises, stance);
+    const matrices = exportMatrices(bodyPose, stanceMatrices);
+    const targets = targetWeights(bodyPose, raises, stance);
     if (exact) {
-      appSkins[p.name] = blendPoints(frame, skinStudioMesh(p.model.studio.mesh, studio));
+      appSkins[p.name] = blendPoints(frame, skinBodyMesh(p.model.bodyRig.mesh, bodyPose));
       const weights = Float32Array.from(kept, (target) => targets[target] ?? 0);
       exactSkins[p.name] = blendPoints(
         frame,
-        skinStudioMesh(exact.mesh, { matrices, correctives: weights }),
+        skinBodyMesh(exact.mesh, { matrices, correctives: weights }),
       );
     }
     return {
@@ -897,7 +897,7 @@ async function preview(options: Options): Promise<PosePreview> {
     sha256: sha,
     scale: fixed(frame.scale),
     bones: frame.bones,
-    parents: Object.fromEntries(frame.bones.map((bone) => [bone, STUDIO_PARENTS[bone]])),
+    parents: Object.fromEntries(frame.bones.map((bone) => [bone, BODY_PARENTS[bone]])),
     light: keyLight(seat),
     holds: options.holds,
     moments,
@@ -914,7 +914,7 @@ async function main(): Promise<void> {
     const cast = castRoleOf(options.role);
     const animal = cast ? speciesAnimal(viewsOf(cast).species) : null;
     if (!animal) {
-      throw new Error(`${options.role} is no role with a studio body. ${USAGE}`);
+      throw new Error(`${options.role} is no role with a body. ${USAGE}`);
     }
     const args = [
       ...rest.filter((arg, i) => arg !== '--out' && rest[i - 1] !== '--out'),

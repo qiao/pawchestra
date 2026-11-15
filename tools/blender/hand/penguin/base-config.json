@@ -1,6 +1,6 @@
 {
   "source": "assets/models/penguin/tripo-p2/penguin.fbx",
-  "sourceNote": "The Tripo P2 fox mesh with its quads (assets/models/fox/README.md). The hand rig assets/models/fox/tripo-hand/fox.blend starts from it in a live Blender with the calls of tools/blender/studio_armature.py (design 4.4, \"Hand rig\").",
+  "sourceNote": "The Tripo P2 fox mesh with its quads (assets/models/fox/README.md). The hand rig assets/models/fox/tripo-hand/fox.blend starts from it in a live Blender with the calls of tools/blender/body_armature.py (design 4.4, \"Hand rig\").",
   "name": "Penguin",
   "weld": 1e-05,
   "joints": {
@@ -224,7 +224,7 @@
     -1,
     -0.06
   ],
-  "studio": {
+  "bind": {
     "legTurns": {
       "thigh": [
         0.642374,
@@ -262,7 +262,7 @@
         "head": 0
       }
     },
-    "trunkNote": "The trunk of the bind leans forward a little (trunk_turn() of tools/blender/rig_mesh.py): the pelvis turns forward until the hip angle closes by 2 degrees, and each trunk bone takes its share. Thus the shoulders stay over the hips, as a brass player stands erect (docs/reference/wind-technique.md, 1.8), and the center of mass stays over the middle of the soles with the leg turns of studio.legTurns. The recline keeps the scale: the clip reference holds the upright source, so the shoulder landmark stays the shoulder of the source.",
+    "trunkNote": "The trunk of the bind leans forward a little (trunk_turn() of tools/blender/rig_mesh.py): the pelvis turns forward until the hip angle closes by 2 degrees, and each trunk bone takes its share. Thus the shoulders stay over the hips, as a brass player stands erect (docs/reference/wind-technique.md, 1.8), and the center of mass stays over the middle of the soles with the leg turns of bind.legTurns. The recline keeps the scale: the clip reference holds the upright source, so the shoulder landmark stays the shoulder of the source.",
     "bindArms": {
       "upper_arm": [
         0.813873,
@@ -275,7 +275,7 @@
         0.571719
       ]
     },
-    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the monkey of main (tools/mesh-rigs/monkey.json at cbc8db5e4), so that the elbow axes of the trumpet hold stay.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (Body.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the monkey of main (tools/mesh-rigs/monkey.json at cbc8db5e4), so that the elbow axes of the trumpet hold stay.",
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
@@ -349,7 +349,7 @@
     "points": 12,
     "reach": 1,
     "darkReach": 2,
-    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm body-module drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
   },
   "chair": {
     "halfWidth": 0.13,
@@ -361,13 +361,13 @@
     "helper": 0.03,
     "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies."
   },
-  "jointsNote": "The places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips before the longer legs, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from cuts of the mesh and from its edge rings. Arm (axis y 0.638 to 0.626, z 0.064, radius 0.024 to 0.04): the shoulder joint at x 0.072, inside the first clean arm ring (x 0.097) and the trunk side (x 0.077); the elbow at x 0.195, in the middle of the 4 close rings at x 0.176 to 0.21 and at the small step of the outline; the wrist at x 0.31, at the close rings at x 0.296 to 0.32 where the paw widens; the knuckles at x 0.362, where the fingers part; the tip at x 0.42. Leg: the crotch is at y 0.18, so the thigh lies in the haunch. The hip joint at y 0.29 in the middle of the haunch ring; the knee at y 0.175, at the corner of the back outline and the close rings at y 0.143 to 0.174; the ankle at y 0.06, at the heel; the ball of the foot at z 0.1, and the toe tips at z 0.139. Trunk: the waist is narrowest at y 0.54 (x 0.071) and the haunch widest at y 0.34 (x 0.12). The spine bones lie at about 0.35 of the depth from the back. The neck is narrowest at y 0.70 to 0.72 (x 0.057), and the chin is at y 0.733. Ears: the root at y 0.885, the tips at (0.107, 1.0, 0.064). Tail: the root leaves the back at y 0.40, the tail goes back to z -0.135 by y 0.30, hangs down, and its tip is at (0, 0.109, -0.2). The palm is the true palm of the source: the normal of the plane of the paw vertices (x 0.33 to 0.43) is (-0.147, -0.987, -0.063). It faces down, and the finger tips curl down toward it. The knee joint lies 2 mm out of the middle of its leg ring (x 0.063), so that the rest frame of the thigh in the frame of the hips has an error below 1e-5 in Blender, which the export checks (assets/models/fox/README.md, \"tripo-hand/fox.blend\"). Longer legs: the edit of assets/models/fox/README.md (\"Longer legs\") maps the height y of each joint to g(y) of that edit: the joints above y 0.30 move up by 0.0456, the knee goes from y 0.175 to 0.1966, and the ankle and the foot stay. The tail joints move up by 0.0456. The hip joint lies at (0.058, 0.335514, 0.058): 0.003 units forward of the hip joint before the edit, so that the rest frame of the thigh in the frame of the hips has an error below 2e-6, which the export checks.",
+  "jointsNote": "The places are in the body units and axes of the source pose: 1 unit from the soles to the ear tips before the longer legs, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from cuts of the mesh and from its edge rings. Arm (axis y 0.638 to 0.626, z 0.064, radius 0.024 to 0.04): the shoulder joint at x 0.072, inside the first clean arm ring (x 0.097) and the trunk side (x 0.077); the elbow at x 0.195, in the middle of the 4 close rings at x 0.176 to 0.21 and at the small step of the outline; the wrist at x 0.31, at the close rings at x 0.296 to 0.32 where the paw widens; the knuckles at x 0.362, where the fingers part; the tip at x 0.42. Leg: the crotch is at y 0.18, so the thigh lies in the haunch. The hip joint at y 0.29 in the middle of the haunch ring; the knee at y 0.175, at the corner of the back outline and the close rings at y 0.143 to 0.174; the ankle at y 0.06, at the heel; the ball of the foot at z 0.1, and the toe tips at z 0.139. Trunk: the waist is narrowest at y 0.54 (x 0.071) and the haunch widest at y 0.34 (x 0.12). The spine bones lie at about 0.35 of the depth from the back. The neck is narrowest at y 0.70 to 0.72 (x 0.057), and the chin is at y 0.733. Ears: the root at y 0.885, the tips at (0.107, 1.0, 0.064). Tail: the root leaves the back at y 0.40, the tail goes back to z -0.135 by y 0.30, hangs down, and its tip is at (0, 0.109, -0.2). The palm is the true palm of the source: the normal of the plane of the paw vertices (x 0.33 to 0.43) is (-0.147, -0.987, -0.063). It faces down, and the finger tips curl down toward it. The knee joint lies 2 mm out of the middle of its leg ring (x 0.063), so that the rest frame of the thigh in the frame of the hips has an error below 1e-5 in Blender, which the export checks (assets/models/fox/README.md, \"tripo-hand/fox.blend\"). Longer legs: the edit of assets/models/fox/README.md (\"Longer legs\") maps the height y of each joint to g(y) of that edit: the joints above y 0.30 move up by 0.0456, the knee goes from y 0.175 to 0.1966, and the ankle and the foot stay. The tail joints move up by 0.0456. The hip joint lies at (0.058, 0.335514, 0.058): 0.003 units forward of the hip joint before the edit, so that the rest frame of the thigh in the frame of the hips has an error below 2e-6, which the export checks.",
   "body": {
     "crease": 180
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle of the fox of main. The haunch is 0.24 units (0.37 m) wide, so the chair of design 4.5 (0.42 m) holds it, and the body needs no seatWidth.",
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/body-module.ts) beside the height: the crease angle of the fox of main. The haunch is 0.24 units (0.37 m) wide, so the chair of design 4.5 (0.42 m) holds it, and the body needs no seatWidth.",
   "eyeSize": 0.211529,
-  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export. The hand rig keeps the eyes of the mesh, so it places no pea eye. The simple route reads this value.",
+  "eyeSizeNote": "The head height H of the body in units, as body-module measures it on the export. The hand rig keeps the eyes of the mesh, so it places no pea eye. The simple route reads this value.",
   "metersPerUnit": 1.526966,
   "metersPerUnitNote": "The scale of the app: H (0.211529 units) stays 0.322998 m, the H of the fox of assets/models/fox/fox.rig.glb at cbc8db5e4. The fact height of the armature is the shoulder joints (0.6836 units, 0.638 before the longer legs of assets/models/fox/README.md) at this scale: 1.043834 m.",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/fox.blend holds it.",

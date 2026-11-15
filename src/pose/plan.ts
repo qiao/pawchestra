@@ -775,7 +775,7 @@ export function pulseTimes(beats: readonly Beat[]): Float64Array {
  * @returns The limits that the body gives.
  */
 function cueFacts(model: PlayerModel): CueFacts {
-  const { cueHeadLeft, cueHeadRight, cueLift } = model.studio.body;
+  const { cueHeadLeft, cueHeadRight, cueLift } = model.bodyRig.body;
   const facts: CueFacts = {};
   if (cueHeadLeft !== undefined) {
     facts.headLeft = cueHeadLeft * MathUtils.DEG2RAD;

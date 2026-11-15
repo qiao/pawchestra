@@ -276,7 +276,7 @@ Sources 13, 14, and 15 opened on 2026-11-12, and sources 16 and 17 on 2026-11-13
     doi:10.1525/mp.2010.28.1.47
 13. M. Neel. "Festival Etiquette." Yamaha Music Educators, teaching tips, 2018-08-20.
     https://hub.yamaha.com/music-educators/prof-dev/teaching-tips/festival-etiquette
-14. S. Aron. "Stage Deportment I: Why We Bow." Stephen Aron Studio, 2015-11-11.
+14. S. Aron. "Stage Deportment I: Why We Bow." Stephen Aron Body, 2015-11-11.
     https://stephen-aron.squarespace.com/stephenaronstudio/2015/11/stage-deportment-i-why-we-bow.html
 15. F. Khobkhun, M. Hollands, and J. Richards. "The Effect of Different Turn Speeds on Whole-Body
     Coordination in Younger and Older Healthy Adults." Sensors 21(8), 2827, 2021.

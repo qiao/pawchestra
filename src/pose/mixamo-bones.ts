@@ -11,7 +11,7 @@ import type { BoneName } from '../models/rig.ts';
  *   bend of `Spine`, and `chest` carries the arms and the neck as `Spine2` does.
  * - **Forearm roll.** Mixamo has no twist bone, and the hand turns with the roll of the forearm.
  *   The player hand takes the world turn of the hand, so the roll reaches the twist bone of the
- *   studio (`TWIST_SHARE` of `models/studio-rig.ts`).
+ *   body (`TWIST_SHARE` of `models/body-rig.ts`).
  * - **Fingers.** The bones of the four long fingers give one curl of the `fingers` block. The
  *   thumb and the end bones (`*4`, `*_End`) drive no bone.
  * - **Feet.** `ToeBase` drives no bone: the foot of the player is one block.

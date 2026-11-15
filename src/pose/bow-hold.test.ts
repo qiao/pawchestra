@@ -138,10 +138,10 @@ describe('the bow in the right hand (design 4.6, 5.3)', () => {
       'hippo contrabass',
       'rabbit violin',
     ]);
-    // The paw of the studio rabbit closes around its small bow, so the stick and the hair go
+    // The paw of the rabbit closes around its small bow, so the stick and the hair go
     // into the skin of the paw. The sweep of the violinist keeps the bow out of the body and the
     // violin (`pose/test-sweep-roles.ts`).
-    for (const player of players.filter((p) => !p.model.studio)) {
+    for (const player of players.filter((p) => !p.model.bodyRig)) {
       const plan = scene.plan.players[player.index];
       if (!plan) {
         throw new Error('The player has no plan.');
@@ -175,9 +175,9 @@ describe('the bow in the right hand (design 4.6, 5.3)', () => {
     // A small file: each bowed section plays four quarter notes. The band of the gap fits the
     // mitten of the parametric biped and the stick of the bow of the app. The rabbit is not
     // here: its bow is smaller (`violinScale` of its species), and its paw has the skin of a
-    // studio body.
+    // body.
     const scene = sceneOf(STRINGS);
-    const parametric = bowedPlayers(scene).filter((player) => !player.model.studio);
+    const parametric = bowedPlayers(scene).filter((player) => !player.model.bodyRig);
     expect(parametric.length).toBeGreaterThan(2);
     for (const player of parametric) {
       const pose = poseAt(scene.plan, 1.2, 10, PLAYING, []).players[player.index];

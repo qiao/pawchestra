@@ -57,7 +57,7 @@ STRANDS = {
 #: The back of the neck and the top of the back, where the normal map of the source paints a
 #: crumpled pattern of small bumps: the triangles of the rig file with the middle at |x| below
 #: `side`, y from `above` to `below`, and z below `behind`, and a normal with z below `facing` (the
-#: studio units and axes of the bind: y up, +z forward). In the warm light, the bumps showed as red
+#: body units and axes of the bind: y up, +z forward). In the warm light, the bumps showed as red
 #: and brown dots behind a raised left arm. The texels of these triangles take no tilt of the
 #: source, only the tilt of the strands. The area grows by `grow` texels at NORMAL_SIZE, so that the
 #: bilinear samples at the edges of its triangles take no bump, and then takes a soft edge of

@@ -5,7 +5,7 @@ round.
 
 ## Bodies and roles
 
-Each species has a studio body (`'studio-<a>'`) with the role-neutral bind (design 4.4). "Hand
+Each species has a body (`'body-<a>'`) with the role-neutral bind (design 4.4). "Hand
 rig" means the hand rig of a Tripo P2 mesh in `assets/models/<s>/tripo-hand/`, with no arm cut and
 no stretch. A chain in `tools/blender/hand/<s>/` makes each one. The `README.md` of each model
 folder gives the files of each step.
@@ -61,7 +61,7 @@ These rules hold for each route:
 
 ## The asset chain
 
-Two routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each one. Design 4.4
+Two routes make the rig file `<s>.rig.glb`, and `pnpm body-module` packs each one. Design 4.4
 ("Models") gives the chain in a diagram. A source mesh needs its arms apart from the trunk.
 
 - **Simple route.** `simple_rig.py` writes the `.blend` of a hand rig from a clean quad mesh with
@@ -77,8 +77,8 @@ Test a change of a shared hold on the mannequin with
 1. **Rig.** Make the `.blend` by the simple route or by hand ("Steps of a hand rig"), and export
    it with `pnpm rig-export`. Keep the budgets.
 2. **Export.** Add the animal to `ANIMALS` with the landmark of its scale, the crease angle of its
-   reference crops, and the seat settings. Run `pnpm studio-body <a>`, add the module to
-   `STUDIO_BODIES`, and give the species the body.
+   reference crops, and the seat settings. Run `pnpm body-module <a>`, add the module to
+   `BODIES`, and give the species the body.
 3. **Holds.** Fit the holds (`SPECIES_HOLDS`, `SPECIES_WIND_HOLDS` with `LEG_RESTS`, or
    `PERCUSSION_HOLDS`) in the `H` of the new body with `pnpm hold-fit`, `pnpm hold-reach`, and
    `pnpm pose-depth`.
@@ -92,8 +92,8 @@ The chain of a Tripo body lives in `tools/blender/hand/<s>/` (`tools/blender/han
 Change the chain, never its `.blend`, and run `pnpm hand-chain <s>`. A size change is
 `metersPerUnit` in `params.json`. A worktree has the chain in git, so copy no scratch folder.
 
-In a live Blender, call only the functions of `studio_preview.py` (`sp`), `studio_armature.py`
-(`sa`), and `studio_eyes.py` (`se`) of `tools/blender/`. Run their command lines headless only.
+In a live Blender, call only the functions of `body_preview.py` (`sp`), `body_armature.py`
+(`sa`), and `body_eyes.py` (`se`) of `tools/blender/`. Run their command lines headless only.
 Write the exact call and values of each scripted edit of a `.blend` in the `README.md` row of the
 file. Try each scripted edit on a copy with `pnpm rig-trial`, and find thin faces and sharp edges
 with `pnpm bind-view`.
@@ -116,7 +116,7 @@ with `pnpm bind-view`.
 4. **Preview.** `pnpm pose-preview <role>` writes the app pose of each moment.
    `sp.load_preview()` shows it beside the rig, `sp.refresh_preview()` shows the open file, and
    `sp.fold_colors(True)` marks the folds. Check each weight edit in the bind and the app pose.
-5. **Export.** Run `pnpm rig-export <s>` and `pnpm studio-body <s>`. Diff `<s>.rig.json` to see
+5. **Export.** Run `pnpm rig-export <s>` and `pnpm body-module <s>`. Diff `<s>.rig.json` to see
    what moved.
 
 For the simple route, run `simple_rig.py`, then step 5. Write a texture with `Image.save()`:
@@ -150,7 +150,7 @@ old arm bones hold no skin and only drive the new bones (`armSegments`).
               hand (skin) --> fingers (skin)
 ```
 
-`poseSegments()` of `src/models/studio-rig.ts` and `driven_turns()` of
+`poseSegments()` of `src/models/body-rig.ts` and `driven_turns()` of
 `tools/blender/rig_mesh.py` turn the new bones with the same rule.
 
 ## Traps
@@ -260,7 +260,7 @@ Design 4.4 gives the merges of each copy.
   and fit the bench to the legs. A long thigh puts the feet forward: lengthen the shin
   with a point edit, and move `headFloor` and each lap share (`lap.along`) with the legs.
 - The linear blend flattens a bent knee. Give the knees `bind.knee`.
-- A tail on the floor stays flat with rigid bone turns (`studio.tailBind`). A large tail needs two
+- A tail on the floor stays flat with rigid bone turns (`bind.tailBind`). A large tail needs two
   bones. A tip bone far off the curl of the mesh pinches the bend (`weights.tail.bend`). A tail
   root can set the seat top: fix it with `sit.top` and `sit.root`.
 - A girth move that ends at a joint leaves a ledge in the seated bind. Relax the posed bind there

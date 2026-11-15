@@ -5,8 +5,8 @@ import { FINISH_ORDER } from '../models/mesh.ts';
 import { MAX_RIM_LIGHTS } from './rim-light.ts';
 
 /**
- * The fur shading of a studio body with a color map (design 4.5): a sheen and the strand normals
- * of a normal map, only on the fur faces: the faces with texture points (`StudioTexture`) and the
+ * The fur shading of a body with a color map (design 4.5): a sheen and the strand normals
+ * of a normal map, only on the fur faces: the faces with texture points (`BodyTexture`) and the
  * finish `matte`. The eyeballs (the finish `eye`), the gloss faces, and the `plain` faces, such as
  * a whisker, keep the shading of the shared material.
  */
@@ -78,7 +78,7 @@ export function createFurUniforms(normalOn: { value: number }): FurUniforms {
 /**
  * Gives the factor of the tilts of a normal map for `normalScale` of a material, from
  * {@link FUR_LOOK}. The y factor is negative: the green of the map points to +v of OpenGL (up in
- * the image), and the texture points of a studio body have v from the top edge, as in glTF.
+ * the image), and the texture points of a body have v from the top edge, as in glTF.
  *
  * @returns The factor.
  */

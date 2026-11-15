@@ -1,13 +1,13 @@
 import { Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 
-import { STUDIO_TRIANGLE_BUDGET } from '../../tools/studio-budgets.ts';
+import { BODY_TRIANGLE_BUDGET } from '../../tools/body-budgets.ts';
 import type { BodyBoneName } from './biped.ts';
 import { seated } from './body-frame.ts';
 import { BONE_NAMES, boneIndex, makeSkeleton } from './rig.ts';
 import { SPECIES, SPECIES_IDS } from './species.ts';
 import type { SpeciesParams } from './species.ts';
-import { studioRigOf } from './studio-body.ts';
+import { bodyRigOf } from './body.ts';
 import { builtBody } from './test-body.ts';
 import type { BuiltBody } from './test-body.ts';
 
@@ -34,20 +34,20 @@ describe('buildBiped for each species', () => {
     const species: SpeciesParams = SPECIES[id];
     const { mesh, body } = build(species);
     const { headHeight: h } = species;
-    // A studio body keeps the mesh, the skin, and the colors of its GLB file (design 4.4).
-    const studio = species.body ? studioRigOf(species.body, false) : null;
+    // A body keeps the mesh, the skin, and the colors of its GLB file (design 4.4).
+    const bodyRig = species.body ? bodyRigOf(species.body, false) : null;
 
     describe(id, () => {
       it('stays within its body budget (design 4.5)', () => {
-        // A studio body keeps the faces of its GLB file. The first download and the frame time
+        // A body keeps the faces of its GLB file. The first download and the frame time
         // stay the limits (design 4.5).
         expect(mesh.positions.length / 9).toBeLessThanOrEqual(
-          studio ? STUDIO_TRIANGLE_BUDGET : 2600,
+          bodyRig ? BODY_TRIANGLE_BUDGET : 2600,
         );
       });
 
-      it.runIf(studio)('keeps the faces and the colors of its GLB file (design 4.4)', () => {
-        const faces = studio?.mesh.colors ?? new Float32Array();
+      it.runIf(bodyRig)('keeps the faces and the colors of its GLB file (design 4.4)', () => {
+        const faces = bodyRig?.mesh.colors ?? new Float32Array();
         // The bead eyes follow the faces of the file (design 4.5).
         expect(mesh.positions.length / 9).toBeGreaterThan(faces.length / 3);
         for (let t = 0; t < faces.length / 3; t++) {
@@ -65,7 +65,7 @@ describe('buildBiped for each species', () => {
         expect(volume).toBeGreaterThan(0);
       });
 
-      it.runIf(!studio)(
+      it.runIf(!bodyRig)(
         'puts each triangle on one body bone, with faces that point out (design 4.4)',
         () => {
           const volumes = new Map<number, number>();

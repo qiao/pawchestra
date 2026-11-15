@@ -74,7 +74,7 @@ const MOVING_AVOID = [
  * Gives the posed triangles of some groups of bones in one pass over the mesh. Each triangle
  * belongs to the bone of its first corner (design 4.4), as in `posedPart()` of
  * `test-clearance.ts`, and each corner takes the skin of the GPU (`posedCorner()`): two bones of
- * the player, or the skin of the studio for a studio body.
+ * the player, or the skin of the body for a body.
  *
  * @param posed The posed skeleton.
  * @param groups The groups of bones.
@@ -147,7 +147,7 @@ function conductorChecks(stand: PosedPart, set: string): RoleChecks {
 
 /**
  * The number of shard files of the test of the conductor clearance
- * (`conductor-clearance-<shard>.test.ts`, design 9.3). The skin of the studio bear takes more
+ * (`conductor-clearance-<shard>.test.ts`, design 9.3). The skin of the bear takes more
  * time than the rigid parts, so each shard holds one demo, and no file takes more than about 10 s.
  */
 export const CONDUCTOR_CLEARANCE_SHARDS = 6;

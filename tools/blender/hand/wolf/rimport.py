@@ -5,7 +5,7 @@ import math
 
 from mathutils import Matrix
 
-import studio_armature as sa
+import body_armature as sa
 
 TURN = 0.0
 

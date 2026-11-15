@@ -17,8 +17,8 @@ import {
 } from '../models/instruments/percussion.ts';
 import type { TablePlace } from '../models/instruments/percussion.ts';
 import type { PlayTarget } from '../models/instruments/types.ts';
-import { pawBindOf } from '../models/studio-rig.ts';
-import type { PawBind } from '../models/studio-rig.ts';
+import { pawBindOf } from '../models/body-rig.ts';
+import type { PawBind } from '../models/body-rig.ts';
 import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
 import { X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
@@ -207,7 +207,7 @@ export interface FingersDamp {
   readonly up: number;
   /**
    * The depth of the lowest point of the rigid paw under the head, in head heights `H`
-   * (`DampHand.touch`). The skin of the studio body lies up to about 2.5 cm under that point, so
+   * (`DampHand.touch`). The skin of the body lies up to about 2.5 cm under that point, so
    * a negative depth lays the end of the paw lightly on the head.
    */
   readonly press: number;
@@ -384,7 +384,7 @@ interface PercussionHold {
   /**
    * True: each paw that holds a mallet, a stick, a beater, or the clip of the triangle keeps the
    * turn of the hand of the player, and the retarget does not turn it in the plane of its palm
-   * toward the forearm (`PAW_TURN` of `models/studio-rig.ts`). The piece follows the hand of the
+   * toward the forearm (`PAW_TURN` of `models/body-rig.ts`). The piece follows the hand of the
    * player, so it then stays where the bind pose holds it in the closed paw. False: the retarget
    * turns the paw, and a turn of 30° moves the claws off a stick.
    */
@@ -1301,8 +1301,8 @@ export interface SwitchRig {
   /** The tip of the middle claw of the right paw in the bind pose, from the bind wrist. */
   readonly tip: Vec3;
   /**
-   * The bind of each studio paw (`studioForearmTurn()` of `models/studio-rig.ts`): the turn of a
-   * paw at a switch mixes in the frame of the studio forearm.
+   * The bind of each body paw (`bodyForearmTurn()` of `models/body-rig.ts`): the turn of a
+   * paw at a switch mixes in the frame of the body forearm.
    */
   readonly pawBinds: Readonly<Record<'L' | 'R', PawBind>>;
 }
@@ -2000,7 +2000,7 @@ function switchRig(
     toRight: toVec3(toRight),
     fingerHand: toQuat(pawTurn('R', face.clone().negate(), fingersTo)),
     tip: toVec3(tip.sub(new Vector3(...right.bind.wrist))),
-    pawBinds: { L: pawBindOf(model.studio.arms.L), R: pawBindOf(model.studio.arms.R) },
+    pawBinds: { L: pawBindOf(model.bodyRig.arms.L), R: pawBindOf(model.bodyRig.arms.R) },
   };
 }
 
@@ -2181,8 +2181,8 @@ export function offsetTarget(target: StrikeTarget, offset: Vec3): StrikeTarget {
 
 /**
  * Gives the directions across a forearm (design 5.3), in the frame of the elbow: the hinge of the
- * elbow is normal to the upper arm and the forearm, as the studio skin turns its forearm
- * (`poseStudioBones()`). `up` is the direction in which a mallet leaves the fist with no twist
+ * elbow is normal to the upper arm and the forearm, as the body skin turns its forearm
+ * (`poseBodyBones()`). `up` is the direction in which a mallet leaves the fist with no twist
  * of the paw on the forearm: in the bind pose, the hinge is +x, the forearm points down, and the
  * mallet points forward. `out` is the hinge, turned to the out side of the hand.
  *

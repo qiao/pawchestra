@@ -928,8 +928,8 @@ export function holdReachVariantLines(
 
 /**
  * Runs the tool: `node tools/hold-reach.ts <species> [options]`. With `--glb <file>`, the species
- * gets the studio body that the export makes from the file, in a copy of `src/`
- * (`tools/glb-swap.ts`). A species with no studio body takes the body when it has a rig config
+ * gets the body that the export makes from the file, in a copy of `src/`
+ * (`tools/glb-swap.ts`). A species with no body takes the body when it has a rig config
  * (`speciesAnimal()` of `tools/glb-swap.ts`).
  */
 async function main(): Promise<void> {
@@ -969,7 +969,7 @@ async function main(): Promise<void> {
     const animal = speciesAnimal(species);
     if (!animal) {
       throw new Error(
-        `The species ${species} has no studio body and no rig config tools/mesh-rigs/${species}.json, so --glb does not apply.`,
+        `The species ${species} has no body and no rig config tools/mesh-rigs/${species}.json, so --glb does not apply.`,
       );
     }
     process.exitCode = await withGlbBody(animal, glb, (dir) =>

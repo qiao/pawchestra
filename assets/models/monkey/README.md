@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the monkey (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/monkey.ts`, which this chain writes:
+`src/models/bodies/monkey.ts`, which this chain writes:
 
 ```text
 tripo-p2/monkey.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/monkey.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export monkey    the same run
    v
 tripo-hand/monkey.rig.glb       rigged mesh, with its summary monkey.rig.json
-   │  pnpm studio-body monkey   the same run
+   │  pnpm body-module monkey   the same run
    v
-src/models/studio/monkey.ts     studio body of the app
+src/models/bodies/monkey.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -54,7 +54,7 @@ around.
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,271 vertices and 3,583 faces: 2,923 quads and 660 triangles, no n-gon. One UV layer |
 | Parts | 4 parts: the body with the tail (3,147 vertices), two eyeballs (49 vertices each, spheres of radius 0.0327 about (±0.041, 0.839, 0.197)), and a loose speck of 26 vertices that floats about 0.05 units behind the tail (z -0.269 to -0.288). 24 open edges, and no edge with more than two faces |
-| Box | In the studio units (1 unit from the soles to the top of the tuft): x ±0.431 (the finger tips), z -0.288 (the speck) to 0.288 (the muzzle). The monkey faces -y in Blender, with its left side at +x, so the import needs no turn |
+| Box | In the body units (1 unit from the soles to the top of the tuft): x ±0.431 (the finger tips), z -0.288 (the speck) to 0.288 (the muzzle). The monkey faces -y in Blender, with its left side at +x, so the import needs no turn |
 
 The folder `monkey.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness and
 the metallic maps are not kept.
@@ -81,13 +81,13 @@ those of the Tripo wolf with the changes below. `make_config.py` writes
 |---|---|
 | Size | 398,656 bytes (each run writes other bytes) |
 | SHA-256 | `1d0484d325e91a8620df7c2aad0a19fcf61d1a16231a3908db359dd1bb864470` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the tuft, the soles at z = 0, the monkey faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the top of the tuft, the soles at z = 0, the monkey faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `monkey`: 3,721 vertices and 3,983 faces (3,323 quads and 660 triangles, 7,306 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 20 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 96 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/monkey/tripo-hand/monkey-color.webp`) |
 | Armature | `monkey_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.857518 (the shoulder joints at 1.356832 m for each unit: 1.2 times the scale 1.130693 that kept H of the monkey of main, so that H is 0.400355 m), `crease` 180 |
 | Eyes | The eyeballs of the mesh, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/monkey/tripo-p2/monkey.fbx', 1e-5)`. No vertex
@@ -171,7 +171,7 @@ haunch, behind the heels, which only sets the seat height of the export. The sea
 0.401 m (0.292 m on the monkey of main), so the soles stay on the floor in the app. The legs keep
 the length of the source. The thighs hang straight down, the knees bend 22 degrees, and the
 shoulders stay over the hips, as a brass player stands erect (`docs/reference/wind-technique.md`,
-1.8). The soloist keeps this stance (`soloist` false in `ANIMALS` of `tools/studio-body.ts`).
+1.8). The soloist keeps this stance (`soloist` false in `ANIMALS` of `tools/body-module.ts`).
 Reason: the straight legs of the sheet put the center of mass 2.1 to 2.8 cm off the middle of the
 soles. With the leg turns and the trunk lean of the monkey of main, the large head and the chest
 leaned far forward of the haunch.

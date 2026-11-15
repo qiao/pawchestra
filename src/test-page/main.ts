@@ -2,7 +2,7 @@ import './style.css';
 
 import { playWithSilentSwitch } from '../app/audio-session.ts';
 import { DEFAULT_VOLUME, volumeGain } from '../app/bar-rules.ts';
-import { loadStudioBodies } from '../app/body-loads.ts';
+import { loadBodies } from '../app/body-loads.ts';
 import { runSliced } from '../app/slices.ts';
 import {
   STOPPED,
@@ -559,7 +559,7 @@ class TestPage {
 
   /**
    * Builds the piece of a role in slices of the main thread (design 7.2), shows it, and starts its
-   * loop. Only the studio body of the species loads, with the body of the bear and of the species
+   * loop. Only the body of the species loads, with the body of the bear and of the species
    * of the seat, because the layout of the app builds their models first (`layoutSceneSteps()`).
    *
    * @param role The role.
@@ -569,7 +569,7 @@ class TestPage {
       return;
     }
     const species = [...role.bodies, CONDUCTOR.species];
-    await loadStudioBodies([...new Set(species.map((id) => SPECIES[id].body))]);
+    await loadBodies([...new Set(species.map((id) => SPECIES[id].body))]);
     const stage = this.#stage;
     const piece = await runSliced(pieceSteps(role, stage), () => role === this.#picked);
     if (!piece) {

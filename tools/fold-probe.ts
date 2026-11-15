@@ -1,7 +1,7 @@
 /**
- * Counts the folded faces of the skin of the studio body of a role (design 4.4). It poses the
+ * Counts the folded faces of the skin of the body of a role (design 4.4). It poses the
  * body as the app does, over each demo of the role. The test of a fold is the test of the
- * studio. The bind normal of a face moves by the mean of the skin matrices of its corners. The
+ * body. The bind normal of a face moves by the mean of the skin matrices of its corners. The
  * face is folded when its posed normal is more than 90° from that normal. For each sample set,
  * the tool prints the samples, the samples with a fold, their share, and the most folded faces.
  * Then it prints the main bone of the folded faces. With `--faces <n>`, it also prints the `n`
@@ -20,7 +20,7 @@
  * `--bins <face>` gives the turn of each bone of the arm of the face from its bind pose with a fold
  * and with no fold, and the share of the samples with a fold by that turn ({@link binProbe}).
  *
- * `--glb <file>` gives the role the studio body of another GLB file, in a copy of `src/` (`tools/glb-swap.ts`). With `--base`, the
+ * `--glb <file>` gives the role the body of another GLB file, in a copy of `src/` (`tools/glb-swap.ts`). With `--base`, the
  * working tree takes the body of the file, and the commit keeps its own ({@link compareFolds}).
  *
  * Usage: pnpm fold-probe <role> [--demo <id>]... [--step <seconds>] [--faces <n>] [--turns <face>]
@@ -45,15 +45,15 @@ import type { InstrumentId } from '../src/models/instruments/types.ts';
 import type { PlayerModel } from '../src/models/player.ts';
 import { isSpeciesId } from '../src/models/species.ts';
 import type { SpeciesId } from '../src/models/species.ts';
-import { STUDIO_BONES, STUDIO_PARENTS } from '../src/models/studio-format.ts';
-import type { Side, StudioBone, StudioMesh } from '../src/models/studio-format.ts';
+import { BODY_BONES, BODY_PARENTS } from '../src/models/body-format.ts';
+import type { Side, BodyBone, BodyMesh } from '../src/models/body-format.ts';
 import {
-  createStudioPose,
-  poseStudioBones,
-  skinStudioMesh,
-  studioOffsets,
-} from '../src/models/studio-rig.ts';
-import type { StudioPose, StudioRig } from '../src/models/studio-rig.ts';
+  createBodyPose,
+  poseBodyBones,
+  skinBodyMesh,
+  bodyOffsets,
+} from '../src/models/body-rig.ts';
+import type { BodyPose, BodyRig } from '../src/models/body-rig.ts';
 import { toVec3 } from '../src/models/tuples.ts';
 import type { Quat, Vec3 } from '../src/models/tuples.ts';
 import { countInAt } from '../src/pose/count-in.ts';
@@ -72,13 +72,13 @@ export type RoleSource =
       readonly kind: 'conductor';
     }
   | {
-      /** Each player of the instrument with a studio body. */
+      /** Each player of the instrument with a body. */
       readonly kind: 'player';
       /** The instrument of the players. */
       readonly instrument: InstrumentId;
       /**
        * The species of the role. The rabbits of the first violins and the red foxes of the second
-       * violins play one instrument with two studio bodies, so each body has a role of its own.
+       * violins play one instrument with two bodies, so each body has a role of its own.
        */
       readonly species: readonly SpeciesId[];
       /**
@@ -88,7 +88,7 @@ export type RoleSource =
       readonly recast?: Recast;
     };
 
-/** The roles with a studio body. A new role of route 3 adds one entry. */
+/** The roles with a body. A new role of route 3 adds one entry. */
 export const FOLD_ROLES: ReadonlyMap<string, RoleSource> = new Map<string, RoleSource>([
   ['conductor', { kind: 'conductor' }],
   ['pianist', { kind: 'player', instrument: 'piano', species: ['polar-bear'] }],
@@ -274,11 +274,11 @@ export function roleSpecies(role: RoleSource): SpeciesId[] {
 }
 
 /**
- * Gives the animal of the studio body of a role (`tools/glb-swap.ts`).
+ * Gives the animal of the body of a role (`tools/glb-swap.ts`).
  *
  * @param role The role.
  * @returns The animal, such as `rabbit` for the violinist.
- * @throws Error if no species of the role has a studio body, or more than one has.
+ * @throws Error if no species of the role has a body, or more than one has.
  */
 export function roleAnimal(role: RoleSource): string {
   const animals = [
@@ -286,7 +286,7 @@ export function roleAnimal(role: RoleSource): string {
   ];
   const [animal] = animals;
   if (animal === undefined || animals.length > 1) {
-    throw new Error(`The role has the studio bodies of ${animals.join(', ') || 'no animal'}.`);
+    throw new Error(`The role has the bodies of ${animals.join(', ') || 'no animal'}.`);
   }
   return animal;
 }
@@ -297,7 +297,7 @@ export const SAMPLE_SETS = ['rest', 'play', 'lift'] as const;
 /** One set of samples. */
 export type SampleSet = (typeof SAMPLE_SETS)[number];
 
-/** The folded faces of one posed body by the side of their main studio bone. */
+/** The folded faces of one posed body by the side of their main body bone. */
 export interface SideSplit {
   /** The faces whose main bone is a bone of the left side, such as `upper_arm_L`. */
   readonly L: number;
@@ -308,7 +308,7 @@ export interface SideSplit {
 }
 
 /**
- * Splits folded faces by the side of their main studio bone: a name that ends with `_L` is on the
+ * Splits folded faces by the side of their main body bone: a name that ends with `_L` is on the
  * left, a name that ends with `_R` is on the right, and the other names are in the middle.
  *
  * @param bones The main bone of each folded face ({@link mainBone}).
@@ -342,7 +342,7 @@ export interface FoldCount {
   split: SideSplit;
   /** The demo and the time of the posed body with the most folded faces. */
   worst: string;
-  /** The folded faces of all samples, by the main studio bone of the face. */
+  /** The folded faces of all samples, by the main body bone of the face. */
   readonly bones: Map<string, number>;
   /** The number of samples in which each folded face folds, by the index of the face. */
   readonly byFace: Map<number, number>;
@@ -359,7 +359,7 @@ export interface FaceWorst {
    * matrix of its corners, in degrees. A folded face has more than 90°.
    */
   readonly angle: number;
-  /** The studio bone whose turn changes the normal of the face most in the sample ({@link turnBone}). */
+  /** The body bone whose turn changes the normal of the face most in the sample ({@link turnBone}). */
   readonly bone: string;
   /** The change of the normal by the turn of that bone, in degrees. */
   readonly turn: number;
@@ -397,13 +397,13 @@ export interface WorstSample extends FaceWorst {
 export interface FoldReport {
   /** The demos that have the role. */
   readonly demos: string[];
-  /** The number of faces of the studio body. */
+  /** The number of faces of the body. */
   faces: number;
   /**
-   * The bind mesh of the first studio body of the role, or `null` when no demo has the role. The
+   * The bind mesh of the first body of the role, or `null` when no demo has the role. The
    * bodies of a role share their faces, so the facts of a face come from this mesh.
    */
-  mesh: StudioMesh | null;
+  mesh: BodyMesh | null;
   /** The folds of each sample set. */
   readonly sets: Readonly<Record<SampleSet, FoldCount>>;
 }
@@ -454,14 +454,14 @@ interface FaceNormals {
 /**
  * Writes the mean of the linear parts of the skin matrices of the corners of a face.
  *
- * @param mesh The studio mesh in the bind pose.
+ * @param mesh The body mesh in the bind pose.
  * @param matrices The skin matrices, 16 numbers for each bone, column by column.
  * @param corners The three corners of the face.
  * @param linear The 9 numbers of the mean, column by column, which the function writes.
  * @returns `linear`.
  */
 function meanLinear(
-  mesh: Pick<StudioMesh, 'joints' | 'weights'>,
+  mesh: Pick<BodyMesh, 'joints' | 'weights'>,
   matrices: ArrayLike<number>,
   corners: readonly number[],
   linear: number[],
@@ -486,7 +486,7 @@ function meanLinear(
  * Gives the posed normal of a face and its bind normal moved by the mean of the skin matrices of
  * its corners.
  *
- * @param mesh The studio mesh in the bind pose.
+ * @param mesh The body mesh in the bind pose.
  * @param matrices The skin matrices, 16 numbers for each bone, column by column.
  * @param posed The posed places, three numbers for each vertex.
  * @param face The index of the triangle.
@@ -494,7 +494,7 @@ function meanLinear(
  * @returns The two normals.
  */
 function faceNormals(
-  mesh: Pick<StudioMesh, 'positions' | 'joints' | 'weights' | 'corners'>,
+  mesh: Pick<BodyMesh, 'positions' | 'joints' | 'weights' | 'corners'>,
   matrices: ArrayLike<number>,
   posed: ArrayLike<number>,
   face: number,
@@ -528,17 +528,17 @@ function angleOf(u: Vec3, v: Vec3): number {
 }
 
 /**
- * Finds the folded faces of a posed studio mesh. The bind normal of a face moves by the mean of
+ * Finds the folded faces of a posed body mesh. The bind normal of a face moves by the mean of
  * the skin matrices of its corners. The face is folded when its posed normal is more than 90°
  * from that normal.
  *
- * @param mesh The studio mesh in the bind pose.
+ * @param mesh The body mesh in the bind pose.
  * @param matrices The skin matrices, 16 numbers for each bone, column by column.
  * @param posed The posed places, three numbers for each vertex.
  * @returns The folded faces, as indices of the triangles of the mesh.
  */
 export function foldedFaces(
-  mesh: Pick<StudioMesh, 'positions' | 'joints' | 'weights' | 'corners'>,
+  mesh: Pick<BodyMesh, 'positions' | 'joints' | 'weights' | 'corners'>,
   matrices: ArrayLike<number>,
   posed: ArrayLike<number>,
 ): number[] {
@@ -557,14 +557,14 @@ export function foldedFaces(
  * Gives the angle of the fold of a face: the angle between its posed normal and its bind normal
  * moved by the mean of the skin matrices of its corners ({@link foldedFaces}).
  *
- * @param mesh The studio mesh in the bind pose.
+ * @param mesh The body mesh in the bind pose.
  * @param matrices The skin matrices, 16 numbers for each bone, column by column.
  * @param posed The posed places, three numbers for each vertex.
  * @param face The index of the triangle.
  * @returns The angle, in degrees: more than 90 for a folded face.
  */
 export function foldAngle(
-  mesh: Pick<StudioMesh, 'positions' | 'joints' | 'weights' | 'corners'>,
+  mesh: Pick<BodyMesh, 'positions' | 'joints' | 'weights' | 'corners'>,
   matrices: ArrayLike<number>,
   posed: ArrayLike<number>,
   face: number,
@@ -574,11 +574,11 @@ export function foldAngle(
 }
 
 /**
- * Skins one vertex of a studio mesh as `skinStudioMesh()` does: the corrective shapes by their
+ * Skins one vertex of a body mesh as `skinBodyMesh()` does: the corrective shapes by their
  * weights, then the blend of up to four bones. The vertex can take the skin matrix of another
  * bone in place of the matrix of one bone.
  *
- * @param mesh The studio mesh.
+ * @param mesh The body mesh.
  * @param pose The pose of the bones.
  * @param v The index of the vertex.
  * @param swap The bone whose matrix the vertex does not take, and the bone whose matrix it takes
@@ -586,8 +586,8 @@ export function foldAngle(
  * @returns The posed place.
  */
 function skinVertex(
-  mesh: StudioMesh,
-  pose: Pick<StudioPose, 'matrices' | 'correctives'>,
+  mesh: BodyMesh,
+  pose: Pick<BodyPose, 'matrices' | 'correctives'>,
   v: number,
   swap: readonly [from: number, to: number] | null,
 ): Vec3 {
@@ -624,26 +624,26 @@ function skinVertex(
 
 /** The bone whose turn changes the normal of a face most, with the change. */
 interface FaceTurn {
-  /** The name of the studio bone, or empty when no bone of the face has a parent. */
+  /** The name of the body bone, or empty when no bone of the face has a parent. */
   readonly bone: string;
   /** The change of the normal, in degrees. */
   readonly turn: number;
 }
 
 /**
- * Finds the studio bone whose turn changes the normal of a posed face most. For each bone of the
+ * Finds the body bone whose turn changes the normal of a posed face most. For each bone of the
  * corners of the face, the corners take the skin matrix of its parent in place of its own matrix:
  * the face then moves as if the bone had no turn from its parent. The bone whose loss turns the
  * normal of the face farthest is the bone of the fold.
  *
- * @param mesh The studio mesh in the bind pose.
+ * @param mesh The body mesh in the bind pose.
  * @param pose The pose of the bones.
  * @param face The index of the triangle.
  * @returns The bone and the change of the normal.
  */
 export function turnBone(
-  mesh: StudioMesh,
-  pose: Pick<StudioPose, 'matrices' | 'correctives'>,
+  mesh: BodyMesh,
+  pose: Pick<BodyPose, 'matrices' | 'correctives'>,
   face: number,
 ): FaceTurn {
   const corners = [0, 1, 2].map((k) => mesh.corners[face * 3 + k] ?? 0);
@@ -664,12 +664,12 @@ export function turnBone(
   );
   let best: FaceTurn = { bone: '', turn: 0 };
   for (const bone of [...bones].toSorted((a, b) => a - b)) {
-    const name = STUDIO_BONES[bone];
-    const parent = name ? STUDIO_PARENTS[name] : null;
+    const name = BODY_BONES[bone];
+    const parent = name ? BODY_PARENTS[name] : null;
     if (!name || !parent) {
       continue;
     }
-    const turn = angleOf(posed, normalWith([bone, STUDIO_BONES.indexOf(parent)]));
+    const turn = angleOf(posed, normalWith([bone, BODY_BONES.indexOf(parent)]));
     if (turn > best.turn) {
       best = { bone: name, turn };
     }
@@ -681,16 +681,16 @@ export function turnBone(
  * Gives the three corners of a face in a posed sample: the index of each vertex, its place in the
  * bind pose and in the posed skin, the length of the move of each corrective shape at its full
  * weight, and the length of the move of all shapes at their weights in the sample, as
- * `skinStudioMesh()` adds them before the blend of the bones.
+ * `skinBodyMesh()` adds them before the blend of the bones.
  *
- * @param mesh The studio mesh in the bind pose.
+ * @param mesh The body mesh in the bind pose.
  * @param correctiveWeights The weight of each corrective shape of the mesh in the sample.
  * @param posed The posed places, three numbers for each vertex.
  * @param face The index of the triangle.
  * @returns The corners, in the order of the corners of the face.
  */
 function cornerSamples(
-  mesh: Pick<StudioMesh, 'positions' | 'corners' | 'correctives'>,
+  mesh: Pick<BodyMesh, 'positions' | 'corners' | 'correctives'>,
   correctiveWeights: ArrayLike<number>,
   posed: ArrayLike<number>,
   face: number,
@@ -717,14 +717,14 @@ function cornerSamples(
 }
 
 /**
- * Gives the main studio bone of a face: the bone with the largest weight over its three corners.
+ * Gives the main body bone of a face: the bone with the largest weight over its three corners.
  *
- * @param mesh The studio mesh.
+ * @param mesh The body mesh.
  * @param face The index of the triangle.
  * @returns The name of the bone.
  */
 export function mainBone(
-  mesh: Pick<StudioMesh, 'joints' | 'weights' | 'corners'>,
+  mesh: Pick<BodyMesh, 'joints' | 'weights' | 'corners'>,
   face: number,
 ): string {
   const sums = new Map<number, number>();
@@ -736,7 +736,7 @@ export function mainBone(
     }
   }
   const [best] = [...sums].toSorted((x, y) => y[1] - x[1]);
-  return STUDIO_BONES[best?.[0] ?? 0] ?? '';
+  return BODY_BONES[best?.[0] ?? 0] ?? '';
 }
 
 /**
@@ -758,13 +758,13 @@ function emptyCount(): FoldCount {
 }
 
 /**
- * Gets each posed studio body of {@link probeFolds}: the rig, the pose of its bones, the posed
+ * Gets each posed body of {@link probeFolds}: the rig, the pose of its bones, the posed
  * places, the folded faces, the sample set, and the label of the sample: the demo and the time,
  * such as `bach-bwv1047.mid 12.25 s`.
  */
 export type FoldVisit = (
-  rig: StudioRig,
-  studio: StudioPose,
+  rig: BodyRig,
+  bodyPose: BodyPose,
   posed: Float32Array,
   folded: readonly number[],
   set: SampleSet,
@@ -774,7 +774,7 @@ export type FoldVisit = (
 /**
  * Counts the folded faces of one posed body into a count.
  *
- * @param model The player model with its studio rig.
+ * @param model The player model with its body rig.
  * @param pose The pose of the player.
  * @param label The demo and the time of the sample.
  * @param count The count to update.
@@ -789,33 +789,33 @@ function countPose(
   set: SampleSet,
   visit?: FoldVisit,
 ): void {
-  const rig = model.studio;
-  const studio = poseStudioBones(
+  const rig = model.bodyRig;
+  const bodyPose = poseBodyBones(
     rig,
     model.skeleton,
     pose.rotations,
-    studioOffsets(pose),
+    bodyOffsets(pose),
     1,
-    createStudioPose(),
+    createBodyPose(),
   );
-  const posed = skinStudioMesh(rig.mesh, studio);
-  const folded = foldedFaces(rig.mesh, studio.matrices, posed);
-  visit?.(rig, studio, posed, folded, set, label);
+  const posed = skinBodyMesh(rig.mesh, bodyPose);
+  const folded = foldedFaces(rig.mesh, bodyPose.matrices, posed);
+  visit?.(rig, bodyPose, posed, folded, set, label);
   const bones: string[] = [];
   for (const face of folded) {
     const bone = mainBone(rig.mesh, face);
     bones.push(bone);
     count.bones.set(bone, (count.bones.get(bone) ?? 0) + 1);
     count.byFace.set(face, (count.byFace.get(face) ?? 0) + 1);
-    const angle = foldAngle(rig.mesh, studio.matrices, posed, face);
+    const angle = foldAngle(rig.mesh, bodyPose.matrices, posed, face);
     if (angle > (count.faceWorst.get(face)?.angle ?? 0)) {
       const correctiveWeights = Array.from(
-        studio.correctives.subarray(0, rig.mesh.correctives.length),
+        bodyPose.correctives.subarray(0, rig.mesh.correctives.length),
       );
       count.faceWorst.set(face, {
         label,
         angle,
-        ...turnBone(rig.mesh, studio, face),
+        ...turnBone(rig.mesh, bodyPose, face),
         correctiveWeights,
         corners: cornerSamples(rig.mesh, correctiveWeights, posed, face),
       });
@@ -832,16 +832,16 @@ function countPose(
   }
 }
 
-/** One studio body of a role in a scene. */
+/** One body of a role in a scene. */
 interface RoleBody {
   /** The index of the player in the layout, or `null` for the conductor. */
   readonly index: number | null;
-  /** The player model, with its studio rig. */
+  /** The player model, with its body rig. */
   readonly model: PlayerModel;
 }
 
 /**
- * Finds the studio bodies of a role in a scene: the first player of each model of a species of the
+ * Finds the bodies of a role in a scene: the first player of each model of a species of the
  * role. The violin seats of a demo hold many rabbits with one model, so the first of them stands
  * for all.
  *
@@ -875,7 +875,7 @@ export function roleBodies(role: RoleSource, scene: TestScene): RoleBody[] {
 export type PlayFilter = (scene: TestScene, player: number | null, song: number) => boolean;
 
 /**
- * Counts the folded faces of the studio body of a role over demos. Each demo has three sample
+ * Counts the folded faces of the body of a role over demos. Each demo has three sample
  * sets. The rest pose is the pose before the start. The play goes from the count-in to the end
  * at each step. The lift of the arms takes the first 3 s of wall time after the start.
  *
@@ -910,8 +910,8 @@ export function probeFolds(
       continue;
     }
     report.demos.push(demo.file);
-    report.faces = (bodies[0]?.model.studio.mesh.corners.length ?? 0) / 3;
-    report.mesh ??= bodies[0]?.model.studio.mesh ?? null;
+    report.faces = (bodies[0]?.model.bodyRig.mesh.corners.length ?? 0) / 3;
+    report.mesh ??= bodies[0]?.model.bodyRig.mesh ?? null;
 
     const audible = allAudible(scene.score);
     const buffer = createScenePose(scene.plan);
@@ -974,7 +974,7 @@ export function foldLines(name: string, report: FoldReport, step: number): strin
   };
   const bones = [...all.bones].toSorted((a, b) => b[1] - a[1]).map(([bone, n]) => `${bone} ${n}`);
   return [
-    `Folded faces of the studio body of the ${name} (${report.faces} faces), play step ${step} s.`,
+    `Folded faces of the body of the ${name} (${report.faces} faces), play step ${step} s.`,
     `Demos: ${report.demos.join(', ') || 'none'}`,
     '',
     '| Set | Samples | With a fold | Share | Most faces (by the side of the main bone) | Worst sample |',
@@ -982,23 +982,23 @@ export function foldLines(name: string, report: FoldReport, step: number): strin
     ...SAMPLE_SETS.map((set) => row(set, report.sets[set])),
     row('all', all),
     '',
-    `Folded faces of all samples by the main studio bone: ${bones.join(', ') || 'none'}`,
+    `Folded faces of all samples by the main body bone: ${bones.join(', ') || 'none'}`,
   ];
 }
 
 /** One bone of a corner of a face, with its weight. */
 interface CornerWeight {
-  /** The name of the studio bone. */
+  /** The name of the body bone. */
   readonly bone: string;
   /** The weight, from 0 to 1. */
   readonly weight: number;
 }
 
-/** The facts of one face of a studio mesh in the bind pose. */
+/** The facts of one face of a body mesh in the bind pose. */
 interface FaceFacts {
   /** The index of the triangle in the mesh. */
   readonly face: number;
-  /** The main studio bone of the face ({@link mainBone}). */
+  /** The main body bone of the face ({@link mainBone}). */
   readonly bone: string;
   /** The middle of the face: the mean of its three corners, in meters. */
   readonly middle: Vec3;
@@ -1012,15 +1012,15 @@ interface FaceFacts {
 }
 
 /**
- * Gives the facts of one face of a studio mesh in the bind pose: its main bone, its middle, the
+ * Gives the facts of one face of a body mesh in the bind pose: its main bone, its middle, the
  * angle at each corner, and the weights of each corner.
  *
- * @param mesh The studio mesh in the bind pose.
+ * @param mesh The body mesh in the bind pose.
  * @param face The index of the triangle.
  * @returns The facts.
  */
 export function faceFacts(
-  mesh: Pick<StudioMesh, 'positions' | 'joints' | 'weights' | 'corners'>,
+  mesh: Pick<BodyMesh, 'positions' | 'joints' | 'weights' | 'corners'>,
   face: number,
 ): FaceFacts {
   const corners = [0, 1, 2].map((k) => mesh.corners[face * 3 + k] ?? 0);
@@ -1042,7 +1042,7 @@ export function faceFacts(
   const weights = corners.map((v) =>
     [0, 1, 2, 3]
       .map((k) => ({
-        bone: STUDIO_BONES[mesh.joints[v * 4 + k] ?? 0] ?? '',
+        bone: BODY_BONES[mesh.joints[v * 4 + k] ?? 0] ?? '',
         weight: mesh.weights[v * 4 + k] ?? 0,
       }))
       .filter((entry) => entry.weight > 0)
@@ -1206,11 +1206,11 @@ const TURN_BIN = 10;
  * Gives the side of the body of a face: the side of its middle in the bind pose. The animal faces
  * -z, and its left side is -x, so a face of the chest near the right shoulder is on the right.
  *
- * @param mesh The places and the triangles of the studio mesh in the bind pose.
+ * @param mesh The places and the triangles of the body mesh in the bind pose.
  * @param face The index of the triangle.
  * @returns `L` for a middle at x < 0, else `R`.
  */
-export function faceSide(mesh: Pick<StudioMesh, 'positions' | 'corners'>, face: number): Side {
+export function faceSide(mesh: Pick<BodyMesh, 'positions' | 'corners'>, face: number): Side {
   let x = 0;
   for (let k = 0; k < 3; k++) {
     x += mesh.positions[(mesh.corners[face * 3 + k] ?? 0) * 3] ?? 0;
@@ -1398,7 +1398,7 @@ export function turnProbe(face: number): TurnProbe {
   const samples: TurnSample[] = [];
   let found: { readonly side: Side; readonly bind: Vec3 } | null = null;
   let faces = 0;
-  const visit: FoldVisit = (rig, studio, ...[, folded]) => {
+  const visit: FoldVisit = (rig, bodyPose, ...[, folded]) => {
     faces = rig.mesh.corners.length / 3;
     if (face >= faces) {
       return;
@@ -1408,15 +1408,15 @@ export function turnProbe(face: number): TurnProbe {
     const bind = toVec3(new Vector3(...rig.body.heads[`forearm_${side}`]).sub(joint));
     found ??= { side, bind };
     const turn = relativeTurn(
-      studio.matrices,
-      STUDIO_BONES.indexOf(`upper_arm_${side}`),
-      STUDIO_BONES.indexOf('chest'),
+      bodyPose.matrices,
+      BODY_BONES.indexOf(`upper_arm_${side}`),
+      BODY_BONES.indexOf('chest'),
     );
     samples.push({ turn, folded: folded.includes(face) });
   };
   const lines = (): string[] => {
     if (!found) {
-      throw new Error(`The studio body of the role has ${faces} faces, so it has no face ${face}.`);
+      throw new Error(`The body of the role has ${faces} faces, so it has no face ${face}.`);
     }
     return turnLines(face, found.side, samples, found.bind);
   };
@@ -1520,29 +1520,25 @@ function binProbe(face: number): TurnProbe {
   const samples: { readonly turns: Quat[]; readonly folded: boolean }[] = [];
   let side: Side | null = null;
   let faces = 0;
-  const bonesOf = (of: Side): StudioBone[] =>
+  const bonesOf = (of: Side): BodyBone[] =>
     (['clavicle', 'upper_arm', 'forearm', 'forearm_twist', 'hand', 'fingers'] as const).map(
-      (bone): StudioBone => `${bone}_${of}`,
+      (bone): BodyBone => `${bone}_${of}`,
     );
-  const visit: FoldVisit = (rig, studio, ...[, folded]) => {
+  const visit: FoldVisit = (rig, bodyPose, ...[, folded]) => {
     faces = rig.mesh.corners.length / 3;
     if (face >= faces) {
       return;
     }
     side ??= faceSide(rig.mesh, face);
     const turns = bonesOf(side).map((bone) => {
-      const parent = STUDIO_PARENTS[bone] ?? 'chest';
-      return relativeTurn(
-        studio.matrices,
-        STUDIO_BONES.indexOf(bone),
-        STUDIO_BONES.indexOf(parent),
-      );
+      const parent = BODY_PARENTS[bone] ?? 'chest';
+      return relativeTurn(bodyPose.matrices, BODY_BONES.indexOf(bone), BODY_BONES.indexOf(parent));
     });
     samples.push({ turns, folded: folded.includes(face) });
   };
   const lines = (): string[] => {
     if (side === null) {
-      throw new Error(`The studio body of the role has ${faces} faces, so it has no face ${face}.`);
+      throw new Error(`The body of the role has ${faces} faces, so it has no face ${face}.`);
     }
     const all = samples.length;
     const folded = samples.filter((sample) => sample.folded).length;
@@ -1572,7 +1568,7 @@ export interface FaceRecord {
   readonly face: number;
   /** The number of samples of each set in which the face folds. */
   readonly folds: Readonly<Record<SampleSet, number>>;
-  /** The main studio bone of the face ({@link mainBone}). */
+  /** The main body bone of the face ({@link mainBone}). */
   readonly bone: string;
   /** The middle of the face in the bind pose, in meters. */
   readonly middle: Vec3;
@@ -1999,7 +1995,7 @@ export function readFoldJson(text: string): FoldCounts {
  * `faces` above 0, the table of the faces of {@link faceCompareLines} follows. With faces of
  * `--faces-of`, the commit also gives their middles (`--middles`), and the table of
  * {@link baseFaceLines} follows. With `--glb <file>`, only the child of the working tree takes the
- * option, so it probes the studio body of the file in a copy of `src/` (`tools/glb-swap.ts`), and
+ * option, so it probes the body of the file in a copy of `src/` (`tools/glb-swap.ts`), and
  * the commit keeps its own body and its cache.
  *
  * @param name The name of the role.
@@ -2032,7 +2028,7 @@ async function compareFolds(
   const cell = (count: SetCount): string =>
     `${((100 * count.withFold) / Math.max(1, count.samples)).toFixed(1)}% (${count.withFold}/${count.samples}), most ${count.most} (${splitText(count.split)})`;
   const lines = [
-    `Folded faces of the studio body of the ${name} on ${label} and on the working tree: ${seconds} s.`,
+    `Folded faces of the body of the ${name} on ${label} and on the working tree: ${seconds} s.`,
     '',
     `| Set | ${label} | Working tree |`,
     '|---|---:|---:|',
@@ -2049,7 +2045,7 @@ async function compareFolds(
 
 /**
  * Runs the probe: `node tools/fold-probe.ts <role> [--demo <id>]... [--step <seconds>]`. With
- * `--glb <file>`, the role gets the studio body that the export makes from the file, in a copy of
+ * `--glb <file>`, the role gets the body that the export makes from the file, in a copy of
  * `src/` (`tools/glb-swap.ts`). With `--base <ref>`, the probe of the commit and of the working
  * tree run at the same time ({@link compareFolds}), also with `--glb`.
  */

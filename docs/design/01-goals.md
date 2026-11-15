@@ -14,7 +14,7 @@
   that the file uses.
 - **Frame time.** The scene renders at 60 fps on a laptop with an integrated GPU. Design 9.7
   gives the limit and its check.
-- **Triangles.** The triangle budget of a studio body allows round forms (4.4). The first
+- **Triangles.** The triangle budget of a body allows round forms (4.4). The first
   download and the frame time stay the limits.
 
 ### Reference images
@@ -53,7 +53,7 @@ choices win over the images:
 - **Conductor.** The bear holds one baton, in the right paw. Its sheet shows a baton in each paw.
 - **Species with no reference image.** The mouse, the beaver, the pig, the rhino, the badger,
   the monkey, and the deer have no image. The source mesh sets the form. The head top keeps the
-  height of the earlier body of the species (`height` of `ANIMALS` in `tools/studio-body.ts`),
+  height of the earlier body of the species (`height` of `ANIMALS` in `tools/body-module.ts`),
   and the monkey and the deer are a little larger.
 - **Penguin.** The Tripo FBX sets the form and the colors, and the head height H keeps the H of
   the earlier penguin. The orchestra images set the folder.

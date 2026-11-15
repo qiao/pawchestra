@@ -18,7 +18,7 @@ A manager briefs one implementation agent for each round, with no review agent a
 ## Before the brief
 
 The manager runs these commands on `main` and puts the numbers into the brief:
-`pnpm studio-body <a> --inspect`, `pnpm pose-depth <role> --gaps`, `pnpm arm-check <role>`,
+`pnpm body-module <a> --inspect`, `pnpm pose-depth <role> --gaps`, `pnpm arm-check <role>`,
 `pnpm hold-reach <species> --instrument <id>` (with `--glb <file>` for a new file), and
 `pnpm build && pnpm size`. The brief gives the posture of a real player from the technique
 references of `docs/reference/`.
@@ -39,7 +39,7 @@ Start commit `<hash>`. <Alone on `main`, or detached worktree `.claude/worktrees
 
 ## Goal
 <the request in neutral words>. Done when:
-1. `pnpm studio-body <a>` writes the module, and the species has the body.
+1. `pnpm body-module <a>` writes the module, and the species has the body.
 2. <the pose claims: the seat, the feet, the hold>.
 3. The role is in `SWEEP_ROLES`, `FOLD_ROLES`, `ROLE_VIEWS`, and "Bodies and roles".
 4. On request only: `pnpm arm-check <role> --base <start> --views <dir>` gives no `FAIL`.
@@ -121,5 +121,5 @@ Each brief of a round needs these rules. Copy this list into `<scratch>/rules-co
 - **A new hold.** The pose index of design 5, design 5.2 (the rest), 5.3 (the hold), and 4.6 (the
   reach). Put each choice and its reason into its design section.
 
-The code lists are `ANIMALS`, `STUDIO_BODIES`, `SPECIES`, `SWEEP_ROLES`, `ROLE_VIEWS`,
+The code lists are `ANIMALS`, `BODIES`, `SPECIES`, `SWEEP_ROLES`, `ROLE_VIEWS`,
 `FOLD_ROLES`, and the hold tables of step 3 of "Steps of a new body" of [`rigging.md`](rigging.md).

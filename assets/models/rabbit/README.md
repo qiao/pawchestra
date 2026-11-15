@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the rabbit (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/rabbit.ts`, which this chain writes:
+`src/models/bodies/rabbit.ts`, which this chain writes:
 
 ```text
 tripo-p2/rabbit.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/rabbit.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export rabbit    the same run
    v
 tripo-hand/rabbit.rig.glb       rigged mesh, with its summary rabbit.rig.json
-   │  pnpm studio-body rabbit   the same run
+   │  pnpm body-module rabbit   the same run
    v
-src/models/studio/rabbit.ts     studio body of the app
+src/models/bodies/rabbit.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Hand rig" below gives the
@@ -56,7 +56,7 @@ SHA-256 `5eedb256218d3e71cc4fe7879b496f9a18c3483adc48badb4f1680cfdc04354c`).
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,328 vertices and 3,606 faces: 2,918 quads and 688 triangles, no n-gon. One UV layer |
 | Parts | 11 parts: the body with the tail (3,162 vertices), two eyeballs (37 vertices each, open at the back, a sphere of radius 0.0224 units about (±0.0344, 0.7139, 0.0754)), and eight whisker strips of 11 or 13 vertices. No vertices merge at 1e-5. 140 open edges in 15 loops, and 22 edges with more than two faces |
-| Axes | The rabbit faces -y of Blender, so the import needs no turn. Then 1 unit from the soles to the ear tips, x ±0.3217 (the paw tips), and z -0.1444 (the tail) to 0.1444 (the nose) in the studio axes |
+| Axes | The rabbit faces -y of Blender, so the import needs no turn. Then 1 unit from the soles to the ear tips, x ±0.3217 (the paw tips), and z -0.1444 (the tail) to 0.1444 (the nose) in the body axes |
 
 The folder `rabbit.fbm/` keeps two maps of the zip file under new names, as bytes: the base color
 map (`tripo_rgb_*.jpg`) and the normal map (`tripo_normal_*.jpg`). The roughness and the metallic
@@ -87,7 +87,7 @@ and the legs keep the length of the source: no cut, no split from the trunk, and
 | SHA-256 | `7bc30639690f8b80afb7d28fb2d143a4d935c9cecd482bcf0623ec6615c272b0` |
 | Origin | Made in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `rabbit`: 3,846 vertices and 4,072 faces (3,384 quads and 688 triangles, 7,456 triangles), flat faces, and the surface of `sa.add_surface()`. The 74 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`) |
 | Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (the source joints, mapped by the paw turns). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.834507 (the shoulder joints at 1.474394 m for each unit, so that H is 0.304675 m), `crease` 180, `backRoom` 0.01 |
@@ -106,7 +106,7 @@ The chain of the body is in `tools/blender/hand/rabbit/` (`build.py`, `make_conf
 `params.json`, `base-config.json`, `redits.py`, `rimport.py`, `rings.py`), and `pnpm hand-chain
 rabbit` runs it (`tools/blender/hand/README.md`). Two runs give the same bytes of the rig file, its
 summary, the rig config, and the module. Only the `.blend` differs. The edits, in the order of the
-work (`sa` is `tools/blender/studio_armature.py`, x is the x of the left arm). Each edit is a need
+work (`sa` is `tools/blender/body_armature.py`, x is the x of the left arm). Each edit is a need
 of the rig, the seat, or the look:
 
 - **Import.** `sa.import_source('assets/models/rabbit/tripo-p2/rabbit.fbx', 1e-5)`. The FBX faces
@@ -134,7 +134,7 @@ of the rig, the seat, or the look:
   attribute `eye`. 55 light faces of the nose box leave the gloss nose, so that they show the
   color map.
 - **Armature.** The armature of the config with a palm for each side: the true palm of the
-  source, (0, -0.996, 0.087) in the studio axes, from the mean normal of the pink paw pads, turned
+  source, (0, -0.996, 0.087) in the body axes, from the mean normal of the pink paw pads, turned
   by the paw turn. The property `hinges` holds the elbow axis of the config of each side, turned
   about its bind upper arm by 6 degrees on the left and -37 degrees on the right. The hip joint
   lies at (0.06, 0.275, 0.01).
@@ -162,7 +162,7 @@ The weights, in the order of the work, in the rest pose:
 4. The vertices of the loose parts (the eyeballs and the whisker strips) and of the gloss nose
    take {`head` 1}: 229 vertices.
 5. Ear rows: a plane across the base of each ear, through (0.045, 0.81, 0), (0.045, 0.805, -0.06),
-   (0.02, 0.815, -0.03), and (0.075, 0.795, -0.03) (studio axes, x mirrored on the right). Each
+   (0.02, 0.815, -0.03), and (0.075, 0.795, -0.03) (body axes, x mirrored on the right). Each
    head vertex above the plane by 0.008 or more and with |x| above 0.002 takes {`ear_<side>` 1},
    the band of 0.008 takes {`ear_<side>` 0.5, `head` 0.5}, and each other vertex gives its ear
    share to `head` (475 ear, 6 base, and 308 head rows).
@@ -206,7 +206,7 @@ the lap of the longer legs.
 degrees forward, and each foot turns 15 degrees with the heel up, with the toes flat on the floor
 (`legTurns` of the config). The front of the seat lies 0.05 units behind the knee joint of the
 bind, and 56 % of the thigh lies on the seat. The legs keep the length of the source, so the seat
-height of the app is 0.229 m (`seatHeight` of `src/models/studio/rabbit.ts`).
+height of the app is 0.229 m (`seatHeight` of `src/models/bodies/rabbit.ts`).
 
 **Lids.** A lid on each eye: 13 × 13 points from psi -48 to 50 degrees and lam -55 to 60 degrees
 (the right lid mirrors the range) at 1.12 ball radii, and a lower strip at 1.07 radii, held turned

@@ -1,6 +1,6 @@
 {
   "source": "assets/models/rhino/tripo-p2/rhino.fbx",
-  "sourceNote": "The Tripo P2 rhino mesh with its quads (assets/models/rhino/README.md). The hand rig assets/models/rhino/tripo-hand/rhino.blend starts from it in headless Blender with the calls of tools/blender/studio_armature.py (design 4.4, \"Hand rig\").",
+  "sourceNote": "The Tripo P2 rhino mesh with its quads (assets/models/rhino/README.md). The hand rig assets/models/rhino/tripo-hand/rhino.blend starts from it in headless Blender with the calls of tools/blender/body_armature.py (design 4.4, \"Hand rig\").",
   "name": "Rhino",
   "weld": 1e-05,
   "joints": {
@@ -224,7 +224,7 @@
     -0.909,
     -0.015
   ],
-  "studio": {
+  "bind": {
     "trunk": {
       "open": 0,
       "shares": {
@@ -249,7 +249,7 @@
         0.993297
       ]
     },
-    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the rhino of main (tools/mesh-rigs/rhino.json at 8e42c4eaa), so that the elbow axes of the tuba hold stay.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (Body.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the rhino of main (tools/mesh-rigs/rhino.json at 8e42c4eaa), so that the elbow axes of the tuba hold stay.",
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
@@ -363,7 +363,7 @@
     "points": 12,
     "reach": 1,
     "darkReach": 2,
-    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm body-module drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
   },
   "chair": {
     "halfWidth": 0.2,
@@ -375,13 +375,13 @@
     "helper": 0.03,
     "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies."
   },
-  "jointsNote": "The places are the places of the source, in the studio units and axes: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed rings of 19 vertices from x 0.239 to x 0.342, axis y 0.567 to 0.559 and z -0.073 to -0.051, radius about 0.067): the shoulder joint at x 0.14, 0.035 units inside the side of the trunk, the elbow at x 0.25, at the middle from the shoulder to the wrist, the wrist at x 0.355, where the paw widens, the knuckles at x 0.405, and the tip at x 0.451. Leg (sections from y 0 to 0.16, the middle at x 0.105, z -0.07): the hip joint at (0.115, 0.23, -0.045) in the haunch, the knee at y 0.13, the ankle at y 0.05, the ball of the foot at z 0, and the toe tips at z 0.045. The thigh slopes 16 degrees back, so that the roll of its bone stays well defined. Trunk: the spine bones lie at about 0.35 of the depth from the back. The chin is at y 0.63. Ears: the root at (0.085, 0.885, -0.015), the tips at (0.11, 1.0, 0.008). Tail: a loose part of the source that hangs from (0, 0.325, -0.25) down to (0, 0.135, -0.262). The palm is the true palm of the source: the mean normal of the paw faces that face down (x from 0.36) is (0.417, -0.909, -0.015).",
+  "jointsNote": "The places are the places of the source, in the body units and axes: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed rings of 19 vertices from x 0.239 to x 0.342, axis y 0.567 to 0.559 and z -0.073 to -0.051, radius about 0.067): the shoulder joint at x 0.14, 0.035 units inside the side of the trunk, the elbow at x 0.25, at the middle from the shoulder to the wrist, the wrist at x 0.355, where the paw widens, the knuckles at x 0.405, and the tip at x 0.451. Leg (sections from y 0 to 0.16, the middle at x 0.105, z -0.07): the hip joint at (0.115, 0.23, -0.045) in the haunch, the knee at y 0.13, the ankle at y 0.05, the ball of the foot at z 0, and the toe tips at z 0.045. The thigh slopes 16 degrees back, so that the roll of its bone stays well defined. Trunk: the spine bones lie at about 0.35 of the depth from the back. The chin is at y 0.63. Ears: the root at (0.085, 0.885, -0.015), the tips at (0.11, 1.0, 0.008). Tail: a loose part of the source that hangs from (0, 0.325, -0.25) down to (0, 0.135, -0.262). The palm is the true palm of the source: the mean normal of the paw faces that face down (x from 0.36) is (0.417, -0.909, -0.015).",
   "body": {
     "crease": 180
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/body-module.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
   "eyeSize": 0.255007,
-  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
+  "eyeSizeNote": "The head height H of the body in units, as body-module measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
   "metersPerUnit": 1.611,
   "metersPerUnitNote": "The scale of the app: the eyes of the standing rhino are 1.275 m above the floor, as on the rhino of rhino.rig.glb at 8e42c4eaa, so that the seat search of each demo keeps its seats. The fact height of the armature is the shoulder joints at this scale.",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/rhino.blend holds it.",

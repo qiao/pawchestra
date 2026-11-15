@@ -385,7 +385,7 @@ export function withRefTree<T>(
 /**
  * The paths of a commit that a probe of the code of the commit reads: the source, the demos, the
  * rules of the demo patches, and the tools. The tools of the commit fit its source, such as the
- * export of the studio bodies of `tools/studio-body.ts`, which a newer tool can import from a
+ * export of the bodies of `tools/body-module.ts`, which a newer tool can import from a
  * newer source.
  */
 const PROBE_PATHS: readonly string[] = [

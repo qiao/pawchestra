@@ -273,7 +273,7 @@ export class MeshBuilder {
 
   /**
    * Adds triangles that each have their own finish, and corners that each have their own color
-   * and skin, such as the faces of a studio body (design 4.4).
+   * and skin, such as the faces of a body (design 4.4).
    *
    * @param positions x, y, z of each corner, 9 numbers for each triangle, counterclockwise from
    *   outside.

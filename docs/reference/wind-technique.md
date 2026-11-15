@@ -702,7 +702,7 @@ Each source opened on 2026-10-18, except where its entry gives another date.
     https://pub.dega-akustik.de/ICA2019/data/articles/001333.pdf
 12. W. Barrett, "Playing Legato on the Trombone: A Primer", Online Trombone Journal.
     https://trombone.org/articles/view.php?id=106
-13. S. Tanner, "Warm-Up & Fundamental Exercise Materials", Trombone Studio, University of Colorado
+13. S. Tanner, "Warm-Up & Fundamental Exercise Materials", Trombone Body, University of Colorado
     Boulder (2025-26), section II.D. https://www.colorado.edu/music/media/10918
 14. I. Bousfield, "Learn Legato", lesson 8 of "Unlocking the Trombone Code", MusicGurus.
     https://www.musicgurus.com/courses/ian-bousfield-unlocking-the-trombone-code-course/lessons/learn-legato-trombone-ian-bousfield-course

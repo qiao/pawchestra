@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the penguin (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/penguin.ts`, which this chain writes:
+`src/models/bodies/penguin.ts`, which this chain writes:
 
 ```text
 tripo-p2/penguin.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/penguin.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export penguin    the same run
    v
 tripo-hand/penguin.rig.glb       rigged mesh, with its summary penguin.rig.json
-   │  pnpm studio-body penguin   the same run
+   │  pnpm body-module penguin   the same run
    v
-src/models/studio/penguin.ts     studio body of the app
+src/models/bodies/penguin.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -31,7 +31,7 @@ made by one build script in a headless Blender 5.2, by the route of the Tripo wo
 the form, the colors, and the eyes of the source: no point edit changes the head, the face, the
 trunk, the flippers, the legs, the feet, or the tail. The flippers keep the length of the source: no
 cut, no split from the trunk, and no stretch. The `ANIMALS` entry of the penguin
-(`tools/studio-body.ts`) points to `tripo-hand/penguin.rig.glb`. The files of the earlier penguin
+(`tools/body-module.ts`) points to `tripo-hand/penguin.rig.glb`. The files of the earlier penguin
 above do not change.
 
 | File | Origin | Rebuild |
@@ -57,7 +57,7 @@ tubes have 16 vertices around.
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,161 vertices and 3,378 faces: 2,854 quads and 524 triangles, no n-gon. One UV layer |
 | Parts | 3 parts: the body (3,039 vertices) and two eyeballs (61 vertices each, spheres of radius 0.021 about (±0.052, 0.923, 0.035)). 118 open edges in 18 loops (the 2 eye sockets, the open backs of the 2 eyeballs, 12 small holes of the feet, and 2 holes at the root of the tail), and no edge with more than two faces |
-| Box | In the studio units (1 unit from the soles to the crown): x ±0.470 (the flipper tips), z -0.242 (the tail tip) to 0.242 (the beak tip). The penguin faces -y in Blender, with its left side at +x, so the import needs no turn |
+| Box | In the body units (1 unit from the soles to the crown): x ±0.470 (the flipper tips), z -0.242 (the tail tip) to 0.242 (the beak tip). The penguin faces -y in Blender, with its left side at +x, so the import needs no turn |
 
 The folder `penguin.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness
 and the metallic maps are not kept.
@@ -84,13 +84,13 @@ those of the Tripo monkey with the changes below. `make_config.py` writes
 |---|---|
 | Size | 385,596 bytes |
 | SHA-256 | `4e35b622b0d08e4dda7ca8fc16da63cdc62b8cd46c5d42b6a86b697e9faf7e67` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the crown, the soles at z = 0, the penguin faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the crown, the soles at z = 0, the penguin faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `penguin`: 3,616 faces after the rings, the beak split, and the lids, flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 68 faces at the beak tip take the slot `fur` and the color map ("Nose"). The 120 faces of the two eyeballs have the face attribute `eye`, and the lid faces the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/penguin/tripo-hand/penguin-color.webp`) |
 | Armature | `penguin_rig`: the 30 body bones, `tail_tip`, `jaw`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.677402 (the shoulder joints at 1.050235 m for each unit, so that H is 0.217537 m, the H of the earlier penguin), `crease` 180 |
 | Eyes | The eyeballs of the mesh, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/penguin/tripo-p2/penguin.fbx', 1e-5)`. No vertex

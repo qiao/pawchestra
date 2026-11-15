@@ -1,7 +1,7 @@
 """Import of the new Tripo polar bear: sa.import_source(). The FBX faces -y of Blender after the
 import, and +x is the left side of the bear, so no turn is necessary."""
 
-import studio_armature as sa
+import body_armature as sa
 
 
 def import_fox(path, weld):

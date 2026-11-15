@@ -26,7 +26,7 @@ interface PianoPaw {
 }
 
 /**
- * The paw of the studio polar bear: a row of 5 claws about 9.7 cm wide in the app, so the claws
+ * The paw of the polar bear: a row of 5 claws about 9.7 cm wide in the app, so the claws
  * stand about 24 mm apart, 0.87 of a white key. A human hand of 0.9 times the size takes the
  * spans times 0.9 (`docs/reference/piano-technique.md` section 9.2), and the paw spans a little
  * less than its claw row.

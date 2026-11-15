@@ -1,7 +1,7 @@
 # Cat model
 
 This folder holds the Tripo P2 source mesh of the cat (`tripo-p2/`) and its hand rig
-(`tripo-hand/`). The app does not serve these files. It loads the module `src/models/studio/cat.ts`,
+(`tripo-hand/`). The app does not serve these files. It loads the module `src/models/bodies/cat.ts`,
 which this chain writes:
 
 ```text
@@ -12,9 +12,9 @@ tripo-hand/cat.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export cat    the same run
    v
 tripo-hand/cat.rig.glb       rigged mesh, with its summary cat.rig.json
-   │  pnpm studio-body cat   the same run
+   │  pnpm body-module cat   the same run
    v
-src/models/studio/cat.ts     studio body of the app
+src/models/bodies/cat.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -83,13 +83,13 @@ eye edit.
 |---|---|
 | Size | 382,564 bytes |
 | SHA-256 | `e6f7978c6f733b872a60134db5ac932412b40384ec7ebf0ff69b0b30def8d0ea` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the cat faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `cat`: 3,693 vertices and 3,829 faces (3,274 quads and 555 triangles, 7,103 triangles), flat faces, and the surface of `sa.add_surface()`, with the shape keys `bind_belly` ("Belly"), `bind_tail` ("Tail behind the chair"), and `bind_sit` ("Sit"). No face is gloss: the 45 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 187 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids `lid`, and the 36 faces of the whisker strips `plain`. The UV map of the FBX, and the property `texture` (`assets/models/cat/tripo-hand/cat-color.webp`) |
 | Armature | `cat_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.942613 (the shoulder joints at 1.48443 m for each unit, so that H is 0.339381 m, the H of the cat of `cat.rig.glb` at cbc8db5e4), `crease` 180, `seatWidth` 0.46 |
 | Eyes | The eyeballs of the mesh at 0.90 of their size ("Eye size"), with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side, y the height, in the source):
 
 - **Import.** `sa.import_source('assets/models/cat/tripo-p2/cat.fbx', 1e-5)`. No vertex merges,
@@ -153,7 +153,7 @@ left side, y the height, in the source):
   at x 0.31, the knuckles at x 0.353 (x 0.36 in the source, moved by the paw edit), the hip at (0.075, 0.29, 0.045), and the knee at (0.0715,
   0.165, 0.045). The palm is the true palm of the source, the mean normal of the paw faces that
   face down, (0.047, -0.998, -0.039), turned by the paw turn. The bind upper arm points down and
-  forward, (0.5014, -0.6017, 0.6217) in the studio axes (`studio.bindArms.upper_arm`), and the
+  forward, (0.5014, -0.6017, 0.6217) in the body axes (`bind.bindArms.upper_arm`), and the
   property `hinges` holds the elbow axis of each side, turned about its bind upper arm by 11
   degrees on the left and -48 degrees on the right ("Arm twist").
 
@@ -186,7 +186,7 @@ shading of an FBX viewer.
 smooth normals of the fur. As flat gloss faces in one color, the nose showed facets and no nostrils.
 The weights do not change: the nose vertices keep the row {`head` 1}. The armature property
 `headShift` (0, 0, -0.000732941) moves the head center of the holds back to the head center of the
-gloss nose, because the head box of `pnpm studio-body` now holds the nose. Thus no hold moves. The
+gloss nose, because the head box of `pnpm body-module` now holds the nose. Thus no hold moves. The
 nose keeps the colors of the source map. In the hall light it reads as the nose of the FBX file, so
 the map tool does not change it.
 
@@ -194,7 +194,7 @@ the map tool does not change it.
 degrees forward, and each foot turns 12 degrees with the heel up, the toes flat on the floor
 (`legTurns` of the config, `tools/rig/leg_turns.py <config> 20 20 8 12`). The front of the seat
 lies 0.06 units behind the knee joint of the bind, and 46 % of the thigh lies on the seat. The
-seat height of the app is 0.222 m, with the legs of the source (`StudioBody.seatHeight`). The
+seat height of the app is 0.222 m, with the legs of the source (`Body.seatHeight`). The
 lowest point of each foot is on the floor, and the toe pads touch it over 7.7 cm.
 
 With the shins 12 degrees forward and flat feet, the seat was 0.201 m, and the chair read low. The
@@ -232,7 +232,7 @@ with steep sides, and its edge showed as teeth from behind. Thighs 15 degrees do
 layout (design 4.5).
 
 **Tail behind the chair.** The tail has two bones, `tail` from the root at (0, 0.36, -0.065) and
-`tail_tip` from (0, 0.22, -0.12) to (0, 0.10, -0.20), with the `studio.tailBind` of the third cat.
+`tail_tip` from (0, 0.22, -0.12) to (0, 0.10, -0.20), with the `bind.tailBind` of the third cat.
 The tube vertices take exact rows along a middle line from (0, 0.335, -0.029) to (0, 0.119,
 -0.225), and the key `bind_tail` lays the tube along the path `tailLay.path` of `params.json`:
 back from the root (0, 0.333, -0.031) of the bind, over the back edge of the seat, and down behind

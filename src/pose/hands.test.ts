@@ -225,8 +225,8 @@ describe('poseHands (design 5.3, 4.7)', () => {
         if (player.instrument === 'harp') {
           // The arms of the harpist hang at the sides, and the paws stand beside the knees.
           expect(Math.abs(palm.x), label).toBeGreaterThan(Math.abs(knee.x));
-        } else if (player.model.studio) {
-          // The skin of a studio body blends the thighs into the hips and the belly, and the
+        } else if (player.model.bodyRig) {
+          // The skin of a body blends the thighs into the hips and the belly, and the
           // body is one closed shell with the arms. The paw of the round polar bear rests on
           // the low front of the belly over its thigh, as the hands of a pianist rest in the lap
           // before a performance. It touches the lap, and the test of the pianist clearance

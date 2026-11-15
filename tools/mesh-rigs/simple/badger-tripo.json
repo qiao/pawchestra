@@ -1,6 +1,6 @@
 {
   "source": "assets/models/badger/tripo-p2/badger.fbx",
-  "sourceNote": "The Tripo P2 badger mesh with its quads (assets/models/badger/README.md). The hand rig assets/models/badger/tripo-hand/badger.blend starts from it in headless Blender with the calls of tools/blender/studio_armature.py (design 4.4, \"Hand rig\").",
+  "sourceNote": "The Tripo P2 badger mesh with its quads (assets/models/badger/README.md). The hand rig assets/models/badger/tripo-hand/badger.blend starts from it in headless Blender with the calls of tools/blender/body_armature.py (design 4.4, \"Hand rig\").",
   "name": "Badger",
   "weld": 1e-05,
   "joints": {
@@ -224,7 +224,7 @@
     -0.99,
     -0.005
   ],
-  "studio": {
+  "bind": {
     "trunk": {
       "open": 0,
       "shares": {
@@ -249,7 +249,7 @@
         0.571719
       ]
     },
-    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the bent bind of the violin hold, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (Body.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the bent bind of the violin hold, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
@@ -363,7 +363,7 @@
     "points": 12,
     "reach": 1,
     "darkReach": 2,
-    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm body-module drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
   },
   "chair": {
     "halfWidth": 0.04,
@@ -380,9 +380,9 @@
     "crease": 180,
     "seatWidth": 0.07
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/body-module.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
   "eyeSize": 0.269175,
-  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
+  "eyeSizeNote": "The head height H of the body in units, as body-module measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
   "metersPerUnit": 1.038285,
   "metersPerUnitNote": "The scale of the app: 1.147 times the scale 0.905218 that gave the H of the badger of aa8af0dd8 (0.243662 m), so that the standing crown matches the crown of that badger (1.038 m).",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/badger.blend holds it.",

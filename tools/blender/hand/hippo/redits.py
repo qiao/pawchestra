@@ -1,4 +1,4 @@
-"""Point edits of the rest mesh of the new Tripo fox, as pure maps of points in the studio axes (y up,
+"""Point edits of the rest mesh of the new Tripo fox, as pure maps of points in the body axes (y up,
 +z forward, +x the left side). The build (build.py) moves the mesh with them, and
 make_config.py moves the joints with the same maps, so that the bones fit the edited mesh."""
 
@@ -287,7 +287,7 @@ EDITS = {
 
 
 def map_points(X, params, tail=None, eye_side=None, part=None):
-    """Moves the points X (n x 3, studio axes) by each point edit of the params, in order.
+    """Moves the points X (n x 3, body axes) by each point edit of the params, in order.
     params['sourceJoints'] holds the joints of the source (make_config.SOURCE). eye_side gives
     +1 or -1 for each point of the left or the right eyeball, and 0 for each other point."""
     X = np.asarray(X, float)
@@ -306,7 +306,7 @@ def rotation(axis, angle):
 
 def paw_axis(joints, side):
     """The rest forearm axis of a side (from the forearm joint to the wrist joint), outward, and the
-    forearm joint, in the studio axes. The right side mirrors the left joints."""
+    forearm joint, in the body axes. The right side mirrors the left joints."""
     m = np.array([1.0 if side == 'L' else -1.0, 1, 1])
     f = np.array(joints['forearm_L']['head'], float) * m
     h = np.array(joints['hand_L']['head'], float) * m

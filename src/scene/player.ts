@@ -28,18 +28,18 @@ import type { KettleCount } from '../models/instruments/percussion.ts';
 import type { InstrumentId } from '../models/instruments/types.ts';
 import { boneIndex } from '../models/rig.ts';
 import type { BoneName } from '../models/rig.ts';
-import { STUDIO_BONES } from '../models/studio-format.ts';
-import { studioRenderMeshSteps } from '../models/studio-body.ts';
+import { BODY_BONES } from '../models/body-format.ts';
+import { bodyRenderMeshSteps } from '../models/body.ts';
 import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
 import {
   CLOSED_EYE_SCALE,
-  STUDIO_POSE_BONES,
-  createStudioPose,
-  poseStudioBones,
-  studioOffsets,
-} from '../models/studio-rig.ts';
-import type { StudioPose, StudioRig } from '../models/studio-rig.ts';
+  BODY_POSE_BONES,
+  createBodyPose,
+  poseBodyBones,
+  bodyOffsets,
+} from '../models/body-rig.ts';
+import type { BodyPose, BodyRig } from '../models/body-rig.ts';
 import type { Skeleton as PlayerSkeleton } from '../models/rig.ts';
 import type { AnimalPose, ScenePose } from '../pose/types.ts';
 import { bodyMapMaterial } from './body-texture.ts';
@@ -50,9 +50,9 @@ import { createStringBands, updateStringBands } from './harp-strings.ts';
 import type { StringBands } from './harp-strings.ts';
 
 /**
- * Creates the geometry of a player model with a studio body (design 4.4): the body in the bind
- * pose of the studio, with four bones for each vertex and the corrective shapes of the arms as morph
- * targets, and the instrument on the bones of the player. The colors of the studio hold its
+ * Creates the geometry of a player model with a body (design 4.4): the body in the bind
+ * pose of the body, with four bones for each vertex and the corrective shapes of the arms as morph
+ * targets, and the instrument on the bones of the player. The colors of the body hold its
  * baked occlusion, so the geometry adds none. The body gets its smooth normals, with their changes
  * for the corrective shapes as morph normals (design 4.5). The instrument keeps the crease normals
  * of its finishes. A body with a color map gets its texture points as the attribute `uv1`. All
@@ -73,7 +73,7 @@ export function createPlayerGeometry(model: PlayerModel): BufferGeometry {
  * @returns The steps, which return the geometry.
  */
 function* createPlayerGeometrySteps(model: PlayerModel): Steps<BufferGeometry> {
-  const render = yield* studioRenderMeshSteps(model.studio, model.mesh);
+  const render = yield* bodyRenderMeshSteps(model.bodyRig, model.mesh);
   yield;
   const geometry = createGeometry(render.data);
   geometry.setAttribute('skinIndex', new BufferAttribute(render.joints, 4));
@@ -118,13 +118,13 @@ function movesCorners(model: PlayerModel): boolean {
   return !!(model.keys || model.strings || model.pedals || model.copies);
 }
 
-/** The parts of a player mesh with a studio body that a pose needs. */
-interface StudioPlayer {
-  readonly rig: StudioRig;
+/** The parts of a player mesh with a body that a pose needs. */
+interface BodyPlayer {
+  readonly rig: BodyRig;
   /** The skeleton of the player, which `poseAt()` poses. */
   readonly skeleton: PlayerSkeleton;
   /** The bones of the pose, written on each frame. */
-  readonly pose: StudioPose;
+  readonly pose: BodyPose;
 }
 
 /**
@@ -349,7 +349,7 @@ export function releaseSkeletons(meshes: readonly SkinnedMesh[]): void {
 /**
  * Creates the hidden group that holds the bones of a player mesh. three.js visits each child of a
  * visible object in each render and in each shadow map, and stops at a hidden object. A bone draws
- * nothing, so the group hides the bones: a player with a studio body has 74 bones, and the 55
+ * nothing, so the group hides the bones: a player with a body has 74 bones, and the 55
  * players of `perf-60.mid` gave about 4,000 visits in each pass. The group stays at the origin of
  * the mesh, and a product with the identity matrix is exact, so the world matrices of the bones do
  * not change.
@@ -363,8 +363,8 @@ function createBoneGroup(): Group {
   return group;
 }
 
-/** The player meshes with a studio body. */
-const studioPlayers = new WeakMap<SkinnedMesh, StudioPlayer>();
+/** The player meshes with a body. */
+const bodyPlayers = new WeakMap<SkinnedMesh, BodyPlayer>();
 
 /** The keys of a player mesh with a keyboard, which {@link applyPose} turns (design 4.6, 5.3). */
 interface KeyMesh {
@@ -513,9 +513,9 @@ function stringLinePoints(strings: HarpStrings, bind: Float32Array): Float32Arra
  * each player gets its own pose. A player with a keyboard or a harp also gets its own positions,
  * so that its keys go down with its notes, and its strings close while their bands show
  * ({@link ownGeometry}). The bands of a harp are a child of the mesh ({@link createStringBands}).
- * A player whose studio body has a color map for the palette of its species
+ * A player whose body has a color map for the palette of its species
  * (`PlayerModel.bodyMap`) gets the copy of the shared material with the map (`bodyMapMaterial()`,
- * design 4.5). A player whose studio body has eyeballs gets a copy with
+ * design 4.5). A player whose body has eyeballs gets a copy with
  * the eye light (`eyeLightMaterial()`, design 4.5).
  *
  * @param model The player model of `models/`.
@@ -529,17 +529,17 @@ export function createPlayerMesh(
   materials: readonly MeshStandardMaterial[],
 ): SkinnedMesh {
   const own = movesCorners(model) ? ownGeometry(geometry) : geometry;
-  const { body } = model.studio;
+  const { body } = model.bodyRig;
   const file = model.bodyMap;
   const mapped =
     file === null
       ? materials
       : materials.map((shared) => bodyMapMaterial(shared, file, body.texture?.file));
-  const mesh = createStudioMesh(
+  const mesh = createBodyMesh(
     model,
-    model.studio,
+    model.bodyRig,
     own,
-    body.eyeballs ? mapped.map((base) => eyeLightMaterial(base, body, model.studio.mesh)) : mapped,
+    body.eyeballs ? mapped.map((base) => eyeLightMaterial(base, body, model.bodyRig.mesh)) : mapped,
   );
   const position = own.getAttribute('position');
   const bind = geometry.getAttribute('position').array;
@@ -588,26 +588,26 @@ export function createPlayerMesh(
 }
 
 /**
- * Creates the skinned mesh of a player with a studio body (design 4.4). Each bone of the studio and
+ * Creates the skinned mesh of a player with a body (design 4.4). Each bone of the body and
  * of the player is a child of the mesh, with no parent bone: {@link applyPose} writes the matrix
- * of each bone from the pose of the player (`poseStudioBones()`).
+ * of each bone from the pose of the player (`poseBodyBones()`).
  *
  * @param model The player model.
- * @param rig The rig of its studio body.
+ * @param rig The rig of its body.
  * @param geometry The geometry of the model, from {@link createPlayerGeometry}.
  * @param materials The shared material.
  * @returns The mesh in the bind pose of the player.
  */
-function createStudioMesh(
+function createBodyMesh(
   model: PlayerModel,
-  rig: StudioRig,
+  rig: BodyRig,
   geometry: BufferGeometry,
   materials: readonly MeshStandardMaterial[],
 ): SkinnedMesh {
   const mesh = new SkinnedMesh(geometry, [...materials]);
   const group = createBoneGroup();
   mesh.add(group);
-  const bones = Array.from({ length: STUDIO_POSE_BONES }, () => {
+  const bones = Array.from({ length: BODY_POSE_BONES }, () => {
     const bone = new Bone();
     bone.matrixAutoUpdate = false;
     group.add(bone);
@@ -620,11 +620,11 @@ function createStudioMesh(
       bones.map(() => new Matrix4()),
     ),
   );
-  studioPlayers.set(mesh, { rig, skeleton: model.skeleton, pose: createStudioPose() });
+  bodyPlayers.set(mesh, { rig, skeleton: model.skeleton, pose: createBodyPose() });
   mesh.castShadow = true;
   mesh.receiveShadow = true;
   mesh.frustumCulled = false;
-  applyStudioPose(mesh, {
+  applyBodyPose(mesh, {
     rotations: new Float32Array(model.skeleton.positions.length * 4).map((_, i) =>
       i % 4 === 3 ? 1 : 0,
     ),
@@ -636,23 +636,23 @@ function createStudioMesh(
 }
 
 /**
- * Copies a pose to the bones of a player mesh with a studio body: the matrix of each bone and the
+ * Copies a pose to the bones of a player mesh with a body: the matrix of each bone and the
  * weights of the corrective shapes (design 4.4, 5.1).
  *
- * @param mesh A mesh of {@link createStudioMesh}. Another mesh does not change.
+ * @param mesh A mesh of {@link createBodyMesh}. Another mesh does not change.
  * @param pose The pose of the player.
  */
-function applyStudioPose(mesh: SkinnedMesh, pose: AnimalPose): void {
-  const player = studioPlayers.get(mesh);
+function applyBodyPose(mesh: SkinnedMesh, pose: AnimalPose): void {
+  const player = bodyPlayers.get(mesh);
   if (!player) {
     return;
   }
   const eyeScale = Math.max(CLOSED_EYE_SCALE, 1 - pose.blink);
-  const { matrices, correctives } = poseStudioBones(
+  const { matrices, correctives } = poseBodyBones(
     player.rig,
     player.skeleton,
     pose.rotations,
-    studioOffsets(pose),
+    bodyOffsets(pose),
     eyeScale,
     player.pose,
   );
@@ -689,10 +689,10 @@ function applyStudioPose(mesh: SkinnedMesh, pose: AnimalPose): void {
  * ({@link holdSkeletons}). The bones of the mesh then keep the bind pose, so {@link hideBone}
  * does not apply to the mesh.
  *
- * @param mesh A mesh of {@link createStudioMesh}. Another mesh does not change.
+ * @param mesh A mesh of {@link createBodyMesh}. Another mesh does not change.
  */
 function readPoseLocals(mesh: SkinnedMesh): void {
-  const player = studioPlayers.get(mesh);
+  const player = bodyPlayers.get(mesh);
   const skeleton = mesh.skeleton;
   const group = skeleton.bones[0]?.parent;
   if (player && group && skeleton instanceof FrameSkeleton) {
@@ -711,11 +711,11 @@ export interface HeadPoints {
   readonly head: [number, number, number];
 }
 
-/** The indices of the studio bones of {@link HeadPoints}. */
+/** The indices of the body bones of {@link HeadPoints}. */
 const HEAD_POINT_BONES = {
-  eyeL: STUDIO_BONES.indexOf('eye_L'),
-  eyeR: STUDIO_BONES.indexOf('eye_R'),
-  head: STUDIO_BONES.indexOf('head'),
+  eyeL: BODY_BONES.indexOf('eye_L'),
+  eyeR: BODY_BONES.indexOf('eye_R'),
+  head: BODY_BONES.indexOf('head'),
 } as const;
 
 /** The pose matrix of one bone, which {@link writePosedPoint} writes before it reads it. */
@@ -725,12 +725,12 @@ const posedMatrix = new Matrix4();
 const posedPoint = new Vector3();
 
 /**
- * Writes a point of a studio body in the bind pose at its place in the pose of the last frame, in
+ * Writes a point of a body in the bind pose at its place in the pose of the last frame, in
  * world axes.
  *
  * @param mesh The player mesh. Its world matrix must be ready.
- * @param matrices The pose matrices of the studio bones of the mesh (`StudioPose.matrices`).
- * @param bone The index of the studio bone that the point follows.
+ * @param matrices The pose matrices of the body bones of the mesh (`BodyPose.matrices`).
+ * @param bone The index of the body bone that the point follows.
  * @param bind The point in the bind pose, in the model axes.
  * @param out The point to write.
  */
@@ -761,10 +761,10 @@ function writePosedPoint(
  * @param mesh A mesh of {@link createPlayerMesh}, posed by {@link applyPose}. Its world matrix
  *   must be ready.
  * @param out The points to write.
- * @returns True if it wrote the points, or false for a mesh with no studio body.
+ * @returns True if it wrote the points, or false for a mesh with no body.
  */
 export function writeHeadPoints(mesh: SkinnedMesh, out: HeadPoints): boolean {
-  const player = studioPlayers.get(mesh);
+  const player = bodyPlayers.get(mesh);
   if (!player) {
     return false;
   }
@@ -785,7 +785,7 @@ export function writeHeadPoints(mesh: SkinnedMesh, out: HeadPoints): boolean {
  * @param name The bone of the player.
  */
 export function hideBone(mesh: SkinnedMesh, name: BoneName): void {
-  const bone = mesh.skeleton.bones[STUDIO_BONES.length + boneIndex(name)];
+  const bone = mesh.skeleton.bones[BODY_BONES.length + boneIndex(name)];
   if (!bone) {
     return;
   }
@@ -794,8 +794,8 @@ export function hideBone(mesh: SkinnedMesh, name: BoneName): void {
 }
 
 /**
- * Copies a pose to the bones of a player mesh: the bones of the studio body from the pose
- * ({@link applyStudioPose}), the turns of the keys of a mesh with a keyboard ({@link applyKeys}),
+ * Copies a pose to the bones of a player mesh: the bones of the body from the pose
+ * ({@link applyBodyPose}), the turns of the keys of a mesh with a keyboard ({@link applyKeys}),
  * and the swings of the strings of a mesh with a harp ({@link applyStrings}) (design 5.1).
  *
  * @param mesh A mesh of {@link createPlayerMesh}.
@@ -805,7 +805,7 @@ export function applyPose(mesh: SkinnedMesh, pose: AnimalPose): void {
   applyKeys(mesh, pose.keys);
   applyPedals(mesh, pose.pedals);
   applyCopies(mesh, pose.held);
-  applyStudioPose(mesh, pose);
+  applyBodyPose(mesh, pose);
   applyStrings(mesh, pose.strings);
 }
 
@@ -840,14 +840,14 @@ function uploadCorners(position: BufferAttribute, from: number, to: number): voi
  */
 function applyStrings(mesh: SkinnedMesh, swings: Float32Array | null | undefined): void {
   const own = stringMeshes.get(mesh);
-  const player = studioPlayers.get(mesh);
+  const player = bodyPlayers.get(mesh);
   if (!own || !player) {
     return;
   }
 
   const { bands, bind, position, lines, closed } = own;
   const { strings } = bands;
-  const offset = (STUDIO_BONES.length + boneIndex(strings.bone)) * 16;
+  const offset = (BODY_BONES.length + boneIndex(strings.bone)) * 16;
   const shown = updateStringBands(bands, swings, player.pose.matrices, offset);
   const out = position.array;
   if (!(out instanceof Float32Array)) {

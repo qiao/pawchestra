@@ -9,7 +9,7 @@ tools/blender/hand/<species>/params.json + base-config.json
   ->  make_config.py (uv, python -I)    ->  tools/mesh-rigs/simple/<species>-tripo.json
   ->  build.py (headless Blender)       ->  assets/models/<species>/tripo-hand/<species>.blend
   ->  pnpm rig-export <species>         ->  <species>.rig.glb + <species>.rig.json
-  ->  pnpm studio-body <species>        ->  src/models/studio/<species>.ts + studio-heights.ts
+  ->  pnpm body-module <species>        ->  src/models/bodies/<species>.ts + body-heights.ts
 ```
 
 ## Run
@@ -29,7 +29,7 @@ Blender comes from the variable `BLENDER`, or from the path.
 | File | Job |
 |---|---|
 | `params.json` | The values of the body: the point edits, the rings, the rows, the seat, the eyes, and the scale `metersPerUnit` |
-| `base-config.json` | The start of the rig config: the studio settings, the colors, and the notes |
+| `base-config.json` | The start of the rig config: the body settings, the colors, and the notes |
 | `make_config.py` | Maps the joints of the source through the point edits, and writes the rig config |
 | `build.py` | Builds the `.blend` from the source FBX file: the point edits, the rings, the armature, the weights, the bind, the eyes, and the facts |
 | `redits.py` | The point edits that `make_config.py` and `build.py` share |
@@ -37,7 +37,7 @@ Blender comes from the variable `BLENDER`, or from the path.
 | `eye-centers.json` | The eye faces of the source, for a body whose params name it in `eyeFaces` |
 | `assets/models/<species>/tripo-hand/<species>-bands.json` | Output: the band faces of the paw turns, for a body whose params name it in `bandFade`. The maps tool of the species (`tools/tripo-maps.py <species>` or `tools/<species>-maps.py`) reads it, so run that tool after the chain |
 
-The scripts also import `studio_armature.py`, `studio_eyes.py`, `bind_edit.py`, and
+The scripts also import `body_armature.py`, `body_eyes.py`, `bind_edit.py`, and
 `band_faces.py` of `tools/blender/`.
 
 ## Change a body
@@ -48,7 +48,7 @@ The scripts also import `studio_armature.py`, `studio_eyes.py`, `bind_edit.py`, 
 3. Commit the change of the chain with its outputs, and update the `README.md` of the species.
 
 Do not edit a `.blend` of a chain in Blender, because the next run of the chain writes it again.
-A run writes the `.blend` with other bytes each time. The rig file, its summary, the studio module,
+A run writes the `.blend` with other bytes each time. The rig file, its summary, the body module,
 and the rig config are the same byte for byte for the same chain.
 
 ## One copy of build.py for each species

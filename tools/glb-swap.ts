@@ -1,5 +1,5 @@
 /**
- * Runs a probe on the studio body that the export makes from another GLB file (`--glb <file>`),
+ * Runs a probe on the body that the export makes from another GLB file (`--glb <file>`),
  * with no edit of `ANIMALS` and no written module in `src/` (`docs/agents/rigging.md`, "The asset
  * chain"). The pure core keeps no state: the probe runs in a child process on
  * a copy of `src/` that holds the module of the file, as `pnpm body-probe --base` runs the probe of
@@ -13,13 +13,13 @@ import { dirname, join, relative, resolve } from 'node:path';
 
 import { SPECIES, isSpeciesId } from '../src/models/species.ts';
 import type { SpeciesId, SpeciesParams } from '../src/models/species.ts';
-import { isStudioBodyName } from '../src/models/studio-body.ts';
-import type { StudioBodyName } from '../src/models/studio-body.ts';
-import type { StudioBody } from '../src/models/studio-format.ts';
+import { isBodyName } from '../src/models/body.ts';
+import type { BodyName } from '../src/models/body.ts';
+import type { Body } from '../src/models/body-format.ts';
 import { ROOT } from './ref-tree.ts';
 import { trackChild, trackFolder } from './stop-cleanup.ts';
-import { ANIMALS, studioBody, studioModule } from './studio-body.ts';
-import type { AnimalEntry } from './studio-body.ts';
+import { ANIMALS, glbBody, bodyModule } from './body-module.ts';
+import type { AnimalEntry } from './body-module.ts';
 
 /** The paths of the working tree that the copy holds as files. */
 const COPIED = ['src', 'package.json'] as const;
@@ -79,35 +79,24 @@ export function takeGlb(args: readonly string[], cwd: string = process.cwd()): G
 }
 
 /**
- * Tells if a value of `SpeciesParams.body` names a studio body: a body of the app or a test body.
+ * Tells if a value of `SpeciesParams.body` names a body: a body of the app or a test body.
  *
  * @param body The value.
- * @returns True for a studio body (`isStudioBodyName()`).
+ * @returns True for a body (`isBodyName()`).
  */
-function isStudioBody(body: string | undefined): body is StudioBodyName {
-  return body !== undefined && isStudioBodyName(body);
+function isBody(body: string | undefined): body is BodyName {
+  return body !== undefined && isBodyName(body);
 }
 
 /**
- * Gives the animal of a studio body: its id in `ANIMALS` and the name of its module in
- * `src/models/studio/`. The body `studio-<animal>` comes from the module `studio/<animal>.ts`.
- *
- * @param body The studio body.
- * @returns The animal, such as `rabbit`.
- */
-export function studioAnimal(body: StudioBodyName): string {
-  return body.replace(/^studio-/, '');
-}
-
-/**
- * Gives the animal of the studio body of a species.
+ * Gives the animal of the body of a species.
  *
  * @param species The species.
- * @returns The animal, or `null` when the species has no studio body.
+ * @returns The animal, or `null` when the species has no body.
  */
 export function speciesAnimal(species: SpeciesId): string | null {
   const params: SpeciesParams = SPECIES[species];
-  return isStudioBody(params.body) ? studioAnimal(params.body) : null;
+  return isBody(params.body) ? params.body : null;
 }
 
 /**
@@ -162,7 +151,7 @@ export function handRigSummaryPath(animal: string): string | null {
 }
 
 /**
- * Gives the species with the studio body of an animal.
+ * Gives the species with the body of an animal.
  *
  * @param animal The animal.
  * @returns The species, in the order of `SPECIES`.
@@ -185,22 +174,22 @@ function glbSettings(animal: string, file: string): AnimalEntry {
   const known = ANIMALS.get(animal);
   if (!known) {
     throw new Error(
-      `ANIMALS of tools/studio-body.ts has no animal ${animal}. The animals are: ${[...ANIMALS.keys()].join(', ')}.`,
+      `ANIMALS of tools/body-module.ts has no animal ${animal}. The animals are: ${[...ANIMALS.keys()].join(', ')}.`,
     );
   }
   return { ...known, glb: relative(ROOT, file) };
 }
 
-/** The studio body of a GLB file, and the text of its module. */
+/** The body of a GLB file, and the text of its module. */
 interface GlbModule {
   /** The body that the export makes from the file. */
-  readonly body: StudioBody;
+  readonly body: Body;
   /** The text of the module, before the formatter of the repository. */
   readonly text: string;
 }
 
 /**
- * Makes the studio body of an animal from another GLB file, in memory, as `pnpm studio-body`
+ * Makes the body of an animal from another GLB file, in memory, as `pnpm body-module`
  * does.
  *
  * @param animal The animal of `ANIMALS`.
@@ -216,12 +205,12 @@ export function glbModule(
   bytes: Uint8Array,
   settings: AnimalEntry = glbSettings(animal, file),
 ): GlbModule {
-  const { body } = studioBody(bytes, settings.glb ?? '', settings);
-  return { body, text: studioModule(animal, settings.constant, body) };
+  const { body } = glbBody(bytes, settings.glb ?? '', settings);
+  return { body, text: bodyModule(animal, settings.constant, body) };
 }
 
 /**
- * Makes a copy of the working tree in which the studio body of an animal comes from another GLB
+ * Makes a copy of the working tree in which the body of an animal comes from another GLB
  * file, runs a work in it, and removes it. The copy holds `src/`, `package.json`, and the scripts
  * of `tools/` ({@link copiedTool}), with links to `node_modules/`
  * and `demos/`. The copy is also an empty git repository, as the probe tree of
@@ -258,7 +247,7 @@ export async function withGlbBody<T>(
       symlinkSync(join(ROOT, path), join(dir, path), 'dir');
     }
     execFileSync('git', ['init', '--quiet'], { cwd: dir, stdio: 'ignore' });
-    await writeFile(join(dir, 'src', 'models', 'studio', `${animal}.ts`), text);
+    await writeFile(join(dir, 'src', 'models', 'bodies', `${animal}.ts`), text);
     return await work(dir);
   } finally {
     await rm(dir, { recursive: true, force: true });

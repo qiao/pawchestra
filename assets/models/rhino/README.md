@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the rhino (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/rhino.ts`, which this chain writes:
+`src/models/bodies/rhino.ts`, which this chain writes:
 
 ```text
 tripo-p2/rhino.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/rhino.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export rhino    the same run
    v
 tripo-hand/rhino.rig.glb       rigged mesh, with its summary rhino.rig.json
-   │  pnpm studio-body rhino   the same run
+   │  pnpm body-module rhino   the same run
    v
-src/models/studio/rhino.ts     studio body of the app
+src/models/bodies/rhino.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -56,7 +56,7 @@ around.
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 5,353 vertices and 5,703 faces: 4,963 quads and 740 triangles, no n-gon. One UV layer |
 | Parts | 4 parts: the body with the horns and the ears (5,134 vertices), one eyeball on each side (a dome of 43 vertices, open at its rim, a sphere of radius 0.0208 units about (±0.062, 0.792, 0.100)), and the tail (133 vertices, from (0, 0.336, -0.234) down to its tuft at y 0.129). 28 open edges: the rims of the 2 eyeballs. No edge has more than two faces |
-| Box | In the studio units (1 unit from the soles to the top of the ears): x ±0.451 (the paw tips), z -0.299 (the tail) to 0.299 (the large horn). The rhino faces -y in Blender, with its left side at +x, so the import needs no turn |
+| Box | In the body units (1 unit from the soles to the top of the ears): x ±0.451 (the paw tips), z -0.299 (the tail) to 0.299 (the large horn). The rhino faces -y in Blender, with its left side at +x, so the import needs no turn |
 
 The folder `rhino.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness
 and the metallic maps are not kept.
@@ -83,13 +83,13 @@ edits of `redits.py`.
 | Item | Value |
 |---|---|
 | Size | 559,198 bytes. A new build gives the same export, but not the same `.blend` bytes |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the rhino faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the rhino faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `rhino`: 5,945 vertices and 6,243 faces (5,503 quads and 740 triangles, 11,746 triangles), flat faces, and the surface of `sa.add_surface()` with no gloss face. The 84 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/rhino/tripo-hand/rhino-color.webp`) |
 | Armature | `rhino_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.947268 (the shoulder joints at 1.611 m for each unit, so that the eyes of the standing rhino are 1.275 m above the floor, as on the rhino of `8e42c4eaa`), `crease` 180, `noseTop` 0.775, and `mouthHeight` 0.669 ("Face rows") |
 | Eyes | The eyeballs of the source, with the finish `eye` and the eye light of the app, and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/rhino/tripo-p2/rhino.fbx', 1e-5)`. No vertex
@@ -165,7 +165,7 @@ The weights, in the rest pose:
 
 **Face rows.** Bone heat gave the muzzle, the horns, and the cheeks about 0.3 of each ear bone and
 0.1 of the neck, because the long muzzle lies as far from the head bone as from the ear bones. The
-muzzle then moved with the ears, and `pnpm studio-body` found no muzzle vertex with the row `head`
+muzzle then moved with the ears, and `pnpm body-module` found no muzzle vertex with the row `head`
 1, so the tip of the nose lay at the front of the large horn, 0.9 units high. With the ear rows and
 the face rows, each vertex of the muzzle takes {`head` 1}. The fact `noseTop` puts the tip of the
 nose at the front of the muzzle under the large horn (the horn starts at y 0.79), and the fact
@@ -182,7 +182,7 @@ elephant (`../elephant/README.md`, "Arm roots"), they went 5.7 cm in, at the elb
 normal of the faces at its vertex, as the smooth shading of an FBX viewer.
 
 **Stance.** The rhino stands at its tuba in the pose of the source (`standingBody()` of
-`src/models/studio-rig.ts`). The bind keeps the legs of the source: the leg turns of the config are
+`src/models/body-rig.ts`). The bind keeps the legs of the source: the leg turns of the config are
 the turn from the source legs to the same legs (`tools/rig/leg_turns.py <config> 106.1 20.3
 -2.1`), and the trunk of the bind stands as in the source (`trunk.open` 0). The property `seat` is
 {`prop` `chair`, `front` -0.17, `back` -0.27, `halfWidth` 0.2}: a seat under the back of the

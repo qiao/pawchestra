@@ -1,6 +1,6 @@
 {
   "source": "assets/models/rabbit/tripo-p2/rabbit.fbx",
-  "sourceNote": "The fourth Tripo P2 rabbit mesh with its quads (assets/models/rabbit/README.md). The hand rig assets/models/rabbit/tripo-hand/rabbit.blend starts from it in headless Blender with the calls of tools/blender/studio_armature.py (design 4.4, \"Hand rig\").",
+  "sourceNote": "The fourth Tripo P2 rabbit mesh with its quads (assets/models/rabbit/README.md). The hand rig assets/models/rabbit/tripo-hand/rabbit.blend starts from it in headless Blender with the calls of tools/blender/body_armature.py (design 4.4, \"Hand rig\").",
   "name": "Rabbit",
   "weld": 1e-05,
   "joints": {
@@ -224,7 +224,7 @@
     -0.996,
     0.087
   ],
-  "studio": {
+  "bind": {
     "trunk": {
       "open": 4,
       "shares": {
@@ -249,7 +249,7 @@
         0.571719
       ]
     },
-    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the fox of main, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (Body.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the fox of main, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
@@ -350,7 +350,7 @@
     "points": 12,
     "reach": 1,
     "darkReach": 2,
-    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm body-module drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
   },
   "chair": {
     "halfWidth": 0.13,
@@ -362,14 +362,14 @@
     "helper": 0.03,
     "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies. Bone heat gives them their weights."
   },
-  "jointsNote": "The places are the places of the source, mapped by the paw turns of the hand rig (assets/models/rabbit/README.md). The source places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed rings of 13 vertices on the upper arm and 11 on the forearm, the axis at y 0.563, a pole band from x 0.12 to 0.194 at the elbow): the shoulder joint at x 0.07, the elbow at x 0.158, the wrist at x 0.255, where the forearm rings end and the paw starts, the knuckles at x 0.287, and the tip at x 0.322. Leg (closed rings of 15 vertices on the thigh and 14 on the shin): the hip joint at (0.06, 0.275, 0.01) in the haunch, the knee at y 0.157, where the rings of 15 meet the rings of 14, the ankle at y 0.058, and the toe tips at z 0.125. Trunk: the hips at y 0.31, the neck at y 0.595, and the head from y 0.625 to 0.81. Ears: the root at y 0.805, the tips at (0.097, 1.0, -0.025). Tail: a short bone from (0, 0.305, -0.095) back.",
+  "jointsNote": "The places are the places of the source, mapped by the paw turns of the hand rig (assets/models/rabbit/README.md). The source places are in the body units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed rings of 13 vertices on the upper arm and 11 on the forearm, the axis at y 0.563, a pole band from x 0.12 to 0.194 at the elbow): the shoulder joint at x 0.07, the elbow at x 0.158, the wrist at x 0.255, where the forearm rings end and the paw starts, the knuckles at x 0.287, and the tip at x 0.322. Leg (closed rings of 15 vertices on the thigh and 14 on the shin): the hip joint at (0.06, 0.275, 0.01) in the haunch, the knee at y 0.157, where the rings of 15 meet the rings of 14, the ankle at y 0.058, and the toe tips at z 0.125. Trunk: the hips at y 0.31, the neck at y 0.595, and the head from y 0.625 to 0.81. Ears: the root at y 0.805, the tips at (0.097, 1.0, -0.025). Tail: a short bone from (0, 0.305, -0.095) back.",
   "body": {
     "crease": 180,
     "backRoom": 0.01
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source, and a seat 1 cm deeper, so that the back keeps off the chair back.",
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/body-module.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source, and a seat 1 cm deeper, so that the back keeps off the chair back.",
   "eyeSize": 0.206644,
-  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
+  "eyeSizeNote": "The head height H of the body in units, as body-module measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
   "metersPerUnit": 1.474394,
   "metersPerUnitNote": "The scale of the app: H (0.206644 units of the source form) is 0.304675 m. At this scale, the eyes of the seated rabbit are at the height of the eyes of the third Tripo rabbit (0.947 m, assets/models/rabbit/tripo-hand/rabbit.rig.glb at 931b150dd), so the seat search of each demo reads the old eye height (design 4.2). At the H of the third rabbit (0.2985 m), the seated eyes were 0.8 cm lower. The hand rig keeps the form of the source, so only the scale of the whole body sets H. The fact height of the armature is the shoulder joints at this scale.",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/rabbit.blend holds it.",

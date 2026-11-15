@@ -26,7 +26,7 @@ import redits as ce  # noqa: E402
 import rimport  # noqa: E402
 import rings  # noqa: E402
 import tail as tl  # noqa: E402
-import studio_armature as sa  # noqa: E402
+import body_armature as sa  # noqa: E402
 
 import make_config as mc  # noqa: E402
 
@@ -41,20 +41,20 @@ def log(*a):
     print('build:', text, flush=True)
 
 
-def studio_points(me):
+def body_points(me):
     co = np.empty(len(me.vertices) * 3)
     me.vertices.foreach_get('co', co)
-    return co.reshape(-1, 3) @ sa.TO_STUDIO.T
+    return co.reshape(-1, 3) @ sa.TO_BODY.T
 
 
-def set_studio_points(me, S):
-    me.vertices.foreach_set('co', (S @ sa.TO_STUDIO).ravel())
+def set_body_points(me, S):
+    me.vertices.foreach_set('co', (S @ sa.TO_BODY).ravel())
     me.update()
 
 
 def point_edits(body):
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     # The tail of the beaver is a part of the body: its points lie behind the haunch.
     tail = tail_mask(S)
     roots = part_roots(me)
@@ -64,7 +64,7 @@ def point_edits(body):
     T = ce.map_points(
         S, dict(P, edits=[e for e in P.get('edits', []) if 'after' not in e]), tail, part
     )
-    set_studio_points(me, T)
+    set_body_points(me, T)
     log(
         'point edits',
         [e['kind'] for e in P.get('edits', [])],
@@ -94,9 +94,9 @@ def paw_size(body):
     if not edits:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     T = ce.map_points(S, dict(P, edits=edits))
-    set_studio_points(me, T)
+    set_body_points(me, T)
     move = np.linalg.norm(T - S, axis=1)
     for sign, side in ((1, 'L'), (-1, 'R')):
         moved = (move > 1e-6) & (sign * S[:, 0] > 0)
@@ -107,7 +107,7 @@ def paw_size(body):
 
 
 def limb_loops(bm, kind, sign):
-    P_ = np.array([rings.studio(v.co) for v in bm.verts])
+    P_ = np.array([rings.body(v.co) for v in bm.verts])
     if kind == 'arm':
         inside = (sign * P_[:, 0] > 0.07) & (P_[:, 1] > 0.50) & (P_[:, 1] < 0.70)
         axis = (sign, 0, 0)
@@ -183,7 +183,7 @@ def seed_rings(body):
             bm = bmesh.new()
             bm.from_mesh(me)
             bm.edges.ensure_lookup_table()
-            S = np.array([rings.studio(v.co) for v in bm.verts])
+            S = np.array([rings.body(v.co) for v in bm.verts])
             seed = np.array(spec['seed']) * (sign, 1, 1)
             best, e0 = None, None
             for e in bm.edges:
@@ -266,7 +266,7 @@ def turn_paws(body):
         # The paw: each arm vertex past ring A along the axis, on the side of the paw. Ring A
         # stays: it is slanted, so 5 of its 12 vertices lay past the mean, turned with the paw, and
         # sheared the quads before the ring into a pinched wrist with a stretched texture.
-        S = np.array([rings.studio(v.co) for v in bm.verts])
+        S = np.array([rings.body(v.co) for v in bm.verts])
         Borig = S[B].copy()
         t_a = float(np.mean((S[A] - f) @ axis))
         r = np.linalg.norm((S - f) - np.outer((S - f) @ axis, axis), axis=1)
@@ -274,7 +274,7 @@ def turn_paws(body):
         move[A] = False
         S[move] = (S[move] - f) @ R.T + f
         for i in np.nonzero(move)[0]:
-            bm.verts[i].co = Vector((S[i] @ sa.TO_STUDIO).tolist())
+            bm.verts[i].co = Vector((S[i] @ sa.TO_BODY).tolist())
         # The new quads join A[i] to the turned vertex that now lies where B[i] lay before.
         Bold = np.array([R.T @ (S[b] - f) + f for b in B])
         shift = min(
@@ -306,7 +306,7 @@ def turn_paws(body):
             w = 1 - ce.smoothstep(0.0, fade, (S[ids] - f) @ axis - t_b)
             S[ids] += w[:, None] * delta[near]
             for i in ids:
-                bm.verts[i].co = Vector((S[i] @ sa.TO_STUDIO).tolist())
+                bm.verts[i].co = Vector((S[i] @ sa.TO_BODY).tolist())
         band = bm.faces.layers.int.get('band') or bm.faces.layers.int.new('band')
         for i in range(n):
             forward, uvs = old[i]
@@ -341,7 +341,7 @@ def turn_paws(body):
 
 
 def build_rig(rm):
-    """build_armature() of studio_armature.py with a palm for each side: the palm of the config
+    """build_armature() of body_armature.py with a palm for each side: the palm of the config
     turned by the paw turn of the side about its rest forearm axis. With hingeTurn of the params,
     the elbow axis of a side turns about its bind upper arm by that angle in degrees."""
     config = CONFIG
@@ -447,7 +447,7 @@ def fold_relax(body):
     me.calc_loop_triangles()
     loose = set(loose_vertices(me))
     tris = np.array([t.vertices[:] for t in me.loop_triangles if t.vertices[0] not in loose])
-    S0 = studio_points(me)
+    S0 = body_points(me)
     S = S0.copy()
     nbr = [[] for _ in range(len(S))]
     for e in me.edges:
@@ -469,7 +469,7 @@ def fold_relax(body):
         over = n > rule['clip']
         S[over] = S0[over] + d[over] * (rule['clip'] / n[over])[:, None]
     left = fold_faces(S, tris, rule)
-    set_studio_points(me, S)
+    set_body_points(me, S)
     n = np.linalg.norm(S - S0, axis=1)
     log(
         f'fold relax: {first} fold triangles before, {len(left)} after {k + 1} rounds; {len(moved)} vertices move, '
@@ -502,7 +502,7 @@ def own_eyes(body):
         for i in comp:
             part[i] = comp[0]
     bm.free()
-    S = studio_points(me)
+    S = body_points(me)
     lo, hi = np.array(CONFIG['colors']['eyeBox'][0]), np.array(CONFIG['colors']['eyeBox'][1])
     roots = {}
     for i, r in part.items():
@@ -535,7 +535,7 @@ def own_eyes(body):
 
 def round_balls(body, eyes):
     """Pulls the hidden back of each eyeball onto the sphere of the ball: each ball vertex more
-    than ballRound degrees from the eye axis (the studio direction (0.35, 0, 0.94), x mirrored on
+    than ballRound degrees from the eye axis (the body direction (0.35, 0, 0.94), x mirrored on
     the right) and farther from the middle than the radius r of the fitted sphere moves in to r.
     The Tripo balls are not round (the back reaches 1.09 r), and the lid must lie farther from the
     middle than each ball vertex. The front of the ball, which shows, stays."""
@@ -543,7 +543,7 @@ def round_balls(body, eyes):
     if angle is None:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     moved = 0
     for sign in (1.0, -1.0):
         roots = part_roots(me)
@@ -571,7 +571,7 @@ def round_balls(body, eyes):
                 f'round balls: the {len(ids)} ball vertices of side {sign:+.0f} move onto the sphere of '
                 f'{k} r ({k * r:.5f}) about {np.round(c, 5).tolist()}'
             )
-    set_studio_points(me, S)
+    set_body_points(me, S)
     log(f'round balls: {moved} hidden ball vertices move in to the sphere of their ball')
 
 
@@ -662,11 +662,11 @@ def exact_rows(body, rig, head_ids):
       of rows.knuckle.band."""
     R = P['rows']
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     count = {'arm': 0, 'wrist': 0, 'paw': 0}
     W, K = R['wrist'], R['knuckle']
     for side, sign in (('L', 1.0), ('R', -1.0)):
-        bone = lambda n: np.array(rig.data.bones[f'{n}_{side}'].head_local) @ sa.TO_STUDIO.T
+        bone = lambda n: np.array(rig.data.bones[f'{n}_{side}'].head_local) @ sa.TO_BODY.T
         ua, fh, hh, gh = bone('upper_arm'), bone('forearm'), bone('hand'), bone('fingers')
         axis = (hh - fh) / np.linalg.norm(hh - fh)
         line = (hh - ua) / np.linalg.norm(hh - ua)
@@ -717,11 +717,11 @@ def tail_rows(body, rig):
     the tail bone and c = smoothstep(-bend, bend) of the distance along tail_tip from its head."""
     rule = P['tailRows']
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     ids = tail_vertices(me)
     bone = lambda n: (
-        np.array(rig.data.bones[n].head_local) @ sa.TO_STUDIO.T,
-        np.array(rig.data.bones[n].tail_local) @ sa.TO_STUDIO.T,
+        np.array(rig.data.bones[n].head_local) @ sa.TO_BODY.T,
+        np.array(rig.data.bones[n].tail_local) @ sa.TO_BODY.T,
     )
     th, tt = bone('tail')
     kh, kt = bone('tail_tip')
@@ -849,7 +849,7 @@ def ear_rows(body):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     names = {g.index: g.name for g in body.vertex_groups}
     # The plane goes through the points of the ear base of the source, mapped by the point edits.
     Q = ce.map_points(np.array(rule['points'], float), P)
@@ -897,7 +897,7 @@ def thicken_trunk(body):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     t = np.minimum(weights_of(body, {'hips', 'spine', 'spine1', 'chest', 'neck'}), 1.0)
     y0 = CONFIG['joints']['hips']['head'][1]
     y1 = CONFIG['joints']['neck']['head'][1]
@@ -933,7 +933,7 @@ def thicken_trunk(body):
     move[:, 0] = (fw - 1) * S[:, 0]
     move[:, 2] = (fd - 1) * (S[:, 2] - c_z)
     T = S + t[:, None] * move
-    set_studio_points(me, T)
+    set_body_points(me, T)
     log(
         'trunk: largest move',
         round(float(np.linalg.norm(T - S, axis=1).max()), 4),
@@ -1010,7 +1010,7 @@ def relax(body, rounds=10, lam=0.5, mu=-0.53, clip=0.01):
     eyeballs, the loose parts, the gloss nose, the open edges (the eye sockets), and the vertices of
     the edges of more than two faces (the lip and lid lines) stay."""
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     bm = bmesh.new()
     bm.from_mesh(me)
     bm.verts.ensure_lookup_table()
@@ -1031,7 +1031,7 @@ def relax(body, rounds=10, lam=0.5, mu=-0.53, clip=0.01):
         n = np.linalg.norm(d, axis=1)
         over = n > clip
         X[over] = S[over] + d[over] * (clip / n[over])[:, None]
-    set_studio_points(me, X)
+    set_body_points(me, X)
     n = np.linalg.norm(X - S, axis=1)
     log(
         f'relax: {rounds} Taubin rounds ({lam}, {mu}), {int(free.sum())} free vertices, largest move '
@@ -1218,7 +1218,7 @@ def brow_strips(body):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     loose = set(loose_vertices(me))
     faces = [
         p.index
@@ -1244,7 +1244,7 @@ def band_uvs(body):
     flags = np.zeros(len(me.polygons), int)
     attr.data.foreach_get('value', flags)
     if rule:
-        S = studio_points(me)
+        S = body_points(me)
         uv = me.uv_layers.active.data
         band = np.nonzero(flags)[0]
         verts = {v for f in band for v in me.polygons[f].vertices}
@@ -1272,7 +1272,7 @@ def band_uvs(body):
             side = 'L' if flags[f] == 1 else 'R'
             _, axis = ce.paw_axis(CONFIG['joints'], side)
             q = S[list(p.vertices)]
-            n = np.array(p.normal[:]) @ sa.TO_STUDIO.T
+            n = np.array(p.normal[:]) @ sa.TO_BODY.T
             a = axis - (axis @ n) * n
             a /= np.linalg.norm(a)
             b = np.cross(n, a)
@@ -1769,11 +1769,11 @@ def tail_rows_beaver(body, rig):
     tail weights to the hips, so that the haunch follows the pelvis."""
     rule = P['tailRule']
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     ids = np.nonzero(tail_mask(S))[0]
     bone = lambda n: (
-        np.array(rig.data.bones[n].head_local) @ sa.TO_STUDIO.T,
-        np.array(rig.data.bones[n].tail_local) @ sa.TO_STUDIO.T,
+        np.array(rig.data.bones[n].head_local) @ sa.TO_BODY.T,
+        np.array(rig.data.bones[n].tail_local) @ sa.TO_BODY.T,
     )
     th, tt = bone('tail')
     kh, kt = bone('tail_tip')
@@ -1810,7 +1810,7 @@ def mesh_edges(me):
 def tail_line(body):
     """The middle line of the rest tail (tail.py), the tube vertices, and their places."""
     rule = P['tailLay']
-    S = studio_points(body.data)
+    S = body_points(body.data)
     line, dist = tl.middle_line(S, mesh_edges(body.data), rule)
     tube, place = tl.tube_mask(S, line, dist, rule)
     return line, np.nonzero(tube)[0], place
@@ -1823,7 +1823,7 @@ def tail_rows(body, rig):
     hips, so that the haunch follows the pelvis."""
     rule = P['tailLay']
     line, ids, place = tail_line(body)
-    head = np.array(rig.data.bones['tail_tip'].head_local) @ sa.TO_STUDIO.T
+    head = np.array(rig.data.bones['tail_tip'].head_local) @ sa.TO_BODY.T
     bend = float(tl.line_place(head[None], line)[0][0])
     a = tl.smoothstep(*rule['rowRoot'], place[ids])
     b = tl.smoothstep(bend - rule['rowBend'], bend + rule['rowBend'], place[ids])
@@ -1866,13 +1866,13 @@ def tail_key(body, rig):
     rule = P['tailLay']
     line, ids, place = tail_line(body)
     restore = be.pose_bind(body, rig)
-    Pb = be.bind_points(body) @ sa.TO_STUDIO.T
+    Pb = be.bind_points(body) @ sa.TO_BODY.T
     pb = rig.pose.bones['hips']
     mat = np.array(pb.matrix @ rig.data.bones['hips'].matrix_local.inverted())
-    turn = sa.TO_STUDIO @ mat[:3, :3] @ sa.TO_STUDIO.T
-    root = (mat @ np.r_[line[0] @ sa.TO_STUDIO, 1.0])[:3] @ sa.TO_STUDIO.T
+    turn = sa.TO_BODY @ mat[:3, :3] @ sa.TO_BODY.T
+    root = (mat @ np.r_[line[0] @ sa.TO_BODY, 1.0])[:3] @ sa.TO_BODY.T
     new, ls, lc = tl.lay(
-        studio_points(body.data)[ids],
+        body_points(body.data)[ids],
         place[ids],
         line,
         turn,
@@ -1888,7 +1888,7 @@ def tail_key(body, rig):
         body.data.calc_loop_triangles()
         tris = np.array([t.vertices[:] for t in body.data.loop_triangles])
         out = rm['taubin'](out, tris, ids, share, rule['smooth'])
-    move = (out - Pb) @ sa.TO_STUDIO
+    move = (out - Pb) @ sa.TO_BODY
     count = be.add_bind_move(body, rig, move, 'bind_tail')
     restore()
     n = np.linalg.norm(out - Pb, axis=1)
@@ -1911,7 +1911,7 @@ def mouth_rim(body):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     hx, y0, y1, z0, z1 = rule['box']
     # The box is in the places of the source: its heights take the point edits (the longer shins
     # lift the head).
@@ -1962,12 +1962,12 @@ def smile(body):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     roots = part_roots(me)
     count = np.bincount(roots)
     part = np.where(count[roots] < 100, roots, -1)
     T = ce.smile(S, rule, dict(P, _part=part))
-    set_studio_points(me, T)
+    set_body_points(me, T)
     move = np.linalg.norm(T - S, axis=1)
     log(
         f'smile: {int((move > 1e-6).sum())} vertices move, {int(((move > 1e-6) & (part >= 0)).sum())} of loose parts, '
@@ -2042,7 +2042,7 @@ def main():
             p.material_index = 0
         log(f'nose: {len(fur)} gloss faces go to fur')
         if 'headShift' in P:
-            # The nose now counts in the head box of `pnpm studio-body`, which moves the head
+            # The nose now counts in the head box of `pnpm body-module`, which moves the head
             # center of the holds forward. The shift keeps the head center of the gloss nose, so
             # that no hold moves.
             rig['headShift'] = P['headShift']

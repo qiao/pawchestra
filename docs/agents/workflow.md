@@ -73,8 +73,8 @@ when another agent works on the repository at the same time. Then these rules ho
 - The manager merges a round with `tools/merge-worktree.sh <name>` from the main checkout. Its head
   comment gives the steps. It stops before the cherry-pick when the main checkout has an
   uncommitted edit of a file that the commits touch: wait, and run it again.
-- Never merge a conflict in a generated file by hand. The merge script writes a studio module or
-  `src/models/studio-heights.ts` again. Write a fitted table, such as `DEMO_LOUDNESS`
+- Never merge a conflict in a generated file by hand. The merge script writes a body module or
+  `src/models/body-heights.ts` again. Write a fitted table, such as `DEMO_LOUDNESS`
   (`pnpm loudness --fit --write`), again with its tool after the merge.
 - Git ignores `scratch/` and `reports/`, so `git worktree remove --force` deletes them. The merge
   script copies them first. Do the same before a remove by hand.

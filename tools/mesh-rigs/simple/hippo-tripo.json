@@ -1,6 +1,6 @@
 {
   "source": "assets/models/hippo/tripo-p2/hippo.fbx",
-  "sourceNote": "The Tripo P2 hippo mesh with its quads (assets/models/hippo/README.md). The hand rig assets/models/hippo/tripo-hand/hippo.blend starts from it in headless Blender with the calls of tools/blender/studio_armature.py (design 4.4, \"Hand rig\").",
+  "sourceNote": "The Tripo P2 hippo mesh with its quads (assets/models/hippo/README.md). The hand rig assets/models/hippo/tripo-hand/hippo.blend starts from it in headless Blender with the calls of tools/blender/body_armature.py (design 4.4, \"Hand rig\").",
   "name": "Hippo",
   "weld": 1e-05,
   "joints": {
@@ -237,7 +237,7 @@
     -0.98,
     -0.075
   ],
-  "studio": {
+  "bind": {
     "trunk": {
       "open": 1,
       "shares": {
@@ -262,7 +262,7 @@
         0.571719
       ]
     },
-    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the dog of main (tools/mesh-rigs/dog.json at cbc8db5e4), so that the elbow axes of the cello hold stay.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (Body.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the dog of main (tools/mesh-rigs/dog.json at cbc8db5e4), so that the elbow axes of the cello hold stay.",
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
@@ -376,7 +376,7 @@
     "points": 12,
     "reach": 1,
     "darkReach": 2,
-    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm body-module drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
   },
   "chair": {
     "halfWidth": 0.24,
@@ -392,9 +392,9 @@
   "body": {
     "crease": 180
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/body-module.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
   "eyeSize": 0.327308,
-  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
+  "eyeSizeNote": "The head height H of the body in units, as body-module measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
   "metersPerUnit": 1.534818,
   "metersPerUnitNote": "",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/hippo.blend holds it.",

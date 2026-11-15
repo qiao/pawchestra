@@ -3,7 +3,7 @@
 ## 4.1 Look
 
 - Low-poly shapes with flat facets and matte colors from the reference images. The fur of a
-  studio body shades smooth across the small angles between its faces and keeps its larger
+  body shades smooth across the small angles between its faces and keeps its larger
   edges. The props and the plain parts of the instruments keep flat faces. The glossy parts of
   the instruments shade soft (4.5, materials).
 - A cinematic stage light. The key light goes from the front of the stage to the back, so the
@@ -32,7 +32,7 @@ These product choices apply to each area:
 - **Natural balance.** A body that stands, or that plays with no chair, keeps its center of mass
   over the middle of its soles, where a real stance is most stable (4.4, seat).
 - **Fur by shading only.** The material has no tufts, no shells, no fins, and no hair cards. A
-  studio body with a color map gets a sheen and strand normals on its fur faces (4.5, materials).
+  body with a color map gets a sheen and strand normals on its fur faces (4.5, materials).
 
 ## 4.2 Layout
 
@@ -118,7 +118,7 @@ in a line at the back, as the Vienna Philharmonic seats them. The diagram shows 
 ## 4.3 Species
 
 Each species has one `SpeciesParams` in `SPECIES` of `models/species.ts`, and each species has a
-studio body of its own (4.4). The table gives the species of each section.
+body of its own (4.4). The table gives the species of each section.
 
 | Section             | Species                                       | Section  | Species                    |
 | ------------------- | --------------------------------------------- | -------- | -------------------------- |
@@ -146,16 +146,16 @@ studio body of its own (4.4). The table gives the species of each section.
 ```typescript
 /** The parameters of one species (`SPECIES` of `models/species.ts`). */
 interface SpeciesParams {
-  /** The head height `H` of the studio body, in meters. */
+  /** The head height `H` of the body, in meters. */
   headHeight: number;
   /** The height of the seat above the floor, in H: the length of the seated legs. */
   seatHeight: number;
   /** The fur, the belly, and the accent colors (4.5). The UI seat dots read them. */
   colors: SpeciesColors;
-  /** The studio body of the species (4.4): `'studio-rabbit'`, `'studio-fox'`, and so on. */
-  body: StudioBodyName;
-  /** Another palette of the faces of the body (`StudioBody.palettes`): the tan fox. */
-  palette?: StudioPalette;
+  /** The body of the species (4.4): `'rabbit'`, `'fox'`, and so on. */
+  body: BodyName;
+  /** Another palette of the faces of the body (`Body.palettes`): the tan fox. */
+  palette?: BodyPalette;
   /**
    * The scale of an instrument of `SCALED_INSTRUMENTS` for the species (4.6), 1 by default.
    * Also `violaScale`, `celloScale`, `bassScale`, `fluteScale`, `oboeScale`,
@@ -179,21 +179,21 @@ interface SpeciesParams {
 ```
 
 The head height `H` is the unit of the body. The head height and the seat height of a species
-come from its studio body (`StudioBody.headHeight`, `StudioBody.seatHeight`). The bear has no
-studio seat, so it uses a seat of 0.75 H. The holds of 4.6 and the pose holds of 5.3 give each
+come from its body (`Body.headHeight`, `Body.seatHeight`). The bear has no
+body seat, so it uses a seat of 0.75 H. The holds of 4.6 and the pose holds of 5.3 give each
 value that follows the body in `H`, so one hold serves the species of different sizes, and a body
 size change needs no hold edit (5.3, "Units").
 
 ## 4.4 Models
 
 Code builds the instruments and the props from low-poly shapes with vertex colors. Each species
-has a studio body: a source mesh, rigged into the studio format. The app reads only the modules
-of `src/models/studio/`, and the tools make them from the meshes:
+has a body: a source mesh, rigged into the body format. The app reads only the modules
+of `src/models/bodies/`, and the tools make them from the meshes:
 
 ```text
 source FBX + chain (tools/blender/hand/<a>/)  ->  build.py (headless Blender)  ->  <a>.blend
   ->  pnpm rig-export <a> (headless Blender)  ->  <a>.rig.glb
-  ->  pnpm studio-body <a> (no Blender)  ->  src/models/studio/<a>.ts (the app reads only this)
+  ->  pnpm body-module <a> (no Blender)  ->  src/models/bodies/<a>.ts (the app reads only this)
 ```
 
 The simple route makes the `.blend` of a new body with one script ("Simple route"), and a person
@@ -220,7 +220,7 @@ each vertex and each joint by one rule, and a run gives the same bytes again. Th
   girths of the arms and the legs, the paws, and the tail. Reason: rules that copied the old body (a
   smaller head, thinner arms) made the cat differ from its own mesh, and its paws then looked too
   large. A point edit can stretch the legs to the old seat (the edit `legs` of a chain), and the
-  leg turns of the seat (`studio.legTurns`) keep the knees of the old body. The trunk length and
+  leg turns of the seat (`bind.legTurns`) keep the knees of the old body. The trunk length and
   the trunk shape stay a product choice of the point edits. `pnpm body-shape` measures the seated
   bind: the width and the depth of the trunk at 10 heights from the seat to the neck joint, the
   girths of the limbs at their middles, the knee and the ankle gaps from the front, the distance of
@@ -246,12 +246,12 @@ each vertex and each joint by one rule, and a run gives the same bytes again. Th
 - **Intake spec.** A new mesh comes with its arms apart from the trunk and with clean quad rings,
   as the table below gives, so that the rig keeps its faces and adds only the arm segments and the
   weights.
-- **Triangle budget.** The budget of a studio body allows round forms, such as a round tube for
-  each arm (`STUDIO_TRIANGLE_BUDGET`, `STUDIO_MESH_GZIP_BUDGET` of `tools/studio-budgets.ts`).
+- **Triangle budget.** The budget of a body allows round forms, such as a round tube for
+  each arm (`BODY_TRIANGLE_BUDGET`, `BODY_MESH_GZIP_BUDGET` of `tools/body-budgets.ts`).
   The first download of 1 MB and the frame time of 9.7 stay the limits. The whole scene has no
   triangle limit of its own.
 - **Licenses.** The project author made the meshes with Meshy or Tripo on a paid plan, and holds
-  their rights. The files of `assets/models/` and `src/models/studio/` are under CC BY-NC 4.0 (the
+  their rights. The files of `assets/models/` and `src/models/bodies/` are under CC BY-NC 4.0 (the
   `README.md` of the repository), with no entry in the third-party license file (7.3).
 - **Test mannequin.** `tools/blender/mannequin.py` makes an original test body for the rig chain
   and for the Mixamo route (`assets/models/mannequin/README.md`). The preset `human` has the
@@ -270,7 +270,7 @@ each vertex and each joint by one rule, and a run gives the same bytes again. Th
 | Limb rings | Each arm and leg is a quad tube. Its rings have 16 vertices, stand at a right angle to the bone, and lie about 0.45 to 0.5 radii apart. | Short arm segments keep each turn step small, and close rings keep the faces between them from a spiral fold. A ring of fewer vertices shows a flat side when the arm twists. |
 | Joint rings | At least 3 rings within one radius of each elbow and knee, and 2 of each wrist. | The helper bone of a joint spans these rings, so that the bend spreads over several faces. |
 | Color edges | Each color edge of the texture lies on a ring or another edge, and no arm face crosses one. | Each face takes one color, so a face across a color edge gives a saw-tooth edge. |
-| Faces | Most of the triangles in quads, and at most `STUDIO_TRIANGLE_BUDGET` triangles. | A triangle stops an edge ring. The budget keeps the download and the frame time. |
+| Faces | Most of the triangles in quads, and at most `BODY_TRIANGLE_BUDGET` triangles. | A triangle stops an edge ring. The budget keeps the download and the frame time. |
 
 A GLB file holds only triangles. The glTF exporter writes the two triangles of a quad one after
 the other, so the simple route joins each such pair into a quad again (`join_quads()` of
@@ -286,8 +286,8 @@ the other, so the simple route joins each such pair into a quad again (`join_qua
 
 ### Export
 
-`pnpm studio-body <animal>` reads the rigged GLB file with no Blender and writes the module. The
-entry of the animal in `ANIMALS` of `tools/studio-body.ts` gives its settings. A hand rig holds
+`pnpm body-module <animal>` reads the rigged GLB file with no Blender and writes the module. The
+entry of the animal in `ANIMALS` of `tools/body-module.ts` gives its settings. A hand rig holds
 the facts of its body in its `.blend` ("Hand rig").
 
 - It turns the animal to face -z and scales it. It drops the props and the clips of the GLB file,
@@ -297,7 +297,7 @@ the facts of its body in its `.blend` ("Hand rig").
   hand rig with no eye objects keeps the eyes of its mesh (`eyes` is `null`): each eye bone lies at
   the middle of the sphere that fits the eye faces of its side (`ownEyesOf()`), and the app adds no
   bead eyes. Such eyes follow the head bone. A lid on each eye blinks over them
-  (`StudioBody.lids`, "Hand rig"). Each eye bends to the head surface (`eyeBend()`), so its rim
+  (`Body.lids`, "Hand rig"). Each eye bends to the head surface (`eyeBend()`), so its rim
   lies at the fur.
   `eyePush()` tests a coarse oval with no turn (`PUSH_OVAL`), so that the faces of the oval of the
   app do not move the eye places. A test of the oval of the app pushed single eyes out, and it
@@ -315,7 +315,7 @@ the facts of its body in its `.blend` ("Hand rig").
   (`headFloor`, `headCeiling`), because the holds in `H` start at the head.
 - The mouth lies `MOUTH_DROP` H below the tip of the nose. A body whose nose is far in front of its
   mouth gives the height of its mouth line (`mouthHeight`, a fact of the body), and its mouth is
-  then the front of the lips on the middle plane at that height (`mouthOf()`, `StudioBody.mouth`).
+  then the front of the lips on the middle plane at that height (`mouthOf()`, `Body.mouth`).
   The pig takes it. Reason: the rule put the pig mouth on the front of the snout disc, so the horn
   mouthpiece touched the disc in front of the lips. A real player rests the mouthpiece on the lips
   (winds 2.1, 2.2). A new mouth point moves the instrument of the bind pose, and the layout reads
@@ -329,7 +329,7 @@ the facts of its body in its `.blend` ("Hand rig").
 ### Rig file
 
 The rig file `<s>.rig.glb` (`pnpm rig-export <s>`) holds one mesh of faces with one color each,
-the skeleton of a studio body (`STUDIO_BONES`), a skin of up to four bones for each vertex, and up
+the skeleton of a body (`BODY_BONES`), a skin of up to four bones for each vertex, and up
 to `RAISE_LIMIT` corrective shapes. The rig config of a chain
 (`tools/mesh-rigs/simple/<s>-tripo.json`) gives the joints and the rules, each with a note. The
 rig file holds only the animal, so that other tools can read it, and a role-neutral body holds no
@@ -338,27 +338,27 @@ only the preview images show a chair.
 
 | Group | Config keys | Purpose |
 | --- | --- | --- |
-| Seat | `studio.legTurns`, `sit`, `studio.trunk`, `chair.front` | Bind a seated role in its pose of 5.2, with the haunch on the seat. |
-| Arms | `armSegments`, `studio.bindSupination`, `studio.bindArms`, `studio.straightArms` | Spread the roll of an arm along the arm, so the skin does not twist. |
+| Seat | `bind.legTurns`, `sit`, `bind.trunk`, `chair.front` | Bind a seated role in its pose of 5.2, with the haunch on the seat. |
+| Arms | `armSegments`, `bind.bindSupination`, `bind.bindArms`, `bind.straightArms` | Spread the roll of an arm along the arm, so the skin does not twist. |
 | Colors | `colors.tone`, `colors.dark` | Move the face colors toward the reference, and keep the black borders clean. |
 | Face | `eyeShell` | Give the bead eyes their shells. |
-| Tail | `studio.tailBind` | Lay a tail on the seat or the floor. |
+| Tail | `bind.tailBind` | Lay a tail on the seat or the floor. |
 
 **Arms.** A hold with the elbow out and level rolls the upper arm far, and the linear blend at
 the shoulder then twists the skin and squeezes the arm flat. So a body takes arm segments with a
 helper bone at the elbow and at the wrist (`armSegments`). The bind paw sets the zero of the paw twist, so
-the rig turns it toward supination where a hold supinates far (`studio.bindSupination`).
+the rig turns it toward supination where a hold supinates far (`bind.bindSupination`).
 
 **Thumb bones.** The format has a thumb bone for each paw (`THUMB_BONES`), with a close axis
-(`StudioBody.thumbAxes`). No body of the app uses them now.
+(`Body.thumbAxes`). No body of the app uses them now.
 
-**Straight bind.** A bind that bends a thick elbow or paw (`studio.bindArms`) makes the rest shape
+**Straight bind.** A bind that bends a thick elbow or paw (`bind.bindArms`) makes the rest shape
 a linear blend of that bend, with the skin on the inner side already pressed. Each pose then blends
 its own bend on top of it, and the bent wrists of the bear showed a dark slit that no weight rule
-removed. So a body can bind its arms as straight as the source (`studio.straightArms`): the skin
+removed. So a body can bind its arms as straight as the source (`bind.straightArms`): the skin
 blends one time, from the source. A straight arm has no elbow plane, so the body gives the elbow
-axis of each arm (`StudioBody.hinges`). The axis is the axis of the bent bind of
-`studio.bindArms`, so that the upper arms and the paws keep their world turns in each pose. The
+axis of each arm (`Body.hinges`). The axis is the axis of the bent bind of
+`bind.bindArms`, so that the upper arms and the paws keep their world turns in each pose. The
 inner elbow then bends further from its bind, so a `raise` shape of a bent elbow relaxes its faces.
 The linear blend of the larger bend also narrows the bent elbow, and a shape cannot widen it.
 Weights that keep the forearm and the elbow helper off the upper arm keep the elbow wide, but the
@@ -456,12 +456,12 @@ body has few shapes (`RAISE_LIMIT`), so a shape goes to the recast holds with th
 
 A body can also come from a rig that a person or an agent makes by hand in Blender, saved as
 `assets/models/<s>/tripo-hand/<s>.blend`. `pnpm rig-export <s>` (`tools/blender/export_rig.py`,
-headless Blender) reads it and writes `<s>.rig.glb` in the format of "Rig file". Thus `pnpm studio-body`,
+headless Blender) reads it and writes `<s>.rig.glb` in the format of "Rig file". Thus `pnpm body-module`,
 the app, and the gates (`arm-check`, `cast-matrix`, `pose-depth`, `close-views`) do not change.
 Reason: a rig that a program calculates again from the source on each run moves vertices that a
 rule was not written for. A fix by hand or by a point edit is local, and it shows in Blender
 before the export. A pose in Blender skins from the T-pose and the app from the bind, so
-`pnpm pose-preview` and `tools/blender/studio_preview.py` show the app pose of each moment on an
+`pnpm pose-preview` and `tools/blender/body_preview.py` show the app pose of each moment on an
 export of the open `.blend`, with the bind as its rest.
 
 Eighteen species have the hand rig of a Tripo P2 mesh (`assets/models/<s>/tripo-hand/<s>.blend`).
@@ -487,11 +487,11 @@ of the app.
 
 ```text
 source mesh  ->  edits by hand in Blender (loop edges, smoothed vertices)  ->  mesh of <s>.blend
-  ->  add_surface(..., eye_fans=False) of tools/blender/studio_armature.py (face colors, gloss nose)
-  ->  armature, weights, bind, and shape keys by hand (studio_armature.py can start them)
-  ->  eye objects (place_eyes() of tools/blender/studio_eyes.py), or eye faces of the mesh
+  ->  add_surface(..., eye_fans=False) of tools/blender/body_armature.py (face colors, gloss nose)
+  ->  armature, weights, bind, and shape keys by hand (body_armature.py can start them)
+  ->  eye objects (place_eyes() of tools/blender/body_eyes.py), or eye faces of the mesh
   ->  pnpm rig-export <s>  ->  <s>.rig.glb + <s>.rig.json (a text summary for diffs)
-  ->  pnpm studio-body <s>  ->  src/models/studio/<s>.ts
+  ->  pnpm body-module <s>  ->  src/models/bodies/<s>.ts
 ```
 
 In a rig made by hand, the mesh of the `.blend` is the source of truth, and no tool makes it
@@ -513,9 +513,9 @@ name of the first fault.
 
 Each value of a hand rig, such as the bind, the joints, the weights, the keys, the bead eyes, and
 the facts of the body, lives only in its `.blend`. The bead eyes are objects of the `.blend`, so
-that Blender shows the eyes of the app, and no rule of `pnpm studio-body` moves or sizes them. A
+that Blender shows the eyes of the app, and no rule of `pnpm body-module` moves or sizes them. A
 `.blend` with no eye objects shows the eyes of its mesh, which the color map paints. The
-facts of the body (`BODY_FACTS` of `tools/studio-body.ts`), such as the scale, the crease angle,
+facts of the body (`BODY_FACTS` of `tools/body-module.ts`), such as the scale, the crease angle,
 and the width of the chair, are custom properties of the armature, so that each fact has one
 place beside the rig that it fits. `ANIMALS` keeps only the settings of the app: the role, the
 constant, and the GLB file. A tool reads each value from the export
@@ -525,13 +525,13 @@ of its chain.
 Each Tripo body of `tripo-hand/` comes from a script chain in
 `tools/blender/hand/<s>/`: `params.json` and `base-config.json` hold its values, `make_config.py`
 writes its rig config `tools/mesh-rigs/simple/<s>-tripo.json`, and `build.py` writes its `.blend` in
-headless Blender. `pnpm hand-chain <s>` runs the chain, `rig-export`, and `studio-body`. For such a
+headless Blender. `pnpm hand-chain <s>` runs the chain, `rig-export`, and `body-body`. For such a
 body, the chain is the source of truth, and the `.blend` is an output. Reason: git keeps the
 chain, so each worktree and each later round can make the body again byte for byte.
 
 | GLB item | Hand rig |
 | --- | --- |
-| Joints and parents | The bones of the armature, in the order of `STUDIO_BONES`, with the parents of `STUDIO_PARENTS`. |
+| Joints and parents | The bones of the armature, in the order of `BODY_BONES`, with the parents of `BODY_PARENTS`. |
 | Bind nodes, inverse bind matrices | The world frames of the bones in the Action `bind`. |
 | `POSITION` | The mesh in the bind: the basis and the shape keys `bind*`, moved by the linear blend of the bones. |
 | `JOINTS_0`, `WEIGHTS_0` | The vertex groups. |
@@ -550,13 +550,13 @@ chain, so each worktree and each later round can make the body again byte for by
 | `caps`, `rim` | The boolean face attributes `cap` and `rim`. |
 | `TEXCOORD_0`, `texture` | With the custom property `texture` of the mesh object (the web copy of the color map): the active UV map, with v from the top edge. A gloss face and a face with the boolean face attribute `plain`, such as a whisker, take (-1, -1). |
 | `trunk` | Calculated: the largest turn of a trunk bone from the pose of the sheet to the bind. |
-| `headShift` | The custom property `headShift` of the armature, in the studio axes. `pnpm studio-body` adds it to the head center of the holds. A nose that goes from the slot `gloss` to the slot `fur` moves the head box forward, so the Tripo wolf, beagle, and cat set it, and no hold moves. |
-| `headFactor` | The custom property `headFactor` of the armature. A hand rig that scales the head about the neck joint by the head weights, as the Tripo beagle, sets it, and `pnpm studio-body` measures H and the head center before the factor, so no hold moves. |
+| `headShift` | The custom property `headShift` of the armature, in the body axes. `pnpm body-module` adds it to the head center of the holds. A nose that goes from the slot `gloss` to the slot `fur` moves the head box forward, so the Tripo wolf, beagle, and cat set it, and no hold moves. |
+| `headFactor` | The custom property `headFactor` of the armature. A hand rig that scales the head about the neck joint by the head weights, as the Tripo beagle, sets it, and `pnpm body-module` measures H and the head center before the factor, so no hold moves. |
 | `neckFactor`, `upperTwist` | None. The mesh holds the form, and the arm segments replace the twist bone. |
 
 The layout of the `.blend`:
 
-- **Units and axes.** One Blender unit is one unit of the studio: the T-pose source is 1 unit from
+- **Units and axes.** One Blender unit is one unit of the body: the T-pose source is 1 unit from
   the soles to the top (`load_mesh()`), with the soles at z = 0. The animal faces -Y, with its left
   side at +X. A form change in the mesh, such as longer legs, keeps the units, so that the facts
   in units, such as `headFloor`, keep their meaning. The mesh and the armature have no transform.
@@ -564,7 +564,7 @@ The layout of the `.blend`:
   for a mesh with eye faces. The export skips
   the objects of other types. The custom properties of the armature are on the armature object,
   and the export also reads them from the armature data.
-- **Armature.** The rest is the T-pose of the source. The bones are the bones of `STUDIO_BONES`
+- **Armature.** The rest is the T-pose of the source. The bones are the bones of `BODY_BONES`
   with no eye bones: the body bones, the optional `tail_tip` and `jaw`, and all or none of
   `ARM_SEGMENT_BONES`. The Z axis of each bone points to its hint, at a right angle to the bone,
   as `frame()` of `rig_mesh.py` does: up (+Z) for `root`, the feet, the toes, the tail, and the
@@ -575,12 +575,12 @@ The layout of the `.blend`:
   helpers turn by the rule of the app (`driven_turns()`): the helper keys them, and the export
   checks them.
 - **Mesh.** The material slots are `fur` and `gloss`. The mesh has no gloss faces of an eye, and
-  `pnpm studio-body` stops for a file with eye fans. The nose has gloss faces on the head bone
+  `pnpm body-module` stops for a file with eye fans. The nose has gloss faces on the head bone
   alone ("Export"), or fur faces with the color map, as on the Tripo polar bear, wolf, beagle,
   monkey, and cat. Reason: flat gloss facets in one color showed a light square in the key light
   and no painted nostrils. A mesh with no gloss face writes no gloss
   primitive. The face attribute `color` gives one color to each face. Each vertex has 1 to
-  `STUDIO_INFLUENCES` weights that add up to 1. The mesh has one Armature modifier, with no
+  `BODY_INFLUENCES` weights that add up to 1. The mesh has one Armature modifier, with no
   envelopes and no preserve volume, and no other modifier. A face can have more than three
   corners, and the export divides it as Blender does.
 - **Eyes.** Each eye object is a mesh with the bone `head` as its parent. In the bind, its origin
@@ -589,16 +589,16 @@ The layout of the `.blend`:
   eye. Both eyes have one size. The mesh of the object is a preview of the eye of the app: the
   oval of `EYE` and its light, bent to the head surface by the rule of `eyeBend()` and turned
   upright by the rule of `uprightRoll()`. The export
-  reads only the transform. `pnpm studio-body` measures the bend where the axis of the eye meets
+  reads only the transform. `pnpm body-module` measures the bend where the axis of the eye meets
   the head surface, so that an eye can stand in front of the surface, and it reports a front of
   an eye that the head covers (`eyePush()`). A mesh whose color map paints its eyes, such as the
   eyeballs of a Tripo mesh, keeps them in place of the eye objects: their faces have the face
   attribute `eye`, the fur slot, and the UVs of the source, and each of their vertices has the
   weight row `head` 1. Reason: a blink of an eye bone flattens a ball and opens its socket into
-  the head. The export refuses eye objects and eye faces in one file. `pnpm studio-body` gives
+  the head. The export refuses eye objects and eye faces in one file. `pnpm body-module` gives
   the eye faces the wet finish `eye` (`EYEBALL_FINISH`), or the `eyeFinish` of the body, and lists
-  them as `StudioBody.eyeballs`. A corner of such a face takes the mean normal of the eye faces at
-  its vertex with no crease angle (`studioNormals()`), so each ball shades smooth. Reason: the matte
+  them as `Body.eyeballs`. A corner of such a face takes the mean normal of the eye faces at
+  its vertex with no crease angle (`bodyNormals()`), so each ball shades smooth. Reason: the matte
   fur gives a painted eye no gloss, and a flat gloss face shows its facets.
 - **Eye highlight.** The eye light of the players (4.5) gives each eyeball its highlight, so the
   ball carries no catchlight mesh. A white lens on the ball was an opaque disc with a hard edge,
@@ -607,7 +607,7 @@ The layout of the `.blend`:
   ball, a little larger than the ball, with the face attribute `lid`, the fur slot, the face
   colors of the fur next to the eye, and UVs of a clean fur patch of the color map. The file
   holds the open lid, turned up into the head about its hinge axis, and each lid vertex has the
-  weight row `head` 1, so that Blender shows the head of the app. `pnpm studio-body` moves each
+  weight row `head` 1, so that Blender shows the head of the app. `pnpm body-module` moves each
   lid vertex onto the eye bone of its side, and the blink turns the eye bone about the hinge axis
   by up to the angle of `lids` (5.1). Reason: a turn about the middle keeps the lid outside the
   ball, so the ball keeps its form and the socket stays closed. The lid reaches past the dark
@@ -616,7 +616,7 @@ The layout of the `.blend`:
   toward the ball, so the moving edge shows no gap.
 - **Shape keys.** `Basis` is the T-pose source. A key `bind*`, such as `bind_sit`, is a fix of the
   bind at the weight 1, such as the haunch on the seat or a crease. A key `arm_raise_<side>`, then
-  `arm_raise_<side>2`, is a corrective shape of "Rig file", at most `STUDIO_RAISES`, in the order
+  `arm_raise_<side>2`, is a corrective shape of "Rig file", at most `BODY_RAISES`, in the order
   of the keys. A rig that comes from a GLB file can also hold the pose of the sheet as the Action
   `reference`, and the four shapes of the source as drawn keys.
 
@@ -625,9 +625,9 @@ The layout of the `.blend`:
 interface HandRigArmature {
   /** The palm hint of the left arm bones, in Blender axes. The right side mirrors it. */
   readonly palm: Vec3;
-  /** `SeatExtras` with no top, in the units and the axes of the studio. */
+  /** `SeatExtras` with no top, in the units and the axes of the body. */
   readonly seat: Omit<SeatExtras, 'top'>;
-  /** The unit elbow axes of straight bind arms, in Blender axes (`StudioBody.hinges`). */
+  /** The unit elbow axes of straight bind arms, in Blender axes (`Body.hinges`). */
   readonly hinges?: Readonly<Record<Side, Vec3>>;
   /** The height of the landmark in the app, in meters: it sets the scale. */
   readonly height: number;
@@ -651,7 +651,7 @@ interface HandRigArmature {
   readonly cueLift?: number;
 }
 
-/** An entry of the extras `ownEyes`, in the bind, in the units and the axes of the studio. */
+/** An entry of the extras `ownEyes`, in the bind, in the units and the axes of the body. */
 interface OwnEyeExtras {
   /** The middle of the sphere that fits the eyeball faces: the head of the eye bone of the side. */
   readonly middle: Vec3;
@@ -659,7 +659,7 @@ interface OwnEyeExtras {
   readonly faces: readonly number[];
 }
 
-/** The extras `lids`, in the bind, in the axes of the studio (`StudioLids` of the module). */
+/** The extras `lids`, in the bind, in the axes of the body (`BodyLids` of the module). */
 interface LidExtras {
   /** The turn of each lid from open to closed, in radians. */
   readonly angle: number;
@@ -669,7 +669,7 @@ interface LidExtras {
   readonly faces: Readonly<Record<Side, readonly number[]>>;
 }
 
-/** An entry of the extras `eyes`, in the bind, in the units and the axes of the studio. */
+/** An entry of the extras `eyes`, in the bind, in the units and the axes of the body. */
 interface EyeExtras {
   /** The middle of the eye: the head of its eye bone. */
   readonly middle: Vec3;
@@ -683,9 +683,9 @@ interface EyeExtras {
 interface HandRigRaise {
   readonly side: Side;
   readonly bone?: 'forearm' | 'hand';
-  /** `StudioRaise.turn` as w, x, y, z, in Blender axes. */
+  /** `BodyRaise.turn` as w, x, y, z, in Blender axes. */
   readonly turn: readonly [number, number, number, number];
-  /** `StudioRaise.fade`, in degrees. */
+  /** `BodyRaise.fade`, in degrees. */
   readonly fade: readonly [full: number, none: number];
 }
 ```
@@ -700,7 +700,7 @@ its rest is the bind.
 A clean quad mesh with the arms apart from the trunk, such as a Tripo mesh in a T-pose, can take
 the simple route: `tools/blender/simple_rig.py` with a config of `tools/mesh-rigs/simple/`. It
 makes no cut, no cap, no remesh, and no rebuild, so the body keeps the form of its source. It
-writes the `.blend` of a hand rig, and `pnpm rig-export` and `pnpm studio-body` follow ("Hand
+writes the `.blend` of a hand rig, and `pnpm rig-export` and `pnpm body-module` follow ("Hand
 rig"). The first Tripo P2 rabbit was a trial of this route that the app does not use. A hand rig
 of the fourth Tripo P2 rabbit (`assets/models/rabbit/tripo-p2/`) with no arm cut and no arm
 stretch (`assets/models/rabbit/tripo-hand/`) is the body of the rabbit. Its source FBX is the
@@ -753,7 +753,7 @@ covered the lap point, and the rest lifted the viola and the bow to the chest. I
 over the back edge of the seat and hangs down behind the chair between the back posts (the key
 `bind_tail`), and it does not sway. Reason: a tail on the seat beside the haunch went through the
 seat or near a back post. The large tail of the Tripo fox goes back over the back edge of the
-seat and hangs down behind the chair (`studio.tailBind`), and its rows start at the root loop of the
+seat and hangs down behind the chair (`bind.tailBind`), and its rows start at the root loop of the
 tail on the back. Reason: with rows from the bone heat, the root of the tail counted as the body, the chair grew
 deeper, and the tail went into the seat.
 A hand rig of the Tripo P2 fox (`assets/models/fox/tripo-hand/`) is the body of the red fox and the
@@ -948,7 +948,7 @@ the trunk (the intake table of "Source meshes").
 source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface())
   ->  limb factors (limbs)  ->  edge ring splits on the arms (rings.subdivide)
   ->  armature and seated bind of the config  ->  bone heat, weight smooth, roll split
-  ->  bead eyes and facts  ->  <a>.blend  ->  pnpm rig-export  ->  pnpm studio-body
+  ->  bead eyes and facts  ->  <a>.blend  ->  pnpm rig-export  ->  pnpm body-module
 ```
 
 - **Quads.** An FBX source keeps its quads, and a GLB source holds only triangles. The join of a
@@ -970,7 +970,7 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
 ### Seat
 
 - A seated role binds its mesh seated. The export puts the soles on the floor and the haunch on
-  the seat. The chair fits the body (`StudioBody.seatHeight`, `chairDepth`, `chairWidth`,
+  the seat. The chair fits the body (`Body.seatHeight`, `chairDepth`, `chairWidth`,
   `backRoom`), so the feet touch the floor. The seat is level, and it ends where the thighs leave
   it at the haunch (`chair.front`).
 - The rig writes the seat of its config into the extras of the asset (`seat`, `SeatExtras` below),
@@ -1002,14 +1002,14 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   bench. The thighs slope down at most about 25°. Reason: thighs that slope further down put the
   haunch on the front edge of the bench, and the bear looks as if it stands up. A smaller slope
   lowers the hips, and below about 25° the thighs set the seat top in place of the haunch. The
-  bench reaches back from the front edge of its fit to at least `PIANO_BENCH.studioDepth`, so the
+  bench reaches back from the front edge of its fit to at least `PIANO_BENCH.bodyDepth`, so the
   round haunch sits on the bench with a little room behind it. The deer sits on the stool of the
   harp.
 - The wider haunch of the cat sits on a wider chair (`seatWidth`), and its tail lies curled on
-  the seat around the left side of the haunch (`studio.tailCurl` of the rig config). The rabbit
+  the seat around the left side of the haunch (`bind.tailCurl` of the rig config). The rabbit
   sits with more room behind the back (`backRoom`), so that its back keeps off the chair back.
 - The Tripo rabbit of `tripo-hand/` keeps the legs of its mesh, and its chair fits them
-  (`StudioBody.seatHeight`). It sits as a real
+  (`Body.seatHeight`). It sits as a real
   violinist does: the thighs of its bind slope a little down, and the seat of its rig ends where
   the calves start to go below the thighs. So the seat carries most of each thigh, its front edge
   is a little behind the knees, and the back of the pelvis is near the chair back. Reason: with
@@ -1043,7 +1043,7 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   sit on one seat plane, and the hip joints stand about 0.3 H over the seat, as on the cat, the
   pig, and the wolf. Reason: a small knob of the source at the back of the haunch was the lowest
   point over the seat, so the seat top went under it, and the thighs and the haunch floated over
-  the seat as in a squat. The root of its tail turns up a little (`studio.tailBind`), so that the
+  the seat as in a squat. The root of its tail turns up a little (`bind.tailBind`), so that the
   tail clears the back edge of the higher seat and the feet, in place of the tail tip, stand on
   the floor. The fox thus sits a little lower, and its tail reaches a little farther back, so the
   layout (4.5) moves players in most demos.
@@ -1069,10 +1069,10 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   at its timpani. Its center of mass then lies over the middle of its soles. Its seat height is
   the height of the back of its haunch over the floor, and the app builds no chair under it.
 - A seated body that also stands as a soloist (`soloist` of `ANIMALS`) keeps the leg shapes of
-  its sheet pose (`standingBody()` of `models/studio-rig.ts`).
+  its sheet pose (`standingBody()` of `models/body-rig.ts`).
 
 ```typescript
-/** The seat of a rig in the extras of its GLB file, in the units of the studio (`studio-body.ts`). */
+/** The seat of a rig in the extras of its GLB file, in the units of the body (`body-body.ts`). */
 interface SeatExtras {
   /** The seat of the app that takes its place: `chair`, or `bench` for the piano bench. */
   readonly prop: string;
@@ -1089,15 +1089,15 @@ interface SeatExtras {
 ### Retarget and render
 
 ```text
- src/models/studio/<a>.ts: StudioBody (packed mesh, heads, palms, sheet arms)
-        | studioRig() (models/studio-rig.ts)
+ src/models/bodies/<a>.ts: Body (packed mesh, heads, palms, sheet arms)
+        | bodyRig() (models/body-rig.ts)
         v
- StudioRig: the skeleton of the player (arms straight down), the constants of the arms
+ BodyRig: the skeleton of the player (arms straight down), the constants of the arms
         |                                   |
- buildStudioBody(): the body in the         poseAt() pose of the player (5.1), each frame
+ buildBody(): the body in the         poseAt() pose of the player (5.1), each frame
  bind pose of the player, two bones of          |
  the player for each corner (footprints,        v
- hanging arms, tests)                       poseStudioBones(): the studio bones from the
+ hanging arms, tests)                       poseBodyBones(): the body bones from the
                                             bones of the player, the corrective weights
                                                 |
                                                 v
@@ -1105,17 +1105,17 @@ interface SeatExtras {
                                             targets (scene/player.ts)
 ```
 
-- **Retarget.** The app keeps its own motion (5.3, 5.4), so it drives the studio bones from the
+- **Retarget.** The app keeps its own motion (5.3, 5.4), so it drives the body bones from the
   pose of the player in each frame. The skeleton of the player has each arm straight down,
   because the pose code reads a hanging arm in the bind pose (5.2). Each paw turns toward the
   forearm up to `PAW_TURN`, because the skin bends well only near its clips. A pose can give a
   paw its own turn (`pawTurnL`, `pawTurnR`, `pawBendR`). Each shape takes its weight from the pose
   alone (`raiseWeight()`), so the rule of stateless poses holds.
 - **Render.** The fur gets smooth normals within the crease angle of the body (`crease` of
-  `ANIMALS`, `studioNormals()`). A body can take its own angle, such as 180° for a Tripo body
+  `ANIMALS`, `bodyNormals()`). A body can take its own angle, such as 180° for a Tripo body
   that shows the smooth shading of its source. The other bodies share one angle. A body can also
   blend its face colors (`colorBlend`), and no body of the app takes it. The colors hold the baked occlusion of the rig.
-- **Bind mesh.** `buildStudioBody()` gives the mesh in the bind pose of the player, with two
+- **Bind mesh.** `buildBody()` gives the mesh in the bind pose of the player, with two
   bones for each corner, for the footprints, the budgets, and the tests.
 - **Recast role.** A role tool tests a body in a role that is not its own with a recast role
   `<role>@<species>` (`recastScene()` of `pose/test-scene.ts`). The species takes the seats and
@@ -1138,7 +1138,7 @@ rule of the Mixamo files.
  PlayerClip: the rotations of BONE_NAMES and the root offset at CLIP_RATE frames a second
    | clipPoseAt() (pose/clip-pose.ts), in each frame, with no state
    v
- AnimalPose --> poseStudioBones()
+ AnimalPose --> poseBodyBones()
 ```
 
 ```typescript
@@ -1224,7 +1224,7 @@ when no light value can match the lit pixels of the reference.
   light (`SIDE_GLOW`) keeps its sides from black. The chairs are a honey wood. The music stands are
   black with a warm gray desk, because black desks were the largest shapes of some close shots.
 - **Species colors.** `SPECIES_COLORS` gives each species the fur, the belly, and the accent color.
-  A studio body keeps the face colors of its rig (4.4). The UI seat dots read the fur color, and a
+  A body keeps the face colors of its rig (4.4). The UI seat dots read the fur color, and a
   color rule of a rig can move the fur toward it. All bead eyes are black with a light. A body that
   shows the eyes of its mesh takes the eye colors of its color map (4.4, "Hand rig").
 - **Instrument colors.** `INSTRUMENT_COLORS`. The bowed strings are varnished wood with a lighter
@@ -1254,7 +1254,7 @@ of three.js in the same order, so each bit stays (`FrameSkeleton` of `scene/play
 
 | Finish    | Parts                                                     | Intent                                                                |
 | --------- | --------------------------------------------------------- | --------------------------------------------------------------------- |
-| `matte`   | Cloth, raw wood, the stage, the props, and the bodies.    | No gloss. A studio body smooths the angles below its crease angle.    |
+| `matte`   | Cloth, raw wood, the stage, the props, and the bodies.    | No gloss. A body smooths the angles below its crease angle.    |
 | `varnish` | The varnished wood of the bowed strings, the harp, the bassoon, the drums, and the xylophone. | A soft gloss.                                                         |
 | `lacquer` | The black lacquer of the piano bench, the woodwinds, and the timpani frame, and the bead eyes. | A sharp gloss.                                                        |
 | `metal`   | Brass, bronze, copper, chrome, nickel silver, and silver. | Sharp highlights, and a half metal look with the color of the metal.  |
@@ -1270,10 +1270,10 @@ of a polished finish showed almost nothing, and a full metalness looked black. W
 the brass, the copper, the lacquer, and the string varnish show the warm lamps and the lit
 stage. The fur stays matte with the factor 1.
 
-The studio bodies smooth their fur, because their many small faces showed a crumpled pattern
+The bodies smooth their fur, because their many small faces showed a crumpled pattern
 under the hard key light.
 
-A studio body can show a color map of its fur in place of its face colors (`StudioBody.texture`,
+A body can show a color map of its fur in place of its face colors (`Body.texture`,
 such as the Tripo rabbit). The module holds the image path and the texture point of each fur corner.
 A player of such a body takes a copy of the shared material with the map
 (`bodyMapMaterial()` of `scene/body-texture.ts`), and its geometry holds the points as `uv1`. The
@@ -1301,9 +1301,9 @@ source FBX. The Tripo beagle of the dog (`assets/models/dog/tripo-hand/`) does t
 (`assets/models/elephant/tripo-hand/`) with `tools/tripo-maps.py elephant`, and the Tripo fawn
 (`assets/models/deer/tripo-hand/`) with `tools/tripo-maps.py deer`.
 
-A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
+A palette of the faces can have its own color map (`BodyTexture.palettes`), such as the map of
 the tan fox. `tools/fox-maps.py` makes both maps of the fox from the source image. A species shows
-the map of its palette (`studioBodyMap()`), and a palette with no map shows its face colors. Thus
+the map of its palette (`bodyMapOf()`), and a palette with no map shows its face colors. Thus
 the tan fox never shows the red map. The red map keeps the colors of the source and adds fur
 strands (`STRANDS`, "Strand normals" below). The tan map
 moves only the orange fur of the source, by one step of the lightness and the hue (`TAN_STEP`), and
@@ -1398,7 +1398,7 @@ edges of the triangles, so such a line breaks into dashes that move with the cam
   so a rim in a back light is a soft band. The stage gets no wrap. A thin ear passes a part of the
   rim light to its side away from the lamp, with a warm tint (`EAR_GLOW`), as the skin of a real
   ear glows in a back light. The vertex shader finds the ears by the skin weights of the bones
-  `ear_L` and `ear_R`, so each studio body with ear bones gets the glow. The default camera
+  `ear_L` and `ear_R`, so each body with ear bones gets the glow. The default camera
   stands in front, so each ear stands between a rim light and the camera.
 - **Side and back-row lights** (`SIDE_LIGHT`, `BACK_ROW_LIGHT`). Weak cross lights from the
   front corners. They cast no shadow (2.6), so the key light alone casts the shadows. The
@@ -1758,7 +1758,7 @@ curved side of the piano and turns a little to the pianist.
 
 ## 4.6 Model inventory
 
-Each body is a module of `src/models/studio/` (4.4). The instruments are in
+Each body is a module of `src/models/bodies/` (4.4). The instruments are in
 `models/instruments/`.
 
 | Section    | Species         | Body file             | Support         |
@@ -2175,7 +2175,7 @@ type BoneName =
   | 'root' | 'hips' | 'spine' | 'chest' | 'neck' | 'head'
   /** Opens for the choir. */
   | 'jaw'
-  /** Scale on Y for blinks, or turn the lids of a studio body with lids. */
+  /** Scale on Y for blinks, or turn the lids of a body with lids. */
   | 'eyeL' | 'eyeR' | 'earL' | 'earR'
   /** Only if the species has a tail. */
   | 'tail1' | 'tail2'
@@ -2192,22 +2192,22 @@ type BoneName =
   | 'slide';
 ```
 
-- **Studio bones.** A studio body has a skeleton of its own: the 30 body bones, two
+- **Body bones.** A body has a skeleton of its own: the 30 body bones, two
   eye bones for the bead eyes (for the lids of a body with the eyes of its mesh), and the
-  optional bones (`OPTIONAL_STUDIO_BONES`): a tail tip (`tail_tip`), the jaw of a beak (`jaw`),
+  optional bones (`OPTIONAL_BODY_BONES`): a tail tip (`tail_tip`), the jaw of a beak (`jaw`),
   the arm segments and helpers (`ARM_SEGMENT_BONES`), the digits of a hand rig (`DIGIT_BONES`),
   and the thumbs of a fist (`THUMB_BONES`). The optional bones come after the other bones, so
-  that a new one keeps each other index. The scene gives the mesh the studio bones and the bones
-  of the player, and `poseStudioBones()` writes their matrices from the pose of the player. A
+  that a new one keeps each other index. The scene gives the mesh the body bones and the bones
+  of the player, and `poseBodyBones()` writes their matrices from the pose of the player. A
   pose also holds the twist bones of the upper arms (`UPPER_TWIST_BONES`).
 - **Arm segments.** `poseArm()` writes each segment from the turns of its arm, around the joint at
   the start of its part. The readers of the bind mesh read the upper arm or the forearm of the
-  player for them (`STUDIO_FOLLOWS`).
+  player for them (`BODY_FOLLOWS`).
 - **Digits and thumbs.** Each digit of a hand rig takes the turn of the fingers and its own bend
   around the curl axis of its paw. Each thumb of a fist takes the turn of the paw and its own bend
   about its close axis. With no bend, a digit moves as the fingers and a thumb as the paw. The
   readers of the bind mesh read the fingers or the paw of the player for them.
-- **Jaw.** The `jaw` of a studio body is a child of `head` at the hinge of the beak, and the choir
+- **Jaw.** The `jaw` of a body is a child of `head` at the hinge of the beak, and the choir
   pose opens it (5.3). A body with no jaw keeps the `jaw` of the player with no vertex on it.
 - **Arms.** Analytic two-bone IK (upper arm and forearm). `poseAt()` calculates the hand targets
   on the instrument: the bow frog, the fingerboard position of the pitch, the keys, and the

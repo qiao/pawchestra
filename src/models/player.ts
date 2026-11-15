@@ -14,8 +14,8 @@ import { boneIndex, makeSkeleton } from './rig.ts';
 import type { BoneName, Skeleton } from './rig.ts';
 import { SPECIES, instrumentScale } from './species.ts';
 import { celloPinOf } from './instruments/cello-fit.ts';
-import { studioBodyMap, studioRigOf } from './studio-body.ts';
-import type { StudioRig } from './studio-rig.ts';
+import { bodyMapOf, bodyRigOf } from './body.ts';
+import type { BodyRig } from './body-rig.ts';
 import type { SpeciesId, SpeciesParams } from './species.ts';
 import { buildInstrument } from './instruments/catalog.ts';
 import { attachInstrument } from './instruments/hold.ts';
@@ -191,12 +191,12 @@ export interface PlayerModel {
    */
   readonly copies: PieceCopies | null;
   /**
-   * The rig of the studio body (design 4.4). The scene draws the body with the skin of the
-   * studio, and `mesh` holds the body in the bind pose of the player.
+   * The rig of the body (design 4.4). The scene draws the body with the skin of the
+   * body, and `mesh` holds the body in the bind pose of the player.
    */
-  readonly studio: StudioRig;
+  readonly bodyRig: BodyRig;
   /**
-   * The color map of the studio body for the palette of the species (`studioBodyMap()`, design
+   * The color map of the body for the palette of the species (`bodyMapOf()`, design
    * 4.5), or `null` for a body that shows the colors of its faces.
    */
   readonly bodyMap: string | null;
@@ -295,7 +295,7 @@ export function* buildPlayerSteps(
     strings: placed.strings,
     pedals: placed.pedals,
     copies: placed.copies,
-    studio: studioRigOf(params.body, stance.kind === 'standing'),
-    bodyMap: studioBodyMap(params.body, params.palette),
+    bodyRig: bodyRigOf(params.body, stance.kind === 'standing'),
+    bodyMap: bodyMapOf(params.body, params.palette),
   };
 }

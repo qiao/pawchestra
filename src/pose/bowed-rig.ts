@@ -1,8 +1,8 @@
 import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import type { PlayerModel } from '../models/player.ts';
-import { pawBindOf } from '../models/studio-rig.ts';
-import type { PawBind } from '../models/studio-rig.ts';
+import { pawBindOf } from '../models/body-rig.ts';
+import type { PawBind } from '../models/body-rig.ts';
 import { boneIndex } from '../models/rig.ts';
 import type { SpeciesId } from '../models/species.ts';
 import { placePoint } from '../models/instruments/hold.ts';
@@ -125,8 +125,8 @@ export interface BowedHold {
   readonly farSideR: number;
   /**
    * The bend of the right paw off the line of its forearm while it holds the bow, in the plane of
-   * its palm, in radians (`pawBendR` of `AnimalPose`, `poseStudioBones()` of
-   * `models/studio-rig.ts`): 0 turns the paw onto the line of the forearm, as the retarget does
+   * its palm, in radians (`pawBendR` of `AnimalPose`, `poseBodyBones()` of
+   * `models/body-rig.ts`): 0 turns the paw onto the line of the forearm, as the retarget does
    * for each paw. The bend counts from the forearm, so the paw keeps its place in the world with
    * each bind of the body (design 4.4).
    */
@@ -136,7 +136,7 @@ export interface BowedHold {
    * (`turnOnStick()` of `pose/bowed.ts`). The hand turns in the plane of its palm around the
    * grip, so that the forearm keeps the angle `forearm` in that plane, in radians, with a turn of
    * at most `most` radians to each side. The retarget then turns the paw toward the forearm by one
-   * angle (`PAW_TURN` of `models/studio-rig.ts`), so that the stick keeps its place in the paw.
+   * angle (`PAW_TURN` of `models/body-rig.ts`), so that the stick keeps its place in the paw.
    * The bow keeps its place on the strings and turns in the paw, as the fingers of a player let
    * the bow turn in the hand over a stroke (design 5.3).
    */
@@ -742,7 +742,7 @@ const HANGING_BOW = {
  * 0.09 m, the right forearm goes 1.7 cm into the body (1.2 cm with 0.11 m). In pizzicato, the paw
  * plucks over the end of the fingerboard (`pluckPlace` 0), with the bow tip up and back: with the
  * pluck of the chin hold, near the bow, the right forearm goes 3.5 cm into the body. The right
- * elbow points down at the tip too: up, as in the chin hold, the skin of the studio rabbit folds at
+ * elbow points down at the tip too: up, as in the chin hold, the skin of the rabbit folds at
  * the right upper arm (`pnpm fold-probe violinist`). The left elbow points down, forward, and a
  * little out, (-0.5, -1, -0.5), so that it comes toward the middle of the body under the violin, as
  * the elbow of a real player (section 1.10): the upper arm turns 46° from the vertical to the side
@@ -1863,8 +1863,8 @@ export interface BowedRig {
   readonly armL: ArmRig;
   readonly armR: ArmRig;
   /**
-   * The bind of the left paw of the studio body, from which its twist on the forearm counts
-   * (`studioPawTwist()` of `models/studio-rig.ts`): the lift of a violin or a viola keeps the twist
+   * The bind of the left paw of the body, from which its twist on the forearm counts
+   * (`bodyPawTwist()` of `models/body-rig.ts`): the lift of a violin or a viola keeps the twist
    * between -π and π on its way.
    */
   readonly pawBindL: PawBind;
@@ -2304,7 +2304,7 @@ export function bowedRig(
     bowAlign: toQuat(setFromBasis(new Quaternion(), hairAxis, hairNormal).invert()),
     armL: armRig(model, 'L'),
     armR: armRig(model, 'R'),
-    pawBindL: pawBindOf(model.studio.arms.L),
+    pawBindL: pawBindOf(model.bodyRig.arms.L),
     restRotation: toQuat(restRotation),
     carryVia: hold.carryVia && !atSide ? toQuat(turnTo(hold.carryVia, new Quaternion())) : null,
     playShift: toVec3(playShift),

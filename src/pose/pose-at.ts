@@ -2,7 +2,7 @@ import { MathUtils, Quaternion, Vector3 } from 'three';
 
 import type { InstrumentId } from '../models/instruments/types.ts';
 import { boneIndex } from '../models/rig.ts';
-import { DIGITS } from '../models/studio-format.ts';
+import { DIGITS } from '../models/body-format.ts';
 import { X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { poseBowed } from './bowed.ts';

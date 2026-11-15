@@ -96,13 +96,13 @@ describe('fieldHashes', () => {
     expect(MESH_FIELDS.filter((field) => a[field] !== b[field])).toEqual(['colors']);
   });
 
-  it('hashes the corrective shapes and the normals of each studio body, and of no other body', () => {
+  it('hashes the corrective shapes and the normals of each body, and of no other body', () => {
     const probe = probeBodies();
     for (const [id, params] of Object.entries<SpeciesParams>(SPECIES)) {
-      const studio = params.body?.startsWith('studio-') ?? false;
+      const hasBody = params.body !== undefined;
       for (const body of Object.values(probe.species[id] ?? {})) {
-        expect(body.fields?.correctives !== undefined, id).toBe(studio);
-        expect(body.fields?.normals !== undefined, id).toBe(studio);
+        expect(body.fields?.correctives !== undefined, id).toBe(hasBody);
+        expect(body.fields?.normals !== undefined, id).toBe(hasBody);
       }
     }
     expect(probe.players['conductor/bear/baton']?.fields?.normals).toBeDefined();

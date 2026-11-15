@@ -1,6 +1,6 @@
 {
   "source": "assets/models/cat/tripo-p2/cat.fbx",
-  "sourceNote": "The fourth Tripo P2 cat mesh with its quads (assets/models/cat/README.md). The hand rig assets/models/cat/tripo-hand/cat.blend starts from it in headless Blender with the calls of tools/blender/studio_armature.py (design 4.4, \"Hand rig\").",
+  "sourceNote": "The fourth Tripo P2 cat mesh with its quads (assets/models/cat/README.md). The hand rig assets/models/cat/tripo-hand/cat.blend starts from it in headless Blender with the calls of tools/blender/body_armature.py (design 4.4, \"Hand rig\").",
   "name": "Cat",
   "weld": 1e-05,
   "joints": {
@@ -237,7 +237,7 @@
     -0.998,
     -0.039
   ],
-  "studio": {
+  "bind": {
     "trunk": {
       "open": 3,
       "shares": {
@@ -262,7 +262,7 @@
         0.571719
       ]
     },
-    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the bent bind of the violin hold, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (Body.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are the directions of the old bent bind of the bent bind of the violin hold, so that the elbow axes and the zero of the roll of the upper arm stay. The paw has no bind direction, because it keeps the turn of the upper arm.",
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
@@ -376,7 +376,7 @@
     "points": 12,
     "reach": 1,
     "darkReach": 2,
-    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm body-module drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
   },
   "chair": {
     "halfWidth": 0.15,
@@ -388,14 +388,14 @@
     "helper": 0.03,
     "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies."
   },
-  "jointsNote": "The places are the places of the source, mapped by the paw turns and the eye edit of the hand rig (assets/models/cat/README.md). The source places are in the studio units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed loops of 12 vertices from x 0.111 to 0.314, axis y 0.635): the shoulder at x 0.095, at the trunk side, the elbow at x 0.20, the wrist at x 0.31, where the paw widens, the knuckles at x 0.36, the tip at x 0.41. Leg: the hip at (0.075, 0.29, 0.045), the knee at y 0.165, the ankle at y 0.06, the toe tips at z 0.155. Trunk: the spine bones lie at about 0.4 of the depth from the back. Tail: a part of the body, from its root at (0, 0.36, -0.065) back and down to its tip at (0, 0.10, -0.20). The palm is the true palm of the source: the mean normal of the paw faces that face down (x from 0.32), (0.047, -0.998, -0.039). The paw turn of the build turns it with the paw.",
+  "jointsNote": "The places are the places of the source, mapped by the paw turns and the eye edit of the hand rig (assets/models/cat/README.md). The source places are in the body units and axes of the source pose: 1 unit from the soles to the ear tips, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Arm (closed loops of 12 vertices from x 0.111 to 0.314, axis y 0.635): the shoulder at x 0.095, at the trunk side, the elbow at x 0.20, the wrist at x 0.31, where the paw widens, the knuckles at x 0.36, the tip at x 0.41. Leg: the hip at (0.075, 0.29, 0.045), the knee at y 0.165, the ankle at y 0.06, the toe tips at z 0.155. Trunk: the spine bones lie at about 0.4 of the depth from the back. Tail: a part of the body, from its root at (0, 0.36, -0.065) back and down to its tip at (0, 0.10, -0.20). The palm is the true palm of the source: the mean normal of the paw faces that face down (x from 0.32), (0.047, -0.998, -0.039). The paw turn of the build turns it with the paw.",
   "body": {
     "crease": 180,
     "seatWidth": 0.46
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source, and the seat width 0.46 m of the cat of main.",
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/body-module.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source, and the seat width 0.46 m of the cat of main.",
   "eyeSize": 0.228622,
-  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
+  "eyeSizeNote": "The head height H of the body in units, as body-module measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
   "metersPerUnit": 1.48443,
   "metersPerUnitNote": "The scale of the app: H (0.228622 units) is 0.339381 m, the H of the cat of assets/models/cat/cat.rig.glb at cbc8db5e4 (0.339375 m).",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/cat.blend holds it.",

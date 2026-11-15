@@ -871,7 +871,7 @@ async function applyTrial(animal: string, tag: string): Promise<void> {
     putBack(`The GLB file differs from the GLB file of the trial ${tag}.`);
   }
   report('export', exported.seconds, `${shown(glb)}: the same bytes as the trial ${tag}`);
-  console.log(`Next: pnpm studio-body ${animal}, and add each call to the rows of the README.md:`);
+  console.log(`Next: pnpm body-module ${animal}, and add each call to the rows of the README.md:`);
   for (const record of chain.filter((r) => r.step)) {
     console.log(`  ${record.step} ${record.args.join(' ')}`);
   }

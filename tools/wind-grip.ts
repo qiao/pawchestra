@@ -2,7 +2,7 @@
  * Measures the contact of each paw of a woodwind player with its instrument over the sample sets
  * of the sweep of its role (design 5.3): the play, the lift, the rest, and the lowering. A gate of
  * the arms or of the depths can pass while the paws float beside the tube, so this tool measures
- * the grip itself, on the skin of the studio as the GPU poses it.
+ * the grip itself, on the skin of the body as the GPU poses it.
  *
  * For each paw and each sample, it measures:
  *
@@ -14,8 +14,8 @@
  * - `tips`: the distance from the finger tips (the corners of the paw farthest from the wrist in
  *   the bind pose) to the instrument, in cm.
  * - `drift`: the distance from the middle of the closed paw to the palm point of the hand of the
- *   player, which the IK puts on the grip, in cm. The retarget turns the paw of the studio
- *   (`PAW_TURN` of `models/studio-rig.ts`), so the paw can leave the grip.
+ *   player, which the IK puts on the grip, in cm. The retarget turns the paw of the body
+ *   (`PAW_TURN` of `models/body-rig.ts`), so the paw can leave the grip.
  * - `along`: the place of the middle of the paw along the tube from the mouthpiece, in cm, beside
  *   the place of its grip.
  * - `side`: the direction from the axis to the middle of the paw, in the axes of the chest
@@ -641,7 +641,7 @@ const TIP_ORDERS = new WeakMap<PosedSkeleton['model'], Partial<Record<Side, read
 
 /**
  * Gives the finger tips of a posed paw: the corners of the paw farthest from the wrist in the bind
- * pose, where the fingers are straight. The skin of a studio body gives most corners of the
+ * pose, where the fingers are straight. The skin of a body gives most corners of the
  * fingers the bone `hand`, so the tool reads the whole paw. A paw that closes its fingers has the
  * knuckles as its farthest corners in the pose, so the tool picks the corners in the bind pose.
  *
@@ -747,7 +747,7 @@ function pawContact(
 
   // The palm faces +x of the hand of the player on the left hand and -x on the right hand, the
   // side to which a curl moves the finger tips (`faceTube()` of `pose/winds.ts`). The retarget
-  // turns the paw of the studio only in the plane of its palm, so the normal is the same.
+  // turns the paw of the body only in the plane of its palm, so the normal is the same.
   const hand = posed.frames[boneIndex(`hand${side}`)]?.rotation ?? new Quaternion();
   const normal = new Vector3(side === 'L' ? 1 : -1, 0, 0)
     .applyQuaternion(hand)
@@ -819,7 +819,7 @@ const BIND_HANDS = new WeakMap<PosedSkeleton['model'], Partial<Record<Side, read
 /**
  * Gives the turn of the visible paw from the bind pose: the rotation that best maps the corners of
  * the `hand` bone of the bind pose onto the posed corners (Kabsch, by a polar decomposition). The
- * retarget turns the studio paw in the plane of its palm (`PAW_TURN` of `models/studio-rig.ts`),
+ * retarget turns the body paw in the plane of its palm (`PAW_TURN` of `models/body-rig.ts`),
  * so the visible paw can differ from the hand of the player. The curled fingers do not move it.
  *
  * @param posed The posed skeleton.

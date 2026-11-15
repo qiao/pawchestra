@@ -25,7 +25,7 @@ Two runs give the same bytes. The script runs Blender again with `PYTHONHASHSEED
 FBX exporter makes its ids from the string hash. The docstring of the script gives the steps.
 
 The rig file `mannequin.rig.glb` of the animal preset is a fixed file. The mesh rig route of the
-app made it, and that route is retired: commit `dffd5dc5d` removed its tools. `pnpm studio-body
+app made it, and that route is retired: commit `dffd5dc5d` removed its tools. `pnpm body-module
 mannequin` makes the module of the body from the rig file.
 
 ## Files
@@ -39,7 +39,7 @@ FBX files.
 | `mannequin-<preset>-tpose.fbx` | The mesh in a T-pose, with no skeleton | An upload to mixamo.com |
 | `mannequin-<preset>-mixamo.glb` | The T-pose mesh with the Mixamo skeleton (65 bones), weights of at most 4 bones, and the test clips | The input of the Mixamo adapter |
 | `mannequin-<preset>-mixamo.fbx` | The same as an FBX file in centimeters, with one take for each clip (`Armature\|<clip>`) | The input of the Mixamo adapter |
-| `mannequin.rig.glb` | The fixed rig of the animal preset, with its faces | The input of `pnpm studio-body mannequin` |
+| `mannequin.rig.glb` | The fixed rig of the animal preset, with its faces | The input of `pnpm body-module mannequin` |
 
 The presets:
 

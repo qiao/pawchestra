@@ -2,7 +2,7 @@ import { Color, ShaderChunk, Vector3 } from 'three';
 import type { MeshStandardMaterial, WebGLProgramParametersWithUniforms } from 'three';
 
 import { FINISH_ORDER } from '../models/mesh.ts';
-import type { StudioBody, StudioMesh } from '../models/studio-format.ts';
+import type { Body, BodyMesh } from '../models/body-format.ts';
 
 /**
  * The eye light of the players (design 4.5), as the eye light of a film set: a small lamp beside
@@ -61,7 +61,7 @@ interface EyeUniforms {
   readonly uEyeMiddle: { value: Float32Array };
 }
 
-/** The eyeballs of a studio body in its bind ({@link eyeBallsOf}). */
+/** The eyeballs of a body in its bind ({@link eyeBallsOf}). */
 interface EyeBalls {
   /** x, y, z of the unit axis of the eye on the +x side, then of the eye on the -x side. */
   readonly axes: Float32Array;
@@ -105,7 +105,7 @@ function solve4(m: number[], v: number[]): number[] {
 }
 
 /**
- * Calculates the axis and the middle of each eyeball of a studio body in its bind. The axis is the
+ * Calculates the axis and the middle of each eyeball of a body in its bind. The axis is the
  * vector area of the eyeball triangles of each side, which points along the middle of the ball
  * part. The middle is the middle of the sphere that fits the eyeball vertices of the side best
  * (least squares), as the export fits the eye bone (`own_eyes_of()` of
@@ -116,7 +116,7 @@ function solve4(m: number[], v: number[]): number[] {
  * @returns The axes and the middles.
  * @throws Error if a side has no eyeball triangles, or if its vertices fit no single sphere.
  */
-function eyeBallsOf(body: StudioBody, mesh: StudioMesh): EyeBalls {
+function eyeBallsOf(body: Body, mesh: BodyMesh): EyeBalls {
   const { positions, corners } = mesh;
   const sums = [new Vector3(), new Vector3()];
   const vertices = [new Set<number>(), new Set<number>()];
@@ -253,10 +253,10 @@ function addEyeLight(shader: WebGLProgramParametersWithUniforms, uniforms: EyeUn
 }
 
 /** The material with the eye light of each base material and body. */
-const materials = new WeakMap<MeshStandardMaterial, WeakMap<StudioBody, MeshStandardMaterial>>();
+const materials = new WeakMap<MeshStandardMaterial, WeakMap<Body, MeshStandardMaterial>>();
 
 /**
- * Gives the material of a player whose studio body has eyeballs (`StudioBody.eyeballs`, design
+ * Gives the material of a player whose body has eyeballs (`Body.eyeballs`, design
  * 4.5): a copy of its material with the eye light, made once for each material and body. The copy
  * keeps the shader patch, the program key, and the draw hook of the material, and adds
  * {@link addEyeLight}.
@@ -268,8 +268,8 @@ const materials = new WeakMap<MeshStandardMaterial, WeakMap<StudioBody, MeshStan
  */
 export function eyeLightMaterial(
   base: MeshStandardMaterial,
-  body: StudioBody,
-  mesh: StudioMesh,
+  body: Body,
+  mesh: BodyMesh,
 ): MeshStandardMaterial {
   let byBody = materials.get(base);
   if (!byBody) {

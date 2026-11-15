@@ -94,17 +94,17 @@ const DEV_LOOK_OVERRIDE: Plugin = {
 };
 
 /**
- * The plugin that gives the browser code an empty record in place of `src/models/studio-bodies.ts`
- * (design 7.2), in the dev server and in the build. Thus no page holds a studio body in its first
+ * The plugin that gives the browser code an empty record in place of `src/models/bodies.ts`
+ * (design 7.2), in the dev server and in the build. Thus no page holds a body in its first
  * download: the app loads the bodies of a piece, and the gallery loads all bodies, each module as
- * a chunk of its own (`loadStudioBodies()` of `src/app/body-loads.ts`). The tests of Vitest keep
+ * a chunk of its own (`loadBodies()` of `src/app/body-loads.ts`). The tests of Vitest keep
  * the module, as the tools in Node do.
  */
-const BROWSER_STUDIO_BODIES: Plugin = {
-  name: 'pawchestra:browser-studio-bodies',
+const BROWSER_BODIES: Plugin = {
+  name: 'pawchestra:browser-bodies',
   apply: (_config, { mode }) => mode !== 'test',
   load(id) {
-    return id.endsWith('/src/models/studio-bodies.ts') ? 'export const STUDIO_BODIES = {};' : null;
+    return id.endsWith('/src/models/bodies.ts') ? 'export const BODIES = {};' : null;
   },
 };
 
@@ -360,7 +360,7 @@ export default defineConfig({
   define: { PAWCHESTRA_ANALYTICS: JSON.stringify(ANALYTICS) },
   plugins: [
     DEV_LOOK_OVERRIDE,
-    BROWSER_STUDIO_BODIES,
+    BROWSER_BODIES,
     INDEX_VALUES,
     SITE_PAGES,
     INLINE_CSS,
@@ -373,7 +373,7 @@ export default defineConfig({
     // tools/size.ts reads the manifest to find the static imports of the entry chunk.
     manifest: true,
     // The largest chunk, `renderer`, holds three.js and the scene code: about 941 kB, or 275 kB
-    // after gzip. Each studio body is a chunk of its own (`BROWSER_STUDIO_BODIES`). The limit of
+    // after gzip. Each body is a chunk of its own (`BROWSER_BODIES`). The limit of
     // the warning of Vite is in kB before gzip, a little above that chunk. The size check of
     // design 7.2 (`pnpm size`, 1 MB after gzip) is the real limit.
     chunkSizeWarningLimit: 1000,

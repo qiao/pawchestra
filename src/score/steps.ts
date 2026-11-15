@@ -1,7 +1,7 @@
 /**
  * The value of a yield of {@link Steps}: `undefined` between two steps, `wait` before a step that
  * waits for the GPU, such as a shader program that compiles in parallel, or the promise of a load
- * that the next step needs, such as the modules of the studio bodies of a piece (design 7.2). The
+ * that the next step needs, such as the modules of the bodies of a piece (design 7.2). The
  * pure modules yield only `undefined`.
  */
 type StepYield = undefined | 'wait' | Promise<void>;

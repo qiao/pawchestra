@@ -1,7 +1,7 @@
 import { ShaderChunk, SpotLight, Vector2, Vector3 } from 'three';
 import type { Group, WebGLProgramParametersWithUniforms } from 'three';
 
-import { STUDIO_BONES } from '../models/studio-format.ts';
+import { BODY_BONES } from '../models/body-format.ts';
 import { LIGHT_NAMES, RIM_LIGHT } from './lights.ts';
 
 /** The most rim lights that the shaders take (`RIM_PLACE.count` of `models/beam.ts`). */
@@ -105,7 +105,7 @@ varying vec3 vRimLight;
  * The light of the rim lights through the thin ears of the players (design 4.5). A thin ear in a
  * back light glows warm on its side away from the lamp, because the light passes through the skin.
  * The vertex shader finds the ear by the skin weights of the bones `ear_L` and `ear_R` of the
- * studio bodies (`STUDIO_BONES`), so each body with ear bones gets the glow.
+ * bodies (`BODY_BONES`), so each body with ear bones gets the glow.
  */
 const EAR_GLOW = {
   /**
@@ -120,14 +120,14 @@ const EAR_GLOW = {
 
 /**
  * The GLSL of the skin weight of the ear bones of a vertex ({@link EAR_GLOW}), as `rimEar`. Each
- * player is a studio body, so the index of each ear bone is the same for each skeleton.
+ * player is a body, so the index of each ear bone is the same for each skeleton.
  */
 const EAR_WEIGHT = /* glsl */ `
 #ifdef USE_SKINNING
 float rimEar = dot(
   skinWeight,
-  vec4(equal(skinIndex, vec4(${STUDIO_BONES.indexOf('ear_L')}.0))) +
-    vec4(equal(skinIndex, vec4(${STUDIO_BONES.indexOf('ear_R')}.0)))
+  vec4(equal(skinIndex, vec4(${BODY_BONES.indexOf('ear_L')}.0))) +
+    vec4(equal(skinIndex, vec4(${BODY_BONES.indexOf('ear_R')}.0)))
 );
 #else
 float rimEar = 0.0;

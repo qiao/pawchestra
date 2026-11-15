@@ -990,7 +990,7 @@ interface CloseViewsArgs {
   /** The box of `--crop` of each pair, or `null` for the whole cell ({@link cropOf}). */
   readonly crop: CropBox | null;
   /**
-   * The GLB file of `--glb`, as an absolute path: the species of the role takes the studio body
+   * The GLB file of `--glb`, as an absolute path: the species of the role takes the body
    * that the export makes from the file (`tools/glb-swap.ts`). `null` keeps the body of the tree.
    */
   readonly glb: string | null;
@@ -1363,7 +1363,7 @@ export function closeViewsArgs(args: readonly string[]): CloseViewsArgs | null {
  * for the play frames (`--set`).
  */
 interface SiteVariant {
-  /** The module of the studio body of the GLB file: its path and its text, or `null`. */
+  /** The module of the body of the GLB file: its path and its text, or `null`. */
   readonly body: { readonly path: string; readonly text: string } | null;
   /**
    * The hold changes of each `--set`, or `null` for none. With more than one, the page applies
@@ -1388,7 +1388,7 @@ const APP_ENTRY = join(ROOT, 'src', 'main.ts');
 
 /**
  * Checks the variant of `--glb` and `--set` of the close views of a role, and makes it: the
- * module of the studio body of the GLB file, as `pnpm fold-probe --glb` makes it. A recast role
+ * module of the body of the GLB file, as `pnpm fold-probe --glb` makes it. A recast role
  * also takes the scale of the size rule of its instrument, as the cast matrix gives it
  * (`recastChanges()` of `tools/recast-scale.ts`). The build of `--base` keeps the scale of its
  * commit.
@@ -1396,7 +1396,7 @@ const APP_ENTRY = join(ROOT, 'src', 'main.ts');
  * @param args The command line.
  * @param check True to only check the variant, with no export of the GLB file.
  * @returns The variant, or `null` with no change or with `check`.
- * @throws Error if a hold change does not fit, if the species of the role has no studio body, or
+ * @throws Error if a hold change does not fit, if the species of the role has no body, or
  *   if the GLB file does not exist.
  */
 async function siteVariant(args: CloseViewsArgs, check: boolean): Promise<SiteVariant | null> {
@@ -1411,7 +1411,7 @@ async function siteVariant(args: CloseViewsArgs, check: boolean): Promise<SiteVa
   const { species } = viewsOf(args);
   const animal = speciesAnimal(species);
   if (args.glb && !animal) {
-    throw new Error(`The ${species} of the role ${roleName(args)} has no studio body for --glb.`);
+    throw new Error(`The ${species} of the role ${roleName(args)} has no body for --glb.`);
   }
   if (args.glb && !existsSync(args.glb)) {
     throw new Error(`The GLB file ${args.glb} does not exist.`);
@@ -1427,9 +1427,9 @@ async function siteVariant(args: CloseViewsArgs, check: boolean): Promise<SiteVa
     return { body: null, holds: holds === null ? null : [holds], entry: GALLERY_ENTRY };
   }
   const { text } = glbModule(animal, args.glb, new Uint8Array(await readFile(args.glb)));
-  console.log(`The ${species} of the working tree takes the studio body of ${args.glb}.`);
+  console.log(`The ${species} of the working tree takes the body of ${args.glb}.`);
   return {
-    body: { path: join(ROOT, 'src', 'models', 'studio', `${animal}.ts`), text },
+    body: { path: join(ROOT, 'src', 'models', 'bodies', `${animal}.ts`), text },
     holds: holds === null ? null : [holds],
     entry: GALLERY_ENTRY,
   };
@@ -1463,7 +1463,7 @@ async function batchVariant(parts: readonly SingleMode[]): Promise<SiteVariant |
 }
 
 /**
- * Gives the plugin of the build of a variant: the module of the studio body of the GLB file in
+ * Gives the plugin of the build of a variant: the module of the body of the GLB file in
  * place of the module of the tree, and a first import of the entry of the page that applies the
  * hold changes with `setHolds()` before the other modules of the page run, as the hold tools
  * change the holds in memory. A build of more than one variant of `--set` applies the changes

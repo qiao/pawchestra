@@ -13,12 +13,12 @@
  * ({@link supinationChange}), with no new rig. The value is the supination of now plus the change.
  * The supination of now comes from `--from` for a GLB file rigged with another value, else from
  * the export summary of a hand rig (`bindSupination` of `<file>.json` beside the GLB file, or
- * `--summary`), else from `studio.bindSupination` of the rig config of the animal. A hand rig keeps
+ * `--summary`), else from `bind.bindSupination` of the rig config of the animal. A hand rig keeps
  * its values only in its `.blend`, so the last line then says to key the values in its Action
  * `bind`.
  *
  * The JSON of each pair goes into a cache by tree (`treeCacheFile()` of `tools/ref-tree.ts`). With
- * `--glb <file>`, the tool runs again in a copy of `src/` with the studio body of the file
+ * `--glb <file>`, the tool runs again in a copy of `src/` with the body of the file
  * (`tools/glb-swap.ts`), with no cache.
  *
  * Usage: pnpm bind-supination <species> [--glb <file>] [--from <L>,<R>] [--summary <file>] [--jobs <n>]
@@ -40,7 +40,7 @@ import {
   withGlbBody,
 } from './glb-swap.ts';
 import { probeDemos } from './probe-demos.ts';
-import { ANIMALS } from './studio-body.ts';
+import { ANIMALS } from './body-module.ts';
 import {
   PROBE_NO_CACHE,
   ROOT,
@@ -51,7 +51,7 @@ import {
 } from './ref-tree.ts';
 import { isSpeciesId } from '../src/models/species.ts';
 import type { SpeciesId } from '../src/models/species.ts';
-import type { Side } from '../src/models/studio-format.ts';
+import type { Side } from '../src/models/body-format.ts';
 
 /** The sides of the arms. */
 const SIDES = ['L', 'R'] as const;
@@ -251,10 +251,10 @@ async function measureRolls(species: SpeciesId, role: string): Promise<RollJson>
   const demos = (await probeDemos()).filter((file) => file.file === demo);
   const lists = (): Record<SampleSet, number[]> => ({ rest: [], play: [], lift: [] });
   const rolls: Record<Side, Record<SampleSet, number[]>> = { L: lists(), R: lists() };
-  probeFolds(source, demos, CAST_SAMPLE.step, (rig, studio, posed, folded, set) => {
+  probeFolds(source, demos, CAST_SAMPLE.step, (rig, bodyPose, posed, folded, set) => {
     const arms = armBinds(rig);
     for (const side of SIDES) {
-      rolls[side][set].push(measureArm(arms[side], studio.matrices, posed, folded, null).pawRoll);
+      rolls[side][set].push(measureArm(arms[side], bodyPose.matrices, posed, folded, null).pawRoll);
     }
   });
   return { version: ROLL_FORMAT, species, role, name, demo, rolls };
@@ -443,7 +443,7 @@ async function main(): Promise<number> {
   if (glb) {
     const animal = speciesAnimal(species);
     if (animal === null) {
-      throw new Error(`The ${species} has no studio body and no rig config for --glb.`);
+      throw new Error(`The ${species} has no body and no rig config for --glb.`);
     }
     // The empty git repository of the copy has no index to key a cache on.
     const env = { ...process.env, [PROBE_NO_CACHE]: '1' };
@@ -504,7 +504,7 @@ async function main(): Promise<number> {
       ),
       '',
       handRig === null
-        ? `studio.bindSupination: { "L": ${value('L')}, "R": ${value('R')} }`
+        ? `bind.bindSupination: { "L": ${value('L')}, "R": ${value('R')} }`
         : `Key the values in the Action bind of ${handRig}: { "L": ${value('L')}, "R": ${value('R')} }`,
     ].join('\n'),
   );

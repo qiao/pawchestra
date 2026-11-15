@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the mouse (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/mouse.ts`, which this chain writes:
+`src/models/bodies/mouse.ts`, which this chain writes:
 
 ```text
 tripo-p2/mouse.fbx              source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/mouse.blend          hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export mouse     the same run
    v
 tripo-hand/mouse.rig.glb        rigged mesh, with its summary mouse.rig.json
-   │  pnpm studio-body mouse    the same run
+   │  pnpm body-module mouse    the same run
    v
-src/models/studio/mouse.ts      studio body of the app
+src/models/bodies/mouse.ts      body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -31,7 +31,7 @@ by one build script in a headless Blender 5.2. The chain is a copy of the chain 
 The source FBX is the target of the look: the body keeps the form, the colors, the eye paint, and
 the eyes of the source, with a crease angle of 180° and only a scale to H. The arms keep the length
 of the source: no cut, no split from the trunk, and no stretch. The `ANIMALS` entry of the mouse in
-`tools/studio-body.ts` points to `tripo-hand/mouse.rig.glb`.
+`tools/body-module.ts` points to `tripo-hand/mouse.rig.glb`.
 
 | File | Origin | Rebuild |
 |---|---|---|
@@ -55,7 +55,7 @@ which goes down behind the legs and lies on the floor behind the mouse.
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,260 vertices and 3,411 faces: 2,938 quads and 473 triangles, no n-gon. One UV layer |
 | Parts | 11 parts: the body with the tail (3,030 vertices), an eyeball of 66 vertices in an open socket on each side, and 8 whisker strips of 12 or 13 vertices. 162 open edges in 18 loops, and one edge with more than two faces |
-| Box | In the studio units (1 unit from the soles to the top of the ears): x ±0.418 (the paw tips), z -0.336 (the tail tip) to 0.336 (the nose). The mouse faces -y in Blender, with its left side at +x, so the import needs no turn |
+| Box | In the body units (1 unit from the soles to the top of the ears): x ±0.418 (the paw tips), z -0.336 (the tail tip) to 0.336 (the nose). The mouse faces -y in Blender, with its left side at +x, so the import needs no turn |
 
 The folder `mouse.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness and
 the metallic maps are not kept. The FBX file names the maps of the zip file, so an import of the
@@ -81,13 +81,13 @@ The hand rig (design 4.4, "Hand rig"). The chain of the body is in `tools/blende
 
 | Item | Value |
 |---|---|
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the mouse faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the top of the ears, the soles at z = 0, the mouse faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `mouse`: 3,720 vertices and 3,819 faces (3,346 quads and 473 triangles, 7,165 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 45 faces of the nose take the slot `fur` and the color map. The 134 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids the face attribute `lid`, and the 50 faces of the whiskers the face attribute `plain`. The UV map of the FBX, and the property `texture` (`assets/models/mouse/tripo-hand/mouse-color.webp`) |
 | Armature | `mouse_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.507275 (the shoulder joints at 0.841252 m for each unit, so that H is 0.221512 m and the lower eye of the standing mouse is 0.688 m high, as on the mouse of `7fa9d1e89`), `crease` 180 |
 | Eyes | The eyeballs of the source in their sockets, with the finish `eye` and the eye light of the app, and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/mouse/tripo-p2/mouse.fbx', 1e-5)`. No vertex merges,
@@ -144,9 +144,9 @@ source. The crease angle 180 gives each corner the mean normal of the faces at i
 smooth shading of an FBX viewer.
 
 **Stance and seat.** The mouse has no chair (`noChair`, design 4.4). Its bind keeps the legs, the
-trunk, and the tail of the source: the leg turns are none (`studio.legTurns`), the trunk takes no
-recline (`studio.trunk.open` 0), and the tail bones keep the directions of the source
-(`studio.tailBind`). Thus it stands on its legs as in the source, with the feet flat on the floor
+trunk, and the tail of the source: the leg turns are none (`bind.legTurns`), the trunk takes no
+recline (`bind.trunk.open` 0), and the tail bones keep the directions of the source
+(`bind.tailBind`). Thus it stands on its legs as in the source, with the feet flat on the floor
 and the tail on the floor behind it. The property `seat` is {`prop` `chair`, `front` 0.015, `back`
 -0.1, `halfWidth` 0.045}: the seat lies between the legs, behind the shins and the feet, and its
 top is the crotch, at 0.119 units. The seat height of the app is 0.100 m (0.076 m on the mouse of

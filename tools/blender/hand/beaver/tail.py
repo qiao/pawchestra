@@ -1,4 +1,4 @@
-"""The tail of the Tripo cat as a tube along a middle line, in the studio axes (pure numpy).
+"""The tail of the Tripo cat as a tube along a middle line, in the body axes (pure numpy).
 
 The source tail of the third cat leaves the back at y 0.36 (before the longer shins), hangs down behind the legs,
 and its end hooks back. The middle line comes from the edge distance from the tip vertex: the

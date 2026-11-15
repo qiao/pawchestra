@@ -130,5 +130,5 @@ active voice, the present tense, and one term for one thing. Do not use em dashe
 ## Licenses of a contribution
 
 The code is under the [Apache License 2.0](LICENSE). The animal models in `assets/models/` and
-`src/models/studio/` are under [CC BY-NC 4.0](assets/models/LICENSE). A contribution to an area
+`src/models/bodies/` are under [CC BY-NC 4.0](assets/models/LICENSE). A contribution to an area
 uses the license of that area.

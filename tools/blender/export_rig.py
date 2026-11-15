@@ -1,17 +1,17 @@
-"""Exports the hand rig of a studio body into the GLB format of a studio body (design 4.4).
+"""Exports the hand rig of a body into the GLB format of a body (design 4.4).
 
     blender -b --factory-startup --python tools/blender/export_rig.py -- <animal> \
         [--blend <file.blend>] [--out <file.glb>]
 
 `pnpm rig-export <animal>` runs it on `assets/models/<animal>/tripo-hand/<animal>.blend`, and writes
-`<animal>.rig.glb` and `<animal>.rig.json` (a text summary for diffs) next to it. `pnpm studio-body`
+`<animal>.rig.glb` and `<animal>.rig.json` (a text summary for diffs) next to it. `pnpm body-module`
 reads the GLB file. The script checks the layout of design 4.4 and stops at the first fault with its
 name. Then it bakes the bind: the rest of the file is the basis with the keys `bind*`, moved by the
 linear blend of the bones in the Action `bind`, and the move of each key `arm_raise_*` is its move
 in the bind. The bake must match the mesh that Blender evaluates within `LIMIT`. The measures use
 the functions of `rig_mesh.py`: the shapes of the source (`correctives()`, `split_shapes()`), the
 seat top (`seat_masks()`), and the rule of the arm segments (`driven_turns()`). The eye objects
-`eye_L` and `eye_R` (`studio_eyes.py`) give the middle, the direction, and the size of each bead eye
+`eye_L` and `eye_R` (`body_eyes.py`) give the middle, the direction, and the size of each bead eye
 in the bind (`eyes_of()`). A file with no eye objects shows the eyes of its mesh: the faces with the
 face attribute `eye` give the middle of each eye in the bind (`own_eyes_of()`) and the triangles of
 each eye, and the app adds no bead eyes. Such a file can have lids: the faces with the face
@@ -31,8 +31,8 @@ import bpy
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import studio_armature as sa  # noqa: E402
-import studio_eyes as se  # noqa: E402
+import body_armature as sa  # noqa: E402
+import body_eyes as se  # noqa: E402
 
 #: The largest gap of the bake from the mesh that Blender evaluates, in units.
 LIMIT = 1e-5
@@ -49,7 +49,7 @@ ROLL_LIMIT = math.radians(0.5)
 EYE_DECIMALS = 9
 
 #: The facts of the body that the armature holds as custom properties, under the names of the
-#: settings of `ANIMALS` of `tools/studio-body.ts` (`BODY_FACTS`), with their units there. The
+#: settings of `ANIMALS` of `tools/body-module.ts` (`BODY_FACTS`), with their units there. The
 #: first two are required.
 BODY_FACTS = (
     'height',
@@ -176,7 +176,7 @@ def read_weights(body, rig, bones, most):
     for g in body.vertex_groups:
         need(
             g.name in bones and rig.data.bones[g.name].use_deform,
-            f'The vertex group {g.name} is no deform bone of the studio.',
+            f'The vertex group {g.name} is no deform bone of the body.',
         )
         index[g.index] = bones.index(g.name)
     w = np.zeros((len(body.data.vertices), len(bones)))
@@ -276,20 +276,20 @@ def evaluated(body, values):
 
 
 def frames_of(worlds, bones):
-    """Gives the frame and the head of each bone in the axes of the studio, after a check that the
+    """Gives the frame and the head of each bone in the axes of the body, after a check that the
     frame turns with no scale."""
     out = {}
     for b in bones:
-        f = sa.TO_STUDIO @ worlds[b][:3, :3]
+        f = sa.TO_BODY @ worlds[b][:3, :3]
         need(np.abs(f.T @ f - np.eye(3)).max() < FRAME_LIMIT, f'The bone {b} scales or shears.')
-        out[b] = (f, sa.TO_STUDIO @ worlds[b][:3, 3])
+        out[b] = (f, sa.TO_BODY @ worlds[b][:3, 3])
     return out
 
 
 def eyes_of(rig, eyes, bind):
     """Gives the middle, the unit direction, and the size of each eye object in the bind, in the
-    units and the axes of the studio, after a check that the object has an even scale and that its
-    Y axis points up along the plane of the eye (`studio_eyes.fit_eyes()`)."""
+    units and the axes of the body, after a check that the object has an even scale and that its
+    Y axis points up along the plane of the eye (`body_eyes.fit_eyes()`)."""
     out = {}
     for side, eye in eyes.items():
         world = se.eye_world(rig, eye, bind)
@@ -306,13 +306,13 @@ def eyes_of(rig, eyes, bind):
         need(
             roll <= ROLL_LIMIT,
             f'The Y axis of {eye.name} is {math.degrees(roll):.2f} degrees off up. Run '
-            'studio_eyes.fit_eyes().',
+            'body_eyes.fit_eyes().',
         )
-        middle = sa.TO_STUDIO @ world[:3, 3]
+        middle = sa.TO_BODY @ world[:3, 3]
         need(middle[0] * (1 if side == 'L' else -1) > 0, f'{eye.name} is on the wrong side.')
         out[side] = {
             'middle': [round(float(x), EYE_DECIMALS) + 0.0 for x in middle],
-            'direction': [round(float(x), EYE_DECIMALS) + 0.0 for x in sa.TO_STUDIO @ frame[:, 2]],
+            'direction': [round(float(x), EYE_DECIMALS) + 0.0 for x in sa.TO_BODY @ frame[:, 2]],
             'size': round(size, EYE_DECIMALS),
         }
     return out
@@ -326,7 +326,7 @@ def ball_middle(points):
 
 def own_eyes_of(me, points, head):
     """Gives the middle of each eye of the mesh in the bind, in the units and the axes of the
-    studio: the middle of the sphere that fits the vertices of the eyeball faces on each side. An
+    body: the middle of the sphere that fits the vertices of the eyeball faces on each side. An
     eyeball face has the face attribute `eye` and no `plain`. An eye face with `plain` keeps
     its face color and no texture, and the fit skips it. The eye bone of the app lies at
     the middle, and a lid turns about it. Each vertex of an eye must follow only the head bone
@@ -350,7 +350,7 @@ def own_eyes_of(me, points, head):
 
 
 def lids_of(rig, me, points, head, eyes, turn):
-    """Gives the lids of the eyes of the mesh in the bind, in the axes of the studio: the turn from
+    """Gives the lids of the eyes of the mesh in the bind, in the axes of the body: the turn from
     open to closed (radians) and the unit hinge axis of each side. The custom property `lids` of
     the armature holds the angle and the axis of each side in the rest of the file: {'angle', 'L',
     'R'}. `turn` is the turn of the head bone from the rest to the bind. Each vertex of a face with
@@ -385,7 +385,7 @@ def lids_of(rig, me, points, head, eyes, turn):
             points[sorted(v for v in ball if points[v][0] * sign > 0)] - middle, axis=1
         )
         need(near > far.max(), f'The lid {side} comes nearer to the middle than its eyeball.')
-        axis = sa.TO_STUDIO @ (turn @ np.array(lids[side], float))
+        axis = sa.TO_BODY @ (turn @ np.array(lids[side], float))
         need(abs(np.linalg.norm(axis) - 1) < 1e-3, f'The lid axis {side} is not a unit vector.')
         out['axes'][side] = [round(float(x), 6) + 0.0 for x in axis / np.linalg.norm(axis)]
     return out
@@ -428,7 +428,7 @@ def extras_of(rig, me, rm, bones, points, w, turns, raises):
         extras['raise'] = []
         for name, (props, _) in raises.items():
             q = props['turn']
-            turn = [*(sa.TO_STUDIO @ np.array(q[1:], float)), q[0]]
+            turn = [*(sa.TO_BODY @ np.array(q[1:], float)), q[0]]
             entry = {
                 'side': props['side'],
                 'turn': [round(float(x), 6) + 0.0 for x in turn],
@@ -440,25 +440,25 @@ def extras_of(rig, me, rm, bones, points, w, turns, raises):
     hinges = sa.rig_property(rig, 'hinges')
     if hinges is not None:
         extras['hinges'] = {
-            s: [round(float(x), 6) + 0.0 for x in sa.TO_STUDIO @ np.array(hinges[s], float)]
+            s: [round(float(x), 6) + 0.0 for x in sa.TO_BODY @ np.array(hinges[s], float)]
             for s in 'LR'
         }
     shift = sa.rig_property(rig, 'headShift')
     if shift is not None:
-        # `pnpm studio-body` adds the shift to the head center of the holds
-        # (`StudioBody.headCenter`). A rig sets it when a change of the surface moves the head box
+        # `pnpm body-module` adds the shift to the head center of the holds
+        # (`Body.headCenter`). A rig sets it when a change of the surface moves the head box
         # but not the head, for example a nose that goes from the slot gloss to the slot fur.
         need(
             isinstance(shift, list)
             and len(shift) == 3
             and all(isinstance(x, (int, float)) and math.isfinite(x) for x in shift),
-            'The property headShift of the armature is not three numbers in the studio axes.',
+            'The property headShift of the armature is not three numbers in the body axes.',
         )
         extras['headShift'] = [float(x) + 0.0 for x in shift]
     factor = sa.rig_property(rig, 'headFactor')
     if factor is not None:
         # A hand rig that scales the head about the neck joint by the head weights. `pnpm
-        # studio-body` measures H and the head center before the factor.
+        # body-module` measures H and the head center before the factor.
         need(
             isinstance(factor, (int, float)) and math.isfinite(factor) and factor > 0,
             'The property headFactor of the armature is not a positive number.',
@@ -530,7 +530,7 @@ def bind_supination(rm, turns, heads):
     """Gives the bind supination of each paw in degrees, by the definition of `paw_supination()` of
     `rig_mesh.py`: the twist of the bind paw from the bind forearm about the forearm, from the
     elbow to the wrist, toward supination. `turns` and `heads` are the world turns from the pose of
-    the sheet to the bind and the heads of the sheet, in the axes of the studio."""
+    the sheet to the bind and the heads of the sheet, in the axes of the body."""
     out = {}
     for side, sign in (('L', -1.0), ('R', 1.0)):
         fore, hand = turns[f'forearm_{side}'], turns[f'hand_{side}']
@@ -570,7 +570,7 @@ def main():
     bpy.ops.wm.open_mainfile(filepath=os.path.abspath(blend))
     rig, body, eyes = objects()
     rm = sa.rig_mesh_lib()
-    order = sa.studio_order(rm)
+    order = sa.body_order(rm)
     bones = [b for b in order if b in rig.data.bones]
     rm['BONES'] = tuple(bones)
     check_rig(rig, body, rm, bones, order)
@@ -579,15 +579,15 @@ def main():
     action = bpy.data.actions['bind']
     sheet, bind = sa.sheet_worlds(rig), sa.action_worlds(rig, action)
     for b in bones:
-        z, y = sa.TO_STUDIO @ sheet[b][:3, 2], sa.TO_STUDIO @ sheet[b][:3, 1]
-        aim = sa.TO_STUDIO @ sa.hint(rig, b)
+        z, y = sa.TO_BODY @ sheet[b][:3, 2], sa.TO_BODY @ sheet[b][:3, 1]
+        aim = sa.TO_BODY @ sa.hint(rig, b)
         aim = (aim - (aim @ y) * y) / np.linalg.norm(aim - (aim @ y) * y)
         roll = math.atan2(np.linalg.norm(np.cross(z, aim)), z @ aim)
         need(
             roll <= ROLL_LIMIT, f'The roll of {b} is {math.degrees(roll):.2f} degrees off its hint.'
         )
     driven = sa.driven_segments(rig, rm, bind, sheet)
-    turns, sheet_heads = sa.studio_turns(bind, sheet)
+    turns, sheet_heads = sa.body_turns(bind, sheet)
     for b, t in driven.items():
         x, y, z, q = rm['matrix_quat'](t.T @ turns[b])
         gap = 2 * math.atan2(math.hypot(x, y, z), q)
@@ -621,19 +621,19 @@ def main():
         need(gap <= LIMIT, f'The move of the key {n} is {gap} u off the move in Blender.')
 
     # The shapes of the source: drawn, or the moves that give the source back in the sheet.
-    points = placed @ sa.TO_STUDIO.T
+    points = placed @ sa.TO_BODY.T
     frames, sheet_frames = frames_of(bind, bones), frames_of(sheet, bones)
     heads = {b: frames[b][1] for b in bones}
     if drawn:
-        source = {n: moves[n] @ sa.TO_STUDIO.T for n in rm['SHAPES']}
+        source = {n: moves[n] @ sa.TO_BODY.T for n in rm['SHAPES']}
     else:
-        src = skin_points(wn, skin_matrices(basis, sheet, bones, rig), basis) @ sa.TO_STUDIO.T
+        src = skin_points(wn, skin_matrices(basis, sheet, bones, rig), basis) @ sa.TO_BODY.T
         back = rm['clip_turns'](turns, heads)
         found, _, _ = rm['correctives'](
             src, points, wn, back, {b: sheet_frames[b][1] for b in bones}, heads
         )
         source = rm['split_shapes'](found, wn, points)
-    shapes = {**source, **{n: moves[n] @ sa.TO_STUDIO.T for n in raises}}
+    shapes = {**source, **{n: moves[n] @ sa.TO_BODY.T for n in raises}}
     extras = extras_of(rig, body.data, rm, bones, points, wn, turns, raises)
     if eyes:
         need(

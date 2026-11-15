@@ -35,16 +35,16 @@ import { roleDemos } from './pose-depth.ts';
 import { optionValue, probeBeside, shortHash, withoutOptions } from './ref-tree.ts';
 import { boneIndex } from '../src/models/rig.ts';
 import type { BoneName } from '../src/models/rig.ts';
-import { STUDIO_BONES } from '../src/models/studio-format.ts';
-import type { StudioMesh } from '../src/models/studio-format.ts';
+import { BODY_BONES } from '../src/models/body-format.ts';
+import type { BodyMesh } from '../src/models/body-format.ts';
 import {
   CLOSED_EYE_SCALE,
-  createStudioPose,
-  poseStudioBones,
-  skinStudioMesh,
-  studioOffsets,
-} from '../src/models/studio-rig.ts';
-import type { StudioRig } from '../src/models/studio-rig.ts';
+  createBodyPose,
+  poseBodyBones,
+  skinBodyMesh,
+  bodyOffsets,
+} from '../src/models/body-rig.ts';
+import type { BodyRig } from '../src/models/body-rig.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
 import { poseSkeleton, posedPoint } from '../src/pose/test-kinematics.ts';
 import type { PosedSkeleton } from '../src/pose/test-kinematics.ts';
@@ -96,14 +96,14 @@ interface MeshCut {
 }
 
 /**
- * Gives the indices of the studio bones whose names match a pattern.
+ * Gives the indices of the body bones whose names match a pattern.
  *
  * @param pattern The pattern.
  * @returns The indices.
  */
 function boneSet(pattern: RegExp): ReadonlySet<number> {
   const set = new Set<number>();
-  for (const [i, name] of STUDIO_BONES.entries()) {
+  for (const [i, name] of BODY_BONES.entries()) {
     if (pattern.test(name)) {
       set.add(i);
     }
@@ -156,7 +156,7 @@ function dot(a: Vec3, b: Vec3): number {
  * @param axes The normal of the plane and the two axes of the cut.
  * @returns The cut.
  */
-function cutMesh(mesh: StudioMesh, center: Vec3, axes: readonly [Vec3, Vec3, Vec3]): MeshCut {
+function cutMesh(mesh: BodyMesh, center: Vec3, axes: readonly [Vec3, Vec3, Vec3]): MeshCut {
   const [normal, s, w] = axes;
   const ids = new Map<string, number>();
   const points: CutPoint[] = [];
@@ -292,10 +292,10 @@ function hullPerimeter(points: readonly (readonly [number, number])[]): number {
 /**
  * Measures the trunk widths and depths of the bind mesh.
  *
- * @param rig The studio rig.
+ * @param rig The body rig.
  * @returns The rows.
  */
-function trunkRows(rig: StudioRig): FormRow[] {
+function trunkRows(rig: BodyRig): FormRow[] {
   const heads = rig.body.heads;
   const bottom = rig.body.seatHeight ?? heads.hips[1];
   const rows: FormRow[] = [];
@@ -333,7 +333,7 @@ function trunkRows(rig: StudioRig): FormRow[] {
   return rows;
 }
 
-/** A limb bone of the studio with two sides. */
+/** A limb bone of the body with two sides. */
 type LimbBone = 'upper_arm' | 'forearm' | 'hand' | 'thigh' | 'shin' | 'foot';
 
 /**
@@ -341,14 +341,14 @@ type LimbBone = 'upper_arm' | 'forearm' | 'hand' | 'thigh' | 'shin' | 'foot';
  * convex hull of the points of the cut on its side of the middle, so that a thigh that joins the
  * other thigh in the cut keeps its own girth.
  *
- * @param rig The studio rig.
+ * @param rig The body rig.
  * @param from The bone at the start of the limb part, such as `upper_arm`.
  * @param to The bone at its end, such as `forearm`.
  * @param ownWeight True to take only the points with more than half of their weight on a limb,
  *   for a thigh that the cut joins to the belly.
  * @returns The girth in centimeters.
  */
-function limbGirth(rig: StudioRig, from: LimbBone, to: LimbBone, ownWeight = false): number {
+function limbGirth(rig: BodyRig, from: LimbBone, to: LimbBone, ownWeight = false): number {
   let sum = 0;
   for (const side of ['L', 'R'] as const) {
     const a = rig.body.heads[`${from}_${side}`];
@@ -375,11 +375,11 @@ function limbGirth(rig: StudioRig, from: LimbBone, to: LimbBone, ownWeight = fal
 /**
  * Measures the gap between the inner sides of the legs near a joint of the bind mesh.
  *
- * @param rig The studio rig.
+ * @param rig The body rig.
  * @param joint The joint, such as `shin` for the knee.
  * @returns The gap in centimeters.
  */
-function legGap(rig: StudioRig, joint: 'shin' | 'foot'): number {
+function legGap(rig: BodyRig, joint: 'shin' | 'foot'): number {
   const left = rig.body.heads[`${joint}_L`];
   const right = rig.body.heads[`${joint}_R`];
   let innerL = -Infinity;
@@ -416,7 +416,7 @@ function legGap(rig: StudioRig, joint: 'shin' | 'foot'): number {
  * @returns The bulge in centimeters.
  */
 function backBulge(
-  mesh: StudioMesh,
+  mesh: BodyMesh,
   positions: ArrayLike<number>,
   ends: readonly [Vec3, Vec3],
   skip: ReadonlySet<number>,
@@ -485,12 +485,12 @@ function backBulge(
 }
 
 /**
- * Measures the seated bind of a studio rig.
+ * Measures the seated bind of a body rig.
  *
- * @param rig The studio rig.
+ * @param rig The body rig.
  * @returns The rows.
  */
-function bindRows(rig: StudioRig): FormRow[] {
+function bindRows(rig: BodyRig): FormRow[] {
   const heads = rig.body.heads;
   const length = (a: Vec3, b: Vec3): number =>
     Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]) * 100;
@@ -595,17 +595,17 @@ function restRows(
  * @returns The bulge in centimeters.
  */
 function restBulge(player: SweepPlayer, posed: PosedSkeleton): number {
-  const rig = player.model.studio;
-  const pose = poseStudioBones(
+  const rig = player.model.bodyRig;
+  const pose = poseBodyBones(
     rig,
     posed.model.skeleton,
     posed.pose.rotations,
-    studioOffsets(posed.pose),
+    bodyOffsets(posed.pose),
     Math.max(CLOSED_EYE_SCALE, 1 - posed.pose.blink),
-    createStudioPose(),
+    createBodyPose(),
   );
-  const out = skinStudioMesh(rig.mesh, pose);
-  const hipsMatrix = new Matrix4().fromArray(pose.matrices, STUDIO_BONES.indexOf('hips') * 16);
+  const out = skinBodyMesh(rig.mesh, pose);
+  const hipsMatrix = new Matrix4().fromArray(pose.matrices, BODY_BONES.indexOf('hips') * 16);
   const forward = new Vector3(0, 0, -1).transformDirection(hipsMatrix);
   const turn = new Matrix4().makeRotationY(Math.atan2(forward.x, -forward.z));
   const q = new Vector3();
@@ -616,7 +616,7 @@ function restBulge(player: SweepPlayer, posed: PosedSkeleton): number {
   }
   const at = (name: 'hips' | 'neck'): Vec3 =>
     new Vector3(...rig.body.heads[name])
-      .applyMatrix4(new Matrix4().fromArray(pose.matrices, STUDIO_BONES.indexOf(name) * 16))
+      .applyMatrix4(new Matrix4().fromArray(pose.matrices, BODY_BONES.indexOf(name) * 16))
       .applyMatrix4(turn)
       .toArray();
   return backBulge(rig.mesh, out, [at('hips'), at('neck')], NOT_POSED_BACK, 0);
@@ -643,7 +643,7 @@ async function measureRows(name: string, demo: string | null): Promise<FormRow[]
   if (!player) {
     throw new Error(`The demo ${file.file} has no ${name}.`);
   }
-  return [...bindRows(player.model.studio), ...restRows(role, player, scene)];
+  return [...bindRows(player.model.bodyRig), ...restRows(role, player, scene)];
 }
 
 /**

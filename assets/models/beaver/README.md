@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the beaver (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/beaver.ts`, which this chain writes:
+`src/models/bodies/beaver.ts`, which this chain writes:
 
 ```text
 tripo-p2/beaver.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/beaver.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export beaver    the same run
    v
 tripo-hand/beaver.rig.glb       rigged mesh, with its summary beaver.rig.json
-   │  pnpm studio-body beaver   the same run
+   │  pnpm body-module beaver   the same run
    v
-src/models/studio/beaver.ts     studio body of the app
+src/models/bodies/beaver.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -30,7 +30,7 @@ made by one build script in a headless Blender 5.2, by the route of the Tripo wo
 (`../wolf/README.md`). The source FBX is the target of the look: the body keeps the form, the
 colors, the eye paint, and the eyes of the source, with a crease angle of 180° and only a scale to
 H. The arms keep the length of the source: no cut, no split from the trunk, and no stretch. The
-`ANIMALS` entry of the beaver in `tools/studio-body.ts` points to `tripo-hand/beaver.rig.glb`. The
+`ANIMALS` entry of the beaver in `tools/body-module.ts` points to `tripo-hand/beaver.rig.glb`. The
 files of the old beaver above do not change.
 
 | File | Origin | Rebuild |
@@ -54,7 +54,7 @@ flat tail goes back from the haunch and lies on the floor behind it.
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,227 vertices and 3,621 faces: 2,643 quads and 978 triangles, no n-gon. One UV layer |
 | Parts | 20 parts: the body with the tail (2,890 vertices), the two front teeth (99 vertices, open at the top), an eyeball of 69 vertices in an open socket on each side, and 16 whisker strips of 5 to 7 vertices. 148 open edges in 19 loops, and no edge with more than two faces |
-| Box | In the studio units (1 unit from the soles to the top of the head): x ±0.467 (the paw tips), z -0.410 (the tail tip) to 0.409 (the nose). The beaver faces -y in Blender, with its left side at +x, so the import needs no turn |
+| Box | In the body units (1 unit from the soles to the top of the head): x ±0.467 (the paw tips), z -0.410 (the tail tip) to 0.409 (the nose). The beaver faces -y in Blender, with its left side at +x, so the import needs no turn |
 
 The folder `beaver.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness and
 the metallic maps are not kept.
@@ -81,13 +81,13 @@ scripts follow the scripts of the Tripo cat (`../cat/README.md`). `make_config.p
 |---|---|
 | Size | 385,466 bytes (each run writes other bytes) |
 | SHA-256 | `f0dc6fe55cec881f13b4e07925e7a9afa17210f678af488ea60f4627fc8d37b9` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the beaver faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the beaver faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `beaver`: 3,711 vertices and 4,053 faces (3,075 quads and 978 triangles, 7,128 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 85 faces of the nose take the slot `fur` and the color map. The 136 faces of the two eyeballs have the face attribute `eye`, the 312 faces of the two lids the face attribute `lid`, and the 42 faces of the whiskers the face attribute `plain`. The UV map of the FBX, and the property `texture` (`assets/models/beaver/tripo-hand/beaver-color.webp`) |
 | Armature | `beaver_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.617287 (the shoulder joints at 1.01029 m for each unit, so that H is 0.310441 m, the H of the beaver of main, 0.310442 m), `crease` 180 |
 | Eyes | The eyeballs of the source in their sockets, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/beaver/tripo-p2/beaver.fbx', 1e-5)`. No vertex
@@ -173,9 +173,9 @@ the folds above. The crease angle 180 gives each corner the mean normal of the f
 as the smooth shading of an FBX viewer.
 
 **Stance and seat.** The beaver has no chair (`noChair`, design 4.4). Its bind keeps the legs, the
-trunk, and the tail of the source: the leg turns are none (`studio.legTurns`), the trunk takes no
-recline (`studio.trunk.open` 0), and the tail bones keep the directions of the source
-(`studio.tailBind`). Thus it stands on its short legs as in the source, with the feet flat on the
+trunk, and the tail of the source: the leg turns are none (`bind.legTurns`), the trunk takes no
+recline (`bind.trunk.open` 0), and the tail bones keep the directions of the source
+(`bind.tailBind`). Thus it stands on its short legs as in the source, with the feet flat on the
 floor and the flat tail on the floor behind it. The property `seat` is {`prop` `chair`, `front` 0,
 `back` -0.1, `halfWidth` 0.24}: its top is the underside of the belly between the legs. The seat
 height of the app is 0.062 m (0.072 m on the beaver of main). The seat height moves no player of a

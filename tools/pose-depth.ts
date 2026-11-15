@@ -1655,7 +1655,7 @@ export const SWEEP_ROLE_TABLE: Omit<RefRole, 'name'> = {
  * stops the run before the probes (`checkRefRole()`). Then the tool writes the details and the
  * table of the working tree, and one compare of each variant with the commit
  * ({@link compareDepths}). With `--glb <file>`, only the child of the working tree takes the
- * option, so it sweeps the studio body of the file ({@link sweepGlb}), and the commit keeps its own
+ * option, so it sweeps the body of the file ({@link sweepGlb}), and the commit keeps its own
  * body and its cache.
  *
  * @param role The role of the options.
@@ -1714,7 +1714,7 @@ async function printPlan(options: Options, role: RoleSweep): Promise<void> {
 }
 
 /**
- * Sweeps the role on the studio body that the export makes from another GLB file (`--glb <file>`),
+ * Sweeps the role on the body that the export makes from another GLB file (`--glb <file>`),
  * such as a GLB file of `pnpm rig-mesh --check --keep`. The tool runs again in a child process, in
  * a copy of `src/` with the module of the file (`withGlbBody()` of `tools/glb-swap.ts`). The files
  * of `assets/` and `src/` do not change, also after a stop or a failure. The child sweeps the tree
@@ -1725,12 +1725,12 @@ async function printPlan(options: Options, role: RoleSweep): Promise<void> {
  * @param glb The absolute path of the GLB file.
  * @param args The other arguments, with no `--glb`.
  * @returns The exit code of the child.
- * @throws Error for a role with no studio body.
+ * @throws Error for a role with no body.
  */
 async function sweepGlb(options: Options, glb: string, args: readonly string[]): Promise<number> {
   const source = findRole(options.role.role);
   if (!source) {
-    throw new Error(`The ${options.role.role} has no studio body, so --glb does not apply.`);
+    throw new Error(`The ${options.role.role} has no body, so --glb does not apply.`);
   }
   return withGlbBody(roleAnimal(source), glb, (dir) =>
     runTool(dir, 'pose-depth.ts', args, { ...process.env, [PROBE_NO_CACHE]: '1' }),
@@ -1739,7 +1739,7 @@ async function sweepGlb(options: Options, glb: string, args: readonly string[]):
 
 /**
  * Runs the tool: `node tools/pose-depth.ts <role> [options]`. With `--glb <file>`, the sweep runs
- * on the studio body of the file ({@link sweepGlb}), and with `--base` too, against the commit
+ * on the body of the file ({@link sweepGlb}), and with `--base` too, against the commit
  * ({@link compareRef}).
  */
 async function main(): Promise<void> {

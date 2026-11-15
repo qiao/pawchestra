@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { STUDIO_TRIANGLE_BUDGET } from '../../tools/studio-budgets.ts';
+import { BODY_TRIANGLE_BUDGET } from '../../tools/body-budgets.ts';
 import { CONDUCTOR, SECTION_INSTRUMENTS, SECTION_SPECIES } from './cast.ts';
 import type { PlayingSection } from './cast.ts';
 import type { MeshData } from './mesh.ts';
@@ -59,10 +59,10 @@ describe('triangle budgets (design 4.5)', () => {
   it('keeps each body within its budget and each instrument within its budget', () => {
     for (const [species, id] of CAST) {
       for (const kettles of id === 'timpani' ? ([2, 3, 4] as const) : ([4] as const)) {
-        const { mesh, studio } = buildPlayer(species, id, kettles);
+        const { mesh, bodyRig } = buildPlayer(species, id, kettles);
         const { body, instrument } = countParts(mesh);
         expect(body, `${species} with the ${id}`).toBeLessThanOrEqual(
-          studio ? STUDIO_TRIANGLE_BUDGET : BODY_BUDGET,
+          bodyRig ? BODY_TRIANGLE_BUDGET : BODY_BUDGET,
         );
         expect(instrument, `${species} with the ${id}`).toBeLessThanOrEqual(INSTRUMENT_BUDGETS[id]);
         expect(instrument, `${species} with the ${id}`).toBeGreaterThan(0);

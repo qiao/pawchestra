@@ -93,8 +93,8 @@ export const PIANO_FRONT_H = 1.0;
 
 /**
  * The piano bench (design 4.5): a seat of 0.75 × 0.35 m at the height of a chair seat. Under a
- * studio body, the bench fits the legs and the haunch (`StudioBody.benchDepth`), and it reaches
- * back to at least {@link PIANO_BENCH.studioDepth} behind its front edge. The parts of the
+ * body, the bench fits the legs and the haunch (`Body.benchDepth`), and it reaches
+ * back to at least {@link PIANO_BENCH.bodyDepth} behind its front edge. The parts of the
  * bench of `polar-bear-views.png` are shares of the seat height: the padded seat (`pad`), the
  * apron under it (`apron`), and the brass foot of each leg (`foot`).
  */
@@ -102,13 +102,13 @@ export const PIANO_BENCH = {
   width: 0.75,
   depth: 0.35,
   /**
-   * The least depth of the bench under a studio body, in meters. The fit of the polar bear holds
+   * The least depth of the bench under a body, in meters. The fit of the polar bear holds
    * only the haunch from the seat top to 0.15 m above it, and its round haunch bulges further back
    * above that. A deeper bench grows back from its front edge, so the sloped thighs stay off it.
    * With the thighs 25° down, the fit is 0.244 m deep (0.195 m with the thighs 40° down), and the
    * bench of 0.32 m reaches 0.198 m behind the floor point, 0.076 m behind the back edge of the fit.
    */
-  studioDepth: 0.32,
+  bodyDepth: 0.32,
   pad: 0.26,
   apron: 0.1,
   foot: 0.12,
@@ -893,7 +893,7 @@ export function pianoPedalTip(pedal: PianoPedal): Vec3 {
 
 /**
  * How far the point of a black key ({@link pianoKeyFront}) stands behind the front edge of the
- * black key, in meters. The claws of the studio polar bear hang about 3 cm in front of the point,
+ * black key, in meters. The claws of the polar bear hang about 3 cm in front of the point,
  * so with no inset they stop over the white keys in front of the black key. A pianist also plays
  * a black key farther in than a white key.
  */
@@ -902,7 +902,7 @@ const BLACK_KEY_INSET = 0.05;
 /**
  * Calculates the point of a piano key that the paw of a pianist aims at, at the height of the top
  * of the key, in the piano axes. For a white key, it is the middle of its front edge. The paw of
- * the studio polar bear is longer than a white key, so the palm stays in front of this point, and
+ * the polar bear is longer than a white key, so the palm stays in front of this point, and
  * the claws lie at the front of the key (design 5.3). A black key is shorter and higher, so its
  * point stands {@link BLACK_KEY_INSET} behind its own front edge, at its top. The claws then
  * reach over the white keys and lie on the black key.
@@ -1304,7 +1304,7 @@ export function buildPiano(): InstrumentModel {
   const damper = new PieceBuilder(PIANO_SCALE);
   addPedal(damper, 'damper');
 
-  // The round belly of the studio polar bear reaches 0.45 m in front of the floor point, so keys
+  // The round belly of the polar bear reaches 0.45 m in front of the floor point, so keys
   // at 0.55 H + 0.05 m (0.26 m) go 15 cm into it. With an upright trunk, keys at 1.37 H stretch
   // the elbows to 117° with the upper arms 28° forward. With the claws on the key tops
   // (`HANDS_HOLDS.piano`) and the upright trunk, the keys at `PIANO_FRONT_H` bend the elbows 97° to

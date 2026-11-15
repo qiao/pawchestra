@@ -1,5 +1,5 @@
 /**
- * Gives the share of the samples in which each named face of a studio skin folds, for `--watch`
+ * Gives the share of the samples in which each named face of a body skin folds, for `--watch`
  * of `pnpm rig-mesh --check` and `--faces-of` of `pnpm hold-fit`. The face indices are those of
  * `pnpm fold-probe --faces`.
  */

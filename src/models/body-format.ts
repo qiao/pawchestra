@@ -1,0 +1,1345 @@
+import type { EyeBend } from './eyes.ts';
+import { FINISH_ORDER } from './mesh.ts';
+import type { Finish } from './mesh.ts';
+import { packCoordinate, PACKED_STEP } from './packed-mesh.ts';
+import {
+  byteReader,
+  readByte,
+  readVarint,
+  toBase64,
+  unzigzag,
+  writeVarint,
+  zigzag,
+} from './packed-bytes.ts';
+import type { ByteReader } from './packed-bytes.ts';
+import type { Quat, Vec3 } from './tuples.ts';
+import { clamp01 } from '../math.ts';
+
+/**
+ * The number of deform segments of each upper arm and of each forearm of a body with arm segments
+ * (`ARM_SEGMENTS` of `tools/blender/rig_mesh.py`).
+ */
+export const ARM_SEGMENTS = 4;
+
+/**
+ * The arm segments and the helpers of a rig with `armSegments` (design 4.4, 4.7), the left
+ * side first: for each side, {@link ARM_SEGMENTS} segments of the upper arm and of the forearm
+ * from the shoulder out, then the elbow helper and the wrist helper. They hold the skin of the
+ * arms, and the pose code turns them from the joints of the arm (`poseArm()` of
+ * `models/body-rig.ts`). The upper arm, the forearm, and the forearm twist bone of such a body
+ * hold no vertex.
+ */
+export const ARM_SEGMENT_BONES = [
+  'upper_arm_seg0_L',
+  'upper_arm_seg1_L',
+  'upper_arm_seg2_L',
+  'upper_arm_seg3_L',
+  'forearm_seg0_L',
+  'forearm_seg1_L',
+  'forearm_seg2_L',
+  'forearm_seg3_L',
+  'elbow_L',
+  'wrist_L',
+  'upper_arm_seg0_R',
+  'upper_arm_seg1_R',
+  'upper_arm_seg2_R',
+  'upper_arm_seg3_R',
+  'forearm_seg0_R',
+  'forearm_seg1_R',
+  'forearm_seg2_R',
+  'forearm_seg3_R',
+  'elbow_R',
+  'wrist_R',
+] as const;
+
+/** An arm segment or a helper of a body. */
+export type ArmSegmentBone = (typeof ARM_SEGMENT_BONES)[number];
+
+/**
+ * The digit bones of a hand rig (design 4.4, "Hand rig"), the left side first: one bone for each
+ * claw of a paw, from `digit1` at the thumb side to `digit5`. Each digit is a child of the fingers
+ * of its side, with its head at the base of its claw and its tail at the claw tip. The pose code
+ * bends each digit around the curl axis of its paw (`poseArm()` of `models/body-rig.ts`), so
+ * that one claw presses a key (design 5.3).
+ */
+export const DIGIT_BONES = [
+  'digit1_L',
+  'digit2_L',
+  'digit3_L',
+  'digit4_L',
+  'digit5_L',
+  'digit1_R',
+  'digit2_R',
+  'digit3_R',
+  'digit4_R',
+  'digit5_R',
+] as const;
+
+/** The number of digit bones of each paw. */
+export const DIGITS = 5;
+
+/**
+ * The thumb bones of a rig whose paw is one fist with a free thumb (design 4.4), the left side
+ * first. Each thumb is a child of the paw (`hand`), with its head at the root of the thumb and its
+ * tail at the thumb tip, because the thumb of a real hand starts at the wrist. The pose code turns
+ * each thumb about its close axis ({@link Body.thumbAxes}) by the bend of digit 1 of its paw
+ * (`poseArm()` of `models/body-rig.ts`). With no bend, the thumb keeps the turn of the paw.
+ */
+const THUMB_BONES = ['thumb_L', 'thumb_R'] as const;
+
+/**
+ * The bones of a body (design 4.4, 4.7): the 30 body bones of a rig file, in
+ * parent order, the two eye bones that `pnpm body-module` adds, so that the eyes blink (design
+ * 5.1), and the optional bones ({@link OPTIONAL_BODY_BONES}): the tip of a tail of two bones,
+ * the jaw of a beak, the arm segments and helpers ({@link ARM_SEGMENT_BONES}), the digit bones
+ * of a hand rig ({@link DIGIT_BONES}), and the thumb bones of a fist ({@link THUMB_BONES}). The
+ * optional bones come last, so that the index of each other bone stays. The names keep the
+ * spelling of the rig. The packed skin names each bone by its index in this list.
+ */
+export const BODY_BONES = [
+  'root',
+  'hips',
+  'spine',
+  'spine1',
+  'chest',
+  'neck',
+  'head',
+  'ear_L',
+  'ear_R',
+  'clavicle_L',
+  'upper_arm_L',
+  'forearm_L',
+  'forearm_twist_L',
+  'hand_L',
+  'fingers_L',
+  'clavicle_R',
+  'upper_arm_R',
+  'forearm_R',
+  'forearm_twist_R',
+  'hand_R',
+  'fingers_R',
+  'thigh_L',
+  'shin_L',
+  'foot_L',
+  'toes_L',
+  'thigh_R',
+  'shin_R',
+  'foot_R',
+  'toes_R',
+  'tail',
+  'eye_L',
+  'eye_R',
+  'tail_tip',
+  'jaw',
+  ...ARM_SEGMENT_BONES,
+  ...DIGIT_BONES,
+  ...THUMB_BONES,
+] as const;
+
+/** A bone of a body. */
+export type BodyBone = (typeof BODY_BONES)[number];
+
+/**
+ * The bones that a body can lack: the tip of a tail of two bones, as the rig of the fox
+ * mesh has, the jaw of a beak that opens, as the rig of the penguin mesh has, and the arm segments
+ * and helpers, as the rig of the polar bear mesh has (design 4.4, 4.7), the digits of a hand
+ * rig, as the polar bear has, and the thumbs of a fist, as the deer has. The `tail` bone then
+ * holds the root of the tail, and the `jaw` bone the lower part of the beak, at the hinge of the
+ * beak. A body with no tip, no jaw, no arm segments, no digits, or no thumbs, such as the bear or
+ * the rabbit, has no vertex on them.
+ */
+export const OPTIONAL_BODY_BONES = [
+  'tail_tip',
+  'jaw',
+  ...ARM_SEGMENT_BONES,
+  ...DIGIT_BONES,
+  ...THUMB_BONES,
+] as const;
+
+/** A bone that a body can lack. */
+type OptionalBodyBone = (typeof OPTIONAL_BODY_BONES)[number];
+
+/** A bone that each body has. */
+export type RequiredBodyBone = Exclude<BodyBone, OptionalBodyBone>;
+
+/** The head of each bone of a body: each bone except an optional bone has one. */
+export type BodyHeads = Readonly<Record<RequiredBodyBone, Vec3>> &
+  Readonly<Partial<Record<OptionalBodyBone, Vec3>>>;
+
+/** The parent of each bone of a body: the hierarchy of a rig file. */
+export const BODY_PARENTS = {
+  root: null,
+  hips: 'root',
+  spine: 'hips',
+  spine1: 'spine',
+  chest: 'spine1',
+  neck: 'chest',
+  head: 'neck',
+  ear_L: 'head',
+  ear_R: 'head',
+  clavicle_L: 'chest',
+  upper_arm_L: 'clavicle_L',
+  forearm_L: 'upper_arm_L',
+  forearm_twist_L: 'forearm_L',
+  hand_L: 'forearm_twist_L',
+  fingers_L: 'hand_L',
+  clavicle_R: 'chest',
+  upper_arm_R: 'clavicle_R',
+  forearm_R: 'upper_arm_R',
+  forearm_twist_R: 'forearm_R',
+  hand_R: 'forearm_twist_R',
+  fingers_R: 'hand_R',
+  thigh_L: 'hips',
+  shin_L: 'thigh_L',
+  foot_L: 'shin_L',
+  toes_L: 'foot_L',
+  thigh_R: 'hips',
+  shin_R: 'thigh_R',
+  foot_R: 'shin_R',
+  toes_R: 'foot_R',
+  tail: 'hips',
+  eye_L: 'head',
+  eye_R: 'head',
+  tail_tip: 'tail',
+  jaw: 'head',
+  upper_arm_seg0_L: 'upper_arm_L',
+  upper_arm_seg1_L: 'upper_arm_L',
+  upper_arm_seg2_L: 'upper_arm_L',
+  upper_arm_seg3_L: 'upper_arm_L',
+  forearm_seg0_L: 'forearm_L',
+  forearm_seg1_L: 'forearm_L',
+  forearm_seg2_L: 'forearm_L',
+  forearm_seg3_L: 'forearm_L',
+  elbow_L: 'upper_arm_L',
+  wrist_L: 'forearm_twist_L',
+  upper_arm_seg0_R: 'upper_arm_R',
+  upper_arm_seg1_R: 'upper_arm_R',
+  upper_arm_seg2_R: 'upper_arm_R',
+  upper_arm_seg3_R: 'upper_arm_R',
+  forearm_seg0_R: 'forearm_R',
+  forearm_seg1_R: 'forearm_R',
+  forearm_seg2_R: 'forearm_R',
+  forearm_seg3_R: 'forearm_R',
+  elbow_R: 'upper_arm_R',
+  wrist_R: 'forearm_twist_R',
+  digit1_L: 'fingers_L',
+  digit2_L: 'fingers_L',
+  digit3_L: 'fingers_L',
+  digit4_L: 'fingers_L',
+  digit5_L: 'fingers_L',
+  digit1_R: 'fingers_R',
+  digit2_R: 'fingers_R',
+  digit3_R: 'fingers_R',
+  digit4_R: 'fingers_R',
+  digit5_R: 'fingers_R',
+  thumb_L: 'hand_L',
+  thumb_R: 'hand_R',
+} as const satisfies Readonly<Record<BodyBone, BodyBone | null>>;
+
+/** A side of the body: the left side of the animal is at -x (design 4.4). */
+export type Side = 'L' | 'R';
+
+/** The leg bones of a body, which turn when a seated body stands (design 4.4). */
+export const BODY_LEG_BONES = [
+  'thigh_L',
+  'shin_L',
+  'foot_L',
+  'toes_L',
+  'thigh_R',
+  'shin_R',
+  'foot_R',
+  'toes_R',
+] as const;
+
+/** A leg bone of a body. */
+type BodyLegBone = (typeof BODY_LEG_BONES)[number];
+
+/**
+ * The bones of a tail of two bones, which turn when a seated body with such a tail stands (design
+ * 4.4): the seated tail goes back through the open back of the chair, and the standing tail hangs.
+ */
+export const BODY_TAIL_BONES = ['tail', 'tail_tip'] as const;
+
+/** A bone of a tail of two bones. */
+type BodyTailBone = (typeof BODY_TAIL_BONES)[number];
+
+/**
+ * The trunk bones of a body, which turn when a seated body with a reclined trunk stands
+ * (design 4.4): the rig reclines the trunk on the seat (`bind.trunk` of the rig config), and the
+ * standing trunk is upright again.
+ */
+export const BODY_TRUNK_BONES = ['hips', 'spine', 'spine1', 'chest', 'neck', 'head'] as const;
+
+/** A trunk bone of a body. */
+type BodyTrunkBone = (typeof BODY_TRUNK_BONES)[number];
+
+/**
+ * The arm bones of a body, from the clavicle out, the left side first. The standing pose of
+ * a seated body with a reclined trunk keeps the turn of each one in the pose of the sheet
+ * ({@link BodyStanding.armTurns}).
+ */
+export const BODY_ARM_BONES = [
+  'clavicle_L',
+  'upper_arm_L',
+  'forearm_L',
+  'forearm_twist_L',
+  'hand_L',
+  'fingers_L',
+  'clavicle_R',
+  'upper_arm_R',
+  'forearm_R',
+  'forearm_twist_R',
+  'hand_R',
+  'fingers_R',
+] as const;
+
+/** An arm bone of a body. */
+export type BodyArmBone = (typeof BODY_ARM_BONES)[number];
+
+/**
+ * The standing pose of a seated body that also stands, such as the violinist rabbit as a
+ * soloist (design 4.4): the legs of the pose of the sheet, with the leg corrective shapes of the
+ * body at their full weight.
+ */
+export interface BodyStanding {
+  /**
+   * The move of the body from its seated place over the seat to its standing place. The app
+   * takes its height from the standing skin: the lowest point, a sole, goes onto the floor.
+   */
+  readonly lift: Vec3;
+  /** The world turn of each leg bone from the bind pose to the pose of the sheet. */
+  readonly turns: Readonly<Record<BodyLegBone, Quat>>;
+  /**
+   * The world turn of each tail bone from the bind pose to the pose of the sheet, for a body with
+   * a tail of two bones. A body with one tail bone keeps the tail of its bind pose.
+   */
+  readonly tailTurns?: Readonly<Record<BodyTailBone, Quat>>;
+  /**
+   * The world turn of each trunk bone from the bind pose to the pose of the sheet, for a body
+   * whose rig reclines the trunk on the seat, and of the tail of a body with one tail bone. The
+   * export adds the move of the hips to the {@link BodyStanding.lift}. Each bone with no turn of
+   * its own, such as an arm or an ear, turns with its parent.
+   */
+  readonly trunkTurns?: Readonly<Partial<Record<BodyTrunkBone | 'tail', Quat>>>;
+  /**
+   * The world turn of each arm bone from the bind pose to the pose of the sheet, for a body whose
+   * rig reclines the trunk on the seat. The standing body turns its trunk upright, and a pose then
+   * turns its arms: two blends of the skin in a row, which miss the one blend of the clip of the
+   * sheet at a vertex with the weights of an arm bone and of trunk bones with other turns. The
+   * standing body solves its arm corrective shapes again with these turns
+   * (`standingBody()` of `models/body-rig.ts`), so that the arms of the sheet give the source.
+   */
+  readonly armTurns?: Readonly<Record<BodyArmBone, Quat>>;
+}
+
+/**
+ * The names of the other palettes of a body (design 4.4, 4.5): the tan palette of the fox
+ * mesh, which the tan foxes of the flutes take. The red foxes keep the palette of the mesh.
+ */
+const BODY_PALETTES = ['tan'] as const;
+
+/** The name of another palette of a body. */
+export type BodyPalette = (typeof BODY_PALETTES)[number];
+
+/**
+ * The largest number of corrective shapes of a raised arm or of a bent wrist of one body
+ * ({@link Body.raises}, `RAISE_LIMIT` of `tools/blender/rig_mesh.py`).
+ */
+export const BODY_RAISES = 4;
+
+/**
+ * The pose of a corrective shape of a raised arm of a rig (design 4.4, a shape key
+ * `arm_raise_<side>`). The shape relaxes the faces that the skin turns over near that pose, such as
+ * the front of the right shoulder of the red fox, whose bow arm is out to the side and down. Its
+ * weight comes from the turn of the upper arm alone (`raiseWeight()` of `models/body-rig.ts`).
+ * The shape of a bent elbow takes its weight from the turn of the forearm from the upper arm, as
+ * the right elbow of the cat, which stays near one bend in the bow strokes. The shape of a bent
+ * wrist takes its weight from the turn of the paw from the forearm, as the left wrist of the cat,
+ * whose paw stays near one turn on the fingerboard. A body can have up to {@link BODY_RAISES}
+ * such shapes, and each one takes its weight from its own turn.
+ */
+export interface BodyRaise {
+  /** The arm of the shape. */
+  readonly side: Side;
+  /**
+   * The bone whose turn gives the weight: `forearm` for the forearm, whose turn from the upper arm
+   * gives the weight of the shape of a bent elbow, and `hand` for the paw, whose turn from the
+   * forearm gives the weight of the shape of a bent wrist. The upper arm when it is not given.
+   */
+  readonly bone?: 'forearm' | 'hand';
+  /**
+   * The turn at which the shape has its full weight: the world turn of the upper arm from the bind
+   * pose, in the axes of the chest. For the forearm, it is the world turn of the forearm from the
+   * bind pose after the inverse of the world turn of the upper arm. For the paw, it is the world
+   * turn of the paw from the bind pose after the inverse of the world turn of the forearm.
+   */
+  readonly turn: Quat;
+  /**
+   * The angles of the turn of the bone from {@link BodyRaise.turn}, in radians: the shape has
+   * its full weight up to the first angle and no weight from the second angle.
+   */
+  readonly fade: readonly [full: number, none: number];
+}
+
+/**
+ * The bead eyes of a body (design 4.4, 4.5): the eyes of `addEye()` of `models/eyes.ts`,
+ * which replace the eyes of the mesh. Each eye lies at the bind place of its eye bone and faces out
+ * from the middle of the head. Each oval bends to the form of the head surface under it, so that
+ * its rim lies at the fur, and its bone lies on the head surface. Each bone moves further out when
+ * the head still covers the front of the eye (`eyePush()` of `tools/body-module.ts`). A hand rig
+ * gives the place, the direction, and the size of each eye with the eye objects of its `.blend`
+ * (`eyesOf()` of `tools/body-module.ts`).
+ */
+export interface BodyEyes {
+  /**
+   * The head height that sizes the eyes, in meters: the head that shows, from the chin to the top
+   * of the skull, or the size of the eye objects of a hand rig. It is larger than
+   * {@link Body.headHeight} when the rig grows the head, so that the eyes fit the larger head.
+   */
+  readonly headHeight: number;
+  /**
+   * The unit direction in which each eye faces, in the bind pose: from the middle of the box of the
+   * head that shows through the eye, or the Z axis of the eye object of a hand rig. The head
+   * surface under the eye of the bear faces 29° up, so an eye along the normal of the surface shows
+   * less of its front in the front view.
+   */
+  readonly directions: Readonly<Record<Side, Vec3>>;
+  /**
+   * The bend of each oval along its direction: a fit of the heights of the head surface over the
+   * oval, from the plane of the eye (`eyeBend()` of `tools/body-module.ts`). Thus a direction that
+   * differs from the normal of the surface, or a curved cheek, moves no edge of the oval out of the
+   * fur. A body with no bends keeps flat ovals.
+   */
+  readonly bends?: Readonly<Record<Side, EyeBend>>;
+}
+
+/**
+ * The lids of a body that shows the eyes of its mesh (design 4.4, 5.1). Each lid is a part
+ * of a sphere around the middle of its eyeball, a little larger than the ball, and follows the eye
+ * bone of its side. In the bind pose, the lid lies open: turned up into the head, under the head
+ * surface. A blink turns each eye bone about the axis of its lid, through the middle of the
+ * eyeball, so that the lid closes down over the eye (`poseBodyBones()` of
+ * `models/body-rig.ts`).
+ */
+export interface BodyLids {
+  /** The turn of each lid from open to closed, in radians. */
+  readonly angle: number;
+  /**
+   * The unit hinge axis of each lid in the bind pose. A turn by a positive angle about it moves
+   * the lid down over the eye.
+   */
+  readonly axes: Readonly<Record<Side, Vec3>>;
+}
+
+/**
+ * The color map of a body (design 4.5): an image of the fur, and the texture point of each
+ * corner of the fur triangles. The pure core holds only the path and the points. The scene loads
+ * the image after the first frame (`scene/body-texture.ts`), and the body shows the colors of its
+ * faces until then.
+ */
+export interface BodyTexture {
+  /** The web copy of the color map, relative to the repository. */
+  readonly file: string;
+  /** The packed texture points ({@link packBodyUvs}). */
+  readonly uvs: string;
+  /**
+   * The web copy of the color map of each other palette of the faces ({@link Body.palettes}),
+   * relative to the repository, such as the map of the tan fox. A species with a palette that has
+   * no map shows the colors of its faces.
+   */
+  readonly palettes?: Readonly<Partial<Record<BodyPalette, string>>>;
+}
+
+/**
+ * A body (design 4.4): the mesh of a rig file in its bind pose, with its own
+ * skeleton, its skin of up to four bones for each vertex, and its corrective shapes.
+ * `pnpm body-module <animal>` writes the module of an animal. The axes are the axes of the model:
+ * the animal faces -z, its left side is -x, the soles are on y = 0, and the middle plane is
+ * x = 0. The units are meters. A seated body has the bind pose of its seated role, with the legs
+ * bent for the seat and the soles on the floor.
+ */
+export interface Body {
+  /** The GLB file, relative to the repository. */
+  readonly source: string;
+  /** The SHA-256 of the GLB file, as hex. */
+  readonly sha256: string;
+  /** The meters for each unit of the body, which is the height of the animal. */
+  readonly scale: number;
+  /** The head of each bone in the bind pose of the mesh. */
+  readonly heads: BodyHeads;
+  /**
+   * The unit normal of each palm in the bind pose: the side to which the fingers curl. It is the
+   * z axis of the `hand` bone of the body.
+   */
+  readonly palms: Readonly<Record<Side, Vec3>>;
+  /** The end of each finger block: the farthest claw tip from the `fingers` bone. */
+  readonly fingerTips: Readonly<Record<Side, Vec3>>;
+  /**
+   * The direction of each upper arm in the pose of the sheet, in the axes of the chest. The
+   * corrective shape of each arm has its full weight in this pose, and the weight 0 in the bind
+   * pose (`correctives()` of `tools/blender/rig_mesh.py`).
+   */
+  readonly sheetArms: Readonly<Record<Side, Vec3>>;
+  /**
+   * The head height `H` of the holds: from the chin to the top of the skull. When the rig grows
+   * the head, `H` is the head height before the factor, so that
+   * the holds in head heights keep their places.
+   */
+  readonly headHeight: number;
+  /** The middle of the head. */
+  readonly headCenter: Vec3;
+  /** The tip of the nose. */
+  readonly nose: Vec3;
+  /**
+   * The middle of the mouth: the front of the lips on the middle plane, at the height of the mouth
+   * line (`mouthHeight` of `pnpm body-module`, design 4.4). A body with no value has its mouth
+   * `MOUTH_DROP` H below the tip of the nose (`models/body.ts`).
+   */
+  readonly mouth?: Vec3;
+  /**
+   * The bead eyes, at the eye bones `eye_L` and `eye_R` of {@link Body.heads}. It is `null`
+   * for a body that shows the eyes of its mesh (design 4.5): a hand rig with eye faces and no eye
+   * objects. Each eye bone then lies at the middle of an eye of the mesh, and these eyes blink with
+   * the lids of the body ({@link Body.lids}).
+   */
+  readonly eyes: BodyEyes | null;
+  /**
+   * The lids of a body that shows the eyes of its mesh. Their faces follow the eye bones. A body
+   * with no lids blinks with its bead eyes, or keeps the eyes of its mesh open.
+   */
+  readonly lids?: BodyLids;
+  /**
+   * The point on the floor under the middle of the body: the origin of the body. A seated body
+   * sits in front of the center of its seat, so that the seat of the body (a bench or a chair)
+   * and the seat of the app have one front edge, and the floor instruments go with it.
+   */
+  readonly floor: Vec3;
+  /**
+   * The height of the top of a flat seat under a seated body: the lowest point of the body over
+   * the seat of the app (the piano bench or the chair). It is `null` for a body that stands.
+   */
+  readonly seatHeight: number | null;
+  /**
+   * The depth of the chair under a body that sits on a chair: the depth of the chair of the
+   * body, so that the body sits on the whole seat. The back of the chair keeps a gap behind the
+   * trunk. It is `null` for a body that stands or sits on a bench.
+   */
+  readonly chairDepth: number | null;
+  /**
+   * The width of the seat of the chair under a body that sits on a chair, in meters, when the
+   * chair of design 4.5 is too narrow for its haunch (`seatWidth` of `ANIMALS` of
+   * `tools/body-module.ts`, or of the armature of a hand rig). A body with no width sits on the
+   * chair of design 4.5.
+   */
+  readonly chairWidth?: number;
+  /**
+   * The depth of the piano bench under a body that sits on a bench, in meters: the bench reaches
+   * from just behind the haunch to where the underside of the thighs leaves the seat top
+   * (`benchFitOf()` of `tools/body-module.ts`). A body with no depth sits on the bench of
+   * `PIANO_BENCH`.
+   */
+  readonly benchDepth?: number;
+  /**
+   * The standing pose of a seated body that also stands. The packed mesh then holds the leg
+   * corrective shapes after the arm corrective shapes. It is `null` for a body that keeps the
+   * stance of its role.
+   */
+  readonly standing: BodyStanding | null;
+  /**
+   * The poses of the corrective shapes of a raised arm or of a bent wrist, at most
+   * {@link BODY_RAISES}. The packed mesh holds these shapes in this order after the two arm-down
+   * shapes, before the leg shapes. A body with no such shape has none.
+   */
+  readonly raises?: readonly BodyRaise[];
+  /**
+   * The crease angle of the smooth normals of the fur, in degrees (design 4.5), from the settings
+   * of the animal.
+   */
+  readonly crease: number;
+  /**
+   * The largest difference of two face colors of the fur that blend at a vertex, in each sRGB
+   * channel from 0 to 1 (`bodyCornerColorsSteps()`, design 4.5), from the settings of the animal. A
+   * body with no value keeps one color for each face.
+   */
+  readonly colorBlend?: number;
+  /**
+   * The largest turn of the head to the left in a cue of the conductor, toward the raised left
+   * hand, in degrees (design 5.4), from the facts of the body. A head that sits high and has a long
+   * muzzle meets the left paw of a cue in a full turn. A body with no value takes `headMax` of
+   * `CUE_MOTION`.
+   */
+  readonly cueHeadLeft?: number;
+  /**
+   * The largest turn of the head to the right in a cue of the conductor, toward the raised baton
+   * arm, in degrees (design 5.4), from the facts of the body. A head that sits high and has a long
+   * muzzle meets the raised right forearm in a full turn. A body with no value takes `headMax` of
+   * `CUE_MOTION`.
+   */
+  readonly cueHeadRight?: number;
+  /**
+   * The angle up of the left hand at the cue point of the conductor, in degrees (design 5.4), from
+   * the facts of the body. A high, wide head meets a left hand that points `cueLift` of
+   * `CUE_MOTION` up. A body with no value takes that angle.
+   */
+  readonly cueLift?: number;
+  /**
+   * The caps of the arms that the cut of a rig makes (design 4.4), as indices of the
+   * triangles of the packed mesh. With `cut.bodyNormals` of the config of the rig, they also hold
+   * the caps of the body and the two faces at the top of each cut. Each corner of a cap takes the
+   * normal of the skin at its vertex (`bodyNormals()`). A body with no such rule has none.
+   */
+  readonly caps?: readonly number[];
+  /**
+   * The skin faces around the caps of the body of the cut of a rig (`cut.bodyNormals` of the
+   * config of the rig, design 4.4), as indices of the triangles of the packed mesh. Each corner
+   * of a rim face takes the normal of the skin at its vertex with no crease angle
+   * (`bodyNormals()`). A body with no such rule has none.
+   */
+  readonly rim?: readonly number[];
+  /**
+   * The faces of the eyes of the mesh of a hand rig with no bead eyes (design 4.4, "Hand rig"), as
+   * indices of the triangles of the packed mesh. They have the `eye` finish, or the `eyeFinish`
+   * of the body in `ANIMALS` of `tools/body-module.ts`, and each corner takes the mean normal of the eyeball faces at its vertex (`bodyNormals()`), so that each
+   * eyeball shades as a smooth ball. A body with bead eyes has none.
+   */
+  readonly eyeballs?: readonly number[];
+  /** The packed mesh ({@link packBodyMesh}). */
+  readonly mesh: string;
+  /**
+   * The color map of the fur (design 4.5), from the custom property `texture` of a hand rig. A
+   * body with no map shows the colors of its faces.
+   */
+  readonly texture?: BodyTexture;
+  /**
+   * The other palettes of the faces of the mesh, by name ({@link packBodyPalette}). A species
+   * selects one with its `palette` (`models/species.ts`). A body with one palette has none.
+   */
+  readonly palettes?: Readonly<Partial<Record<BodyPalette, string>>>;
+  /**
+   * The share of the roll of each upper arm that the skin at the shoulder takes (design 4.4): a
+   * twist bone of the upper arm takes this share of the roll from the chest, and the weight of
+   * the upper arm moves to the twist bone near the shoulder. Thus the roll spreads along the upper
+   * arm, and the skin does not twist at the shoulder. A body with no share has no twist bone.
+   */
+  readonly upperTwist?: number;
+  /**
+   * The unit elbow axis of each arm in the bind pose of a body with straight bind arms (design
+   * 4.4): the axis about which the app bends the elbow (`poseArm()` of `models/body-rig.ts`). A
+   * straight arm has no plane of its own. A body with no axes takes the axis of its bent bind arm:
+   * the upper arm × the forearm.
+   */
+  readonly hinges?: Readonly<Record<Side, Vec3>>;
+  /**
+   * The unit close axis of each thumb in the bind pose of a body with thumb bones (design 4.4,
+   * {@link THUMB_BONES}): a turn about it by a positive angle moves the thumb tip across the palm
+   * (`thumbs` of the rig config). A body with no thumbs has none.
+   */
+  readonly thumbAxes?: Readonly<Record<Side, Vec3>>;
+}
+
+/** The largest number of bones of a vertex of a body. */
+export const BODY_INFLUENCES = 4;
+
+/** The steps of a packed weight from 0 to 1: one byte. */
+const BODY_WEIGHT_STEPS = 255;
+
+/** The step of a packed move of a corrective shape, in meters. */
+export const CORRECTIVE_STEP = 1e-4;
+
+/** The number of steps of a packed color channel from 0 to 1. */
+export const COLOR_STEPS = 65535;
+
+/**
+ * The number of steps of a packed texture coordinate from 0 to 1: a quarter texel of a map of
+ * 2048 pixels.
+ */
+const UV_STEPS = 8192;
+
+/**
+ * The texture coordinate of a corner with no texture, such as a corner of the gloss nose or of a
+ * whisker ({@link unpackBodyUvs}).
+ */
+export const NO_UV = -1;
+
+/** The texture point of a corner: u from the left edge, v from the top edge, each from 0 to 1. */
+export type BodyUv = readonly [u: number, v: number];
+
+/** The texture points of the three corners of a triangle, or `null` for no texture. */
+export type BodyTriangleUvs = readonly [BodyUv, BodyUv, BodyUv] | null;
+
+/** One vertex of a body mesh for {@link packBodyMesh}. */
+export interface BodyVertex {
+  /** The place, in meters. */
+  readonly position: Vec3;
+  /** The bones, as indices in {@link BODY_BONES}, and their weights, which add up to 1. */
+  readonly skin: readonly (readonly [bone: number, weight: number])[];
+}
+
+/** One triangle of a body mesh for {@link packBodyMesh}. */
+export interface BodyTriangle {
+  /** The three vertices, counterclockwise from outside. */
+  readonly corners: readonly [number, number, number];
+  /** The linear color of the face. */
+  readonly color: Vec3;
+  readonly finish: Finish;
+}
+
+/** A body mesh read back by {@link unpackBodyMesh}. */
+export interface BodyMesh {
+  /** x, y, z of each vertex, in meters. */
+  readonly positions: Float32Array;
+  /** The four bones of each vertex. A bone with the weight 0 is bone 0. */
+  readonly joints: Uint8Array;
+  /** The four weights of each vertex, which add up to 1. */
+  readonly weights: Float32Array;
+  /** The three vertices of each triangle. */
+  readonly corners: Uint32Array;
+  /** Linear r, g, b of each triangle. */
+  readonly colors: Float32Array;
+  /** The finish of each triangle, as an index in `FINISH_ORDER`. */
+  readonly finishes: Uint8Array;
+  /** The move of each vertex for each corrective shape: x, y, z in meters. */
+  readonly correctives: readonly Float32Array[];
+}
+
+/**
+ * Splits weights that add up to 1 into whole steps of {@link BODY_WEIGHT_STEPS} that add up
+ * to the whole: each weight is rounded down, and the largest remainders get one more step.
+ *
+ * @param weights The weights.
+ * @returns The steps.
+ */
+export function weightSteps(weights: readonly number[]): number[] {
+  const total = weights.reduce((sum, w) => sum + w, 0);
+  const exact = weights.map((w) => (w / total) * BODY_WEIGHT_STEPS);
+  const steps = exact.map(Math.floor);
+  const order = exact
+    .map((value, i) => [value - Math.floor(value), i] as const)
+    .toSorted((a, b) => b[0] - a[0] || a[1] - b[1]);
+  let missing = BODY_WEIGHT_STEPS - steps.reduce((sum, s) => sum + s, 0);
+  for (const [, i] of order) {
+    if (missing <= 0) {
+      break;
+    }
+    steps[i] = (steps[i] ?? 0) + 1;
+    missing -= 1;
+  }
+  return steps;
+}
+
+/** The palette of a body mesh: its colors in the order of their first use. */
+interface Palette {
+  /** Each color: r, g, b in steps of {@link COLOR_STEPS}, and the finish. */
+  readonly colors: readonly (readonly [Vec3, Finish])[];
+  /** The color of each triangle, as an index in {@link Palette.colors}. */
+  readonly triangleColors: readonly number[];
+}
+
+/**
+ * Gives the palette of the triangles of a body mesh: each pair of a color in whole steps and a
+ * finish one time, in the order of the first triangle that has it.
+ *
+ * @param triangles The triangles.
+ * @returns The palette.
+ */
+function paletteOf(triangles: readonly BodyTriangle[]): Palette {
+  const keys = new Map<string, number>();
+  const colors: (readonly [Vec3, Finish])[] = [];
+  const triangleColors = triangles.map((t) => {
+    const steps = t.color.map((c) => Math.round(clamp01(c) * COLOR_STEPS));
+    const key = `${steps.join(' ')} ${t.finish}`;
+    let index = keys.get(key);
+    if (index === undefined) {
+      index = colors.length;
+      keys.set(key, index);
+      colors.push([[steps[0] ?? 0, steps[1] ?? 0, steps[2] ?? 0], t.finish]);
+    }
+    return index;
+  });
+  return { colors, triangleColors };
+}
+
+/**
+ * Packs another palette of the faces of a body mesh as base64 text: the color count, then r, g,
+ * b of each color of the palette of {@link packBodyMesh} after the map, in steps of
+ * {@link COLOR_STEPS}, in the same order. The finishes stay. {@link unpackBodyMesh} reads it
+ * with the packed mesh of the same triangles.
+ *
+ * @param triangles The triangles of the packed mesh.
+ * @param map Gives the new linear color of a color of the palette and its finish.
+ * @returns The packed palette as base64.
+ */
+export function packBodyPalette(
+  triangles: readonly BodyTriangle[],
+  map: (color: Vec3, finish: Finish) => Vec3,
+): string {
+  const out: number[] = [];
+  const { colors } = paletteOf(triangles);
+  writeVarint(out, colors.length);
+  for (const [steps, finish] of colors) {
+    const linear: Vec3 = [steps[0] / COLOR_STEPS, steps[1] / COLOR_STEPS, steps[2] / COLOR_STEPS];
+    for (const c of map(linear, finish)) {
+      writeVarint(out, Math.round(clamp01(c) * COLOR_STEPS));
+    }
+  }
+  return toBase64(out);
+}
+
+/**
+ * The number of recent vertices that the packed triangles name by their place in the list
+ * ({@link packCorners}).
+ */
+const RECENT_CORNERS = 8;
+
+/**
+ * The largest number in a stream of two byte planes ({@link writePlanes}).
+ */
+const PLANE_LIMIT = 0x10000;
+
+/**
+ * Adds numbers as two byte planes: the low byte of each number, then the high byte of each number.
+ * Gzip finds more repeats in the planes than in LEB128 numbers, also in base64 text.
+ *
+ * @param out The bytes.
+ * @param values The numbers, each an integer from 0 to 65535.
+ * @throws Error if a number is out of this range.
+ */
+function writePlanes(out: number[], values: readonly number[]): void {
+  for (const value of values) {
+    if (!Number.isInteger(value) || value < 0 || value >= PLANE_LIMIT) {
+      throw new Error(`The number ${value} does not fit in two bytes.`);
+    }
+    out.push(value & 0xff);
+  }
+  for (const value of values) {
+    out.push(value >> 8);
+  }
+}
+
+/**
+ * Reads numbers of {@link writePlanes}.
+ *
+ * @param reader The cursor. The read moves it.
+ * @param count The count of the numbers.
+ * @returns The numbers.
+ * @throws Error if the bytes end.
+ */
+function readPlanes(reader: ByteReader, count: number): Uint16Array {
+  const values = new Uint16Array(count);
+  for (let i = 0; i < count; i++) {
+    values[i] = readByte(reader);
+  }
+  for (let i = 0; i < count; i++) {
+    values[i] = (values[i] ?? 0) | (readByte(reader) << 8);
+  }
+  return values;
+}
+
+/**
+ * The state of the code of the corners of the triangles, the same in the pack and the read: the
+ * recent vertices, the most recent first, the highest vertex so far, and the vertex before.
+ */
+interface CornerState {
+  /** The recent vertices, the most recent first, at most {@link RECENT_CORNERS}. */
+  readonly recent: number[];
+  /** The highest vertex so far, or -1. */
+  high: number;
+  /** The vertex of the corner before, or 0. */
+  previous: number;
+}
+
+/**
+ * Records a corner in the state of the corner code.
+ *
+ * @param state The state. The call changes it.
+ * @param corner The vertex of the corner.
+ * @param place The place of the vertex in the recent vertices, or -1.
+ */
+function noteCorner(state: CornerState, corner: number, place: number): void {
+  if (place >= 0) {
+    state.recent.splice(place, 1);
+  }
+  state.recent.unshift(corner);
+  if (state.recent.length > RECENT_CORNERS) {
+    state.recent.pop();
+  }
+  state.high = Math.max(state.high, corner);
+  state.previous = corner;
+}
+
+/**
+ * Gives the code of each corner of the triangles: the place of the vertex in the recent vertices,
+ * or {@link RECENT_CORNERS} for the vertex after the highest vertex so far, or else
+ * {@link RECENT_CORNERS} + 1 + the zigzag number of the difference from the vertex before.
+ *
+ * @param corners The vertex of each corner, in order.
+ * @returns The code of each corner.
+ */
+function packCorners(corners: readonly number[]): number[] {
+  const state: CornerState = { recent: [], high: -1, previous: 0 };
+  return corners.map((corner) => {
+    const place = state.recent.indexOf(corner);
+    let code: number;
+    if (place >= 0) {
+      code = place;
+    } else if (corner === state.high + 1) {
+      code = RECENT_CORNERS;
+    } else {
+      code = RECENT_CORNERS + 1 + zigzag(corner - state.previous);
+    }
+    noteCorner(state, corner, place);
+    return code;
+  });
+}
+
+/**
+ * Packs a body mesh as base64 text. Each stream holds one kind of number, so that gzip finds
+ * the repeats.
+ *
+ * The packed bytes, each count and each number of the LEB128 kind unless the list says else:
+ *
+ * 1. The vertex count, the triangle count, the color count, and the count of corrective shapes.
+ * 2. The place of each vertex, one axis after the other: the difference from the vertex before,
+ *    in steps of `PACKED_STEP`, as a zigzag number in two byte planes ({@link writePlanes}).
+ * 3. The skin: the bone count of each vertex as one byte, then each bone of each vertex as one
+ *    byte, then each weight of each vertex except its last weight, in steps of
+ *    {@link BODY_WEIGHT_STEPS}, as one byte. The steps of a vertex add up to the whole, so the
+ *    read gives the last weight from the others.
+ * 4. The code of each corner of the triangles ({@link packCorners}).
+ * 5. The colors: r, g, b in steps of {@link COLOR_STEPS} and the finish index as one byte.
+ * 6. The color of each triangle, as an index in the colors.
+ * 7. The corrective shapes: the count of the vertices that each shape moves, then the difference
+ *    of each vertex from the vertex before in its shape in two byte planes, then the moves on x
+ *    of all shapes, on y, and on z, in steps of {@link CORRECTIVE_STEP} as zigzag numbers.
+ *
+ * @param vertices The vertices.
+ * @param triangles The triangles.
+ * @param correctives The move of each vertex for each corrective shape.
+ * @returns The packed mesh as base64.
+ * @throws Error if a vertex has more than {@link BODY_INFLUENCES} bones, a triangle names a
+ *   vertex that does not exist, or a difference does not fit in two bytes.
+ */
+export function packBodyMesh(
+  vertices: readonly BodyVertex[],
+  triangles: readonly BodyTriangle[],
+  correctives: readonly (readonly Vec3[])[],
+): string {
+  const out: number[] = [];
+  const { colors, triangleColors } = paletteOf(triangles);
+
+  writeVarint(out, vertices.length);
+  writeVarint(out, triangles.length);
+  writeVarint(out, colors.length);
+  writeVarint(out, correctives.length);
+  for (let axis = 0; axis < 3; axis++) {
+    let last = 0;
+    writePlanes(
+      out,
+      vertices.map((vertex) => {
+        const steps = packCoordinate(vertex.position[axis] ?? 0);
+        const delta = zigzag(steps - last);
+        last = steps;
+        return delta;
+      }),
+    );
+  }
+  const bones: number[] = [];
+  const steps: number[] = [];
+  for (const [v, vertex] of vertices.entries()) {
+    if (vertex.skin.length === 0 || vertex.skin.length > BODY_INFLUENCES) {
+      throw new Error(`The vertex ${v} has ${vertex.skin.length} bones.`);
+    }
+    out.push(vertex.skin.length);
+    bones.push(...vertex.skin.map(([bone]) => bone));
+    steps.push(...weightSteps(vertex.skin.map(([, w]) => w)).slice(0, -1));
+  }
+  out.push(...bones, ...steps);
+  const corners = triangles.flatMap((triangle) => [...triangle.corners]);
+  for (const corner of corners) {
+    if (!vertices[corner]) {
+      throw new Error(`A triangle names the vertex ${corner}, which does not exist.`);
+    }
+  }
+  for (const code of packCorners(corners)) {
+    writeVarint(out, code);
+  }
+  for (const [colorSteps, finish] of colors) {
+    for (const step of colorSteps) {
+      writeVarint(out, step);
+    }
+    out.push(FINISH_ORDER.indexOf(finish));
+  }
+  for (const index of triangleColors) {
+    writeVarint(out, index);
+  }
+  const moved = correctives.map((corrective) =>
+    corrective.flatMap((move, v) =>
+      move.some((d) => Math.round(d / CORRECTIVE_STEP) !== 0) ? [v] : [],
+    ),
+  );
+  for (const list of moved) {
+    writeVarint(out, list.length);
+  }
+  writePlanes(
+    out,
+    moved.flatMap((list) => list.map((v, k) => v - (list[k - 1] ?? 0))),
+  );
+  for (let axis = 0; axis < 3; axis++) {
+    for (const [s, list] of moved.entries()) {
+      for (const v of list) {
+        writeVarint(out, zigzag(Math.round((correctives[s]?.[v]?.[axis] ?? 0) / CORRECTIVE_STEP)));
+      }
+    }
+  }
+  return toBase64(out);
+}
+
+/**
+ * Reads a mesh of {@link packBodyMesh} back, with its own palette or with another palette of
+ * {@link packBodyPalette}.
+ *
+ * @param packed The packed mesh as base64.
+ * @param palette Another packed palette of the same triangles. The colors of the mesh by default.
+ * @returns The vertices, their skins, the triangles, their colors, and the corrective shapes.
+ * @throws Error if the bytes end early, if a triangle names a vertex that does not exist, or if
+ *   the other palette has another number of colors.
+ */
+export function unpackBodyMesh(packed: string, palette?: string): BodyMesh {
+  const reader = byteReader(packed);
+  const vertexCount = readVarint(reader);
+  const triangleCount = readVarint(reader);
+  const colorCount = readVarint(reader);
+  const correctiveCount = readVarint(reader);
+
+  const positions = new Float32Array(vertexCount * 3);
+  for (let axis = 0; axis < 3; axis++) {
+    const deltas = readPlanes(reader, vertexCount);
+    let last = 0;
+    for (let v = 0; v < vertexCount; v++) {
+      last += unzigzag(deltas[v] ?? 0);
+      positions[v * 3 + axis] = last * PACKED_STEP;
+    }
+  }
+
+  const joints = new Uint8Array(vertexCount * BODY_INFLUENCES);
+  const weights = new Float32Array(vertexCount * BODY_INFLUENCES);
+  const counts = Array.from({ length: vertexCount }, () => readByte(reader));
+  for (const [v, count] of counts.entries()) {
+    for (let k = 0; k < count; k++) {
+      joints[v * BODY_INFLUENCES + k] = readByte(reader);
+    }
+  }
+  for (const [v, count] of counts.entries()) {
+    let rest = BODY_WEIGHT_STEPS;
+    for (let k = 0; k < count; k++) {
+      const step = k < count - 1 ? readByte(reader) : rest;
+      rest -= step;
+      weights[v * BODY_INFLUENCES + k] = step / BODY_WEIGHT_STEPS;
+    }
+  }
+
+  const corners = new Uint32Array(triangleCount * 3);
+  const state: CornerState = { recent: [], high: -1, previous: 0 };
+  for (let c = 0; c < corners.length; c++) {
+    const code = readVarint(reader);
+    const place = code < RECENT_CORNERS ? code : -1;
+    let corner: number;
+    if (place >= 0) {
+      corner = state.recent[place] ?? -1;
+    } else if (code === RECENT_CORNERS) {
+      corner = state.high + 1;
+    } else {
+      corner = state.previous + unzigzag(code - RECENT_CORNERS - 1);
+    }
+    if (corner < 0 || corner >= vertexCount) {
+      throw new Error(`The corner ${c} names the vertex ${corner}, which does not exist.`);
+    }
+    corners[c] = corner;
+    noteCorner(state, corner, place);
+  }
+
+  const entries = Array.from({ length: colorCount }, () => {
+    const rgb = [0, 1, 2].map(() => readVarint(reader) / COLOR_STEPS);
+    return { rgb, finish: readByte(reader) };
+  });
+  if (palette !== undefined) {
+    const other = byteReader(palette);
+    const count = readVarint(other);
+    if (count !== colorCount) {
+      throw new Error(`The palette has ${count} colors, and the mesh has ${colorCount}.`);
+    }
+    for (const entry of entries) {
+      entry.rgb = [0, 1, 2].map(() => readVarint(other) / COLOR_STEPS);
+    }
+  }
+  const colors = new Float32Array(triangleCount * 3);
+  const finishes = new Uint8Array(triangleCount);
+  for (let t = 0; t < triangleCount; t++) {
+    const entry = entries[readVarint(reader)];
+    colors.set(entry?.rgb ?? [1, 1, 1], t * 3);
+    finishes[t] = entry?.finish ?? 0;
+  }
+
+  const moved = Array.from({ length: correctiveCount }, () => readVarint(reader));
+  const steps = readPlanes(
+    reader,
+    moved.reduce((sum, count) => sum + count, 0),
+  );
+  let at = 0;
+  const lists = moved.map((count) => {
+    const list = new Uint32Array(count);
+    let v = 0;
+    for (let k = 0; k < count; k++) {
+      v += steps[at] ?? 0;
+      at += 1;
+      list[k] = v;
+    }
+    return list;
+  });
+  const correctives = lists.map(() => new Float32Array(vertexCount * 3));
+  for (let axis = 0; axis < 3; axis++) {
+    for (const [s, list] of lists.entries()) {
+      const corrective = correctives[s];
+      for (const v of list) {
+        const move = unzigzag(readVarint(reader)) * CORRECTIVE_STEP;
+        if (corrective) {
+          corrective[v * 3 + axis] = move;
+        }
+      }
+    }
+  }
+  return { positions, joints, weights, corners, colors, finishes, correctives };
+}
+
+/** The places and the corners of a packed body mesh, which predict its texture points. */
+type UvFrame = Pick<BodyMesh, 'positions' | 'corners'>;
+
+/** A texture point in whole steps of {@link UV_STEPS}. */
+type UvSteps = readonly [u: number, v: number];
+
+/**
+ * Predicts the texture point of a new corner of a triangle from the points of two other corners
+ * of the triangle and the places of the three vertices, as the parallelogram rule of a mesh codec
+ * does. The map from the surface to the image keeps the angles in each triangle, so the new
+ * corner lies at the same place against the known edge in the image as on the surface. The
+ * texture points have v from the top edge, so the corners of a triangle in its order go clockwise
+ * in the image.
+ *
+ * @param frame The places and the corners of the mesh.
+ * @param t The triangle.
+ * @param known The corners with points, as 0, 1, or 2 in the triangle, and their points. With
+ *   one, the prediction is its point.
+ * @param k The new corner, as 0, 1, or 2 in the triangle.
+ * @param last The last new point, the prediction for a triangle with no known corner.
+ * @returns The predicted point, in steps, in the range of the image.
+ */
+function predictUv(
+  frame: UvFrame,
+  t: number,
+  known: readonly (readonly [corner: number, point: UvSteps])[],
+  k: number,
+  last: UvSteps,
+): UvSteps {
+  const [first, second] = known;
+  if (!first) {
+    return last;
+  }
+  if (!second) {
+    return first[1];
+  }
+  const place = (corner: number): Vec3 => {
+    const v = frame.corners[t * 3 + corner] ?? 0;
+    return [
+      frame.positions[v * 3] ?? 0,
+      frame.positions[v * 3 + 1] ?? 0,
+      frame.positions[v * 3 + 2] ?? 0,
+    ];
+  };
+  const [a, b, c] = [place(first[0]), place(second[0]), place(k)];
+  const e = [b[0] - a[0], b[1] - a[1], b[2] - a[2]];
+  const d = [c[0] - a[0], c[1] - a[1], c[2] - a[2]];
+  const ee = (e[0] ?? 0) ** 2 + (e[1] ?? 0) ** 2 + (e[2] ?? 0) ** 2;
+  if (ee === 0) {
+    return first[1];
+  }
+  const s =
+    ((d[0] ?? 0) * (e[0] ?? 0) + (d[1] ?? 0) * (e[1] ?? 0) + (d[2] ?? 0) * (e[2] ?? 0)) / ee;
+  const w = [0, 1, 2].map((i) => (d[i] ?? 0) - s * (e[i] ?? 0));
+  const h = Math.sqrt(((w[0] ?? 0) ** 2 + (w[1] ?? 0) ** 2 + (w[2] ?? 0) ** 2) / ee);
+  const [ua, va] = first[1];
+  const [fu, fv] = [second[1][0] - ua, second[1][1] - va];
+  // The second known corner follows the first in the order of the triangle, or comes before it.
+  const side = (second[0] - first[0] + 3) % 3 === 1 ? 1 : -1;
+  const clamp = (x: number): number => Math.min(UV_STEPS, Math.max(0, Math.round(x)));
+  return [clamp(ua + s * fu + side * h * fv), clamp(va + s * fv - side * h * fu)];
+}
+
+/**
+ * The state of the code of the texture points, the same in the pack and the read: the points of
+ * each vertex, the most recent first, and the last new point.
+ */
+interface UvState {
+  /** The points of each vertex, the most recent first. A vertex on a UV seam has more than one. */
+  readonly byVertex: Map<number, UvSteps[]>;
+  /** The last new point. */
+  last: UvSteps;
+}
+
+/**
+ * Records the point of a corner in the state of the code.
+ *
+ * @param state The state. The call changes it.
+ * @param vertex The vertex of the corner.
+ * @param place The place of the point in the points of the vertex, or -1 for a new point.
+ * @param point The point.
+ */
+function noteUv(state: UvState, vertex: number, place: number, point: UvSteps): void {
+  let list = state.byVertex.get(vertex);
+  if (!list) {
+    list = [];
+    state.byVertex.set(vertex, list);
+  }
+  if (place >= 0) {
+    list.splice(place, 1);
+  } else {
+    state.last = point;
+  }
+  list.unshift(point);
+}
+
+/**
+ * Packs the texture points of the triangles of a body mesh as base64 text, in the order of the
+ * triangles of {@link packBodyMesh}. A corner takes a point of its vertex again, or a new
+ * point, which {@link predictUv} predicts from the corners of the triangle with points. The
+ * packed bytes, each count and each number of the LEB128 kind unless the list says else:
+ *
+ * 1. The triangle count, then one byte for each triangle: 1 with a texture, 0 with none.
+ * 2. The count of the new points. Then u, then v, of each new point: the difference from its
+ *    prediction, in steps of {@link UV_STEPS}, as a zigzag number in two byte planes
+ *    ({@link writePlanes}).
+ * 3. The code of each corner of each triangle with a texture: the place of its point in the
+ *    points of its vertex, the most recent first, or the count of these points for a new point.
+ *
+ * @param uvs The texture points of each triangle.
+ * @param frame The places and the corners of the packed mesh ({@link unpackBodyMesh}).
+ * @returns The packed points as base64.
+ * @throws Error if a coordinate is out of the range from 0 to 1, or the triangle counts differ.
+ */
+export function packBodyUvs(uvs: readonly BodyTriangleUvs[], frame: UvFrame): string {
+  if (uvs.length * 3 !== frame.corners.length) {
+    throw new Error(`The mesh has ${frame.corners.length / 3} triangles, and ${uvs.length} UVs.`);
+  }
+  const state: UvState = { byVertex: new Map(), last: [0, 0] };
+  const codes: number[] = [];
+  const misses: [number[], number[]] = [[], []];
+  for (const [t, triangle] of uvs.entries()) {
+    if (!triangle) {
+      continue;
+    }
+    const points = triangle.map(([u, v]): UvSteps => {
+      if (!(u >= 0 && u <= 1 && v >= 0 && v <= 1)) {
+        throw new Error(`The texture point (${u}, ${v}) is out of the range from 0 to 1.`);
+      }
+      return [Math.round(u * UV_STEPS), Math.round(v * UV_STEPS)];
+    });
+    const places = points.map((point, k) => {
+      const list = state.byVertex.get(frame.corners[t * 3 + k] ?? 0) ?? [];
+      const place = list.findIndex(([u, v]) => u === point[0] && v === point[1]);
+      codes.push(place >= 0 ? place : list.length);
+      return place;
+    });
+    const known: (readonly [number, UvSteps])[] = [];
+    for (const [k, point] of points.entries()) {
+      if ((places[k] ?? -1) >= 0) {
+        known.push([k, point]);
+      }
+    }
+    for (const [k, point] of points.entries()) {
+      const place = places[k] ?? -1;
+      if (place < 0) {
+        const guess = predictUv(frame, t, known, k, state.last);
+        misses[0].push(zigzag(point[0] - guess[0]));
+        misses[1].push(zigzag(point[1] - guess[1]));
+        known.push([k, point]);
+      }
+      noteUv(state, frame.corners[t * 3 + k] ?? 0, place, point);
+    }
+  }
+
+  const out: number[] = [];
+  writeVarint(out, uvs.length);
+  out.push(...uvs.map((triangle) => (triangle ? 1 : 0)));
+  writeVarint(out, misses[0].length);
+  writePlanes(out, misses[0]);
+  writePlanes(out, misses[1]);
+  for (const code of codes) {
+    writeVarint(out, code);
+  }
+  return toBase64(out);
+}
+
+/**
+ * Reads the texture points of {@link packBodyUvs} back.
+ *
+ * @param packed The packed points as base64.
+ * @param frame The places and the corners of the packed mesh ({@link unpackBodyMesh}).
+ * @returns u and v of each corner of each triangle, in the order of the corners of the packed
+ *   mesh. A corner of a triangle with no texture has {@link NO_UV} in both.
+ * @throws Error if the bytes end early, the triangle counts differ, or a corner names a point
+ *   that does not exist.
+ */
+export function unpackBodyUvs(packed: string, frame: UvFrame): Float32Array {
+  const reader = byteReader(packed);
+  const triangleCount = readVarint(reader);
+  if (triangleCount * 3 !== frame.corners.length) {
+    throw new Error(
+      `The mesh has ${frame.corners.length / 3} triangles, and ${triangleCount} UVs.`,
+    );
+  }
+  const textured = Array.from({ length: triangleCount }, () => readByte(reader) === 1);
+  const missCount = readVarint(reader);
+  const missU = readPlanes(reader, missCount);
+  const missV = readPlanes(reader, missCount);
+
+  const out = new Float32Array(triangleCount * 6).fill(NO_UV);
+  const state: UvState = { byVertex: new Map(), last: [0, 0] };
+  let miss = 0;
+  for (const [t, has] of textured.entries()) {
+    if (!has) {
+      continue;
+    }
+    const lists = [0, 1, 2].map((k) => state.byVertex.get(frame.corners[t * 3 + k] ?? 0) ?? []);
+    const places = lists.map((list) => {
+      const code = readVarint(reader);
+      if (code > list.length) {
+        throw new Error(
+          `A corner names the texture point ${code} of its vertex, which does not exist.`,
+        );
+      }
+      return code < list.length ? code : -1;
+    });
+    const points: (UvSteps | null)[] = places.map((place, k) =>
+      place >= 0 ? (lists[k]?.[place] ?? null) : null,
+    );
+    const known: (readonly [number, UvSteps])[] = [];
+    for (const [k, point] of points.entries()) {
+      if (point) {
+        known.push([k, point]);
+      }
+    }
+    for (let k = 0; k < 3; k++) {
+      const place = places[k] ?? -1;
+      let point = points[k] ?? null;
+      if (!point) {
+        const guess = predictUv(frame, t, known, k, state.last);
+        point = [guess[0] + unzigzag(missU[miss] ?? 0), guess[1] + unzigzag(missV[miss] ?? 0)];
+        miss += 1;
+        known.push([k, point]);
+      }
+      noteUv(state, frame.corners[t * 3 + k] ?? 0, place, point);
+      out[(t * 3 + k) * 2] = point[0] / UV_STEPS;
+      out[(t * 3 + k) * 2 + 1] = point[1] / UV_STEPS;
+    }
+  }
+  return out;
+}

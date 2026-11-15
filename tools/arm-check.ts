@@ -1,5 +1,5 @@
 /**
- * Checks the arms of the studio body of each role against one table of limits ({@link ARM_LIMITS},
+ * Checks the arms of the body of each role against one table of limits ({@link ARM_LIMITS},
  * design 4.4), so that a change of a hold, a rig, a pose, an instrument size, or a seat that twists
  * or deforms an arm stops before its merge. A change that meets one measure can move the fault to
  * a joint that no measure reads. So the gate reads the measures of `pnpm fold-probe`, `pnpm
@@ -60,7 +60,7 @@
  * keep the margin. The run then prints the narrow axes of the elbow ring and the wrist ring in
  * centimeters against the base ({@link rebindLines}), because the flat share no longer compares.
  *
- * `--glb <file>` gives the working tree the studio body of another GLB file, such as a file of
+ * `--glb <file>` gives the working tree the body of another GLB file, such as a file of
  * `pnpm rig-mesh --check --keep`, in a copy of `src/` (`tools/glb-swap.ts`). Each role runs in a
  * child of its own, so each role must have the animal of the file: a role of its species, or a
  * recast role `<role>@<species>` of that species ({@link checkGlbRoles}). Thus one run gates the
@@ -95,7 +95,7 @@
  * than from the bind, the narrow axis p5 of each ring in each sample set for `flat`, the part of
  * the rest sample of each demo that shrinks most from the bind, and the worst edges or rings of
  * the worst sample of each arm, with the bone of each. With
- * `--glb <file>`, it explains the studio body of the file, in a copy of `src/`
+ * `--glb <file>`, it explains the body of the file, in a copy of `src/`
  * (`tools/glb-swap.ts`), so that each try body of a rig gives its rings at the same samples.
  *
  * `--json <file>` writes each line of the table of the gate with its values, its verdicts, and
@@ -166,18 +166,18 @@ import { matrixOf, turnOf, wrap } from './bone-turns.ts';
 import { weightOn } from './skin-weight.ts';
 import type { InstrumentId } from '../src/models/instruments/types.ts';
 import { BONE_NAMES } from '../src/models/rig.ts';
-import { STUDIO_BONES } from '../src/models/studio-format.ts';
-import type { Side, StudioBone, StudioMesh } from '../src/models/studio-format.ts';
+import { BODY_BONES } from '../src/models/body-format.ts';
+import type { Side, BodyBone, BodyMesh } from '../src/models/body-format.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
 import {
-  createStudioPose,
-  poseStudioBones,
-  skinStudioMesh,
-  studioOffsets,
+  createBodyPose,
+  poseBodyBones,
+  skinBodyMesh,
+  bodyOffsets,
   twistAngle,
-} from '../src/models/studio-rig.ts';
-import * as studioRig from '../src/models/studio-rig.ts';
-import type { StudioRig } from '../src/models/studio-rig.ts';
+} from '../src/models/body-rig.ts';
+import * as bodyRig from '../src/models/body-rig.ts';
+import type { BodyRig } from '../src/models/body-rig.ts';
 import { countInAt } from '../src/pose/count-in.ts';
 import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
 import { LIFT_FIT_SEC, LOWER_MAX_SEC } from '../src/pose/rest.ts';
@@ -208,7 +208,7 @@ interface UnwindPose {
  * the twist with the unwind in the tree of a commit that has it ({@link UnwindTree}).
  */
 // SAFETY: only the module of an older tree has `skinTwist`, so the field can be missing.
-const sharedTwist = (studioRig as UnwindTree).skinTwist ?? ((twist: number) => twist);
+const sharedTwist = (bodyRig as UnwindTree).skinTwist ?? ((twist: number) => twist);
 
 /** The measures of the gate. */
 export const MEASURES = [
@@ -431,7 +431,7 @@ export const ACCEPTED_GRIPS: ReadonlyMap<string, Readonly<Record<Side, number>>>
   string,
   Readonly<Record<Side, number>>
 >([
-  // The smooth studio bear with the baton along the index finger.
+  // The smooth bear with the baton along the index finger.
   ['conductor', { L: -46, R: 2 }],
   // The T-pose polar bear mesh.
   ['pianist', { L: 39, R: 30 }],
@@ -652,7 +652,7 @@ interface RingBind {
 
 /** The bind facts of one arm. */
 interface ArmBind {
-  /** The indices of the chest and the arm bones in `STUDIO_BONES`. */
+  /** The indices of the chest and the arm bones in `BODY_BONES`. */
   readonly bones: Readonly<Record<'chest' | 'upper' | 'fore' | 'hand', number>>;
   /** The bind heads of the shoulder, the elbow, and the wrist. */
   readonly joints: Readonly<Record<'shoulder' | 'elbow' | 'wrist', Vector3>>;
@@ -672,14 +672,14 @@ interface ArmBind {
   readonly upper: number;
   /** The frames of the grip ({@link GripFrames}). */
   readonly grip: GripFrames;
-  /** The unit palm of the bind paw (`StudioBody.palms`). */
+  /** The unit palm of the bind paw (`Body.palms`). */
   readonly palm: Vector3;
 }
 
 /**
  * The bind frames of the grip of one arm. The grip is the twist of the paw in the frame of the
  * posed forearm: the axis from the elbow to the wrist, and the elbow axis of the retarget
- * (`poseStudioBones()`). Both come from the posed skeleton of the player, and the palm of the paw
+ * (`poseBodyBones()`). Both come from the posed skeleton of the player, and the palm of the paw
  * comes from the hand of the player, so a new bind of the same pose gives the same grip. The zero
  * is the hanging arm of the player in its bind pose: the palm inward, along the elbow axis. A
  * positive grip turns the palm of each arm toward pronation.
@@ -687,13 +687,13 @@ interface ArmBind {
 interface GripFrames {
   /**
    * The turn from the frame of the player to the bind forearm: the down axis to the axis from the
-   * elbow to the wrist, and +x to the elbow axis (`StudioRig.arms`).
+   * elbow to the wrist, and +x to the elbow axis (`BodyRig.arms`).
    */
   readonly fore: Quaternion;
   /**
    * The turn from the frame of the player to the bind paw: the down axis to the axis from the
-   * wrist to the fingers, and the inward palm of the player to the palm of the studio
-   * (`StudioBody.palms`).
+   * wrist to the fingers, and the inward palm of the player to the palm of the body
+   * (`Body.palms`).
    */
   readonly paw: Quaternion;
 }
@@ -713,18 +713,18 @@ export type ArmSample = Readonly<Record<Measure, number>> & {
 };
 
 /**
- * Gives the skin joints of one arm: the studio bones from the upper arm to the fingers, the arm
+ * Gives the skin joints of one arm: the body bones from the upper arm to the fingers, the arm
  * segments and the helpers of a body with them (`sideSegmentBones()`), the clavicle when asked,
  * and each extra joint that follows the upper arm, such as the twist bone of the upper arm
- * (`StudioRig.follows`).
+ * (`BodyRig.follows`).
  *
- * @param rig The studio rig.
+ * @param rig The body rig.
  * @param side The side.
  * @param clavicle True to add the clavicle.
  * @returns The indices of the skin joints.
  */
-function armJoints(rig: StudioRig, side: Side, clavicle: boolean): number[] {
-  const names: StudioBone[] = [
+function armJoints(rig: BodyRig, side: Side, clavicle: boolean): number[] {
+  const names: BodyBone[] = [
     ...(clavicle ? [`clavicle_${side}` as const] : []),
     `upper_arm_${side}`,
     `forearm_${side}`,
@@ -733,10 +733,10 @@ function armJoints(rig: StudioRig, side: Side, clavicle: boolean): number[] {
     `fingers_${side}`,
     ...sideSegmentBones(side),
   ];
-  const own = names.map((name) => STUDIO_BONES.indexOf(name));
-  const upper = rig.follows[STUDIO_BONES.indexOf(`upper_arm_${side}`)];
+  const own = names.map((name) => BODY_BONES.indexOf(name));
+  const upper = rig.follows[BODY_BONES.indexOf(`upper_arm_${side}`)];
   const extra = [...rig.follows.keys()].filter(
-    (j) => j >= STUDIO_BONES.length && rig.follows[j] === upper,
+    (j) => j >= BODY_BONES.length && rig.follows[j] === upper,
   );
   return [...own, ...extra];
 }
@@ -750,7 +750,7 @@ function armJoints(rig: StudioRig, side: Side, clavicle: boolean): number[] {
  * @returns The indices of the faces.
  */
 function armFaces(
-  mesh: Pick<StudioMesh, 'joints' | 'weights' | 'corners'>,
+  mesh: Pick<BodyMesh, 'joints' | 'weights' | 'corners'>,
   joints: readonly number[],
 ): Set<number> {
   const faces = new Set<number>();
@@ -779,7 +779,7 @@ function armFaces(
  * @returns The facts.
  */
 function ringBind(
-  mesh: Pick<StudioMesh, 'positions' | 'joints' | 'weights'>,
+  mesh: Pick<BodyMesh, 'positions' | 'joints' | 'weights'>,
   edges: Uint32Array,
   ring: ArmRing,
   head: Vector3,
@@ -864,11 +864,11 @@ function faceEdges(corners: Uint32Array, faces: ReadonlySet<number> | null): Uin
 /**
  * Finds the bind facts of one arm.
  *
- * @param rig The studio rig.
+ * @param rig The body rig.
  * @param side The side.
  * @returns The facts.
  */
-function armBind(rig: StudioRig, side: Side): ArmBind {
+function armBind(rig: BodyRig, side: Side): ArmBind {
   const { mesh } = rig;
   const h = rig.body.heads;
   const joints = {
@@ -877,10 +877,10 @@ function armBind(rig: StudioRig, side: Side): ArmBind {
     wrist: new Vector3(...h[`hand_${side}`]),
   };
   const bones = {
-    chest: STUDIO_BONES.indexOf('chest'),
-    upper: STUDIO_BONES.indexOf(`upper_arm_${side}`),
-    fore: STUDIO_BONES.indexOf(`forearm_${side}`),
-    hand: STUDIO_BONES.indexOf(`hand_${side}`),
+    chest: BODY_BONES.indexOf('chest'),
+    upper: BODY_BONES.indexOf(`upper_arm_${side}`),
+    fore: BODY_BONES.indexOf(`forearm_${side}`),
+    hand: BODY_BONES.indexOf(`hand_${side}`),
   };
   const arm = armJoints(rig, side, false);
   const all = faceEdges(mesh.corners, null);
@@ -900,10 +900,10 @@ function armBind(rig: StudioRig, side: Side): ArmBind {
   const corners = cornersOf(faces);
   const lowerJoints = [
     ...(['forearm', 'forearm_twist', 'hand', 'fingers'] as const).map(
-      (bone): StudioBone => `${bone}_${side}`,
+      (bone): BodyBone => `${bone}_${side}`,
     ),
     ...sideSegmentBones(side, 'fore'),
-  ].map((bone) => STUDIO_BONES.indexOf(bone));
+  ].map((bone) => BODY_BONES.indexOf(bone));
   const lowerSet = armFaces(mesh, lowerJoints);
   const lower = cornersOf(lowerSet);
   return {
@@ -926,16 +926,16 @@ const DOWN = new Vector3(0, -1, 0);
 
 /**
  * The index of the `instrument` bone in the skin matrices: the bones of the player follow the
- * studio bones (`StudioPose.matrices`).
+ * body bones (`BodyPose.matrices`).
  */
-const INSTRUMENT_BONE = STUDIO_BONES.length + BONE_NAMES.indexOf('instrument');
+const INSTRUMENT_BONE = BODY_BONES.length + BONE_NAMES.indexOf('instrument');
 
-/** The elbow axis of each arm of the player in its bind pose (`poseStudioBones()`). */
+/** The elbow axis of each arm of the player in its bind pose (`poseBodyBones()`). */
 const PLAYER_HINGE = new Vector3(1, 0, 0);
 
 /**
  * The palm of each hand of the player in its bind pose: inward, as `PALMS` of
- * `models/studio-rig.ts` gives it.
+ * `models/body-rig.ts` gives it.
  */
 const PLAYER_PALMS: Readonly<Record<Side, Vector3>> = {
   L: new Vector3(1, 0, 0),
@@ -944,7 +944,7 @@ const PLAYER_PALMS: Readonly<Record<Side, Vector3>> = {
 
 /** The arm constants of a rig that an older tree of a probe can give with no elbow axis. */
 interface ArmHinge {
-  /** The unit elbow axis of the bind pose of the studio. */
+  /** The unit elbow axis of the bind pose of the body. */
   readonly hinge?: Vec3;
 }
 
@@ -952,13 +952,13 @@ interface ArmHinge {
  * Gives the bind frames of the grip of one arm ({@link GripFrames}). A rig with no elbow axis
  * takes the axis of its bind arm: the upper arm × the forearm.
  *
- * @param rig The studio rig.
+ * @param rig The body rig.
  * @param side The side.
  * @param joints The bind heads of the shoulder, the elbow, and the wrist.
  * @returns The frames.
  */
 function gripFrames(
-  rig: StudioRig,
+  rig: BodyRig,
   side: Side,
   joints: Readonly<Record<'shoulder' | 'elbow' | 'wrist', Vector3>>,
 ): GripFrames {
@@ -1014,7 +1014,7 @@ function edgeLengths(positions: ArrayLike<number>, corners: Uint32Array): Float3
 }
 
 /** The bind facts of the arms of each rig. */
-const binds = new WeakMap<StudioRig, Readonly<Record<Side, ArmBind>>>();
+const binds = new WeakMap<BodyRig, Readonly<Record<Side, ArmBind>>>();
 
 /**
  * Gives the bind facts of both arms of a rig, made one time for each rig.
@@ -1022,7 +1022,7 @@ const binds = new WeakMap<StudioRig, Readonly<Record<Side, ArmBind>>>();
  * @param rig The rig.
  * @returns The facts of each side.
  */
-export function armBinds(rig: StudioRig): Readonly<Record<Side, ArmBind>> {
+export function armBinds(rig: BodyRig): Readonly<Record<Side, ArmBind>> {
   let found = binds.get(rig);
   if (!found) {
     found = { L: armBind(rig, 'L'), R: armBind(rig, 'R') };
@@ -1035,11 +1035,11 @@ export function armBinds(rig: StudioRig): Readonly<Record<Side, ArmBind>> {
  * Gives the vertices of the faces of one arm ({@link armFaces}), such as for the box of the arm in
  * a view.
  *
- * @param rig The studio rig.
+ * @param rig The body rig.
  * @param side The side.
  * @returns The indices of the vertices.
  */
-export function armVertices(rig: StudioRig, side: Side): number[] {
+export function armVertices(rig: BodyRig, side: Side): number[] {
   return [...new Set(armBinds(rig)[side].corners)];
 }
 
@@ -1497,7 +1497,7 @@ export function demoMoves(duration: number): Move[] {
 }
 
 /**
- * Samples the lifts and the lowerings of the studio body of a role at steps of {@link MOVE_STEP}
+ * Samples the lifts and the lowerings of the body of a role at steps of {@link MOVE_STEP}
  * ({@link demoMoves}). A lift starts from the rest pose and takes the time of its seeded motion,
  * with no count-in limit, as the set `lift` of `probeFolds()`: a short count-in only makes it
  * faster. A lowering starts from the play pose at its pause point, after the hold. Each sample of
@@ -1513,7 +1513,7 @@ export function demoMoves(duration: number): Move[] {
  */
 export function probeMoves(role: RoleSource, demos: readonly DemoFile[]): Samples {
   const store = emptySamples();
-  const studio = createStudioPose();
+  const bodyPose = createBodyPose();
   for (const demo of demos) {
     const scene = roleScene(role, demo.bytes);
     const bodies = roleBodies(role, scene);
@@ -1541,8 +1541,8 @@ export function probeMoves(role: RoleSource, demos: readonly DemoFile[]): Sample
           if (!pose) {
             continue;
           }
-          const rig = model.studio;
-          poseStudioBones(rig, model.skeleton, pose.rotations, studioOffsets(pose), 1, studio);
+          const rig = model.bodyRig;
+          poseBodyBones(rig, model.skeleton, pose.rotations, bodyOffsets(pose), 1, bodyPose);
           const who = bodies.length > 1 ? ` player ${index ?? ''}` : '';
           store.labels.push(
             `${demo.file}${who} ${move.kind} ${move.at.toFixed(2)} s, wall ${(wall - from).toFixed(2)} s`,
@@ -1550,9 +1550,9 @@ export function probeMoves(role: RoleSource, demos: readonly DemoFile[]): Sample
           const arms = armBinds(rig);
           for (const side of SIDES) {
             const arm = arms[side];
-            const fore = turnOf(studio.matrices, arm.bones.fore);
-            const twist = turnOf(studio.matrices, STUDIO_BONES.indexOf(`forearm_twist_${side}`));
-            const hand = turnOf(studio.matrices, arm.bones.hand);
+            const fore = turnOf(bodyPose.matrices, arm.bones.fore);
+            const twist = turnOf(bodyPose.matrices, BODY_BONES.indexOf(`forearm_twist_${side}`));
+            const hand = turnOf(bodyPose.matrices, arm.bones.hand);
             const foreBind = arm.joints.wrist.clone().sub(arm.joints.elbow).normalize();
             const paw = fore.clone().invert().multiply(hand);
             const turns = [
@@ -1592,20 +1592,20 @@ function turnDegrees(a: Quaternion, b: Quaternion): number {
   return (2 * Math.acos(Math.min(1, Math.abs(a.dot(b)))) * 180) / Math.PI;
 }
 
-/** The key of the bind of each studio rig that {@link bindKey} gave. */
-const bindKeys = new WeakMap<StudioRig, string>();
+/** The key of the bind of each body rig that {@link bindKey} gave. */
+const bindKeys = new WeakMap<BodyRig, string>();
 
 /**
- * Gives the key of the bind of the arms of a studio body: a hash of the bind heads of the arm
+ * Gives the key of the bind of the arms of a body: a hash of the bind heads of the arm
  * bones ({@link BIND_BONES}) from the clavicle, the palms, and the elbow axes
- * (`StudioBody.hinges`), each rounded to 1e-5. Two bodies with one key bind their arms in one
+ * (`Body.hinges`), each rounded to 1e-5. Two bodies with one key bind their arms in one
  * pose, so the values of {@link BIND_MEASURES} count from one zero. A move of the whole body, such
  * as a new seat, keeps the key.
  *
- * @param rig The studio rig.
+ * @param rig The body rig.
  * @returns The first 12 hex digits of the SHA-256 of the bind data.
  */
-function bindKey(rig: StudioRig): string {
+function bindKey(rig: BodyRig): string {
   const found = bindKeys.get(rig);
   if (found !== undefined) {
     return found;
@@ -1640,7 +1640,7 @@ function isRebind(tree: RoleReport, base: RoleReport | null): boolean {
 }
 
 /**
- * Measures the arms of the studio body of a role over demos.
+ * Measures the arms of the body of a role over demos.
  *
  * @param role The role.
  * @param demos The demos. A demo with no body of the role adds nothing.
@@ -1685,7 +1685,7 @@ export function probeRole(
     const rests: Record<Side, Float32Array | null> = { L: null, R: null };
     let plan: ((set: SampleSet, index: number) => string) | null = null;
     const report = probeFolds(role, [demo], step, (...visit) => {
-      const [rig, studio, posed, folded, set] = visit;
+      const [rig, bodyPose, posed, folded, set] = visit;
       // A tree before the label of the visit passes five arguments.
       const given: string | undefined = visit[5];
       plan ??= given === undefined ? planLabels(role, demo, step) : null;
@@ -1700,14 +1700,14 @@ export function probeRole(
         if (set === 'rest') {
           rests[side] = lowerLengths(arms[side], posed);
         }
-        const ringWidths = ringNarrows(arms[side], studio.matrices, posed);
+        const ringWidths = ringNarrows(arms[side], bodyPose.matrices, posed);
         for (const [k, at] of ringAt.entries()) {
           const width = ringWidths[at] ?? Number.NaN;
           if (Number.isFinite(width)) {
             narrows[set][side][k]?.push(width);
           }
         }
-        const sample = measureArm(arms[side], studio.matrices, posed, folded, rests[side]);
+        const sample = measureArm(arms[side], bodyPose.matrices, posed, folded, rests[side]);
         const values = store.values[side];
         for (const measure of MEASURES) {
           if (
@@ -2444,13 +2444,13 @@ function variantGroups(args: readonly string[]): ArmVariant[] {
 }
 
 /**
- * Checks the roles of `--glb <file>`. Each role takes the studio body of the file in a child of its
+ * Checks the roles of `--glb <file>`. Each role takes the body of the file in a child of its
  * own ({@link childMain}), so each role must have the animal of the file: a role of the species of
  * the file, such as `clarinetist` for a file of the wolf, or a recast role of that species, such as
  * `violinist@wolf`.
  *
  * @param roles The roles of the command line.
- * @throws Error if the roles have more than one animal, or if a role has no studio body.
+ * @throws Error if the roles have more than one animal, or if a role has no body.
  */
 function checkGlbRoles(roles: readonly string[]): void {
   const animals = roles.map((role) => {
@@ -2463,7 +2463,7 @@ function checkGlbRoles(roles: readonly string[]): void {
   });
   const kinds = new Set(animals.map(({ animal }) => animal));
   if (kinds.size !== 1 || kinds.has(null)) {
-    const list = animals.map(({ role, animal }) => `${role} (${animal ?? 'no studio body'})`);
+    const list = animals.map(({ role, animal }) => `${role} (${animal ?? 'no body'})`);
     throw new Error(
       `The option --glb takes the roles of one animal, the animal of the file, and the recast roles <role>@<species> of its species. The roles and their animals are: ${list.join(', ')}.`,
     );
@@ -2764,10 +2764,10 @@ export async function traceLines(
           .map((d) => d.file)
       : [];
     throw new Error(
-      `The demo ${range.demo} has no studio body of the ${role}. The demos with the role are: ${withRole.join(', ') || 'none'}.`,
+      `The demo ${range.demo} has no body of the ${role}. The demos with the role are: ${withRole.join(', ') || 'none'}.`,
     );
   }
-  const rig = body.model.studio;
+  const rig = body.model.bodyRig;
   const count = Math.floor((range.to - range.from) / step + 1e-6) + 1;
   if (count > TRACE_LINES) {
     throw new Error(
@@ -2798,17 +2798,17 @@ export async function traceLines(
     if (!pose) {
       continue;
     }
-    const studio = poseStudioBones(
+    const bodyPose = poseBodyBones(
       rig,
       body.model.skeleton,
       pose.rotations,
-      studioOffsets(pose),
+      bodyOffsets(pose),
       1,
-      createStudioPose(),
+      createBodyPose(),
     );
-    const posed = skinStudioMesh(rig.mesh, studio);
+    const posed = skinBodyMesh(rig.mesh, bodyPose);
     const cells = SIDES.map((side) => {
-      const sample = measureArm(arms[side], studio.matrices, posed, [], null);
+      const sample = measureArm(arms[side], bodyPose.matrices, posed, [], null);
       const before = last[side];
       const change = before === null ? 0 : wrap(sample.pawRoll - before);
       last[side] = sample.pawRoll;
@@ -2865,7 +2865,7 @@ interface PartSample {
   /** The bind facts of the arm. */
   readonly arm: ArmBind;
   /** The skin, for the bone of an edge. */
-  readonly mesh: Pick<StudioMesh, 'joints' | 'weights'>;
+  readonly mesh: Pick<BodyMesh, 'joints' | 'weights'>;
 }
 
 /**
@@ -2936,9 +2936,9 @@ function partValue(
  * @param mesh The skin.
  * @param a The first vertex.
  * @param b The second vertex.
- * @returns The name of the studio bone, or `joint <index>` for an extra joint.
+ * @returns The name of the body bone, or `joint <index>` for an extra joint.
  */
-function edgeBone(mesh: Pick<StudioMesh, 'joints' | 'weights'>, a: number, b: number): string {
+function edgeBone(mesh: Pick<BodyMesh, 'joints' | 'weights'>, a: number, b: number): string {
   const sums = new Map<number, number>();
   for (const v of [a, b]) {
     for (let k = 0; k < 4; k++) {
@@ -2947,7 +2947,7 @@ function edgeBone(mesh: Pick<StudioMesh, 'joints' | 'weights'>, a: number, b: nu
     }
   }
   const [joint = -1] = [...sums].toSorted((x, y) => y[1] - x[1])[0] ?? [];
-  return STUDIO_BONES[joint] ?? `joint ${joint}`;
+  return BODY_BONES[joint] ?? `joint ${joint}`;
 }
 
 /**
@@ -3146,13 +3146,13 @@ function explainLines(
   const found: string[] = [];
   for (const demo of demos) {
     const restOf: Record<Side, ArmParts | null> = { L: null, R: null };
-    const report = probeFolds(source, [demo], step, (...[rig, studio, posed, , set, label]) => {
+    const report = probeFolds(source, [demo], step, (...[rig, bodyPose, posed, , set, label]) => {
       const arms = armBinds(rig);
       for (const side of SIDES) {
         const arm = arms[side];
         const parts: ArmParts = {
           lengths: lowerLengths(arm, posed),
-          narrows: ringNarrows(arm, studio.matrices, posed),
+          narrows: ringNarrows(arm, bodyPose.matrices, posed),
         };
         // The rest sample of a demo comes first, and the stretch of the gate counts from it.
         if (set === 'rest') {
@@ -3371,16 +3371,16 @@ function probeWorld(role: RoleSource, demos: readonly DemoFile[], step: number):
   const round = (value: number): number => Math.round(value * 1e6) / 1e6;
   const point = new Vector3();
   for (const demo of demos) {
-    probeFolds(role, [demo], step, (...[rig, studio, , , , label]) => {
+    probeFolds(role, [demo], step, (...[rig, bodyPose, , , , label]) => {
       labels.push(label);
       for (const side of SIDES) {
         for (const bone of BIND_BONES) {
-          const name: StudioBone = `${bone}_${side}`;
-          const matrix = matrixOf(studio.matrices, STUDIO_BONES.indexOf(name));
+          const name: BodyBone = `${bone}_${side}`;
+          const matrix = matrixOf(bodyPose.matrices, BODY_BONES.indexOf(name));
           point.fromArray(rig.body.heads[name]).applyMatrix4(matrix);
           arms[side].push(round(point.x), round(point.y), round(point.z));
         }
-        const hand = matrixOf(studio.matrices, STUDIO_BONES.indexOf(`hand_${side}`));
+        const hand = matrixOf(bodyPose.matrices, BODY_BONES.indexOf(`hand_${side}`));
         point.fromArray(rig.body.palms[side]).transformDirection(hand);
         arms[side].push(round(point.x), round(point.y), round(point.z));
       }
@@ -3525,7 +3525,7 @@ const CHILD = '--child';
 /**
  * Runs the tool as a child ({@link CHILD}): it measures the roles of the command line in this
  * tree, and writes {@link ArmJson} into the file of `--json`. A role that the tree does not have goes into
- * `missing`. With `--glb <file>`, the tool runs again in a copy of `src/` with the studio body of
+ * `missing`. With `--glb <file>`, the tool runs again in a copy of `src/` with the body of
  * the file (`tools/glb-swap.ts`).
  *
  * @param args The arguments, with {@link CHILD} and `--json <file>` at the end.
@@ -3925,7 +3925,7 @@ async function main(): Promise<number> {
   const options = checkArgs(args);
   const { glb, rest } = takeGlb(args);
   if (options.explain && glb) {
-    // The explain runs again in a copy of `src/` with the studio body of the file.
+    // The explain runs again in a copy of `src/` with the body of the file.
     const source = findRole(options.roles[0] ?? '');
     if (!source) {
       throw new Error(`No role has the name ${options.roles.join(', ')}.`);

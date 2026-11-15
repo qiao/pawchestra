@@ -42,7 +42,7 @@ import type { Transport } from './types.ts';
  * surface with an open loop at each cut to an upper arm. The triangles of the shoulder bones join
  * the two cuts across the back, so with no shoulders, the two cuts are one loop.
  */
-const BODY_BONES = [
+const SWEEP_BODY_BONES = [
   'hips',
   'spine',
   'chest',
@@ -65,11 +65,11 @@ const BODY_BONES = [
   'footR',
 ] as const satisfies readonly BoneName[];
 
-/** The open loops of {@link BODY_BONES}: the cuts to the two upper arms. */
+/** The open loops of {@link SWEEP_BODY_BONES}: the cuts to the two upper arms. */
 const BODY_LOOPS = 2;
 
 /**
- * The open loops of {@link BODY_BONES} of each Tripo hand rig, by its rig file (the `README.md` of
+ * The open loops of {@link SWEEP_BODY_BONES} of each Tripo hand rig, by its rig file (the `README.md` of
  * each model folder):
  *
  * - The polar bear: 16 open loops, the cuts to the two upper arms and the open loops of the source
@@ -136,14 +136,14 @@ const TRIPO_BODY_LOOPS: ReadonlyMap<string, number> = new Map([
 ]);
 
 /**
- * Gives the open loops of {@link BODY_BONES} of the body of a player.
+ * Gives the open loops of {@link SWEEP_BODY_BONES} of the body of a player.
  *
  * @param posed The posed skeleton.
  * @param loops The open loops of the body when it is no Tripo hand rig.
  * @returns The loops of {@link TRIPO_BODY_LOOPS} for a Tripo hand rig, else `loops`.
  */
 function bodyLoops(posed: PosedSkeleton, loops: number): number {
-  return TRIPO_BODY_LOOPS.get(posed.model.studio.body.source) ?? loops;
+  return TRIPO_BODY_LOOPS.get(posed.model.bodyRig.body.source) ?? loops;
 }
 
 /** The parts of the two arms that move in the sweep of a role. */
@@ -216,14 +216,14 @@ function* playSamples(scene: TestScene): Generator<SweepSample> {
 }
 
 /**
- * The closed surface of the body of an animal: {@link BODY_BONES} with a cap on each cut, or on
+ * The closed surface of the body of an animal: {@link SWEEP_BODY_BONES} with a cap on each cut, or on
  * each open loop of a Tripo hand rig ({@link TRIPO_BODY_LOOPS}).
  *
  * @param posed The posed skeleton.
  * @returns The surface.
  */
 function bodySurface(posed: PosedSkeleton): ClosedSurface {
-  return closedPart(posed, BODY_BONES, bodyLoops(posed, BODY_LOOPS));
+  return closedPart(posed, SWEEP_BODY_BONES, bodyLoops(posed, BODY_LOOPS));
 }
 
 /** The seat of each player model, found one time for each model. */
@@ -849,16 +849,16 @@ function sweptBowed(
   return first === index;
 }
 
-/** The species of the violinists with a studio body of a mesh. */
+/** The species of the violinists with a body of a mesh. */
 const VIOLINISTS: ReadonlySet<SpeciesId> = new Set(['rabbit', 'fox-red']);
 
-/** The species of the violists with a studio body of a mesh. */
+/** The species of the violists with a body of a mesh. */
 const VIOLISTS: ReadonlySet<SpeciesId> = new Set(['cat']);
 
-/** The species of the cellists with a studio body of a mesh. */
+/** The species of the cellists with a body of a mesh. */
 const CELLISTS: ReadonlySet<SpeciesId> = new Set(['dog']);
 
-/** The species of the bassists with a studio body of a mesh. */
+/** The species of the bassists with a body of a mesh. */
 const BASSISTS: ReadonlySet<SpeciesId> = new Set(['hippo']);
 
 /** The name of the players of each bowed role in the sweep. */
@@ -1203,7 +1203,7 @@ const BASSIST_SWEEP: RoleSweep = {
   players: (scene) => bowedPlayers(scene, 'contrabass', BASSISTS),
 };
 
-/** The species of the timpanists with a studio body of a mesh. */
+/** The species of the timpanists with a body of a mesh. */
 const TIMPANISTS: ReadonlySet<SpeciesId> = new Set(['elephant']);
 
 /**
@@ -1303,7 +1303,7 @@ const TIMPANIST_SWEEP: RoleSweep = {
   sampleSets: (scene) => VIOLINIST_SWEEP.sampleSets(scene),
 };
 
-/** The species of the percussion players with a studio body of a mesh. */
+/** The species of the percussion players with a body of a mesh. */
 const PERCUSSIONISTS: ReadonlySet<SpeciesId> = new Set(['badger']);
 
 /**

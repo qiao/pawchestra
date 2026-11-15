@@ -1,67 +1,64 @@
 import { CONDUCTOR, speciesOf } from '../models/cast.ts';
 import { SPECIES } from '../models/species.ts';
-import { addStudioBody, hasStudioBody, isStudioBodyName } from '../models/studio-body.ts';
-import type { StudioBodyName } from '../models/studio-body.ts';
-import type { StudioBody } from '../models/studio-format.ts';
+import { addBody, hasBody, isBodyName } from '../models/body.ts';
+import type { BodyName } from '../models/body.ts';
+import type { Body } from '../models/body-format.ts';
 import type { Steps } from '../score/steps.ts';
 import type { Score } from '../score/types.ts';
 
 /**
- * The load of the module of each studio body (design 7.2), by the value of `SpeciesParams.body`.
+ * The load of the module of each body (design 7.2), by the value of `SpeciesParams.body`.
  * Each module is a chunk of its own, so the first download holds no body.
  */
 const BODY_LOADS = {
-  'studio-badger': async () => (await import('../models/studio/badger.ts')).STUDIO_BADGER,
-  'studio-bear': async () => (await import('../models/studio/bear.ts')).STUDIO_BEAR,
-  'studio-beaver': async () => (await import('../models/studio/beaver.ts')).STUDIO_BEAVER,
-  'studio-cat': async () => (await import('../models/studio/cat.ts')).STUDIO_CAT,
-  'studio-deer': async () => (await import('../models/studio/deer.ts')).STUDIO_DEER,
-  'studio-dog': async () => (await import('../models/studio/dog.ts')).STUDIO_DOG,
-  'studio-elephant': async () => (await import('../models/studio/elephant.ts')).STUDIO_ELEPHANT,
-  'studio-fox': async () => (await import('../models/studio/fox.ts')).STUDIO_FOX,
-  'studio-hippo': async () => (await import('../models/studio/hippo.ts')).STUDIO_HIPPO,
-  'studio-mannequin': async () => (await import('../models/studio/mannequin.ts')).STUDIO_MANNEQUIN,
-  'studio-monkey': async () => (await import('../models/studio/monkey.ts')).STUDIO_MONKEY,
-  'studio-mouse': async () => (await import('../models/studio/mouse.ts')).STUDIO_MOUSE,
-  'studio-panda': async () => (await import('../models/studio/panda.ts')).STUDIO_PANDA,
-  'studio-penguin': async () => (await import('../models/studio/penguin.ts')).STUDIO_PENGUIN,
-  'studio-pig': async () => (await import('../models/studio/pig.ts')).STUDIO_PIG,
-  'studio-polar-bear': async () =>
-    (await import('../models/studio/polar-bear.ts')).STUDIO_POLAR_BEAR,
-  'studio-rabbit': async () => (await import('../models/studio/rabbit.ts')).STUDIO_RABBIT,
-  'studio-rhino': async () => (await import('../models/studio/rhino.ts')).STUDIO_RHINO,
-  'studio-wolf': async () => (await import('../models/studio/wolf.ts')).STUDIO_WOLF,
-} as const satisfies Readonly<Record<StudioBodyName, () => Promise<StudioBody>>>;
+  badger: async () => (await import('../models/bodies/badger.ts')).BODY_BADGER,
+  bear: async () => (await import('../models/bodies/bear.ts')).BODY_BEAR,
+  beaver: async () => (await import('../models/bodies/beaver.ts')).BODY_BEAVER,
+  cat: async () => (await import('../models/bodies/cat.ts')).BODY_CAT,
+  deer: async () => (await import('../models/bodies/deer.ts')).BODY_DEER,
+  dog: async () => (await import('../models/bodies/dog.ts')).BODY_DOG,
+  elephant: async () => (await import('../models/bodies/elephant.ts')).BODY_ELEPHANT,
+  fox: async () => (await import('../models/bodies/fox.ts')).BODY_FOX,
+  hippo: async () => (await import('../models/bodies/hippo.ts')).BODY_HIPPO,
+  mannequin: async () => (await import('../models/bodies/mannequin.ts')).BODY_MANNEQUIN,
+  monkey: async () => (await import('../models/bodies/monkey.ts')).BODY_MONKEY,
+  mouse: async () => (await import('../models/bodies/mouse.ts')).BODY_MOUSE,
+  panda: async () => (await import('../models/bodies/panda.ts')).BODY_PANDA,
+  penguin: async () => (await import('../models/bodies/penguin.ts')).BODY_PENGUIN,
+  pig: async () => (await import('../models/bodies/pig.ts')).BODY_PIG,
+  'polar-bear': async () => (await import('../models/bodies/polar-bear.ts')).BODY_POLAR_BEAR,
+  rabbit: async () => (await import('../models/bodies/rabbit.ts')).BODY_RABBIT,
+  rhino: async () => (await import('../models/bodies/rhino.ts')).BODY_RHINO,
+  wolf: async () => (await import('../models/bodies/wolf.ts')).BODY_WOLF,
+} as const satisfies Readonly<Record<BodyName, () => Promise<Body>>>;
 
-/** The names of all studio bodies. */
-const ALL_BODIES: readonly StudioBodyName[] = Object.keys(BODY_LOADS).filter(isStudioBodyName);
+/** The names of all bodies. */
+const ALL_BODIES: readonly BodyName[] = Object.keys(BODY_LOADS).filter(isBodyName);
 
 /**
- * Loads the modules of studio bodies that are not loaded, so that a player can have them (design
+ * Loads the modules of bodies that are not loaded, so that a player can have them (design
  * 7.2). Each module loads one time. In Node, all bodies are loaded already.
  *
- * @param names The studio bodies. All bodies when it is not given, for the gallery.
+ * @param names The bodies. All bodies when it is not given, for the gallery.
  */
-export async function loadStudioBodies(
-  names: readonly StudioBodyName[] = ALL_BODIES,
-): Promise<void> {
+export async function loadBodies(names: readonly BodyName[] = ALL_BODIES): Promise<void> {
   const loads = names
-    .filter((name) => !hasStudioBody(name))
+    .filter((name) => !hasBody(name))
     .map(async (name) => {
-      addStudioBody(name, await BODY_LOADS[name]());
+      addBody(name, await BODY_LOADS[name]());
     });
   await Promise.all(loads);
 }
 
 /**
- * Gives the studio bodies that a score casts (design 4.3): the body of the conductor, and the body
+ * Gives the bodies that a score casts (design 4.3): the body of the conductor, and the body
  * of the species of each seat with players.
  *
  * @param score The score.
  * @returns Each body one time.
  */
-export function castBodies(score: Score): StudioBodyName[] {
-  const names = new Set<StudioBodyName>([SPECIES[CONDUCTOR.species].body]);
+export function castBodies(score: Score): BodyName[] {
+  const names = new Set<BodyName>([SPECIES[CONDUCTOR.species].body]);
   for (const seat of score.seats) {
     if (seat.section !== 'sound-only' && seat.playerCount > 0) {
       names.add(SPECIES[speciesOf(seat.section, seat.indexInSection)].body);
@@ -71,7 +68,7 @@ export function castBodies(score: Score): StudioBodyName[] {
 }
 
 /**
- * Loads the studio bodies that a score casts and that are not loaded, as one step of a build
+ * Loads the bodies that a score casts and that are not loaded, as one step of a build
  * (design 7.2). The step yields the promise of the load, and `runSliced()` waits for it. With all
  * bodies loaded, as in Node, the step yields nothing.
  *
@@ -79,8 +76,8 @@ export function castBodies(score: Score): StudioBodyName[] {
  * @returns The steps.
  */
 export function* castBodiesSteps(score: Score): Steps<void> {
-  const missing = castBodies(score).filter((name) => !hasStudioBody(name));
+  const missing = castBodies(score).filter((name) => !hasBody(name));
   if (missing.length > 0) {
-    yield loadStudioBodies(missing);
+    yield loadBodies(missing);
   }
 }

@@ -105,7 +105,7 @@ describe('pnpm hold-reach (design 4.6)', () => {
 
 describe('pnpm hold-reach --instrument flute (design 4.6)', () => {
   it('measures each palm to its grip in the playing pose and in the rest pose', () => {
-    // The wolf has the parametric biped, and the tan fox the studio body of the fox mesh.
+    // The wolf has the parametric biped, and the tan fox the body of the fox mesh.
     const wolf = windReach('wolf', 'flute', 'chair');
     const fox = windReach('fox-tan', 'flute', 'chair');
 

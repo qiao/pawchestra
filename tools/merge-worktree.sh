@@ -7,11 +7,11 @@
 # of the worktree HEAD and the HEAD of <path>). The steps:
 #
 #   1. Stop when the worktree has uncommitted or untracked files, or when <path> has an uncommitted
-#      edit of a file that the commits touch, or of src/models/studio-heights.ts. Name the files.
+#      edit of a file that the commits touch, or of src/models/body-heights.ts. Name the files.
 #   2. Cherry-pick <base>..<worktree HEAD> into <path>. A commit that becomes empty is dropped. On a
-#      conflict in a studio module or in the heights module, write the files again with
-#      tools/regen-studio.sh, and continue. Stop on a conflict in another file.
-#   3. Write the touched studio modules and the heights module again. Stop when a file differs.
+#      conflict in a body module or in the heights module, write the files again with
+#      tools/regen-bodies.sh, and continue. Stop on a conflict in another file.
+#   3. Write the touched body modules and the heights module again. Stop when a file differs.
 #   4. Copy scratch/ and reports/ of the worktree into <path> with `rsync -a --update`, and replace
 #      the absolute path of the worktree with <path> in each copied text file of scratch/.
 #   5. Remove the worktree, and delete its branch if it has one.
@@ -109,8 +109,8 @@ dirty_files() {
   git status --porcelain --untracked-files=no | cut -c4-
 }
 
-# Writes the named studio modules (each one a path of src/models/studio/) and the heights module
-# again in the target. Returns the status of tools/regen-studio.sh.
+# Writes the named body modules (each one a path of src/models/bodies/) and the heights module
+# again in the target. Returns the status of tools/regen-bodies.sh.
 regen_modules() {
   local animals=(--heights) path
   if [ $# -gt 0 ]; then
@@ -119,22 +119,22 @@ regen_modules() {
   for path in "$@"; do
     animals+=("$(basename "$path" .ts)")
   done
-  "$SCRIPT_DIR/regen-studio.sh" "${animals[@]}"
+  "$SCRIPT_DIR/regen-bodies.sh" "${animals[@]}"
 }
 
-# Prints the studio modules among the paths of the arguments that exist in the target.
-studio_modules() {
+# Prints the body modules among the paths of the arguments that exist in the target.
+body_modules() {
   local path
   for path in "$@"; do
     case $path in
-      src/models/studio/*.ts) [ -f "$path" ] && echo "$path" ;;
+      src/models/bodies/*.ts) [ -f "$path" ] && echo "$path" ;;
     esac
   done
   return 0
 }
 
 if [ "$RESUME" = 0 ]; then
-  BUSY=$(git status --porcelain --untracked-files=all -- "${TOUCHED[@]}" src/models/studio-heights.ts)
+  BUSY=$(git status --porcelain --untracked-files=all -- "${TOUCHED[@]}" src/models/body-heights.ts)
   if [ -n "$BUSY" ]; then
     echo "$INTO has uncommitted edits of files that the commits touch. Wait, or commit them first:"
     echo "$BUSY"
@@ -152,7 +152,7 @@ if [ "$RESUME" = 0 ]; then
     while IFS= read -r path; do
       CONFLICTS+=("$path")
       case $path in
-        src/models/studio/*.ts | src/models/studio-heights.ts) GENERATED+=("$path") ;;
+        src/models/bodies/*.ts | src/models/body-heights.ts) GENERATED+=("$path") ;;
       esac
     done < <(git diff --name-only --diff-filter=U)
     if [ "${#CONFLICTS[@]}" -eq 0 ] || [ "${#CONFLICTS[@]}" -ne "${#GENERATED[@]}" ]; then
@@ -170,12 +170,12 @@ if [ "$RESUME" = 0 ]; then
     MODULES=()
     while IFS= read -r path; do
       MODULES+=("$path")
-    done < <(studio_modules "${GENERATED[@]}")
+    done < <(body_modules "${GENERATED[@]}")
     regen_modules ${MODULES[@]+"${MODULES[@]}"} || {
       echo "A generated file failed. Examine $INTO (cherry-pick in progress)."
       exit 4
     }
-    git add -- "${GENERATED[@]}" src/models/studio-heights.ts
+    git add -- "${GENERATED[@]}" src/models/body-heights.ts
     STATUS=0
     "${PICK[@]}" --continue || STATUS=$?
   done
@@ -187,7 +187,7 @@ DIRTY_BEFORE=$(dirty_files | sort)
 MODULES=()
 while IFS= read -r path; do
   MODULES+=("$path")
-done < <(studio_modules "${TOUCHED[@]}")
+done < <(body_modules "${TOUCHED[@]}")
 regen_modules ${MODULES[@]+"${MODULES[@]}"} || {
   echo "A generated file failed. The worktree $WT stays."
   exit 4

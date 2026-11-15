@@ -287,9 +287,9 @@ describe('poseBowed (design 5.3, 4.7)', () => {
         const posed = posedAt(scene, player, t);
         const label = `${species} ${player.instrument} at ${t}`;
         // The finger block of the mitten reaches through the plane of the strings. The paw of a
-        // studio body has one finger bone, and its finger block stays at the side of the neck,
+        // body has one finger bone, and its finger block stays at the side of the neck,
         // under the plane of the strings.
-        if (!player.model.studio) {
+        if (!player.model.bodyRig) {
           const heights = posedPart(posed, ['fingersL']).triangles.flatMap((triangle) =>
             [triangle.a, triangle.b, triangle.c].map((corner) => stopOf(posed, corner).height),
           );

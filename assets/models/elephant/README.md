@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the elephant (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/elephant.ts`, which this chain writes:
+`src/models/bodies/elephant.ts`, which this chain writes:
 
 ```text
 tripo-p2/elephant.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/elephant.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export elephant    the same run
    v
 tripo-hand/elephant.rig.glb       rigged mesh, with its summary elephant.rig.json
-   │  pnpm studio-body elephant   the same run
+   │  pnpm body-module elephant   the same run
    v
-src/models/studio/elephant.ts     studio body of the app
+src/models/bodies/elephant.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -56,7 +56,7 @@ end, and a thin tail with a dark tuft.
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,162 vertices and 3,541 faces: 2,779 quads and 762 triangles, no n-gon. One UV layer |
 | Parts | One part, with no open edge. No eyeball: the map paints each eye on faces of the head |
-| Box | In the studio units (1 unit from the soles to the top of the head): x ±0.438 (the paw ends), z -0.288 (the tail tuft) to 0.288 (the trunk). The elephant faces -y in Blender, with its left side at +x, so the import needs no turn |
+| Box | In the body units (1 unit from the soles to the top of the head): x ±0.438 (the paw ends), z -0.288 (the tail tuft) to 0.288 (the trunk). The elephant faces -y in Blender, with its left side at +x, so the import needs no turn |
 
 The folder `elephant.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness
 and the metallic maps are not kept.
@@ -83,13 +83,13 @@ writes `tools/mesh-rigs/simple/elephant-tripo.json`: the joints of the source.
 | Item | Value |
 |---|---|
 | Size | 376,803 bytes. A new build gives the same export, but not the same `.blend` bytes |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the elephant faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the top of the head, the soles at z = 0, the elephant faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `elephant`: 3,526 vertices and 3,853 faces (3,091 quads and 762 triangles, 6,944 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss. The 42 faces of the two painted eyes have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/elephant/tripo-hand/elephant-color.webp`) |
 | Armature | `elephant_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the standing bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 1.135511 (the shoulder joints at 1.914859 m for each unit, so that H is 0.593073 m, the H of the elephant of main), `crease` 180, and `headFloor` 0.69 ("Trunk") |
 | Eyes | The painted eye faces of the mesh, with the finish `eye` and the eye light, and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/elephant/tripo-p2/elephant.fbx', 1e-5)`. No vertex
@@ -165,10 +165,10 @@ normal of the faces at its vertex, as the smooth shading of an FBX viewer.
 
 **Trunk.** The trunk hangs from the face down to y 0.44, in front of the chest. The armature fact
 `headFloor` 0.69 (design 4.4) keeps the trunk and the tusks out of the head measures of `pnpm
-studio-body`, as on the elephant of main, so that H is the height of the head above the chin.
+body-body`, as on the elephant of main, so that H is the height of the head above the chin.
 
 **Stance.** The elephant stands at its timpani in its bind (`soloist` false in `ANIMALS` of
-`tools/studio-body.ts`). The bind keeps the straight legs of the source (`tools/rig/leg_turns.py
+`tools/body-module.ts`). The bind keeps the straight legs of the source (`tools/rig/leg_turns.py
 <config> 90 0 0 0`), and the trunk of the bind stands as in the source (`trunk.open` 0). The
 property `seat` is {`prop` `chair`, `front` -0.15, `back` -0.27, `halfWidth` 0.2}: a seat under the
 back of the haunch, behind the heels, which only sets the seat height of the export, as on the

@@ -56,11 +56,11 @@
  "body": {
   "crease": 180
  },
- "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+ "bodyNote": "The facts of the body (BODY_FACTS of tools/body-module.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
  "metersPerUnit": 1.050235,
  "metersPerUnitNote": "The scale of the app: H of the body is the H of the penguin of main (assets/models/penguin/penguin.rig.glb at cbc8db5e4), 0.217537 m. The fact height of the armature is the shoulder joints at this scale.",
  "eyeSize": 0.21,
- "jointsNote": "The places are the places of the source, in the studio units and axes: 1 unit from the soles to the crown, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Flipper (closed rings of 16 vertices from x 0.200 to x 0.458, axis y 0.642 to 0.620, z -0.101 to -0.084): the shoulder joint at x 0.16, where the flipper leaves the side of the trunk, the elbow at x 0.265, the wrist at x 0.365, and the tip at x 0.468. The flipper is a flat blade: its wide axis is (0, 0.88, 0.48), and its front face (the white under face) faces (-0.035, -0.444, 0.895), the palm. Feet: the soles from z -0.079 (heels) to 0.12 (toe tips), x 0.04 to 0.165. Tail: the pointed tail feathers go from the lower back (y 0.12, z -0.19) down to the tip at (0, 0.04, -0.242).",
+ "jointsNote": "The places are the places of the source, in the body units and axes: 1 unit from the soles to the crown, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Flipper (closed rings of 16 vertices from x 0.200 to x 0.458, axis y 0.642 to 0.620, z -0.101 to -0.084): the shoulder joint at x 0.16, where the flipper leaves the side of the trunk, the elbow at x 0.265, the wrist at x 0.365, and the tip at x 0.468. The flipper is a flat blade: its wide axis is (0, 0.88, 0.48), and its front face (the white under face) faces (-0.035, -0.444, 0.895), the palm. Feet: the soles from z -0.079 (heels) to 0.12 (toe tips), x 0.04 to 0.165. Tail: the pointed tail feathers go from the lower back (y 0.12, z -0.19) down to the tip at (0, 0.04, -0.242).",
  "rings": {
   "arm": [
    [
@@ -202,7 +202,7 @@
   "yMax": 0.12
  },
  "noseFur": true,
- "studio": {
+ "bind": {
   "bindArms": {
    "upper_arm": [
     0.639602,
@@ -215,7 +215,7 @@
     0.571719
    ]
   },
-  "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the penguin of main (tools/mesh-rigs/penguin.json at cbc8db5e4), so that the elbow axes of the singer hold stay.",
+  "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (Body.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the penguin of main (tools/mesh-rigs/penguin.json at cbc8db5e4), so that the elbow axes of the singer hold stay.",
   "bindSupination": {
    "L": 0,
    "R": 0

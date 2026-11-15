@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the wolf (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/wolf.ts`, which this chain writes:
+`src/models/bodies/wolf.ts`, which this chain writes:
 
 ```text
 tripo-p2/wolf.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/wolf.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export wolf    the same run
    v
 tripo-hand/wolf.rig.glb       rigged mesh, with its summary wolf.rig.json
-   │  pnpm studio-body wolf   the same run
+   │  pnpm body-module wolf   the same run
    v
-src/models/studio/wolf.ts     studio body of the app
+src/models/bodies/wolf.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -53,7 +53,7 @@ around.
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,074 vertices and 3,524 faces: 2,582 quads and 942 triangles, no n-gon. One UV layer |
 | Parts | 3 parts: the body (2,905 vertices), the tail (145 vertices, open at its root inside the haunch), and an open tube of 24 vertices inside the belly (x ±0.04, y 0.33 to 0.46), which no view shows. No eyeball: the map paints each eye on faces of the head. 36 open edges, and no edge with more than two faces |
-| Box | In the studio units (1 unit from the soles to the ear tips): x ±0.409 (the paw tips), z -0.241 (the tail) to 0.241 (the nose). The wolf faces -y in Blender, with its left side at +x, so the import needs no turn |
+| Box | In the body units (1 unit from the soles to the ear tips): x ±0.409 (the paw tips), z -0.241 (the tail) to 0.241 (the nose). The wolf faces -y in Blender, with its left side at +x, so the import needs no turn |
 
 The folder `wolf.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness and
 the metallic maps are not kept.
@@ -80,13 +80,13 @@ scripts follow the scripts of the Tripo fox (`../fox/README.md`). `make_config.p
 |---|---|
 | Size | 394,536 bytes |
 | SHA-256 | `a5a3ea9ea1e9ab171b6a857e9cb8baa37dfdf050aa9cc407a678102126a570af` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the wolf faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the wolf faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `wolf`: 3,656 vertices and 4,066 faces (3,124 quads and 942 triangles, 7,190 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 82 faces of the nose take the slot `fur` and the color map, with the smooth normals of the fur ("Nose"). The 48 faces of the two painted eyes have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/wolf/tripo-hand/wolf-color.webp`) |
 | Armature | `wolf_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 1.121345 (the shoulder joints at 1.77428 m for each unit, so that H is 0.369244 m, the H of the wolf of main), `crease` 180 |
 | Eyes | The painted eye faces of the mesh, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/wolf/tripo-p2/wolf.fbx', 1e-5)`. No vertex merges,
@@ -147,7 +147,7 @@ FBX viewer.
 smooth normals of the fur. As flat gloss faces in one color, the nose showed facets and no nostrils.
 The weights do not change: the nose vertices keep the row {`head` 1}. The armature property
 `headShift` (0, 0, -0.006106139) moves the head center of the holds back to the head center of the
-gloss nose, because the head box of `pnpm studio-body` now holds the nose. Thus no hold moves. The
+gloss nose, because the head box of `pnpm body-module` now holds the nose. Thus no hold moves. The
 nose keeps the colors of the source map. In the hall light it reads as the nose of the FBX file, so
 the map tool does not change it.
 

@@ -634,7 +634,7 @@ The app does not follow these facts:
   the jaw. A banjo roll with the scroll to the side avoids the twist, but no source gives it as a
   rest. On a body with a pronated bind paw, the playing grip lies more than 180° from the bind in
   the supination. There the paw turns the other way, through the direction of no paw twist
-  (`studioPawTwist()`), so that the skin of the forearm does not turn over. No source gives this
+  (`bodyPawTwist()`), so that the skin of the forearm does not turn over. No source gives this
   turn.
 - **The time of the lift.** No source gives the time of the lift. The violin and the viola take
   the longer lift of a carried instrument (`REST_MOTION.liftSec.carried` of `src/pose/rest.ts`,

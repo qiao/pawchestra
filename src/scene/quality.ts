@@ -40,7 +40,7 @@ interface TierSettings {
   /** True for the floor gloss of the surface pass (`FLOOR_GLOSS` of `surface.ts`). */
   readonly floorGloss: boolean;
   /**
-   * The scale of the side of each color map and normal map of a studio body on the GPU
+   * The scale of the side of each color map and normal map of a body on the GPU
    * (`body-texture.ts`): 1 for the size of the file, 0.5 for half the side and a quarter of the
    * memory.
    */

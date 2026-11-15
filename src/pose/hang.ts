@@ -51,7 +51,7 @@ const HANG = {
    */
   bend: 60 * MathUtils.DEG2RAD,
   /**
-   * The smallest swing of the arm out to the side. The paws of the studio bear rest on the front
+   * The smallest swing of the arm out to the side. The paws of the bear rest on the front
    * of its round belly: at 8°, they go 2.2 cm into it.
    */
   minOut: 16 * MathUtils.DEG2RAD,

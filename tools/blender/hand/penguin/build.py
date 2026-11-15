@@ -25,7 +25,7 @@ sys.path.insert(0, HERE)
 import redits as ce  # noqa: E402
 import rimport  # noqa: E402
 import rings  # noqa: E402
-import studio_armature as sa  # noqa: E402
+import body_armature as sa  # noqa: E402
 
 import make_config as mc  # noqa: E402
 
@@ -40,20 +40,20 @@ def log(*a):
     print('build:', text, flush=True)
 
 
-def studio_points(me):
+def body_points(me):
     co = np.empty(len(me.vertices) * 3)
     me.vertices.foreach_get('co', co)
-    return co.reshape(-1, 3) @ sa.TO_STUDIO.T
+    return co.reshape(-1, 3) @ sa.TO_BODY.T
 
 
-def set_studio_points(me, S):
-    me.vertices.foreach_set('co', (S @ sa.TO_STUDIO).ravel())
+def set_body_points(me, S):
+    me.vertices.foreach_set('co', (S @ sa.TO_BODY).ravel())
     me.update()
 
 
 def point_edits(body):
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     tail = np.zeros(len(S), bool)
     tail[tail_vertices(me)] = True
     roots = part_roots(me)
@@ -64,7 +64,7 @@ def point_edits(body):
         eye_side[ids] = np.sign(S[ids, 0].mean())
     part = np.where(count[roots] < 100, roots, -1)
     T = ce.map_points(S, P, tail, eye_side, part)
-    set_studio_points(me, T)
+    set_body_points(me, T)
     log(
         'point edits',
         [e['kind'] for e in P.get('edits', [])],
@@ -84,7 +84,7 @@ def trim_balls(body):
     if not margin:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     roots = part_roots(me)
     count = np.bincount(roots)
     lo, hi = np.array(CONFIG['colors']['eyeBox'][0]), np.array(CONFIG['colors']['eyeBox'][1])
@@ -112,7 +112,7 @@ def trim_balls(body):
 
 
 def beak_plane():
-    """The mouth plane of the beak rule in the studio axes: a point A, and the normal n that points
+    """The mouth plane of the beak rule in the body axes: a point A, and the normal n that points
     up from the lower beak. The plane holds the x axis and the line from A (the mouth corners) to B
     (the tip)."""
     rule = P['beak']
@@ -150,14 +150,14 @@ def split_beak(body):
     bm.from_mesh(me)
     uv = bm.loops.layers.uv.active
     jaw = bm.verts.layers.float.get('jaw') or bm.verts.layers.float.new('jaw')
-    box = [f for f in bm.faces if in_beak_box(rings.studio(f.calc_center_median()))]
+    box = [f for f in bm.faces if in_beak_box(rings.body(f.calc_center_median()))]
     verts = {v for f in box for v in f.verts}
     edges = {e for f in box for e in f.edges}
     cut = bmesh.ops.bisect_plane(
         bm, geom=list(verts) + list(edges) + box, dist=1e-7, plane_co=to_b(a), plane_no=to_b(n)
     )
     path = [g for g in cut['geom_cut'] if isinstance(g, bmesh.types.BMEdge)]
-    beak_face = lambda f: in_beak_box(rings.studio(f.calc_center_median()))
+    beak_face = lambda f: in_beak_box(rings.body(f.calc_center_median()))
     path = [e for e in path if len(e.link_faces) == 2 and all(beak_face(f) for f in e.link_faces)]
     pset = set(path)
     ends = [
@@ -170,7 +170,7 @@ def split_beak(body):
     # rule).
     corner = np.array(P['beak']['corner'], float)
     json.dump(
-        [[rings.studio(v.co).tolist() for v in e.verts] for e in path],
+        [[rings.body(v.co).tolist() for v in e.verts] for e in path],
         open(os.path.join(OUT, 'beak-cut.json'), 'w'),
     )
     comp, stack = (
@@ -178,7 +178,7 @@ def split_beak(body):
         [
             min(
                 {v for e in path for v in e.verts},
-                key=lambda v: np.linalg.norm(rings.studio(v.co) - corner),
+                key=lambda v: np.linalg.norm(rings.body(v.co) - corner),
             )
         ],
     )
@@ -191,7 +191,7 @@ def split_beak(body):
     other = []
     for e in path:
         if e.verts[0] not in comp:
-            info = [np.round(rings.studio(v.co), 4).tolist() for v in e.verts]
+            info = [np.round(rings.body(v.co), 4).tolist() for v in e.verts]
             other.append(info)
     path = [e for e in path if e.verts[0] in comp]
     pset = set(path)
@@ -206,22 +206,22 @@ def split_beak(body):
     if not rule.get('loop') and len(ends) != 2:
         raise SystemExit(
             f'The mouth path ({len(path)} edges of {len(cut["geom_cut"])} cut items, {len(box)} box faces) has {len(ends)} ends, not 2: '
-            f'{[np.round(rings.studio(v.co), 4).tolist() for v in ends]}'
+            f'{[np.round(rings.body(v.co), 4).tolist() for v in ends]}'
         )
-    corners = [np.round(rings.studio(v.co), 4).tolist() for v in ends]
+    corners = [np.round(rings.body(v.co), 4).tolist() for v in ends]
     bmesh.ops.split_edges(bm, edges=path)
     side = lambda p: float((p - a) @ n)
     on = [
         e
         for e in bm.edges
         if e.is_boundary
-        and all(abs(side(rings.studio(v.co))) < 1e-6 for v in e.verts)
+        and all(abs(side(rings.body(v.co))) < 1e-6 for v in e.verts)
         and beak_face(e.link_faces[0])
     ]
     parts = {'upper': [], 'lower': []}
     for e in on:
         parts[
-            'upper' if side(rings.studio(e.link_faces[0].calc_center_median())) > 0 else 'lower'
+            'upper' if side(rings.body(e.link_faces[0].calc_center_median())) > 0 else 'lower'
         ].append(e)
     end_set = set(ends)
     lower_path = set()
@@ -250,7 +250,7 @@ def split_beak(body):
         bm.normal_update()
         up = float(
             np.array(
-                rings.studio(cap.normal) if False else [cap.normal.x, cap.normal.z, -cap.normal.y]
+                rings.body(cap.normal) if False else [cap.normal.x, cap.normal.z, -cap.normal.y]
             )
             @ n
         )
@@ -265,7 +265,7 @@ def split_beak(body):
         v = stack.pop()
         for e in v.link_edges:
             w = e.other_vert(v)
-            p = rings.studio(w.co)
+            p = rings.body(w.co)
             if w not in seen and w not in end_set and side(p) < 0 and in_jaw_box(p):
                 seen.add(w)
                 stack.append(w)
@@ -291,11 +291,11 @@ def jaw_rows(body, rig):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     flag = np.zeros(len(S))
     me.attributes['jaw'].data.foreach_get('value', flag)
-    hb = np.array(rig.data.bones['jaw'].head_local) @ sa.TO_STUDIO.T
-    tb = np.array(rig.data.bones['jaw'].tail_local) @ sa.TO_STUDIO.T
+    hb = np.array(rig.data.bones['jaw'].head_local) @ sa.TO_BODY.T
+    tb = np.array(rig.data.bones['jaw'].tail_local) @ sa.TO_BODY.T
     d = (tb - hb) / np.linalg.norm(tb - hb)
     # Bone heat gives the jaw a share of the upper beak and the face around the jaw bone. Each
     # vertex out of the lower beak gives its jaw share to the head.
@@ -322,7 +322,7 @@ def jaw_rows(body, rig):
 
 
 def limb_loops(bm, kind, sign):
-    P_ = np.array([rings.studio(v.co) for v in bm.verts])
+    P_ = np.array([rings.body(v.co) for v in bm.verts])
     if kind == 'arm':
         inside = (
             (sign * P_[:, 0] > 0.07) & (P_[:, 1] > 0.50) & (P_[:, 1] < 0.80) & (P_[:, 2] < 0.03)
@@ -414,14 +414,14 @@ def turn_paws(body):
             old.append((forward, [uvs[q.index] for q in quad]))
             bm.faces.remove(face)
         # The paw: each arm vertex past ring A along the axis, on the side of the paw.
-        S = np.array([rings.studio(v.co) for v in bm.verts])
+        S = np.array([rings.body(v.co) for v in bm.verts])
         Borig = S[B].copy()
         t_a = float(np.mean((S[A] - f) @ axis))
         r = np.linalg.norm((S - f) - np.outer((S - f) @ axis, axis), axis=1)
         move = (((S - f) @ axis) > t_a + 0.002) & (r < 0.08) & (sign * S[:, 0] > 0.15)
         S[move] = (S[move] - f) @ R.T + f
         for i in np.nonzero(move)[0]:
-            bm.verts[i].co = Vector((S[i] @ sa.TO_STUDIO).tolist())
+            bm.verts[i].co = Vector((S[i] @ sa.TO_BODY).tolist())
         # The new quads join A[i] to the turned vertex that now lies where B[i] lay before.
         Bold = np.array([R.T @ (S[b] - f) + f for b in B])
         shift = min(
@@ -453,7 +453,7 @@ def turn_paws(body):
             w = 1 - ce.smoothstep(0.0, fade, (S[ids] - f) @ axis - t_b)
             S[ids] += w[:, None] * delta[near]
             for i in ids:
-                bm.verts[i].co = Vector((S[i] @ sa.TO_STUDIO).tolist())
+                bm.verts[i].co = Vector((S[i] @ sa.TO_BODY).tolist())
         band = bm.faces.layers.int.get('band') or bm.faces.layers.int.new('band')
         for i in range(n):
             forward, uvs = old[i]
@@ -481,7 +481,7 @@ def turn_paws(body):
 
 
 def build_rig(rm):
-    """build_armature() of studio_armature.py with a palm for each side: the palm of the config
+    """build_armature() of body_armature.py with a palm for each side: the palm of the config
     turned by the paw turn of the side about its rest forearm axis. With hingeTurn of the params,
     the elbow axis of a side turns about its bind upper arm by that angle in degrees."""
     config = CONFIG
@@ -556,7 +556,7 @@ def own_eyes(body):
     the face attribute `eye`. The color map paints a full eye on each eyeball, so the faces keep
     their colors."""
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     roots = part_roots(me)
     count = np.bincount(roots)
     lo, hi = np.array(CONFIG['colors']['eyeBox'][0]), np.array(CONFIG['colors']['eyeBox'][1])
@@ -603,10 +603,10 @@ def remove_balls(body):
     the source and on the face under it, and the dome stands out of the face with no socket, so a
     lid cannot hide in the head. The domes (the loose parts in the eye box) go, and the app bead
     eyes take their place (bead_eyes()). Gives, for each side, the middle and the axis of the dome
-    in the studio axes of the rest mesh: the middle of the sphere fit, and the mean direction of
+    in the body axes of the rest mesh: the middle of the sphere fit, and the mean direction of
     its vertices from that middle."""
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     roots = part_roots(me)
     lo, hi = np.array(CONFIG['colors']['eyeBox'][0]), np.array(CONFIG['colors']['eyeBox'][1])
     out, gone = {}, []
@@ -646,7 +646,7 @@ def bead_eyes(body, rig, domes):
     head surface), moved `out` units along the axis and `down` units down, so that the whole oval
     shows. The direction is the axis of the dome. Both go from the rest to the bind with the head
     bone. The size is the head height H of the body in units times beadEyes.size."""
-    import studio_eyes as se
+    import body_eyes as se
     from mathutils.bvhtree import BVHTree
 
     rule = P['beadEyes']
@@ -661,8 +661,8 @@ def bead_eyes(body, rig, domes):
     move = bind @ np.linalg.inv(rest)
     eyes = {}
     for side, (c, a) in domes.items():
-        cb = sa.TO_STUDIO.T @ c
-        ab = sa.TO_STUDIO.T @ a
+        cb = sa.TO_BODY.T @ c
+        ab = sa.TO_BODY.T @ a
         hit = bvh.ray_cast(Vector((cb + 0.04 * ab).tolist()), Vector((-ab).tolist()), 0.1)
         face = np.array(hit[0][:]) if hit[0] is not None else cb
         mid = face + rule['out'] * ab - np.array([0, 0, rule['down']])
@@ -712,11 +712,11 @@ def loose_vertices(me):
 def tail_vertices(me):
     """The vertices of the tail: the loose part of 100 or more vertices that is not the largest, or
     with tailFlood of the params (a tail joined to the body), the vertices that a flood from the
-    lowest point behind the body (studio z below -0.1) reaches over edges, through vertices with
-    studio z below tailFlood.z and y below tailFlood.yMax."""
+    lowest point behind the body (body z below -0.1) reaches over edges, through vertices with
+    body z below tailFlood.z and y below tailFlood.yMax."""
     rule = P.get('tailFlood')
     if rule:
-        S = studio_points(me)
+        S = body_points(me)
         ok = (S[:, 2] < rule['z']) & (S[:, 1] < rule['yMax'])
         if 'curl' in rule:
             # The end of the curl turns in toward the back, above the root of the tail.
@@ -794,11 +794,11 @@ def exact_rows(body, rig, head_ids):
       of rows.knuckle.band."""
     R = P['rows']
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     count = {'arm': 0, 'wrist': 0, 'paw': 0}
     W, K = R['wrist'], R['knuckle']
     for side, sign in (('L', 1.0), ('R', -1.0)):
-        bone = lambda n: np.array(rig.data.bones[f'{n}_{side}'].head_local) @ sa.TO_STUDIO.T
+        bone = lambda n: np.array(rig.data.bones[f'{n}_{side}'].head_local) @ sa.TO_BODY.T
         ua, fh, hh, gh = bone('upper_arm'), bone('forearm'), bone('hand'), bone('fingers')
         axis = (hh - fh) / np.linalg.norm(hh - fh)
         line = (hh - ua) / np.linalg.norm(hh - ua)
@@ -854,7 +854,7 @@ def tail_rows(body, rig):
 
     rule = P['tailRows']
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     ids = tail_vertices(me)
     inside = set(ids)
     nbr = {i: [] for i in ids}
@@ -881,7 +881,7 @@ def tail_rows(body, rig):
             if d + w < g[j]:
                 g[j] = d + w
                 heapq.heappush(heap, (d + w, j))
-    kh = np.array(rig.data.bones['tail_tip'].head_local) @ sa.TO_STUDIO.T
+    kh = np.array(rig.data.bones['tail_tip'].head_local) @ sa.TO_BODY.T
     near = min(ids, key=lambda i: np.linalg.norm(S[i] - kh))
     g_tip = g[near]
     for i in ids:
@@ -910,11 +910,11 @@ def leg_rows(body, rig):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     names = {g.index: g.name for g in body.vertex_groups}
     count = 0
     for side, sign in (('L', 1.0), ('R', -1.0)):
-        bone = lambda n: np.array(rig.data.bones[f'{n}_{side}'].head_local) @ sa.TO_STUDIO.T
+        bone = lambda n: np.array(rig.data.bones[f'{n}_{side}'].head_local) @ sa.TO_BODY.T
         hip, knee, ankle = bone('thigh'), bone('shin'), bone('foot')
         down = (ankle - hip) / np.linalg.norm(ankle - hip)
         for v in me.vertices:
@@ -1050,7 +1050,7 @@ def ear_rows(body):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     names = {g.index: g.name for g in body.vertex_groups}
     # The plane goes through the points of the ear base of the source, mapped by the point edits.
     Q = ce.map_points(np.array(rule['points'], float), P)
@@ -1098,7 +1098,7 @@ def thicken_trunk(body):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     t = np.minimum(weights_of(body, {'hips', 'spine', 'spine1', 'chest', 'neck'}), 1.0)
     y0 = CONFIG['joints']['hips']['head'][1]
     y1 = CONFIG['joints']['neck']['head'][1]
@@ -1117,7 +1117,7 @@ def thicken_trunk(body):
     move[:, 0] = (fw - 1) * S[:, 0]
     move[:, 2] = (fd - 1) * (S[:, 2] - c_z)
     T = S + t[:, None] * move
-    set_studio_points(me, T)
+    set_body_points(me, T)
     log(
         'trunk: largest move',
         round(float(np.linalg.norm(T - S, axis=1).max()), 4),
@@ -1183,7 +1183,7 @@ def relax(body, rounds=10, lam=0.5, mu=-0.53, clip=0.01):
     eyeballs, the loose parts, the gloss nose, the open edges (the eye sockets), and the vertices of
     the edges of more than two faces (the lip and lid lines) stay."""
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     bm = bmesh.new()
     bm.from_mesh(me)
     bm.verts.ensure_lookup_table()
@@ -1204,7 +1204,7 @@ def relax(body, rounds=10, lam=0.5, mu=-0.53, clip=0.01):
         n = np.linalg.norm(d, axis=1)
         over = n > clip
         X[over] = S[over] + d[over] * (clip / n[over])[:, None]
-    set_studio_points(me, X)
+    set_body_points(me, X)
     n = np.linalg.norm(X - S, axis=1)
     log(
         f'relax: {rounds} Taubin rounds ({lam}, {mu}), {int(free.sum())} free vertices, largest move '
@@ -1391,7 +1391,7 @@ def brow_strips(body):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     loose = set(loose_vertices(me))
     faces = [
         p.index
@@ -1417,7 +1417,7 @@ def band_uvs(body):
     flags = np.zeros(len(me.polygons), int)
     attr.data.foreach_get('value', flags)
     if rule:
-        S = studio_points(me)
+        S = body_points(me)
         uv = me.uv_layers.active.data
         band = np.nonzero(flags)[0]
         verts = {v for f in band for v in me.polygons[f].vertices}
@@ -1445,7 +1445,7 @@ def band_uvs(body):
             side = 'L' if flags[f] == 1 else 'R'
             _, axis = ce.paw_axis(CONFIG['joints'], side)
             q = S[list(p.vertices)]
-            n = np.array(p.normal[:]) @ sa.TO_STUDIO.T
+            n = np.array(p.normal[:]) @ sa.TO_BODY.T
             a = axis - (axis @ n) * n
             a /= np.linalg.norm(a)
             b = np.cross(n, a)

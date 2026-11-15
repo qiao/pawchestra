@@ -17,7 +17,7 @@ export interface LapPlace {
 
 /**
  * Finds the height of the top of a leg above a point: the highest crossing of the vertical line
- * through the point with a triangle of the thigh or the knee. For a studio body, the triangles of
+ * through the point with a triangle of the thigh or the knee. For a body, the triangles of
  * the hips and the belly count too.
  *
  * @param model The player model.
@@ -26,7 +26,7 @@ export interface LapPlace {
  * @returns The height, or the height of the point if the line misses the leg.
  */
 function legTop(model: PlayerModel, side: 'L' | 'R', point: Vector3): number {
-  // The knee is a ball on the shin bone. The skin of a studio body blends the thighs into the
+  // The knee is a ball on the shin bone. The skin of a body blends the thighs into the
   // hips and the belly, so its lap is the top of the hips, the spine, and the legs (design 4.4).
   const leg = new Set([
     boneIndex(`thigh${side}`),

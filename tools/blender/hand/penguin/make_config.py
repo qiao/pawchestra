@@ -20,7 +20,7 @@ import redits as ce  # noqa: E402
 
 P = json.load(open(os.path.join(HERE, 'params.json')))
 
-#: The joints of the source (studio units and axes: 1 unit from the soles to the ear tips, the
+#: The joints of the source (body units and axes: 1 unit from the soles to the ear tips, the
 #: soles at y 0, +z forward, +x the left side), measured on sections of the mesh and its loops.
 SOURCE = {
     'root': ([0, 0, 0], [0, 0, 0.1]),
@@ -111,12 +111,12 @@ def main():
     cfg['sourceNote'] = (
         'The Tripo P2 penguin mesh with its quads (assets/models/penguin/README.md). The hand rig '
         'assets/models/penguin/tripo-hand/penguin.blend starts from it in headless Blender with the calls '
-        'of tools/blender/studio_armature.py (design 4.4, "Hand rig").'
+        'of tools/blender/body_armature.py (design 4.4, "Hand rig").'
     )
     cfg['palm'] = P['palm']
     cfg['texture'] = P['sourceTexture']
     cfg['sourceNote'] = cfg['sourceNote']
-    st = cfg['studio']
+    st = cfg['bind']
     st.pop('legTurns', None)
     unit = lambda v: [round(float(x), 4) for x in np.asarray(v, float) / np.linalg.norm(v)]
     tj = P['sourceJoints']
@@ -143,7 +143,7 @@ def main():
     cfg['metersPerUnitNote'] = P['metersPerUnitNote']
     cfg['eyeSize'] = P['eyeSize']
     cfg['eyeSizeNote'] = (
-        'The head height H of the body in units, as studio-body measures it on the export, before '
+        'The head height H of the body in units, as body-module measures it on the export, before '
         'the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.'
     )
     cfg['jointsNote'] = P['jointsNote']
@@ -155,7 +155,7 @@ def main():
     st['trunk'] = P.get('trunkBind', {'open': 0, 'shares': st['trunk']['shares']})
     st['trunkNote'] = P.get('trunkNote', '')
     st['note'] = P.get('legNote', '')
-    for k, v in P.get('studio', {}).items():
+    for k, v in P.get('bind', {}).items():
         st[k] = v
     with open(path, 'w') as f:
         json.dump(cfg, f, indent=2)

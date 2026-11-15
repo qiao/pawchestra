@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the deer (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/deer.ts`, which this chain writes:
+`src/models/bodies/deer.ts`, which this chain writes:
 
 ```text
 tripo-p2/deer.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/deer.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export deer    the same run
    v
 tripo-hand/deer.rig.glb       rigged mesh, with its summary deer.rig.json
-   │  pnpm studio-body deer   the same run
+   │  pnpm body-module deer   the same run
    v
-src/models/studio/deer.ts     studio body of the app
+src/models/bodies/deer.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -55,7 +55,7 @@ the arms and the legs, and a short white tail.
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,218 vertices and 3,477 faces: 2,947 quads and 530 triangles, no n-gon. One UV layer |
 | Parts | 3 parts: the body with the tail (2,959 vertices) and two eyeballs (129 and 130 vertices, spheres of radius 0.0217 about (±0.0376, 0.8657, 0.0628)). No open edge, and no edge with more than two faces |
-| Box | In the studio units (1 unit from the soles to the ear tips): x ±0.353 (the hoof tips), z -0.189 (the tail) to 0.189 (the nose). The fawn faces -y in Blender, with its left side at +x, so the import needs no turn |
+| Box | In the body units (1 unit from the soles to the ear tips): x ±0.353 (the hoof tips), z -0.189 (the tail) to 0.189 (the nose). The fawn faces -y in Blender, with its left side at +x, so the import needs no turn |
 
 The folder `deer.fbm/` keeps two maps of the zip file under new names, as bytes. The roughness and
 the metallic maps are not kept.
@@ -84,7 +84,7 @@ joints of the source.
 |---|---|
 | Size | 394,165 bytes |
 | SHA-256 | `a90befb9f3fa9247e55881f099fedb3b26afec84ab573bf4320cb17f288c4504` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fawn faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the fawn faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `deer`: 3,746 vertices and 3,923 faces (3,425 quads and 498 triangles, 7,348 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 48 faces of the nose take the slot `fur` and the color map ("Nose"). The 225 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/deer/tripo-hand/deer-color.webp`) |
 | Armature | `deer_rig`: the 30 body bones, `tail_tip`, and the 20 arm segments and helpers, at the joints of the config. The Action `bind` holds the seated bind with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 1.166265 (the shoulder joints at 1.802574 m for each unit: 1.3 times the scale of the standing shoulder height of the deer of `deer.rig.glb` at cbc8db5e4, "Size"), `crease` 180, and `seatWidth` 0.57 ("Seat") |
@@ -93,7 +93,7 @@ joints of the source.
 The old deer has antlers, so its entry took `headCeiling` 0.87. The fawn has no antlers, and its
 ears follow the ear bones, so the hand rig takes no `headCeiling`.
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/deer/tripo-p2/deer.fbx', 1e-5)`. No vertex merges,
@@ -203,7 +203,7 @@ units under it. With psi from -55 degrees, up to 14 points of the closing lid le
 **Size.** The scale is 1.802574 m for each unit (`metersPerUnit` of the config): 1.3 times the
 scale 1.386595 at which the standing shoulder joints are at the height of the deer of
 `deer.rig.glb` at cbc8db5e4. At 1.3, the seated crown with no ears is at the seated crown of the Tripo wolf
-(`scratch/deersize/measure.py` on each `.blend`, the bones of each studio module):
+(`scratch/deersize/measure.py` on each `.blend`, the bones of each body module):
 
 | Measure (m) | Fawn at 1.0 | Fawn at 1.3 | Tripo wolf |
 |---|---|---|---|

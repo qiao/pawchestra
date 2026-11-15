@@ -1,6 +1,6 @@
 {
   "source": "assets/models/penguin/tripo-p2/penguin.fbx",
-  "sourceNote": "The Tripo P2 penguin mesh with its quads (assets/models/penguin/README.md). The hand rig assets/models/penguin/tripo-hand/penguin.blend starts from it in headless Blender with the calls of tools/blender/studio_armature.py (design 4.4, \"Hand rig\").",
+  "sourceNote": "The Tripo P2 penguin mesh with its quads (assets/models/penguin/README.md). The hand rig assets/models/penguin/tripo-hand/penguin.blend starts from it in headless Blender with the calls of tools/blender/body_armature.py (design 4.4, \"Hand rig\").",
   "name": "Penguin",
   "weld": 1e-05,
   "joints": {
@@ -241,7 +241,7 @@
     -0.444,
     0.895
   ],
-  "studio": {
+  "bind": {
     "trunk": {
       "open": 0,
       "shares": {
@@ -266,7 +266,7 @@
         0.571719
       ]
     },
-    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (StudioBody.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the penguin of main (tools/mesh-rigs/penguin.json at cbc8db5e4), so that the elbow axes of the singer hold stay.",
+    "bindArmsNote": "With straightArms, bindArms.upper_arm sets the bind upper arm, and bindArms.forearm sets only the elbow axis: the cross product of the bind upper arm and this forearm direction (Body.hinges, bind_hinges() of tools/blender/rig_mesh.py). The two directions are those of the penguin of main (tools/mesh-rigs/penguin.json at cbc8db5e4), so that the elbow axes of the singer hold stay.",
     "straightArms": true,
     "straightArmsNote": "The bind keeps the arms of the source straight: the forearm and the paw keep the turn of the upper arm, so that the rest shape holds the bend of no role, and each hold bends the elbow and the wrist from the same shape (the role-neutral bind of design 4.4).",
     "bindSupination": {
@@ -380,7 +380,7 @@
     "points": 12,
     "reach": 1,
     "darkReach": 2,
-    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm studio-body drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
+    "note": "Each eye shell is a fan from the middle of the dark faces of the eye to at most points points of their edge, lifted along the normal of the eye. pnpm body-module drops the fan, and the app puts its pea eye there (design 4.5). The faces of the old eye take the main color of the ring around it."
   },
   "chair": {
     "halfWidth": 0.24,
@@ -393,13 +393,13 @@
     "helper": 0.03,
     "note": "Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone of this length in units, as on the other bodies."
   },
-  "jointsNote": "The places are the places of the source, in the studio units and axes: 1 unit from the soles to the crown, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Flipper (closed rings of 16 vertices from x 0.200 to x 0.458, axis y 0.642 to 0.620, z -0.101 to -0.084): the shoulder joint at x 0.16, where the flipper leaves the side of the trunk, the elbow at x 0.265, the wrist at x 0.365, and the tip at x 0.468. The flipper is a flat blade: its wide axis is (0, 0.88, 0.48), and its front face (the white under face) faces (-0.035, -0.444, 0.895), the palm. Feet: the soles from z -0.079 (heels) to 0.12 (toe tips), x 0.04 to 0.165. Tail: the pointed tail feathers go from the lower back (y 0.12, z -0.19) down to the tip at (0, 0.04, -0.242).",
+  "jointsNote": "The places are the places of the source, in the body units and axes: 1 unit from the soles to the crown, the soles at y = 0, +z forward, +x the left side. The right side mirrors the left side. The FBX has no armature, so each joint comes from sections of the mesh and its edge loops. Flipper (closed rings of 16 vertices from x 0.200 to x 0.458, axis y 0.642 to 0.620, z -0.101 to -0.084): the shoulder joint at x 0.16, where the flipper leaves the side of the trunk, the elbow at x 0.265, the wrist at x 0.365, and the tip at x 0.468. The flipper is a flat blade: its wide axis is (0, 0.88, 0.48), and its front face (the white under face) faces (-0.035, -0.444, 0.895), the palm. Feet: the soles from z -0.079 (heels) to 0.12 (toe tips), x 0.04 to 0.165. Tail: the pointed tail feathers go from the lower back (y 0.12, z -0.19) down to the tip at (0, 0.04, -0.242).",
   "body": {
     "crease": 180
   },
-  "bodyNote": "The facts of the body (BODY_FACTS of tools/studio-body.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
+  "bodyNote": "The facts of the body (BODY_FACTS of tools/body-module.ts) beside the height: the crease angle 180, so that each corner takes the mean normal of the faces at its vertex, as the smooth shading of an FBX viewer shows the source.",
   "eyeSize": 0.21,
-  "eyeSizeNote": "The head height H of the body in units, as studio-body measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
+  "eyeSizeNote": "The head height H of the body in units, as body-module measures it on the export, before the head size. The hand rig keeps the eyes of the mesh, so it places no pea eye.",
   "metersPerUnit": 1.050235,
   "metersPerUnitNote": "The scale of the app: H of the body is the H of the penguin of main (assets/models/penguin/penguin.rig.glb at cbc8db5e4), 0.217537 m. The fact height of the armature is the shoulder joints at this scale.",
   "chairNote": "The seat of the rig in units of this body, as the property seat of the armature of tripo-hand/penguin.blend holds it.",

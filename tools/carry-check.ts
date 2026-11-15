@@ -2,7 +2,7 @@
  * Measures the carry of a bowed instrument in the left paw, in each lift and each lowering of the
  * roles with a carried instrument: the violin and the viola (design 5.2). At each step of
  * {@link MOVE_STEP} of each move of `demoMoves()` of `tools/arm-check.ts`, it compares the turn of
- * the instrument with the turn of the left paw (the studio bone `hand_L`). A rigid carry turns the
+ * the instrument with the turn of the left paw (the body bone `hand_L`). A rigid carry turns the
  * two together. For each role, it prints:
  *
  * - the fast steps, in which both turn faster than {@link FAST_TURN}, and the count of those in
@@ -37,8 +37,8 @@ import { probeDemos } from './probe-demos.ts';
 import { probeBeside, shortHash, withoutOptions } from './ref-tree.ts';
 import type { InstrumentId } from '../src/models/instruments/types.ts';
 import { boneIndex } from '../src/models/rig.ts';
-import { STUDIO_BONES } from '../src/models/studio-format.ts';
-import { createStudioPose, poseStudioBones, studioOffsets } from '../src/models/studio-rig.ts';
+import { BODY_BONES } from '../src/models/body-format.ts';
+import { createBodyPose, poseBodyBones, bodyOffsets } from '../src/models/body-rig.ts';
 import { countInAt } from '../src/pose/count-in.ts';
 import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
 import { LIFT_FIT_SEC, LOWER_MAX_SEC } from '../src/pose/rest.ts';
@@ -351,9 +351,9 @@ function measureCarry(role: string, demos: readonly DemoFile[]): MoveCarry[] {
   if (source?.kind !== 'player' || !CARRIED.has(source.instrument)) {
     throw new Error(`The role ${role} has no carried instrument.`);
   }
-  const instrument = STUDIO_BONES.length + boneIndex('instrument');
-  const paw = STUDIO_BONES.indexOf('hand_L');
-  const studio = createStudioPose();
+  const instrument = BODY_BONES.length + boneIndex('instrument');
+  const paw = BODY_BONES.indexOf('hand_L');
+  const bodyPose = createBodyPose();
 
   const moves: MoveCarry[] = [];
   for (const demo of demos) {
@@ -364,7 +364,7 @@ function measureCarry(role: string, demos: readonly DemoFile[]): MoveCarry[] {
       if (index === null) {
         continue;
       }
-      const rig = model.studio;
+      const rig = model.bodyRig;
       for (const move of demoMoves(scene.score.durationSec)) {
         const lead = countInAt(scene.plan.beats, move.at).lengthSec;
         const transport: Transport =
@@ -381,10 +381,10 @@ function measureCarry(role: string, demos: readonly DemoFile[]): MoveCarry[] {
           const frame = poseAt(scene.plan, song, 10 + wall, transport, audible, buffer);
           const pose = frame.players[index];
           if (pose) {
-            poseStudioBones(rig, model.skeleton, pose.rotations, studioOffsets(pose), 1, studio);
+            poseBodyBones(rig, model.skeleton, pose.rotations, bodyOffsets(pose), 1, bodyPose);
             steps.push({
-              held: turnOf(studio.matrices, paw),
-              carried: turnOf(studio.matrices, instrument),
+              held: turnOf(bodyPose.matrices, paw),
+              carried: turnOf(bodyPose.matrices, instrument),
             });
           }
         }

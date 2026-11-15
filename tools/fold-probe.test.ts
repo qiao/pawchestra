@@ -2,7 +2,7 @@ import { Matrix4, Quaternion, Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 
 import { patchedDemo } from './patch-demos.ts';
-import { STUDIO_BONES } from '../src/models/studio-format.ts';
+import { BODY_BONES } from '../src/models/body-format.ts';
 import {
   FOLD_FORMAT,
   FOLD_ROLES,
@@ -43,7 +43,7 @@ import type {
   WorstSample,
 } from './fold-probe.ts';
 import { ROOT, formatVersion, refRoleKeys } from './ref-tree.ts';
-import { ANIMALS } from './studio-body.ts';
+import { ANIMALS } from './body-module.ts';
 import type { Quat } from '../src/models/tuples.ts';
 
 /** The identity matrix, column by column. */
@@ -103,7 +103,7 @@ describe('turnBone', () => {
     const moved = [...IDENTITY.slice(0, 12), 0, -2, 0, 1];
     const matrices = new Float32Array([...IDENTITY, ...IDENTITY, ...moved]);
     const turn = turnBone(mesh, { matrices, correctives: new Float32Array() }, 0);
-    expect(turn.bone).toBe(STUDIO_BONES[2]);
+    expect(turn.bone).toBe(BODY_BONES[2]);
     expect(turn.turn).toBeCloseTo(180, 6);
   });
 
@@ -117,8 +117,8 @@ describe('turnBone', () => {
 });
 
 describe('mainBone', () => {
-  it('gives the studio bone with the largest weight over the corners', () => {
-    expect(mainBone(triangle(), 0)).toBe(STUDIO_BONES[0]);
+  it('gives the body bone with the largest weight over the corners', () => {
+    expect(mainBone(triangle(), 0)).toBe(BODY_BONES[0]);
   });
 });
 
@@ -164,11 +164,11 @@ describe('faceFacts', () => {
     expect(facts.middle.map((x) => Number(x.toFixed(6)))).toEqual([0.333333, 0.333333, 0]);
     expect(facts.angles.map((a) => Number(a.toFixed(6)))).toEqual([90, 45, 45]);
     expect(facts.weights[0]).toEqual([
-      { bone: STUDIO_BONES[5], weight: expect.closeTo(0.7, 6) },
-      { bone: STUDIO_BONES[3], weight: expect.closeTo(0.2, 6) },
-      { bone: STUDIO_BONES[6], weight: expect.closeTo(0.1, 6) },
+      { bone: BODY_BONES[5], weight: expect.closeTo(0.7, 6) },
+      { bone: BODY_BONES[3], weight: expect.closeTo(0.2, 6) },
+      { bone: BODY_BONES[6], weight: expect.closeTo(0.1, 6) },
     ]);
-    expect(facts.weights[1]).toEqual([{ bone: STUDIO_BONES[1], weight: 1 }]);
+    expect(facts.weights[1]).toEqual([{ bone: BODY_BONES[1], weight: 1 }]);
   });
 });
 
@@ -398,7 +398,7 @@ describe('probeFolds', async () => {
       expect(Math.max(0, ...count.byFace.values()), set).toBeLessThanOrEqual(count.withFold);
       expect(count.split.L + count.split.R + count.split.other, set).toBe(count.most);
       for (const bone of count.bones.keys()) {
-        expect(STUDIO_BONES, bone).toContain(bone);
+        expect(BODY_BONES, bone).toContain(bone);
       }
       expect(
         [...count.faceWorst.keys()].toSorted((a, b) => a - b),
@@ -406,7 +406,7 @@ describe('probeFolds', async () => {
       ).toEqual([...count.byFace.keys()].toSorted((a, b) => a - b));
       for (const worst of count.faceWorst.values()) {
         expect(worst.angle, set).toBeGreaterThan(90);
-        expect(STUDIO_BONES, set).toContain(worst.bone);
+        expect(BODY_BONES, set).toContain(worst.bone);
       }
     }
 

@@ -34,7 +34,7 @@ def band_entries(me, flags, S, axis_of):
 
     @param me The mesh.
     @param flags The face attribute `band` of each face.
-    @param S The vertex points in the studio axes.
+    @param S The vertex points in the body axes.
     @param axis_of A function of the side ('L' or 'R') that gives the point and the unit axis of
         the rest forearm, outward.
     @returns The entries, in the order of the faces.

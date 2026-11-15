@@ -25,7 +25,7 @@ sys.path.insert(0, HERE)
 import redits as ce  # noqa: E402
 import rimport  # noqa: E402
 import rings  # noqa: E402
-import studio_armature as sa  # noqa: E402
+import body_armature as sa  # noqa: E402
 
 import make_config as mc  # noqa: E402
 
@@ -40,27 +40,27 @@ def log(*a):
     print('build:', text, flush=True)
 
 
-def studio_points(me):
+def body_points(me):
     co = np.empty(len(me.vertices) * 3)
     me.vertices.foreach_get('co', co)
-    return co.reshape(-1, 3) @ sa.TO_STUDIO.T
+    return co.reshape(-1, 3) @ sa.TO_BODY.T
 
 
-def set_studio_points(me, S):
-    me.vertices.foreach_set('co', (S @ sa.TO_STUDIO).ravel())
+def set_body_points(me, S):
+    me.vertices.foreach_set('co', (S @ sa.TO_BODY).ravel())
     me.update()
 
 
 def point_edits(body):
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     tail = np.zeros(len(S), bool)
     tail[tail_vertices(me)] = True
     roots = part_roots(me)
     count = np.bincount(roots)
     part = np.where(count[roots] < 100, roots, -1)
     T = ce.map_points(S, P, tail, part)
-    set_studio_points(me, T)
+    set_body_points(me, T)
     log(
         'point edits',
         [e['kind'] for e in P.get('edits', [])],
@@ -70,7 +70,7 @@ def point_edits(body):
 
 
 def limb_loops(bm, kind, sign):
-    P_ = np.array([rings.studio(v.co) for v in bm.verts])
+    P_ = np.array([rings.body(v.co) for v in bm.verts])
     if kind == 'arm':
         inside = (sign * P_[:, 0] > 0.07) & (P_[:, 1] > 0.45) & (P_[:, 1] < 0.60)
         axis = (sign, 0, 0)
@@ -98,7 +98,7 @@ def subdivide(body):
                     continue
                 bm = bmesh.new()
                 bm.from_mesh(me)
-                S_ = np.array([rings.studio(v.co) for v in bm.verts])
+                S_ = np.array([rings.body(v.co) for v in bm.verts])
                 if kind == 'arm':
                     inside = (sign * S_[:, 0] > 0.06) & (S_[:, 1] > 0.45) & (S_[:, 1] < 0.60)
                     axis = (sign, 0, 0)
@@ -172,14 +172,14 @@ def turn_paws(body):
             old.append((forward, [uvs[q.index] for q in quad]))
             bm.faces.remove(face)
         # The paw: each arm vertex past ring A along the axis, on the side of the paw.
-        S = np.array([rings.studio(v.co) for v in bm.verts])
+        S = np.array([rings.body(v.co) for v in bm.verts])
         Borig = S[B].copy()
         t_a = float(np.mean((S[A] - f) @ axis))
         r = np.linalg.norm((S - f) - np.outer((S - f) @ axis, axis), axis=1)
         move = (((S - f) @ axis) > t_a + 0.002) & (r < 0.08) & (sign * S[:, 0] > 0.15)
         S[move] = (S[move] - f) @ R.T + f
         for i in np.nonzero(move)[0]:
-            bm.verts[i].co = Vector((S[i] @ sa.TO_STUDIO).tolist())
+            bm.verts[i].co = Vector((S[i] @ sa.TO_BODY).tolist())
         # The new quads join A[i] to the turned vertex that now lies where B[i] lay before.
         Bold = np.array([R.T @ (S[b] - f) + f for b in B])
         shift = min(
@@ -211,7 +211,7 @@ def turn_paws(body):
             w = 1 - ce.smoothstep(0.0, fade, (S[ids] - f) @ axis - t_b)
             S[ids] += w[:, None] * delta[near]
             for i in ids:
-                bm.verts[i].co = Vector((S[i] @ sa.TO_STUDIO).tolist())
+                bm.verts[i].co = Vector((S[i] @ sa.TO_BODY).tolist())
         band = bm.faces.layers.int.get('band') or bm.faces.layers.int.new('band')
         for i in range(n):
             forward, uvs = old[i]
@@ -239,7 +239,7 @@ def turn_paws(body):
 
 
 def build_rig(rm):
-    """build_armature() of studio_armature.py with a palm for each side: the palm of the config
+    """build_armature() of body_armature.py with a palm for each side: the palm of the config
     turned by the paw turn of the side about its rest forearm axis. With hingeTurn of the params,
     the elbow axis of a side turns about its bind upper arm by that angle in degrees."""
     config = CONFIG
@@ -333,7 +333,7 @@ def own_eyes(body):
         for i in comp:
             part[i] = comp[0]
     bm.free()
-    S = studio_points(me)
+    S = body_points(me)
     lo, hi = np.array(CONFIG['colors']['eyeBox'][0]), np.array(CONFIG['colors']['eyeBox'][1])
     roots = {}
     for i, r in part.items():
@@ -446,11 +446,11 @@ def exact_rows(body, rig, head_ids):
       of rows.knuckle.band."""
     R = P['rows']
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     count = {'arm': 0, 'wrist': 0, 'paw': 0}
     W, K = R['wrist'], R['knuckle']
     for side, sign in (('L', 1.0), ('R', -1.0)):
-        bone = lambda n: np.array(rig.data.bones[f'{n}_{side}'].head_local) @ sa.TO_STUDIO.T
+        bone = lambda n: np.array(rig.data.bones[f'{n}_{side}'].head_local) @ sa.TO_BODY.T
         ua, fh, hh, gh = bone('upper_arm'), bone('forearm'), bone('hand'), bone('fingers')
         axis = (hh - fh) / np.linalg.norm(hh - fh)
         line = (hh - ua) / np.linalg.norm(hh - ua)
@@ -501,11 +501,11 @@ def tail_rows(body, rig):
     the tail bone and c = smoothstep(-bend, bend) of the distance along tail_tip from its head."""
     rule = P['tailRows']
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     ids = tail_vertices(me)
     bone = lambda n: (
-        np.array(rig.data.bones[n].head_local) @ sa.TO_STUDIO.T,
-        np.array(rig.data.bones[n].tail_local) @ sa.TO_STUDIO.T,
+        np.array(rig.data.bones[n].head_local) @ sa.TO_BODY.T,
+        np.array(rig.data.bones[n].tail_local) @ sa.TO_BODY.T,
     )
     th, tt = bone('tail')
     kh, kt = bone('tail_tip')
@@ -633,7 +633,7 @@ def ear_rows(body):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     names = {g.index: g.name for g in body.vertex_groups}
     # The plane goes through the points of the ear base of the source, mapped by the point edits.
     Q = ce.map_points(np.array(rule['points'], float), P)
@@ -681,7 +681,7 @@ def thicken_trunk(body):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     t = np.minimum(weights_of(body, {'hips', 'spine', 'spine1', 'chest', 'neck'}), 1.0)
     y0 = CONFIG['joints']['hips']['head'][1]
     y1 = CONFIG['joints']['neck']['head'][1]
@@ -700,7 +700,7 @@ def thicken_trunk(body):
     move[:, 0] = (fw - 1) * S[:, 0]
     move[:, 2] = (fd - 1) * (S[:, 2] - c_z)
     T = S + t[:, None] * move
-    set_studio_points(me, T)
+    set_body_points(me, T)
     log(
         'trunk: largest move',
         round(float(np.linalg.norm(T - S, axis=1).max()), 4),
@@ -766,7 +766,7 @@ def relax(body, rounds=10, lam=0.5, mu=-0.53, clip=0.01):
     eyeballs, the loose parts, the gloss nose, the open edges (the eye sockets), and the vertices of
     the edges of more than two faces (the lip and lid lines) stay."""
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     bm = bmesh.new()
     bm.from_mesh(me)
     bm.verts.ensure_lookup_table()
@@ -787,7 +787,7 @@ def relax(body, rounds=10, lam=0.5, mu=-0.53, clip=0.01):
         n = np.linalg.norm(d, axis=1)
         over = n > clip
         X[over] = S[over] + d[over] * (clip / n[over])[:, None]
-    set_studio_points(me, X)
+    set_body_points(me, X)
     n = np.linalg.norm(X - S, axis=1)
     log(
         f'relax: {rounds} Taubin rounds ({lam}, {mu}), {int(free.sum())} free vertices, largest move '
@@ -974,7 +974,7 @@ def brow_strips(body):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     loose = set(loose_vertices(me))
     faces = [
         p.index
@@ -1000,7 +1000,7 @@ def band_uvs(body):
     flags = np.zeros(len(me.polygons), int)
     attr.data.foreach_get('value', flags)
     if rule:
-        S = studio_points(me)
+        S = body_points(me)
         uv = me.uv_layers.active.data
         band = np.nonzero(flags)[0]
         verts = {v for f in band for v in me.polygons[f].vertices}
@@ -1028,7 +1028,7 @@ def band_uvs(body):
             side = 'L' if flags[f] == 1 else 'R'
             _, axis = ce.paw_axis(CONFIG['joints'], side)
             q = S[list(p.vertices)]
-            n = np.array(p.normal[:]) @ sa.TO_STUDIO.T
+            n = np.array(p.normal[:]) @ sa.TO_BODY.T
             a = axis - (axis @ n) * n
             a /= np.linalg.norm(a)
             b = np.cross(n, a)
@@ -1478,12 +1478,12 @@ def smile(body):
     if not rule:
         return
     me = body.data
-    S = studio_points(me)
+    S = body_points(me)
     roots = part_roots(me)
     count = np.bincount(roots)
     part = np.where(count[roots] < 100, roots, -1)
     T = ce.smile(S, rule, dict(P, _part=part))
-    set_studio_points(me, T)
+    set_body_points(me, T)
     move = np.linalg.norm(T - S, axis=1)
     log(
         f'smile: {int((move > 1e-6).sum())} vertices move, {int(((move > 1e-6) & (part >= 0)).sum())} of loose parts, '

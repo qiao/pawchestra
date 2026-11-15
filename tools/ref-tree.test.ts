@@ -101,9 +101,9 @@ describe('probeScripts', () => {
       'blender',
       'hold-fit.ts',
       'hold-fit.test.ts',
-      'studio-body.ts',
+      'body-module.ts',
     ];
-    const own = ['blender', 'body-probe.ts', 'body-probe.test.ts', 'studio-body.ts'];
+    const own = ['blender', 'body-probe.ts', 'body-probe.test.ts', 'body-module.ts'];
     expect(probeScripts(files, own)).toEqual(['hold-fit.ts']);
   });
 });

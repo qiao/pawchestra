@@ -1,5 +1,5 @@
 /**
- * Measures the form of the arm skin of the studio body of a role (design 4.4): the twist, the
+ * Measures the form of the arm skin of the body of a role (design 4.4): the twist, the
  * collapse, and the spikes, which the fold count of `pnpm fold-probe` does not see. It poses the
  * body as the app does, over each demo of the role, in the sample sets of `pnpm fold-probe`.
  *
@@ -21,9 +21,9 @@
  * Each sample set prints the median and the worst 5% of each value for each side, and the folds of
  * `pnpm fold-probe`. `--rings` adds the median roll and collapse of each ring. Each `--set`
  * changes the holds in memory, as `pnpm fold-probe --set` does, and `--glb <file>` gives the role
- * the studio body of the file. `--json <file>` writes the values of the table. `--body
- * <key>=<value>` sets a rule of the studio body of the role in memory, such as `upperTwist=0.5`
- * (`StudioBody`), as a variant with no change of the body module.
+ * the body of the file. `--json <file>` writes the values of the table. `--body
+ * <key>=<value>` sets a rule of the body of the role in memory, such as `upperTwist=0.5`
+ * (`Body`), as a variant with no change of the body module.
  *
  * Usage: pnpm arm-shape <role> [--demo <id>]... [--step <seconds>] [--set <changes>]...
  * [--body <key>=<value>]... [--rings] [--glb <file>] [--json <file>]
@@ -39,14 +39,14 @@ import { setHolds } from './hold-sets.ts';
 import { patchedDemos } from './patch-demos.ts';
 import { SPECIES } from '../src/models/species.ts';
 import type { SpeciesParams } from '../src/models/species.ts';
-import { studioBodyOf } from '../src/models/studio-body.ts';
-import type { StudioBodyName } from '../src/models/studio-body.ts';
-import { STUDIO_BONES } from '../src/models/studio-format.ts';
+import { bodyOf } from '../src/models/body.ts';
+import type { BodyName } from '../src/models/body.ts';
+import { BODY_BONES } from '../src/models/body-format.ts';
 import { sideSegmentBones } from './arm-segments.ts';
 import { matrixOf, turnOf, wrap } from './bone-turns.ts';
-import type { Side, StudioBody, StudioBone, StudioMesh } from '../src/models/studio-format.ts';
-import { UPPER_TWIST_BONES, twistAngle } from '../src/models/studio-rig.ts';
-import type { StudioRig } from '../src/models/studio-rig.ts';
+import type { Side, Body, BodyBone, BodyMesh } from '../src/models/body-format.ts';
+import { UPPER_TWIST_BONES, twistAngle } from '../src/models/body-rig.ts';
+import type { BodyRig } from '../src/models/body-rig.ts';
 import { weightOn } from './skin-weight.ts';
 
 /** A ring of the arm skin: the bone of its axis and its place along the bone. */
@@ -112,7 +112,7 @@ interface RingBind {
 /** The bind facts of one arm. */
 interface ArmBind {
   readonly side: Side;
-  /** The indices of the arm bones and of the chest in `STUDIO_BONES`. */
+  /** The indices of the arm bones and of the chest in `BODY_BONES`. */
   readonly bones: Readonly<Record<'chest' | 'upper' | 'fore' | 'hand', number>>;
   /** The bind heads of the shoulder, the elbow, and the wrist. */
   readonly joints: Readonly<Record<'shoulder' | 'elbow' | 'wrist', Vector3>>;
@@ -140,13 +140,13 @@ export interface ArmSample {
 }
 
 /**
- * Gives the index of a bone in `STUDIO_BONES`.
+ * Gives the index of a bone in `BODY_BONES`.
  *
  * @param bone The bone.
  * @returns The index.
  */
-function boneAt(bone: StudioBone): number {
-  return STUDIO_BONES.indexOf(bone);
+function boneAt(bone: BodyBone): number {
+  return BODY_BONES.indexOf(bone);
 }
 
 /**
@@ -191,11 +191,11 @@ export function narrowAxis(vectors: ArrayLike<number>, axis: Vector3): number {
 /**
  * Finds the bind facts of one arm: the vertices of each ring and the faces of the shoulder.
  *
- * @param rig The studio rig.
+ * @param rig The body rig.
  * @param side The side.
  * @returns The facts.
  */
-function armBind(rig: StudioRig, side: Side): ArmBind {
+function armBind(rig: BodyRig, side: Side): ArmBind {
   const { mesh } = rig;
   const h = rig.body.heads;
   const joints = {
@@ -209,7 +209,7 @@ function armBind(rig: StudioRig, side: Side): ArmBind {
     fore: boneAt(`forearm_${side}`),
     hand: boneAt(`hand_${side}`),
   };
-  // The twist bone of the upper arm (`StudioBody.upperTwist`) and the arm segments and helpers
+  // The twist bone of the upper arm (`Body.upperTwist`) and the arm segments and helpers
   // (`sideSegmentBones()`) hold the arm weight of a body with them, so the rings of such a body
   // take the same vertices as with no such bone.
   const armBones = [
@@ -303,7 +303,7 @@ function meshEdges(corners: Uint32Array): Uint32Array {
  * @returns The facts.
  */
 function ringBind(
-  mesh: Pick<StudioMesh, 'positions' | 'joints' | 'weights'>,
+  mesh: Pick<BodyMesh, 'positions' | 'joints' | 'weights'>,
   edges: Uint32Array,
   ring: ArmRing,
   head: Vector3,
@@ -371,7 +371,7 @@ function longestEdge(a: Vector3, b: Vector3, c: Vector3): number {
 }
 
 /** The bind facts of the arms of each rig. */
-const binds = new WeakMap<StudioRig, Readonly<Record<Side, ArmBind>>>();
+const binds = new WeakMap<BodyRig, Readonly<Record<Side, ArmBind>>>();
 
 /**
  * Gives the bind facts of both arms of a rig, made one time for each rig.
@@ -379,7 +379,7 @@ const binds = new WeakMap<StudioRig, Readonly<Record<Side, ArmBind>>>();
  * @param rig The rig.
  * @returns The facts of each side.
  */
-export function armBinds(rig: StudioRig): Readonly<Record<Side, ArmBind>> {
+export function armBinds(rig: BodyRig): Readonly<Record<Side, ArmBind>> {
   let found = binds.get(rig);
   if (!found) {
     found = { L: armBind(rig, 'L'), R: armBind(rig, 'R') };
@@ -579,7 +579,7 @@ interface ArmReport {
 }
 
 /**
- * Measures the arm skin of the studio body of a role over demos, in the samples of
+ * Measures the arm skin of the body of a role over demos, in the samples of
  * `probeFolds()` of `tools/fold-probe.ts`.
  *
  * @param role The name of a role of `FOLD_ROLES`.
@@ -598,10 +598,10 @@ async function probeArms(
     throw new Error(`No role has the name ${role}.`);
   }
   const samples = emptySamples();
-  const folds = probeFolds(source, demos, step, (rig, studio, posed, _folded, set) => {
+  const folds = probeFolds(source, demos, step, (rig, bodyPose, posed, _folded, set) => {
     const arms = armBinds(rig);
     for (const side of ['L', 'R'] as const) {
-      samples[set][side].samples.push(measureArm(arms[side], studio.matrices, posed));
+      samples[set][side].samples.push(measureArm(arms[side], bodyPose.matrices, posed));
     }
   });
   return { samples, folds };
@@ -687,8 +687,8 @@ function armJson(report: ArmReport): string {
   return `${JSON.stringify({ demos: report.folds.demos, sets }, null, 1)}\n`;
 }
 
-/** The rules of a studio body that `--body` can set in memory, with the parse of each value. */
-const BODY_RULES: Readonly<Partial<Record<keyof StudioBody, (text: string) => string | number>>> = {
+/** The rules of a body that `--body` can set in memory, with the parse of each value. */
+const BODY_RULES: Readonly<Partial<Record<keyof Body, (text: string) => string | number>>> = {
   upperTwist: (text) => {
     const share = Number(text);
     if (!(share >= 0 && share <= 1)) {
@@ -699,14 +699,14 @@ const BODY_RULES: Readonly<Partial<Record<keyof StudioBody, (text: string) => st
 };
 
 /**
- * Sets rules of the studio bodies of a role in memory (`--body <key>=<value>`).
+ * Sets rules of the bodies of a role in memory (`--body <key>=<value>`).
  *
- * @param bodies The studio bodies of the role.
+ * @param bodies The bodies of the role.
  * @param rules The rules, such as `upperTwist=0.5`.
  * @returns A function that puts the old values back.
  * @throws Error for an unknown rule or a wrong value.
  */
-function setBodyRules(bodies: readonly StudioBodyName[], rules: readonly string[]): () => void {
+function setBodyRules(bodies: readonly BodyName[], rules: readonly string[]): () => void {
   const undo: (() => void)[] = [];
   for (const rule of rules) {
     const [key = '', text = ''] = rule.split('=');
@@ -718,7 +718,7 @@ function setBodyRules(bodies: readonly StudioBodyName[], rules: readonly string[
     }
     const value = parse(text);
     for (const name of bodies) {
-      const body = studioBodyOf(name);
+      const body = bodyOf(name);
       const had = Object.hasOwn(body, key);
       const old: unknown = Object.entries(body).find(([k]) => k === key)?.[1];
       Reflect.set(body, key, value);
@@ -733,12 +733,12 @@ function setBodyRules(bodies: readonly StudioBodyName[], rules: readonly string[
 }
 
 /**
- * Gives the studio bodies of the species of a role.
+ * Gives the bodies of the species of a role.
  *
  * @param role The name of a role of `FOLD_ROLES`.
  * @returns The names of the bodies.
  */
-function roleBodyNames(role: string): StudioBodyName[] {
+function roleBodyNames(role: string): BodyName[] {
   const source = FOLD_ROLES.get(role);
   const names = (source ? roleSpecies(source) : []).flatMap((species) => {
     const params: SpeciesParams = SPECIES[species];
@@ -748,7 +748,7 @@ function roleBodyNames(role: string): StudioBodyName[] {
 }
 
 /**
- * Runs the tool from the command line. With `--glb <file>`, the role gets the studio body that
+ * Runs the tool from the command line. With `--glb <file>`, the role gets the body that
  * the export makes from the file, in a copy of `src/` (`tools/glb-swap.ts`).
  */
 async function main(): Promise<void> {

@@ -2,7 +2,7 @@
 
 This folder holds the Tripo P2 source mesh of the polar bear (`tripo-p2/`) and its hand rig
 (`tripo-hand/`). The app does not serve these files. It loads the module
-`src/models/studio/polar-bear.ts`, which this chain writes:
+`src/models/bodies/polar-bear.ts`, which this chain writes:
 
 ```text
 tripo-p2/polar-bear.fbx             source mesh with quad faces
@@ -12,9 +12,9 @@ tripo-hand/polar-bear.blend         hand rig (design 4.4, "Hand rig")
    │  pnpm rig-export polar-bear    the same run
    v
 tripo-hand/polar-bear.rig.glb       rigged mesh, with its summary polar-bear.rig.json
-   │  pnpm studio-body polar-bear   the same run
+   │  pnpm body-module polar-bear   the same run
    v
-src/models/studio/polar-bear.ts     studio body of the app
+src/models/bodies/polar-bear.ts     body of the app
 ```
 
 `tools/blender/hand/README.md` gives the steps of the chain. The section "Tripo hand rig" below
@@ -52,7 +52,7 @@ around, and its leg tubes 15. This mesh replaces the first Tripo P2 polar bear
 | Writer | Tripo, FBX 7.4 binary. The maps lie beside the FBX file in the zip file |
 | Contents | One mesh object, with no armature and no animation. 3,280 vertices and 3,507 faces: 2,767 quads and 740 triangles (6,274 triangles), no n-gon. One UV layer |
 | Parts | 21 parts: the body (2,636 vertices), two eyeballs (65 vertices each), 10 claws of the paws (29 vertices each), and 8 claws of the feet (28 vertices each). No vertices merge at 1e-5. The open loops are the 2 eye sockets (16 edges), the backs of the 2 eyeballs (14 edges), the bases of the 18 claws (10 edges), and 3 holes of 4 edges: in the nose, on the front of the left thigh, and on the left side of the chest |
-| Box | In the studio units (1 unit from the soles to the top of the head): x ±0.463 (the claw tips) and depth ±0.224. The bear faces -y in Blender. The two sides differ by at most 0.0027 units |
+| Box | In the body units (1 unit from the soles to the top of the head): x ±0.463 (the claw tips) and depth ±0.224. The bear faces -y in Blender. The two sides differ by at most 0.0027 units |
 
 The folder `polar-bear.fbm/` keeps two maps of the zip file under new names, as bytes. The
 roughness and the metallic maps are not kept.
@@ -81,13 +81,13 @@ scripts of the Tripo fox (`assets/models/fox/README.md`). `make_config.py` write
 |---|---|
 | Size | 404,710 bytes |
 | SHA-256 | `19e5ea8c69f3db53bc4012fe034c507363e7a88c598cc494a9ca3c7c5c5a34ac` |
-| Axes | The studio units in the axes of Blender: 1 unit from the soles to the top of the head before the edits, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
+| Axes | The body units in the axes of Blender: 1 unit from the soles to the top of the head before the edits, the soles at z = 0, the bear faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `polar_bear`, with the shape key `bind_belly`: 3,772 vertices and 3,950 faces (3,210 quads and 740 triangles, 7,160 triangles), flat faces, and the surface of `sa.add_surface()`. No face is gloss: the 97 faces of the nose box take the slot `fur` and the color map, with the smooth normals of the fur. The 128 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/polar-bear/tripo-hand/polar-bear-color.webp`) |
 | Armature | `polar_bear_rig`: 60 bones. The 30 body bones, the 20 arm segments and helpers, and the 10 digit bones (`digit1_<side>` at the thumb side, +z, to `digit5_<side>`), at the joints of the config. The Action `bind` holds the seated bind. The properties `palm` (0, 0, -1), `seat`, `hinges`, and `lids` come from the steps below |
 | Facts | `height` 1.346171 (the shoulder joints at 0.672 u at 2.003231 m for each unit, so that H is 0.4228 m, the H of the main polar bear), `crease` 55 |
 | Eyes | The eyeballs of the mesh, with the finish `varnish` and no eye light (`eyeFinish` of the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
-The edits, in the order of the build (`sa` is `tools/blender/studio_armature.py`, x is the x of the
+The edits, in the order of the build (`sa` is `tools/blender/body_armature.py`, x is the x of the
 left side):
 
 - **Import.** `sa.import_source('assets/models/polar-bear/tripo-p2/polar-bear.fbx', 1e-5)`. No
