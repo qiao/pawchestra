@@ -38,12 +38,12 @@
  *        [--json <file>]
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { basename, join, resolve } from 'node:path';
+import { basename, join } from 'node:path';
 
 import { Box3, Matrix4, Triangle, Vector3 } from 'three';
 
 import { setHolds } from './hold-sets.ts';
-import { probeDemos } from './probe-demos.ts';
+import { midiPath, probeDemos } from './probe-demos.ts';
 import {
   ROOT,
   probeBeside,
@@ -351,7 +351,7 @@ function readOptions(args: readonly string[]): ProbeOptions {
         variants.push({ name: value, sets: [] });
         break;
       case '--midi':
-        midi.push(resolve(value));
+        midi.push(midiPath(value));
         break;
       case '--demo':
         demos.push(value.replace(/\.mid$/, ''));

@@ -25,7 +25,7 @@
  * With no `--midi` and no `--demo`, it probes each demo.
  */
 import { readFileSync, writeFileSync } from 'node:fs';
-import { basename, resolve } from 'node:path';
+import { basename } from 'node:path';
 
 import { Quaternion, Vector3 } from 'three';
 
@@ -34,6 +34,7 @@ import { probeBeside, shortHash, withoutOptions } from './ref-tree.ts';
 import { boneIndex } from '../src/models/rig.ts';
 import { countInAt } from '../src/pose/count-in.ts';
 import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
+import { midiPath } from './probe-demos.ts';
 import { PLAYING, allAudible, sceneOf } from '../src/pose/test-scene.ts';
 import type { TestScene } from '../src/pose/test-scene.ts';
 import { buildTimeline } from '../src/score/timeline.ts';
@@ -192,7 +193,7 @@ function parseOptions(args: readonly string[]): RatesOptions {
     switch (flag) {
       case '--midi':
         // The path is absolute, so that the child on the commit of --base reads the same file.
-        midi.push(resolve(value));
+        midi.push(midiPath(value));
         break;
       case '--demo':
         demos.push(value.replace(/\.mid$/, ''));

@@ -14,6 +14,7 @@ import { SHOT_SEED, prepareShots } from '../src/shots/prepare.ts';
 import type { ShotKind, ShotPlan } from '../src/shots/types.ts';
 import { demoLayout } from './demo-layout.ts';
 import { startCinematic } from './cinematic-mode.ts';
+import { chromiumArgs } from './chromium-args.ts';
 import { patchedDemos } from './patch-demos.ts';
 
 /** One screenshot of the review of a step (design 9.8). */
@@ -622,13 +623,7 @@ export async function startSite(root: string, port = 4179, outDir = 'dist'): Pro
     preview: { port, strictPort: false, open: false },
   });
   const base = server.resolvedUrls?.local[0] ?? `http://localhost:${port}/`;
-  const browser = await chromium.launch({
-    args: [
-      '--use-angle=metal',
-      '--ignore-gpu-blocklist',
-      '--autoplay-policy=no-user-gesture-required',
-    ],
-  });
+  const browser = await chromium.launch({ args: chromiumArgs(process.platform) });
   return {
     base,
     browser,
