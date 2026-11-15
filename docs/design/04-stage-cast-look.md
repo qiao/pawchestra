@@ -700,8 +700,8 @@ the simple route: `tools/blender/simple_rig.py` with a config of `tools/mesh-rig
 makes no cut, no cap, no remesh, and no rebuild, so the body keeps the form of its source. It
 writes the `.blend` of a hand rig, and `pnpm rig-export` and `pnpm body-module` follow ("Hand
 rig"). The first Tripo P2 rabbit was a trial of this route that the app does not use. A hand rig
-of the fourth Tripo P2 rabbit (`assets/models/rabbit/tripo-p2/`) with no arm cut and no arm
-stretch (`assets/models/rabbit/tripo-hand/`) is the body of the rabbit. Its source FBX is the
+of the fourth Tripo P2 rabbit (`assets/models/rabbit/tripo-p2/`) with no arm cut
+(`assets/models/rabbit/tripo-hand/`) is the body of the rabbit. Its source FBX is the
 target of its look, as for the Tripo wolf. It keeps the eyeballs of the source in their sockets,
 with no bead eyes, the finish `eye`, the eye light, and a blink lid on each eye ("Hand rig").
 Reason: the map paints a full eye on each eyeball (a black pupil, a brown ring, and a light). Its
@@ -711,8 +711,12 @@ source. Reason: the source paints the fur cream and smooth, and the sheet and th
 show a white rabbit. Its arms are thicker than in the source, with the girth of the third Tripo
 rabbit (the point edit `armGirth` of its chain). Reason: the arms of the source are 15% thinner,
 and thin arms read weak on the earlier Tripo bodies. Its seated eyes are at the height of the eyes
-of the third rabbit (`metersPerUnit` of its chain, 4.2). Its arms reach 0.299 m, so its violin is
-0.9 of the violin of the app (4.6, `violinScale`). The Tripo bear
+of the third rabbit (`metersPerUnit` of its chain, 4.2). Its upper arms and forearms are 1.25 times
+longer than in the source (the point edit `armStretch`, as on the red fox). Reason: the source arm
+reached 0.299 m from the shoulder joint to the palm (0.98 H), and the left paw stopped the strings
+only at the body end of the fingerboard. It now reaches 0.367 m (1.20 H). The edit comes after
+`armGirth`, because the table of `armGirth` holds the x of the source. Its violin is 0.9 of the
+violin of the app (4.6, `violinScale`). The Tripo bear
 (`assets/models/bear/tripo-hand/`) is the body of the conductor, by the rules of the badger. The
 source FBX is the target of its look: it keeps the eyeballs and the eye paint of the source with
 lids, the claws, the round belly, and the tail bump. It stands with the bind of the older bear,

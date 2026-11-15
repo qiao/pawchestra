@@ -28,8 +28,8 @@ commit `931b150dd` has the third Tripo rabbit and the sections of this file abou
 
 `tripo-hand/` holds the hand rig of the rabbit ("tripo-hand/rabbit.blend" below), from the fourth
 Tripo P2 mesh `tripo-p2/rabbit.fbx`, made in headless Blender by the route of the Tripo wolf: the
-form, the eye paint, the whiskers, and the mouth of the source, with no arm cut and no stretch. The
-`ANIMALS` entry of the rabbit points to `tripo-hand/rabbit.rig.glb`.
+form, the eye paint, the whiskers, and the mouth of the source, with no arm cut, and with arms 1.25
+times longer than the arms of the source (the point edit `armStretch`). The `ANIMALS` entry of the rabbit points to `tripo-hand/rabbit.rig.glb`.
 
 | File | Origin | Rebuild |
 |---|---|---|
@@ -78,18 +78,19 @@ The hand rig of the fourth Tripo P2 rabbit (design 4.4, "Hand rig"), made in hea
 (`blender -b --factory-startup`) by one build script, by the route of the Tripo wolf
 (`../wolf/README.md`). The source FBX is the target of the look: the body keeps the form, the eye
 paint, the whiskers, and the mouth of the source, with a crease angle of 180 and one scale of the
-whole body. One form edit changes the source: the girth of the arms ("Arm girth" below). The arms
-and the legs keep the length of the source: no cut, no split from the trunk, and no stretch.
+whole body. Two form edits change the source: the girth of the arms ("Arm girth" below) and the
+length of the arms ("Arm length" below). The arms have no cut and no split from the trunk. The legs
+keep the length of the source.
 
 | Item | Value |
 |---|---|
-| Size | 394,547 bytes |
-| SHA-256 | `7bc30639690f8b80afb7d28fb2d143a4d935c9cecd482bcf0623ec6615c272b0` |
+| Size | 394,390 bytes |
+| SHA-256 | `58e11a9f6e0ba9037ceaf7d73af0b0f3fe6ecf048c4d3cb8f8abc46c0280aee1` |
 | Origin | Made in Blender 5.2 from `tripo-p2/rabbit.fbx` |
 | License | CC BY-NC 4.0, as the FBX file |
 | Axes | The body units in the axes of Blender: 1 unit from the soles to the ear tips, the soles at z = 0, the rabbit faces -y, and +x is its left side. No object has a transform |
 | Mesh | One object `rabbit`: 3,846 vertices and 4,072 faces (3,384 quads and 688 triangles, 7,456 triangles), flat faces, and the surface of `sa.add_surface()`. The 74 faces of the two eyeballs have the face attribute `eye`, and the 312 faces of the two lids the face attribute `lid`. The UV map of the FBX, and the property `texture` (`assets/models/rabbit/tripo-hand/rabbit-color.webp`) |
-| Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (the source joints, mapped by the paw turns). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
+| Armature | `rabbit_rig`: the 30 body bones and the 20 arm segments and helpers of the simple route, at the joints of `tools/mesh-rigs/simple/rabbit-tripo.json` (the source joints, mapped by the paw turns and the point edits). The Action `bind` holds the seated bind of the bind rules of that config, with no bind supination. The properties `palm`, `hinges`, `seat`, and `lids` come from the steps below |
 | Facts | `height` 0.834507 (the shoulder joints at 1.474394 m for each unit, so that H is 0.304675 m), `crease` 180, `backRoom` 0.01 |
 | Eyes | The eyeballs of the mesh at the size of the source, with the finish `eye` and the eye light (no `eyeFinish` in the entry), and a blink lid on each. No eye objects, so the app adds no bead eyes |
 
@@ -99,8 +100,8 @@ FBX file.
 
 | File | Size | SHA-256 |
 |---|---|---|
-| `tripo-hand/rabbit.rig.glb` | 1,131,560 bytes | `a1a0164122943b39f129655a9e690842aedf7903634ecf80a47b900fc84535e8` |
-| `tripo-hand/rabbit.rig.json` | 16,013 bytes | `efd4ce577c8b7c0602a35819cb6fdb3e372e69d7436b6fad637be7476d365a5b` |
+| `tripo-hand/rabbit.rig.glb` | 1,131,576 bytes | `c7350a8e781535f32b4ff48ec0557ee3c46d01a50364bd026cbfe3c554bafc19` |
+| `tripo-hand/rabbit.rig.json` | 16,015 bytes | `9447a49b195d6c6dd6cb259960fafd7fd375fc46946e8cf479bb30c63a0c1c71` |
 
 The chain of the body is in `tools/blender/hand/rabbit/` (`build.py`, `make_config.py`,
 `params.json`, `base-config.json`, `redits.py`, `rimport.py`, `rings.py`), and `pnpm hand-chain
@@ -129,6 +130,14 @@ of the rig, the seat, or the look:
   0.06], "y": [0.5, 0.62]}`): each arm point moves away from the line from the shoulder joint to
   the wrist joint by the factor of its x, with the share 1 up to 0.045 units from the line and 0 at
   0.06. The largest move is 0.0052 units ("Arm girth" below).
+- **Arm stretch.** The point edit `armStretch` of `redits.py` (`{"kind": "armStretch", "k": 1.25,
+  "ramp": 0.01, "reach": [0.05, 0.07]}`), after `armGirth`, because the x of the table of
+  `armGirth` is the x of the source: each arm point moves along the line from the shoulder joint to
+  the wrist joint, so that the upper arm and the forearm grow by 1.25. The paw past the wrist
+  moves as one piece by 0.0465 units, with its turn. The share is 1 up to 0.05 units from the line
+  and 0 at 0.07. The thick arm and the paw lie within 0.046 units of the line, and the nearest trunk
+  point at 0.074 and head point at 0.077, so the trunk, the head, and the loose parts do not move
+  ("Arm length" below).
 - **Surface.** `sa.add_surface(rabbit, 'rabbit', 'assets/models/rabbit/tripo-p2/rabbit.fbm/rabbit_basecolor.jpg',
   eye_fans=False, config=<rabbit-tripo.json>)`. The faces of the two eyeballs get the face
   attribute `eye`. 55 light faces of the nose box leave the gloss nose, so that they show the
@@ -146,7 +155,9 @@ The weights, in the order of the work, in the rest pose:
 2. Arm rows: each vertex of a side with |x| from 0.075, within 0.045 units of the line of the rest
    arm, takes one exact row with `sa.set_weight_row()`: a clavicle share and an elbow helper share,
    linear between the control rows below, and the rest on the 4 roll segments of the upper arm or
-   the forearm. The elbow bend spreads over x 0.127 to 0.188.
+   the forearm. The elbow bend spreads over x 0.127 to 0.188. Each x of this step is the x of the
+   source: the build maps the x of a vertex back through the edit `armStretch`
+   (`redits.arm_source_x()`).
 
    | x | 0.0755 | 0.0866 | 0.0955 | 0.1043 | 0.1143 | 0.1274 | 0.158 | 0.1883 |
    |---|---|---|---|---|---|---|---|---|
@@ -189,15 +200,21 @@ bodies, so the edit `armGirth` gives the arms the girth of the third rabbit: 0.3
 0.258 m (0.848 H). The paws are smaller than the paws of the third rabbit: 0.100 m long and 0.099 m
 wide (0.107 m and 0.121 m), 0.48 of the shoulder distance in width (0.58), so they take no edit.
 
+**Arm length.** The arms of the source reach 0.299 m from the shoulder joint to the middle of the
+palm. With this reach, the violin of 0.456 m put the left paw at the body end of the fingerboard,
+next to the upper bout. The edit `armStretch` makes the upper arm and the forearm 1.25 times
+longer, as on the red fox: the shoulder joint to the wrist joint is 0.343 m (0.274 m in the
+source), and the arms reach 0.367 m to the middle of the palm. The paws keep their size.
+
 **Arm twist.** The turns of the arms in the play of the hold `RABBIT_HOLD` of
 `src/pose/bowed-rig.ts` (`pnpm hold-fit violinist`): the left upper arm 50 degrees, the left paw 21
 degrees (a forearm twist of -13 and a swing of 16), the right upper arm 56 degrees, and the right
 paw 16 degrees (a twist of 10 and a swing of 12). With the left paw turned 5 steps (-163.6
 degrees), the left forearm twisted -46 degrees.
 
-**Violin.** The arms reach 0.299 m from the shoulder joint to the middle of the palm. The violin is
+**Violin.** The arms reach 0.367 m from the shoulder joint to the middle of the palm. The violin is
 0.9 of the violin of the app (0.456 m, `violinScale` of `src/models/species.ts`): the left paw
-reaches the fingerboard from 0.64 of its length from the nut, and the bow paw 0.110 m to 0.250 m of
+reaches the fingerboard from 0.24 of its length from the nut, and the bow paw 0.110 m to 0.385 m of
 the hair (`pnpm hold-reach rabbit --instrument violin`). The rest grip holds the neck at 0.35 of
 the fingerboard (`RABBIT_HOLD.restPlace`), so that the lower end of the violin stands 2.1 cm above
 the lap of the longer legs.

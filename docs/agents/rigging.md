@@ -14,7 +14,7 @@ folder gives the files of each step.
 | --- | --- | --- |
 | bear | Hand rig, smaller paws, paws turned by whole ring steps. Stands on the podium. | `conductor` |
 | polar-bear | Hand rig, a digit bone for each claw. Sits on a bench that fits the legs, with the thighs sloped down (`benchFitOf()`). | `pianist` |
-| rabbit | Hand rig of the fourth Tripo rabbit, thicker arms (`armGirth`), a smaller violin. | `violinist` |
+| rabbit | Hand rig of the fourth Tripo rabbit, thicker arms (`armGirth`), arms 1.25 times longer (`armStretch`), a smaller violin. | `violinist` |
 | fox-red | Hand rig, arms 1.25 times longer, a smaller fore paw, own joints for the legs and the right ear of a source that is no mirror. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
 | cat | Hand rig, a tail curled on the seat, a viola of `violaScale`. | `violist` |
