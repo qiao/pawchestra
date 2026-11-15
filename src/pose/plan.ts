@@ -53,7 +53,6 @@ import { buildStringTrack } from './harp-strings.ts';
 import { notePlucks } from './harp-fingering.ts';
 import { planPedals } from './harp-pedals.ts';
 import type { PedalPlan } from './harp-pedals.ts';
-import type { HarpFingering } from './harp-fingering.ts';
 import type { StringTrack } from './harp-strings.ts';
 import type { DampTrack } from './damps.ts';
 import { percussionTracks } from './percussion.ts';
@@ -200,11 +199,6 @@ export interface HandsLayer {
   readonly strings: StringTrack | null;
   /** The presses of the claws of each paw of a pianist, or `null` for a harp player. */
   readonly digits: { readonly left: DigitTrack; readonly right: DigitTrack } | null;
-  /**
-   * The fingering of each hand of a harp player (`planHarpFingerings()`), or `null` for a
-   * pianist: a finger, a pluck time, and a close time for each note, for a pose of the digits.
-   */
-  readonly fingering: { readonly left: HarpFingering; readonly right: HarpFingering } | null;
   /** The pedal changes of a harp player (`planPedals()`), or `null` for a pianist. */
   readonly pedals: PedalPlan | null;
 }
@@ -552,12 +546,7 @@ function* noteLayerSteps(
       handsRig(model, instrument, instrumentScale(SPECIES[species], instrument)),
     );
     yield;
-    const { left, right, digits, fingering } = yield* handTracksSteps(
-      rig,
-      notes,
-      loudness,
-      amplitude,
-    );
+    const { left, right, digits } = yield* handTracksSteps(rig, notes, loudness, amplitude);
     yield;
     const family = MOTION_FAMILIES[instrument];
     const plucks = family === 'harp' ? notePlucks(notes, [left, right]) : null;
@@ -570,7 +559,6 @@ function* noteLayerSteps(
       keys: family === 'keyboard' ? buildKeyTrack(notes) : null,
       strings: plucks ? buildStringTrack(notes, plucks) : null,
       digits,
-      fingering,
       pedals: plucks ? planPedals(notes, plucks) : null,
     };
   }

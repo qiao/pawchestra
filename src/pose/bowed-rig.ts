@@ -116,11 +116,6 @@ export interface BowedHold {
   /** The direction to which the right elbow points in pizzicato. */
   readonly polePizzicato: Vec3;
   /**
-   * The share of the turn of the right elbow to the back of the hand in the middle of a change
-   * between the bow and pizzicato. The share is 0 at the start and at the end of the change.
-   */
-  readonly followChange: number;
-  /**
    * The far side of the stick for the roll of the right hand (`rollToward()` of `pose/bowed.ts`):
    * the angle of the elbow around the stick, from the back of the hand of the bind pose, at which
    * the roll changes from one end of its range to the other end, in radians. Near it, a small
@@ -515,7 +510,6 @@ const CHIN_HOLD = {
   poleR: [1, -1, -1],
   poleTipR: [0.5, 1, -1],
   polePizzicato: [1, -0.5, -1],
-  followChange: 0,
   farSideR: Math.PI,
   pawBendR: 0,
   stickTurnR: null,
@@ -605,7 +599,6 @@ const FLOOR_HOLD = {
   poleR: [1, 1.4, -0.3],
   poleTipR: [1, 1.4, -0.3],
   polePizzicato: [1, 0, 0],
-  followChange: 0.3,
   farSideR: Math.PI,
   pawBendR: 0,
   stickTurnR: null,

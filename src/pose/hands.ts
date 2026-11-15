@@ -731,8 +731,6 @@ interface HandTracks {
   readonly right: HandTrack;
   /** The presses of the claws of each piano paw, or `null` for a harp player. */
   readonly digits: { readonly left: DigitTrack; readonly right: DigitTrack } | null;
-  /** The fingering of each hand of a harp player, or `null` for a pianist. */
-  readonly fingering: { readonly left: HarpFingering; readonly right: HarpFingering } | null;
 }
 
 /**
@@ -806,7 +804,6 @@ export function* handTracksSteps(
             right: buildDigitTrack(right, fingeringR),
           }
         : null,
-    fingering: harp ? { left: harp[0], right: harp[1] } : null,
   };
 }
 
