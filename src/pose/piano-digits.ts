@@ -3,6 +3,7 @@ import { MathUtils } from 'three';
 import type { HandNote } from './hand-notes.ts';
 import type { PianoFingering } from './piano-fingering.ts';
 import { smoothstep } from '../math.ts';
+import { lastAtOrBefore } from './blend.ts';
 
 /** The number of claws of a paw: the digits 1 (the thumb side) to 5. */
 const DIGIT_COUNT = 5;
@@ -156,27 +157,6 @@ function ramp(from: number, to: number, time: number): number {
 }
 
 /**
- * Gives the index of the last press whose drop starts at or before a time, or -1.
- *
- * @param downs The starts of the drops, sorted.
- * @param time The time.
- * @returns The index.
- */
-function lastDown(downs: Float64Array, time: number): number {
-  let lo = 0;
-  let hi = downs.length;
-  while (lo < hi) {
-    const mid = (lo + hi) >> 1;
-    if ((downs[mid] ?? 0) <= time) {
-      lo = mid + 1;
-    } else {
-      hi = mid;
-    }
-  }
-  return lo - 1;
-}
-
-/**
  * Gives the bend of one claw at a song time (design 5.3). The claw drops from its lift to the key
  * bed at the note start and stays down until the note end, then comes back to the rest bend. Before
  * its next press, it lifts over {@link DIGIT_MOTION.liftSec}, but not before the end of its last
@@ -188,7 +168,7 @@ function lastDown(downs: Float64Array, time: number): number {
  */
 function digitBendAt(presses: DigitPresses, time: number): number {
   const m = DIGIT_MOTION;
-  const i = lastDown(presses.downs, time);
+  const i = lastAtOrBefore(presses.downs, time);
   let bend: number = m.rest;
   let end = Number.NEGATIVE_INFINITY;
   if (i >= 0) {
