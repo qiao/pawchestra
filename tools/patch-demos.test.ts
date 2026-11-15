@@ -21,9 +21,9 @@ import {
   patchedDemos,
   programOffsets,
   readChecksums,
-  sha256,
 } from './patch-demos.ts';
 import type { DemoFile } from './patch-demos.ts';
+import { sha256 } from './ref-tree.ts';
 
 /** Lists the programs of the program changes of each track, at the offsets of `programOffsets()`. */
 function trackPrograms(bytes: Uint8Array): number[][] {

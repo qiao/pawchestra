@@ -1,8 +1,8 @@
-import { createHash } from 'node:crypto';
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 import { parseMidi } from '../src/midi/parse.ts';
+import { sha256 } from './ref-tree.ts';
 
 /** The program changes of one demo file (design 8.3). */
 interface DemoPatch {
@@ -92,16 +92,6 @@ export function readChecksums(readme: string): Map<string, string> {
     }
   }
   return checksums;
-}
-
-/**
- * Calculates the SHA-256 of bytes.
- *
- * @param bytes The bytes.
- * @returns The checksum in lower-case hex.
- */
-export function sha256(bytes: Uint8Array): string {
-  return createHash('sha256').update(bytes).digest('hex');
 }
 
 /**

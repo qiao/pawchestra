@@ -23,7 +23,6 @@
  * Usage: pnpm pose-preview <role> [--moments <name,...>] [--times <s,...>] [--demo <id>]
  *   [--wall <s>] [--set <changes>]... [--skin] [--glb <file>] [--out <file>]
  */
-import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 
@@ -35,7 +34,7 @@ import { findRole, roleBodies, roleScene } from './fold-probe.ts';
 import { runTool, speciesAnimal, takeGlb, withGlbBody } from './glb-swap.ts';
 import { setHolds } from './hold-sets.ts';
 import { probeDemos } from './probe-demos.ts';
-import { ROOT } from './ref-tree.ts';
+import { ROOT, sha256 } from './ref-tree.ts';
 import {
   CORRECTIVE_NAMES,
   LEG_CORRECTIVE_NAMES,
@@ -824,8 +823,8 @@ async function preview(options: Options): Promise<PosePreview> {
   const bound = studioBodyOf(name);
   const file = options.from ?? resolve(ROOT, bound.source);
   const bytes = new Uint8Array(readFileSync(file));
-  const sha256 = createHash('sha256').update(bytes).digest('hex');
-  if (sha256 !== bound.sha256) {
+  const sha = sha256(bytes);
+  if (sha !== bound.sha256) {
     throw new Error(
       `The module of the ${species} comes from another export than ${relative(ROOT, file)}. Run pnpm studio-body ${animal}, or give the file with --glb.`,
     );
@@ -895,7 +894,7 @@ async function preview(options: Options): Promise<PosePreview> {
     species,
     animal,
     glb: file,
-    sha256,
+    sha256: sha,
     scale: fixed(frame.scale),
     bones: frame.bones,
     parents: Object.fromEntries(frame.bones.map((bone) => [bone, STUDIO_PARENTS[bone]])),

@@ -1,4 +1,3 @@
-import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -29,6 +28,7 @@ import {
   removeDc,
 } from './sample-cut.ts';
 import type { CutSample } from './sample-cut.ts';
+import { sha256 } from './ref-tree.ts';
 import { parseSfz } from './sfz.ts';
 import type { SfzRegion } from './sfz.ts';
 import { BASE_SOUNDFONT, PRESET_ALIASES, PRESET_RECIPES, SOURCES } from './soundfont-recipes.ts';
@@ -252,10 +252,6 @@ export function uncoveredRanges(
     }
   }
   return gaps;
-}
-
-function sha256(bytes: Uint8Array): string {
-  return createHash('sha256').update(bytes).digest('hex');
 }
 
 function sourceUrl(source: SourceId, path: string): string {

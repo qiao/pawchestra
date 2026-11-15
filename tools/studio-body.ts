@@ -1,5 +1,4 @@
 import { spawnSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import { existsSync } from 'node:fs';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative, resolve } from 'node:path';
@@ -44,7 +43,7 @@ import type {
   StudioVertex,
 } from '../src/models/studio-format.ts';
 import type { Quat, Vec3 } from '../src/models/tuples.ts';
-import { ROOT } from './ref-tree.ts';
+import { ROOT, sha256 } from './ref-tree.ts';
 import { paletteMap } from './studio-palette.ts';
 import type { PaletteMap } from './studio-palette.ts';
 
@@ -3125,7 +3124,7 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
 
   let body: StudioBody = {
     source,
-    sha256: createHash('sha256').update(bytes).digest('hex'),
+    sha256: sha256(bytes),
     scale: round(scale),
     // SAFETY: the entries hold each bone of STUDIO_BONES one time, and readSkeleton() checks
     // that the skeleton lacks only optional bones.

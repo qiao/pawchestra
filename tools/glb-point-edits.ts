@@ -13,11 +13,10 @@
  * with normals. It updates the bounds of each changed accessor.
  */
 import { execFileSync } from 'node:child_process';
-import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 
-import { ROOT } from './ref-tree.ts';
+import { ROOT, sha256 } from './ref-tree.ts';
 
 /** The component type of a 32-bit float in glTF. */
 const FLOAT = 5126;
@@ -199,7 +198,7 @@ interface EditResult {
  *   if two moves name one place with different deltas.
  */
 function applyPointEdits(edits: EditFile, base: Uint8Array): EditResult {
-  const sha = createHash('sha256').update(base).digest('hex');
+  const sha = sha256(base);
   if (sha !== edits.baseSha256) {
     throw new Error(
       `The base file has the SHA-256 ${sha}, and the edit file names ${edits.baseSha256}.`,
@@ -349,7 +348,7 @@ function main(): void {
   for (const line of lines) {
     console.log(line);
   }
-  const sha = createHash('sha256').update(bytes).digest('hex');
+  const sha = sha256(bytes);
   console.log(`Wrote ${relative(ROOT, out)}: ${bytes.length} bytes, SHA-256 ${sha}.`);
 }
 
