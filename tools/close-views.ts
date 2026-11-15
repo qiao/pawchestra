@@ -104,6 +104,55 @@ function halfMoves(time: number): CloseMoment[] {
   ];
 }
 
+/** The four views of most roles: the front, the left side, the right side, and the back. */
+const FOUR_VIEWS: readonly CloseViewAngle[] = [
+  { name: 'front', azimuth: 0 },
+  { name: 'left', azimuth: -90 },
+  { name: 'right', azimuth: 90 },
+  { name: 'back', azimuth: 180 },
+];
+
+/**
+ * Gives the moments of a bowed role: the frog and the tip of a whole bow, a string crossing, the
+ * rest pose, the half moves at the frog ({@link halfMoves}), and the standing soloist at the frog.
+ *
+ * @param stand True to add the standing soloist. A cellist and a bassist do not stand.
+ * @returns The moments, in the order of the rows of the grid.
+ */
+function bowedMoments(stand: boolean): CloseMoment[] {
+  const moments: CloseMoment[] = [
+    { name: 'frog', time: 0.55, rest: false },
+    { name: 'tip', time: 2.4, rest: false },
+    { name: 'crossing', time: 3.25, rest: false },
+    { name: 'rest', time: 0, rest: true },
+    ...halfMoves(0.55),
+  ];
+  if (stand) {
+    moments.push({ name: 'stand', time: 0.55, rest: false, stand: true });
+  }
+  return moments;
+}
+
+/**
+ * Gives the moments of a wind role: a long note, a time between two phrases, the rest pose, the
+ * half moves at the note ({@link halfMoves}), and the standing soloist at the note.
+ *
+ * @param stand True to add the standing soloist. A tubist always stands.
+ * @returns The moments, in the order of the rows of the grid.
+ */
+function windMoments(stand: boolean): CloseMoment[] {
+  const moments: CloseMoment[] = [
+    { name: 'note', time: 0.6, rest: false },
+    { name: 'between', time: 1.75, rest: false },
+    { name: 'rest', time: 0, rest: true },
+    ...halfMoves(0.6),
+  ];
+  if (stand) {
+    moments.push({ name: 'stand', time: 0.6, rest: false, stand: true });
+  }
+  return moments;
+}
+
 /**
  * The camera of a close view around the body of the animal (the query `body`). The box of the
  * body gives the vertical line, the target, and the distance at the zoom 1. A new role needs no
@@ -330,10 +379,7 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
   pianist: {
     species: 'polar-bear',
     views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
+      ...FOUR_VIEWS,
       // The lid of the piano hides the paws in the front view. From above, the muzzle hides them.
       // This low view from the left, 15° to the front, shows the left paw on the keys.
       { name: 'keys', azimuth: -75, elevation: 25 },
@@ -375,10 +421,7 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
   harpist: {
     species: 'deer',
     views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
+      ...FOUR_VIEWS,
       // The column and the strings hide the left hand in the front view. This view from the front
       // left shows it at the strings.
       { name: 'strings', azimuth: -45 },
@@ -407,129 +450,55 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
   },
   violinist: {
     species: 'rabbit',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
-    moments: [
-      { name: 'frog', time: 0.55, rest: false },
-      { name: 'tip', time: 2.4, rest: false },
-      { name: 'crossing', time: 3.25, rest: false },
-      { name: 'rest', time: 0, rest: true },
-      ...halfMoves(0.55),
-      { name: 'stand', time: 0.55, rest: false, stand: true },
-    ],
+    views: FOUR_VIEWS,
+    moments: bowedMoments(true),
     camera: { kind: 'body', zoom: 1, elevation: 20 },
     // A whole down-bow on A4, then a string crossing from G3 to E5.
     notes: ['0.5 2 A4', '3 0.25 G3', '3.25 0.25 E5', '3.5 0.25 G3'].join('\n'),
   },
   'fox-violinist': {
     species: 'fox-red',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
-    moments: [
-      { name: 'frog', time: 0.55, rest: false },
-      { name: 'tip', time: 2.4, rest: false },
-      { name: 'crossing', time: 3.25, rest: false },
-      { name: 'rest', time: 0, rest: true },
-      ...halfMoves(0.55),
-      { name: 'stand', time: 0.55, rest: false, stand: true },
-    ],
+    views: FOUR_VIEWS,
+    moments: bowedMoments(true),
     camera: { kind: 'body', zoom: 1, elevation: 20 },
     // The test notes of the violinist.
     notes: ['0.5 2 A4', '3 0.25 G3', '3.25 0.25 E5', '3.5 0.25 G3'].join('\n'),
   },
   violist: {
     species: 'cat',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
-    moments: [
-      { name: 'frog', time: 0.55, rest: false },
-      { name: 'tip', time: 2.4, rest: false },
-      { name: 'crossing', time: 3.25, rest: false },
-      { name: 'rest', time: 0, rest: true },
-      ...halfMoves(0.55),
-      { name: 'stand', time: 0.55, rest: false, stand: true },
-    ],
+    views: FOUR_VIEWS,
+    moments: bowedMoments(true),
     camera: { kind: 'body', zoom: 1, elevation: 20 },
     // A whole down-bow on A4, then a string crossing from C3 to A4.
     notes: ['0.5 2 A4', '3 0.25 C3', '3.25 0.25 A4', '3.5 0.25 C3'].join('\n'),
   },
   cellist: {
     species: 'dog',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
-    moments: [
-      { name: 'frog', time: 0.55, rest: false },
-      { name: 'tip', time: 2.4, rest: false },
-      { name: 'crossing', time: 3.25, rest: false },
-      { name: 'rest', time: 0, rest: true },
-      ...halfMoves(0.55),
-    ],
+    views: FOUR_VIEWS,
+    moments: bowedMoments(false),
     camera: { kind: 'body', zoom: 1, elevation: 20 },
     // A whole down-bow on A3, then a string crossing from C2 to A3.
     notes: ['0.5 2 A3', '3 0.25 C2', '3.25 0.25 A3', '3.5 0.25 C2'].join('\n'),
   },
   bassist: {
     species: 'hippo',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
-    moments: [
-      { name: 'frog', time: 0.55, rest: false },
-      { name: 'tip', time: 2.4, rest: false },
-      { name: 'crossing', time: 3.25, rest: false },
-      { name: 'rest', time: 0, rest: true },
-      ...halfMoves(0.55),
-    ],
+    views: FOUR_VIEWS,
+    moments: bowedMoments(false),
     camera: { kind: 'body', zoom: 1, elevation: 20 },
     // A whole down-bow on G2, then a string crossing from E1 to G2.
     notes: ['0.5 2 G2', '3 0.25 E1', '3.25 0.25 G2', '3.5 0.25 E1'].join('\n'),
   },
   flutist: {
     species: 'fox-tan',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
-    moments: [
-      { name: 'note', time: 0.6, rest: false },
-      { name: 'between', time: 1.75, rest: false },
-      { name: 'rest', time: 0, rest: true },
-      ...halfMoves(0.6),
-      { name: 'stand', time: 0.6, rest: false, stand: true },
-    ],
+    views: FOUR_VIEWS,
+    moments: windMoments(true),
     camera: { kind: 'body', zoom: 1, elevation: 20 },
     // A long A5, a rest, then a short phrase with the right paw fingers closed (C5) and open (C6).
     notes: ['0.5 1 A5', '2 0.25 C5', '2.25 0.25 C6', '2.5 0.25 E5'].join('\n'),
   },
   trombonist: {
     species: 'panda',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
+    views: FOUR_VIEWS,
     moments: [
       { name: 'first', time: 0.6, rest: false },
       { name: 'seventh', time: 1.9, rest: false },
@@ -543,31 +512,15 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
   },
   oboist: {
     species: 'mouse',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
-    moments: [
-      { name: 'note', time: 0.6, rest: false },
-      { name: 'between', time: 1.75, rest: false },
-      { name: 'rest', time: 0, rest: true },
-      ...halfMoves(0.6),
-      { name: 'stand', time: 0.6, rest: false, stand: true },
-    ],
+    views: FOUR_VIEWS,
+    moments: windMoments(true),
     camera: { kind: 'body', zoom: 1, elevation: 20 },
     // A long A4, a rest, then a short phrase with the right paw fingers closed (D4) and open (C6).
     notes: ['0.5 1 A4', '2 0.25 D4', '2.25 0.25 C6', '2.5 0.25 E5'].join('\n'),
   },
   timpanist: {
     species: 'elephant',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
+    views: FOUR_VIEWS,
     moments: [
       { name: 'left', time: 0.5, rest: false },
       { name: 'between', time: 1, rest: false },
@@ -586,38 +539,16 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
   },
   bassoonist: {
     species: 'beaver',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
-    moments: [
-      { name: 'note', time: 0.6, rest: false },
-      { name: 'between', time: 1.75, rest: false },
-      { name: 'rest', time: 0, rest: true },
-      ...halfMoves(0.6),
-      { name: 'stand', time: 0.6, rest: false, stand: true },
-    ],
+    views: FOUR_VIEWS,
+    moments: windMoments(true),
     camera: { kind: 'body', zoom: 1, elevation: 20 },
     // A long B♭2, a rest, then a short phrase with the right paw fingers closed (D3) and open (F4).
     notes: ['0.5 1 Bb2', '2 0.25 D3', '2.25 0.25 F4', '2.5 0.25 C3'].join('\n'),
   },
   hornist: {
     species: 'pig',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
-    moments: [
-      { name: 'note', time: 0.6, rest: false },
-      { name: 'between', time: 1.75, rest: false },
-      { name: 'rest', time: 0, rest: true },
-      ...halfMoves(0.6),
-      { name: 'stand', time: 0.6, rest: false, stand: true },
-    ],
+    views: FOUR_VIEWS,
+    moments: windMoments(true),
     camera: { kind: 'body', zoom: 1, elevation: 20 },
     // A long open F3 (the written C4), a rest, then a short phrase: G3 with the first valve, an
     // open C4, and E4 with the second valve (design 5.3).
@@ -625,38 +556,16 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
   },
   clarinetist: {
     species: 'wolf',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
-    moments: [
-      { name: 'note', time: 0.6, rest: false },
-      { name: 'between', time: 1.75, rest: false },
-      { name: 'rest', time: 0, rest: true },
-      ...halfMoves(0.6),
-      { name: 'stand', time: 0.6, rest: false, stand: true },
-    ],
+    views: FOUR_VIEWS,
+    moments: windMoments(true),
     camera: { kind: 'body', zoom: 1, elevation: 20 },
     // A long G4, a rest, then a short phrase with the right paw fingers closed (D4) and open (C6).
     notes: ['0.5 1 G4', '2 0.25 D4', '2.25 0.25 C6', '2.5 0.25 E5'].join('\n'),
   },
   trumpeter: {
     species: 'monkey',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
-    moments: [
-      { name: 'note', time: 0.6, rest: false },
-      { name: 'between', time: 1.75, rest: false },
-      { name: 'rest', time: 0, rest: true },
-      ...halfMoves(0.6),
-      { name: 'stand', time: 0.6, rest: false, stand: true },
-    ],
+    views: FOUR_VIEWS,
+    moments: windMoments(true),
     camera: { kind: 'body', zoom: 1, elevation: 20 },
     // A long open B♭3 (the written C4), a rest, then a short phrase: E♭4 with the first valve, an
     // open F4, and G4 with the first and the second valve (design 5.3).
@@ -664,18 +573,8 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
   },
   tubist: {
     species: 'rhino',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
-    moments: [
-      { name: 'note', time: 0.6, rest: false },
-      { name: 'between', time: 1.75, rest: false },
-      { name: 'rest', time: 0, rest: true },
-      ...halfMoves(0.6),
-    ],
+    views: FOUR_VIEWS,
+    moments: windMoments(false),
     camera: { kind: 'body', zoom: 1, elevation: 20 },
     // A long open B♭1, a rest, then a short phrase: E♭2 with the first valve, an open F2, and G2
     // with the first and the second valve (design 5.3).
@@ -683,12 +582,7 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
   },
   singer: {
     species: 'penguin',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
+    views: FOUR_VIEWS,
     // The default test notes sound from 0 s to 2.5 s and from 3 s to 4 s, so the beak is open at
     // 1.75 s and closed at 2.75 s (`CHOIR_VIEWS` of `tools/choir-check.ts`).
     moments: [
@@ -702,12 +596,7 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
   'bass-drummer': {
     species: 'badger',
     instrument: 'bass-drum',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
+    views: FOUR_VIEWS,
     moments: [
       { name: 'strike', time: 0.5, rest: false },
       { name: 'between', time: 1, rest: false },
@@ -724,12 +613,7 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
   'snare-drummer': {
     species: 'badger',
     instrument: 'snare-drum',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
+    views: FOUR_VIEWS,
     moments: [
       { name: 'right', time: 0.5, rest: false },
       { name: 'left', time: 0.75, rest: false },
@@ -744,12 +628,7 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
   cymbalist: {
     species: 'badger',
     instrument: 'cymbals',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
+    views: FOUR_VIEWS,
     moments: [
       { name: 'strike', time: 0.5, rest: false },
       // The cymbal rings after the strike.
@@ -767,12 +646,7 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
   percussionist: {
     species: 'badger',
     instrument: 'small-percussion',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
+    views: FOUR_VIEWS,
     moments: [
       { name: 'triangle', time: 0.5, rest: false },
       { name: 'between', time: 1, rest: false },
@@ -787,12 +661,7 @@ export const ROLE_VIEWS: Readonly<Record<CloseRole, RoleViews>> = {
   xylophonist: {
     species: 'badger',
     instrument: 'xylophone',
-    views: [
-      { name: 'front', azimuth: 0 },
-      { name: 'left', azimuth: -90 },
-      { name: 'right', azimuth: 90 },
-      { name: 'back', azimuth: 180 },
-    ],
+    views: FOUR_VIEWS,
     moments: [
       { name: 'lowest', time: 0.5, rest: false },
       { name: 'highest', time: 0.75, rest: false },
