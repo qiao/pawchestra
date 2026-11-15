@@ -1198,11 +1198,6 @@ body.is-building #stage {
   background: var(--line-faint);
 }
 
-/* A row that a click focused shows no focus ring after a key of the page (design 2.8). */
-.demo.is-pointer-focus:focus-visible {
-  outline: none;
-}
-
 /* A button or a tab that a click focused shows no focus ring after a key of the page (2.4). */
 [data-pointer-focus]:focus-visible {
   outline: none;
