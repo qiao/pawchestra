@@ -44,7 +44,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 #: The rig script whose pure functions this module and `export_rig.py` share.
 RIG_MESH = os.path.join(ROOT, 'tools', 'blender', 'rig_mesh.py')
 
-#: The map of a point from the axes of Blender to the axes of the studio (`from_blender()`).
+#: The map of a point from the axes of Blender to the axes of the studio.
 TO_STUDIO = np.array([[1.0, 0, 0], [0, 0, 1], [0, -1, 0]])
 
 #: The bones whose roll hint is up (+Z in Blender). The other bones point forward or to the palm.
@@ -268,7 +268,7 @@ def set_weight_row(ob, index, row):
 #: The share of the twist of the forearm (from the forearm to the paw) that each bone of the left
 #: arm takes in the app (`poseSegments()` of `src/models/studio-rig.ts`): the segment k takes
 #: (k + 0.5) / 4, the wrist helper and the paw all, the twist bone of a body with no segments
-#: half (`TWIST_SHARE`). Each other bone takes none.
+#: half (`TWIST_SHARE` of `src/models/studio-rig.ts`). Each other bone takes none.
 FORE_TWIST = {
     **{f'forearm_seg{k}': (k + 0.5) / 4 for k in range(4)},
     'forearm_twist': 0.5,

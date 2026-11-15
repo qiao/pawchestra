@@ -5,7 +5,8 @@
 The script writes these files into `<dir>`. Two runs give the same bytes.
 
 - `mannequin-<preset>.glb`: the mesh with no skeleton in an A-pose, with a gap under each arm
-  (design 4.4, "Intake pose"). It is the input of `pnpm rig-mesh mannequin`.
+  (design 4.4, "Intake pose"). The retired mesh rig route made
+  `assets/models/mannequin/mannequin.rig.glb` from it.
 - `mannequin-<preset>-tpose.fbx`: the mesh with no skeleton in a T-pose, for an upload to
   mixamo.com.
 - `mannequin-<preset>-mixamo.glb` and `mannequin-<preset>-mixamo.fbx`: the T-pose mesh with a
@@ -52,8 +53,7 @@ from mathutils import Matrix, Quaternion, Vector
 FPS = 30
 
 #: The levels of the Subdivision Surface modifier. The Skin modifier gives a ring of 4 vertices at
-#: each point of the graph, and two levels give 16 vertices, as the arm tubes of
-#: `docs/agents/rigging.md` ("The rebuild of the arms in Blender").
+#: each point of the graph, and two levels give 16 vertices for each ring.
 SUBDIVISIONS = 2
 
 #: The factor of each radius of the Skin modifier. The subdivision pulls the corners of each ring

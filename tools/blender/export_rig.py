@@ -3,24 +3,22 @@
     blender -b --factory-startup --python tools/blender/export_rig.py -- <animal> \
         [--blend <file.blend>] [--out <file.glb>]
 
-`pnpm rig-export <animal>` runs it on `assets/models/<animal>/tripo-hand/<animal>.blend`, and
-writes `<animal>.rig.glb` and `<animal>.rig.json` (a text summary for diffs) next to it.
-`pnpm studio-body` reads the GLB file as it reads a file of `rig_mesh.py`. The script checks the layout of design 4.4
-and stops at the first fault with its name. Then it bakes the bind: the rest of the file is the
-basis with the keys `bind*`, moved by the linear blend of the bones in the Action `bind`, and the
-move of each key `arm_raise_*` is its move in the bind. The bake must match the mesh that Blender
-evaluates within `LIMIT`. The measures use the functions of `rig_mesh.py`: the shapes of the source
-(`correctives()`, `split_shapes()`), the seat top (`seat_masks()`), and the rule of the arm
-segments (`driven_turns()`). The eye objects `eye_L` and `eye_R` (`studio_eyes.py`) give the
-middle, the direction, and the size of each bead eye in the bind (`eyes_of()`). A file with no eye
-objects shows the eyes of its mesh: the faces with the face attribute `eye` give the middle of each
-eye in the bind (`own_eyes_of()`) and the triangles of each eye, and the app adds no bead eyes. Such
-a file can have lids: the
-faces with the face attribute `lid` and the custom property `lids` of the armature give the lid
-triangles, the turn from open to closed, and the hinge axis of each side (`lids_of()`). The
-custom properties of the armature give the facts of the body (`body_of()`). The bytes depend only
-on the `.blend`. A mesh object with the custom property `texture` also gets the texture point of
-each corner (`texture_of()`).
+`pnpm rig-export <animal>` runs it on `assets/models/<animal>/tripo-hand/<animal>.blend`, and writes
+`<animal>.rig.glb` and `<animal>.rig.json` (a text summary for diffs) next to it. `pnpm studio-body`
+reads the GLB file. The script checks the layout of design 4.4 and stops at the first fault with its
+name. Then it bakes the bind: the rest of the file is the basis with the keys `bind*`, moved by the
+linear blend of the bones in the Action `bind`, and the move of each key `arm_raise_*` is its move
+in the bind. The bake must match the mesh that Blender evaluates within `LIMIT`. The measures use
+the functions of `rig_mesh.py`: the shapes of the source (`correctives()`, `split_shapes()`), the
+seat top (`seat_masks()`), and the rule of the arm segments (`driven_turns()`). The eye objects
+`eye_L` and `eye_R` (`studio_eyes.py`) give the middle, the direction, and the size of each bead eye
+in the bind (`eyes_of()`). A file with no eye objects shows the eyes of its mesh: the faces with the
+face attribute `eye` give the middle of each eye in the bind (`own_eyes_of()`) and the triangles of
+each eye, and the app adds no bead eyes. Such a file can have lids: the faces with the face
+attribute `lid` and the custom property `lids` of the armature give the lid triangles, the turn from
+open to closed, and the hinge axis of each side (`lids_of()`). The custom properties of the armature
+give the facts of the body (`body_of()`). The bytes depend only on the `.blend`. A mesh object with
+the custom property `texture` also gets the texture point of each corner (`texture_of()`).
 """
 
 import hashlib
@@ -459,8 +457,8 @@ def extras_of(rig, me, rm, bones, points, w, turns, raises):
         extras['headShift'] = [float(x) + 0.0 for x in shift]
     factor = sa.rig_property(rig, 'headFactor')
     if factor is not None:
-        # A hand rig that scales the head about the neck joint by the head weights, as `pnpm
-        # rig-mesh` grows it. `pnpm studio-body` measures H and the head center before the factor.
+        # A hand rig that scales the head about the neck joint by the head weights. `pnpm
+        # studio-body` measures H and the head center before the factor.
         need(
             isinstance(factor, (int, float)) and math.isfinite(factor) and factor > 0,
             'The property headFactor of the armature is not a positive number.',
