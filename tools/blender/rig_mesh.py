@@ -20,10 +20,36 @@ import numpy as np
 #: The body bones of a studio body, in parent order (`STUDIO_BONES` of
 #: `src/models/studio-format.ts`, with no eye bones).
 BONES = (
-    'root', 'hips', 'spine', 'spine1', 'chest', 'neck', 'head', 'ear_L', 'ear_R',
-    'clavicle_L', 'upper_arm_L', 'forearm_L', 'forearm_twist_L', 'hand_L', 'fingers_L',
-    'clavicle_R', 'upper_arm_R', 'forearm_R', 'forearm_twist_R', 'hand_R', 'fingers_R',
-    'thigh_L', 'shin_L', 'foot_L', 'toes_L', 'thigh_R', 'shin_R', 'foot_R', 'toes_R', 'tail',
+    'root',
+    'hips',
+    'spine',
+    'spine1',
+    'chest',
+    'neck',
+    'head',
+    'ear_L',
+    'ear_R',
+    'clavicle_L',
+    'upper_arm_L',
+    'forearm_L',
+    'forearm_twist_L',
+    'hand_L',
+    'fingers_L',
+    'clavicle_R',
+    'upper_arm_R',
+    'forearm_R',
+    'forearm_twist_R',
+    'hand_R',
+    'fingers_R',
+    'thigh_L',
+    'shin_L',
+    'foot_L',
+    'toes_L',
+    'thigh_R',
+    'shin_R',
+    'foot_R',
+    'toes_R',
+    'tail',
 )
 
 #: The optional bone of a tail of two bones (`OPTIONAL_STUDIO_BONES` of
@@ -38,14 +64,38 @@ JAW = 'jaw'
 
 #: The parent of each body bone (`STUDIO_PARENTS` of `src/models/studio-format.ts`).
 PARENTS = {
-    'root': None, 'hips': 'root', 'spine': 'hips', 'spine1': 'spine', 'chest': 'spine1',
-    'neck': 'chest', 'head': 'neck', 'ear_L': 'head', 'ear_R': 'head', 'clavicle_L': 'chest',
-    'upper_arm_L': 'clavicle_L', 'forearm_L': 'upper_arm_L', 'forearm_twist_L': 'forearm_L',
-    'hand_L': 'forearm_twist_L', 'fingers_L': 'hand_L', 'clavicle_R': 'chest',
-    'upper_arm_R': 'clavicle_R', 'forearm_R': 'upper_arm_R', 'forearm_twist_R': 'forearm_R',
-    'hand_R': 'forearm_twist_R', 'fingers_R': 'hand_R', 'thigh_L': 'hips', 'shin_L': 'thigh_L',
-    'foot_L': 'shin_L', 'toes_L': 'foot_L', 'thigh_R': 'hips', 'shin_R': 'thigh_R',
-    'foot_R': 'shin_R', 'toes_R': 'foot_R', 'tail': 'hips', TAIL_TIP: 'tail', JAW: 'head',
+    'root': None,
+    'hips': 'root',
+    'spine': 'hips',
+    'spine1': 'spine',
+    'chest': 'spine1',
+    'neck': 'chest',
+    'head': 'neck',
+    'ear_L': 'head',
+    'ear_R': 'head',
+    'clavicle_L': 'chest',
+    'upper_arm_L': 'clavicle_L',
+    'forearm_L': 'upper_arm_L',
+    'forearm_twist_L': 'forearm_L',
+    'hand_L': 'forearm_twist_L',
+    'fingers_L': 'hand_L',
+    'clavicle_R': 'chest',
+    'upper_arm_R': 'clavicle_R',
+    'forearm_R': 'upper_arm_R',
+    'forearm_twist_R': 'forearm_R',
+    'hand_R': 'forearm_twist_R',
+    'fingers_R': 'hand_R',
+    'thigh_L': 'hips',
+    'shin_L': 'thigh_L',
+    'foot_L': 'shin_L',
+    'toes_L': 'foot_L',
+    'thigh_R': 'hips',
+    'shin_R': 'thigh_R',
+    'foot_R': 'shin_R',
+    'toes_R': 'foot_R',
+    'tail': 'hips',
+    TAIL_TIP: 'tail',
+    JAW: 'head',
 }
 
 #: The arm bones of each side, from the shoulder out. The clavicle does not move.
@@ -100,11 +150,13 @@ def smoothstep(x, low, high):
 def quat_matrix(q):
     """Gives the rotation matrix of a quaternion (x, y, z, w)."""
     x, y, z, w = unit(q)
-    return np.array([
-        [1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)],
-        [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
-        [2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)],
-    ])
+    return np.array(
+        [
+            [1 - 2 * (y * y + z * z), 2 * (x * y - z * w), 2 * (x * z + y * w)],
+            [2 * (x * y + z * w), 1 - 2 * (x * x + z * z), 2 * (y * z - x * w)],
+            [2 * (x * z - y * w), 2 * (y * z + x * w), 1 - 2 * (x * x + y * y)],
+        ]
+    )
 
 
 def matrix_quat(m):
@@ -127,7 +179,8 @@ def matrix_quat(m):
 
 
 def swing(a, b):
-    """Gives the smallest rotation matrix that turns the unit vector `a` onto the unit vector `b`."""
+    """Gives the smallest rotation matrix that turns the unit vector `a` onto the unit vector
+    `b`."""
     a, b = unit(a), unit(b)
     axis = np.cross(a, b)
     s = np.linalg.norm(axis)
@@ -161,7 +214,9 @@ def linear(srgb):
 
 def sample_grid(n):
     """Gives the barycentric weights of the texture samples of a face: a grid of `n` steps."""
-    return np.array([(i / n, j / n, (n - i - j) / n) for i in range(n + 1) for j in range(n + 1 - i)])
+    return np.array(
+        [(i / n, j / n, (n - i - j) / n) for i in range(n + 1) for j in range(n + 1 - i)]
+    )
 
 
 def face_samples(uv, grid, texture):
@@ -181,22 +236,47 @@ def luminance(samples):
 def oklab(srgb):
     """Converts sRGB colors from 0 to 1 to Oklab (Björn Ottosson, 2020)."""
     rgb = linear(srgb)
-    lms = rgb @ np.array([[0.4122214708, 0.5363325363, 0.0514459929],
-                          [0.2119034982, 0.6806995451, 0.1073969566],
-                          [0.0883024619, 0.2817188376, 0.6299787005]]).T
-    return np.cbrt(lms) @ np.array([[0.2104542553, 0.7936177850, -0.0040720468],
-                                    [1.9779984951, -2.4285922050, 0.4505937099],
-                                    [0.0259040371, 0.7827717662, -0.8086757660]]).T
+    lms = (
+        rgb
+        @ np.array(
+            [
+                [0.4122214708, 0.5363325363, 0.0514459929],
+                [0.2119034982, 0.6806995451, 0.1073969566],
+                [0.0883024619, 0.2817188376, 0.6299787005],
+            ]
+        ).T
+    )
+    return (
+        np.cbrt(lms)
+        @ np.array(
+            [
+                [0.2104542553, 0.7936177850, -0.0040720468],
+                [1.9779984951, -2.4285922050, 0.4505937099],
+                [0.0259040371, 0.7827717662, -0.8086757660],
+            ]
+        ).T
+    )
 
 
 def srgb_of_oklab(lab):
     """Converts Oklab colors back to sRGB colors from 0 to 1."""
-    lms = lab @ np.array([[1.0, 0.3963377774, 0.2158037573],
-                          [1.0, -0.1055613458, -0.0638541728],
-                          [1.0, -0.0894841775, -1.2914855480]]).T
-    rgb = (lms ** 3) @ np.array([[4.0767416621, -3.3077115913, 0.2309699292],
-                                 [-1.2684380046, 2.6097574011, -0.3413193965],
-                                 [-0.0041960863, -0.7034186147, 1.7076147010]]).T
+    lms = (
+        lab
+        @ np.array(
+            [
+                [1.0, 0.3963377774, 0.2158037573],
+                [1.0, -0.1055613458, -0.0638541728],
+                [1.0, -0.0894841775, -1.2914855480],
+            ]
+        ).T
+    )
+    rgb = (lms**3) @ np.array(
+        [
+            [4.0767416621, -3.3077115913, 0.2309699292],
+            [-1.2684380046, 2.6097574011, -0.3413193965],
+            [-0.0041960863, -0.7034186147, 1.7076147010],
+        ]
+    ).T
     rgb = np.clip(rgb, 0.0, 1.0)
     return np.where(rgb <= 0.0031308, rgb * 12.92, 1.055 * rgb ** (1 / 2.4) - 0.055)
 
@@ -238,7 +318,8 @@ def tone(colors, main_bone, rule):
     keep = [BONES.index(b) for b in BONES if b.rsplit('_', 1)[0] in rule['keep']]
     chroma = np.hypot(lab[:, 1], lab[:, 2])
     share = ((chroma <= rule['chroma']) & ~np.isin(main_bone, keep)) * (
-        1.0 - smoothstep(lab[:, 0], *rule['light']))
+        1.0 - smoothstep(lab[:, 0], *rule['light'])
+    )
     for k in range(3):
         lab[:, k] += share * np.interp(lab[:, 0], points[:, 0], points[:, k + 1])
     return srgb_of_oklab(lab), int((share > 0).sum())
@@ -346,9 +427,10 @@ def segment_joints(heads, ends, rolls, children, rule):
                 ends[name] = a + (b - a) * (k + 1) / ARM_SEGMENTS
                 rolls[name] = rolls[f'{part}_{side}']
                 children[name] = None
-        for name, joint, toward, roll in ((f'elbow_{side}', e, w, f'forearm_{side}'),
-                                          (f'wrist_{side}', w, ends[f'hand_{side}'],
-                                           f'hand_{side}')):
+        for name, joint, toward, roll in (
+            (f'elbow_{side}', e, w, f'forearm_{side}'),
+            (f'wrist_{side}', w, ends[f'hand_{side}'], f'hand_{side}'),
+        ):
             heads[name] = joint.copy()
             ends[name] = joint + unit(toward - joint) * rule['helper']
             rolls[name] = rolls[roll]
@@ -404,8 +486,9 @@ def driven_turns(turns, heads):
 def arm_bones(side):
     """Gives the arm bones of one side that move the arm vertices: the bones of `ARM`, and the arm
     segments and helpers of a rig with `armSegments`."""
-    return [f'{b}_{side}' for b in ARM] + [b for b in BONES if b.endswith('_' + side)
-                                           and (b in SEGMENT_PARENTS or b in DIGIT_PARENTS)]
+    return [f'{b}_{side}' for b in ARM] + [
+        b for b in BONES if b.endswith('_' + side) and (b in SEGMENT_PARENTS or b in DIGIT_PARENTS)
+    ]
 
 
 def digit_bones():
@@ -450,8 +533,13 @@ def taubin(points, tris, ids, share, rounds):
 
 #: The bones that turn with each trunk bone of the shares of `studio.trunk`: the clavicles with
 #: the chest, and the ears with the head.
-TRUNK_FOLLOWERS = {'clavicle_L': 'chest', 'clavicle_R': 'chest', 'ear_L': 'head', 'ear_R': 'head',
-                   JAW: 'head'}
+TRUNK_FOLLOWERS = {
+    'clavicle_L': 'chest',
+    'clavicle_R': 'chest',
+    'ear_L': 'head',
+    'ear_R': 'head',
+    JAW: 'head',
+}
 
 
 def recline(angle):
@@ -715,8 +803,7 @@ def dark_faces_near(points, tris, dark, taken, loop, normal, rule):
     radius = np.linalg.norm(np.cross(ring - center, normal), axis=1).max()
     mids = points[tris].mean(axis=1) - center
     across = np.linalg.norm(np.cross(mids, normal), axis=1)
-    near = (dark & (across <= rule['darkReach'] * radius)
-            & (np.abs(mids @ normal) <= 0.5 * radius))
+    near = dark & (across <= rule['darkReach'] * radius) & (np.abs(mids @ normal) <= 0.5 * radius)
     near[np.asarray(list(taken), int)] = False
     return corner_patches(tris, np.nonzero(near)[0])
 
@@ -743,8 +830,7 @@ def recolor_old_eyes(colors, tris, points, old):
     the ring that has the color."""
     inside = set(int(f) for f in old)
     corners = set(int(c) for f in old for c in tris[f])
-    ring = [f for f, t in enumerate(tris)
-            if f not in inside and any(int(c) in corners for c in t)]
+    ring = [f for f, t in enumerate(tris) if f not in inside and any(int(c) in corners for c in t)]
     a, b, c = points[tris[ring, 0]], points[tris[ring, 1]], points[tris[ring, 2]]
     areas = 0.5 * np.linalg.norm(np.cross(b - a, c - a), axis=1)
     totals = {}
@@ -803,12 +889,15 @@ def add_eye_shells(verts, bind, tris, colors, dark, eyes, rule):
             shell = np.vstack([middle, place[ring]])
             gap = fan_gap(shell, fan, place[corners], normal)
             target.append(shell + (lift + gap) * normal)
-        new_tris.append(np.array([[count, count + 1 + k, count + 1 + (k + 1) % n]
-                                  for k in range(n)]))
+        new_tris.append(
+            np.array([[count, count + 1 + k, count + 1 + (k + 1) % n] for k in range(n)])
+        )
         new_colors.append(np.tile(colors[faces].mean(axis=0), (n, 1)))
         count += n + 1
-        log(f'eye {side}: {len(faces)} dark faces, an edge of {len(loop)} points, a fan of {n} '
-            f'faces, {gap + lift:.4f} u over the eye, {len(old[side])} faces of the old eye')
+        log(
+            f'eye {side}: {len(faces)} dark faces, an edge of {len(loop)} points, a fan of {n} '
+            f'faces, {gap + lift:.4f} u over the eye, {len(old[side])} faces of the old eye'
+        )
         # The faces under the shell take the mean color of the fur faces around the eye.
         around = set()
         for f in faces:
@@ -823,10 +912,18 @@ def add_eye_shells(verts, bind, tris, colors, dark, eyes, rule):
         near[side] = dark_faces_near(bind, tris, dark, taken, loop, normal, rule)
         taken |= set(int(f) for patch in near[side] for f in patch)
     tris_out = np.concatenate(new_tris)
-    material = np.concatenate([material, np.array(['gloss'] * (len(tris_out) - len(tris)),
-                                                  dtype=object)])
-    return (np.concatenate(new_src), np.concatenate(new_bind), tris_out,
-            np.concatenate(new_colors), material, old, near)
+    material = np.concatenate(
+        [material, np.array(['gloss'] * (len(tris_out) - len(tris)), dtype=object)]
+    )
+    return (
+        np.concatenate(new_src),
+        np.concatenate(new_bind),
+        tris_out,
+        np.concatenate(new_colors),
+        material,
+        old,
+        near,
+    )
 
 
 def correctives(src, bind, weights, turns, src_heads, bind_heads):
@@ -882,11 +979,18 @@ def seat_extras(rule, prop, top):
     on x, in the units of the studio. `pnpm studio-body` fits the seat of the app to it. Each
     number is a 32-bit float, as a vertex of the file, so that the export gives the same values as
     from the box of a chair mesh."""
+
     def single(value):
         """Gives the value as a 32-bit float."""
         return float(np.float32(value))
-    return {'prop': prop, 'top': single(top), 'front': single(rule['front']),
-            'back': single(rule['back']), 'halfWidth': single(rule['halfWidth'])}
+
+    return {
+        'prop': prop,
+        'top': single(top),
+        'front': single(rule['front']),
+        'back': single(rule['back']),
+        'halfWidth': single(rule['halfWidth']),
+    }
 
 
 class GlbWriter:
@@ -906,8 +1010,12 @@ class GlbWriter:
         self.views.append({'buffer': 0, 'byteOffset': len(self.bin), 'byteLength': len(data)})
         self.bin += data
         count = len(array)
-        accessor = {'bufferView': len(self.views) - 1, 'componentType': component,
-                    'count': count, 'type': kind}
+        accessor = {
+            'bufferView': len(self.views) - 1,
+            'componentType': component,
+            'count': count,
+            'type': kind,
+        }
         if normalized:
             accessor['normalized'] = True
         if minmax:
@@ -954,16 +1062,35 @@ def primitive_arrays(points, tris, colors, materials, weights, shapes, name, bas
             joints[i, j] = k
             values[i, j] = weights[v, k]
     return {
-        'position': points[vertex], 'color': color, 'base': base_color, 'joints': joints,
-        'weights': values, 'uv': texcoord,
+        'position': points[vertex],
+        'color': color,
+        'base': base_color,
+        'joints': joints,
+        'weights': values,
+        'uv': texcoord,
         'shapes': [shape[vertex] for shape in shapes.values()],
         'indices': np.array(corners, np.uint32),
     }
 
 
-def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind_frames,
-              bind_heads, src_frames, src_heads, extras, base=None,
-              generator='pawchestra tools/blender/rig_mesh.py', uvs=None):
+def write_glb(
+    path,
+    config,
+    bind,
+    tris,
+    colors,
+    materials,
+    weights,
+    shapes,
+    bind_frames,
+    bind_heads,
+    src_frames,
+    src_heads,
+    extras,
+    base=None,
+    generator='pawchestra tools/blender/rig_mesh.py',
+    uvs=None,
+):
     """Writes the rig as a GLB file in the format of a studio body, with the extras of the asset
     for `pnpm studio-body`. The file holds only the animal: the seat is numbers in the extras
     (`seat_extras()`). The morph targets are the shapes, in their order. With `base`, the colors
@@ -972,9 +1099,14 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
     the script that writes the file: `export_rig.py` writes with this function."""
     w = GlbWriter()
     shape_names = list(shapes)
-    mats = [{'name': name, 'doubleSided': True,
-             'pbrMetallicRoughness': {'metallicFactor': 0.0, 'roughnessFactor': rough}}
-            for name, rough in MATERIALS]
+    mats = [
+        {
+            'name': name,
+            'doubleSided': True,
+            'pbrMetallicRoughness': {'metallicFactor': 0.0, 'roughnessFactor': rough},
+        }
+        for name, rough in MATERIALS
+    ]
 
     primitives = []
     for k, (name, _) in enumerate(MATERIALS):
@@ -993,12 +1125,16 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
             attributes['TEXCOORD_0'] = w.floats(arrays['uv'], 'VEC2')
         attributes['JOINTS_0'] = w.add(arrays['joints'], 5121, 'VEC4')
         attributes['WEIGHTS_0'] = w.floats(arrays['weights'], 'VEC4')
-        primitives.append({
-            'attributes': attributes,
-            'indices': w.add(arrays['indices'].ravel(), 5125, 'SCALAR'),
-            'material': k,
-            'targets': [{'POSITION': w.floats(s, 'VEC3', minmax=True)} for s in arrays['shapes']],
-        })
+        primitives.append(
+            {
+                'attributes': attributes,
+                'indices': w.add(arrays['indices'].ravel(), 5125, 'SCALAR'),
+                'material': k,
+                'targets': [
+                    {'POSITION': w.floats(s, 'VEC3', minmax=True)} for s in arrays['shapes']
+                ],
+            }
+        )
 
     # The joints: the local place and turn of each bone in the bind pose and in the clip.
     def local(frames, heads, name):
@@ -1014,8 +1150,11 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
     inverse = []
     for name in BONES:
         t, r = local(bind_frames, bind_heads, name)
-        node = {'name': name, 'rotation': [float(x) for x in matrix_quat(r)],
-                'translation': [float(x) for x in t]}
+        node = {
+            'name': name,
+            'rotation': [float(x) for x in matrix_quat(r)],
+            'translation': [float(x) for x in t],
+        }
         children = [joint_index[c] for c in BONES if PARENTS[c] == name]
         if children:
             node['children'] = children
@@ -1024,7 +1163,7 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
         world[:3, :3] = bind_frames[name]
         world[:3, 3] = bind_heads[name]
         inverse.append(np.linalg.inv(world).T.ravel())
-    nodes.append({'name': f"{config['name']}Rig", 'children': [0, joint_index['root']]})
+    nodes.append({'name': f'{config["name"]}Rig', 'children': [0, joint_index['root']]})
 
     times = w.floats(np.zeros(1), 'SCALAR', minmax=True)
 
@@ -1034,21 +1173,43 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
         channels, samplers = [], []
         for bone in BONES:
             t, r = local(frames, heads, bone)
-            for target, value, kind in (('translation', t, 'VEC3'),
-                                        ('rotation', matrix_quat(r), 'VEC4')):
-                samplers.append({'input': times, 'output': w.floats(np.asarray([value]), kind),
-                                 'interpolation': 'LINEAR'})
-                channels.append({'sampler': len(samplers) - 1,
-                                 'target': {'node': joint_index[bone], 'path': target}})
-        samplers.append({'input': times, 'output': w.floats(np.array(weights), 'SCALAR'),
-                         'interpolation': 'LINEAR'})
+            for target, value, kind in (
+                ('translation', t, 'VEC3'),
+                ('rotation', matrix_quat(r), 'VEC4'),
+            ):
+                samplers.append(
+                    {
+                        'input': times,
+                        'output': w.floats(np.asarray([value]), kind),
+                        'interpolation': 'LINEAR',
+                    }
+                )
+                channels.append(
+                    {
+                        'sampler': len(samplers) - 1,
+                        'target': {'node': joint_index[bone], 'path': target},
+                    }
+                )
+        samplers.append(
+            {
+                'input': times,
+                'output': w.floats(np.array(weights), 'SCALAR'),
+                'interpolation': 'LINEAR',
+            }
+        )
         channels.append({'sampler': len(samplers) - 1, 'target': {'node': 0, 'path': 'weights'}})
         return {'name': name, 'channels': channels, 'samplers': samplers}
 
     # The clip `reference` gives the source back: each shape has its full weight, but the shapes
     # of a raised arm.
-    animations = [clip('reference', src_frames, src_heads,
-                       [0.0 if name.startswith('arm_raise') else 1.0 for name in shape_names])]
+    animations = [
+        clip(
+            'reference',
+            src_frames,
+            src_heads,
+            [0.0 if name.startswith('arm_raise') else 1.0 for name in shape_names],
+        )
+    ]
 
     gltf = {
         'asset': {'generator': generator, 'version': '2.0'},
@@ -1058,12 +1219,21 @@ def write_glb(path, config, bind, tris, colors, materials, weights, shapes, bind
         'animations': animations,
         'materials': mats,
         'meshes': [
-            {'name': config['name'], 'primitives': primitives,
-             'weights': [0.0] * len(shape_names), 'extras': {'targetNames': shape_names}},
+            {
+                'name': config['name'],
+                'primitives': primitives,
+                'weights': [0.0] * len(shape_names),
+                'extras': {'targetNames': shape_names},
+            },
         ],
-        'skins': [{'name': f"{config['name']}Rig", 'joints': [joint_index[n] for n in BONES],
-                   'skeleton': joint_index['root'],
-                   'inverseBindMatrices': w.floats(np.array(inverse), 'MAT4')}],
+        'skins': [
+            {
+                'name': f'{config["name"]}Rig',
+                'joints': [joint_index[n] for n in BONES],
+                'skeleton': joint_index['root'],
+                'inverseBindMatrices': w.floats(np.array(inverse), 'MAT4'),
+            }
+        ],
         'accessors': w.accessors,
         'bufferViews': w.views,
         'buffers': [{'byteLength': len(w.bin)}],
