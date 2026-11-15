@@ -214,6 +214,9 @@ function bandMaterial(shared: MeshStandardMaterial): MeshStandardMaterial {
       shared.onBeforeCompile(shader, renderer);
       addBand(shader);
     };
+    // The program key of the shared material, plus the band patch: with the default key, the
+    // source of this arrow, the bands of two shared materials would share one program.
+    band.customProgramCacheKey = () => `${shared.customProgramCacheKey()} band`;
     material = band;
     bandMaterials.set(shared, band);
   }
