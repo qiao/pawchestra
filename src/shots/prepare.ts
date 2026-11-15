@@ -2177,7 +2177,7 @@ function candidatesAt(planner: Planner, cut: number, window: WindowMusic): Candi
   // The rank of a candidate. A soloist is the soloist of the score, or a seat with one player
   // that carries the lead: its entry wins over the entry of a section.
   const tierOf = (candidate: Candidate): Tier => {
-    if ((candidate.kind === 'wide' || candidate.kind === 'high') && forced) {
+    if (!isCloseShot(candidate.kind) && forced) {
       return TIERS.forced;
     }
     if (candidate.entering.length === 0) {
@@ -2208,7 +2208,7 @@ function candidatesAt(planner: Planner, cut: number, window: WindowMusic): Candi
   for (const candidate of list) {
     const close = candidate.kind === 'section' || candidate.kind === 'solo';
     const reused = close || candidate.kind === 'side';
-    const wideKind = candidate.kind === 'wide' || candidate.kind === 'high';
+    const wideKind = !isCloseShot(candidate.kind);
     const again = alone && candidate.kind === 'solo';
     // Rule 1: no repeat of the kind and the subject.
     if (previous && candidate.id === previous.id && !again) {
@@ -2417,7 +2417,7 @@ function bestCut(
 function chooseEnd(planner: Planner, start: number, kind: ShotKind, latest = Infinity): number {
   const t = SHOT_TIMES;
   const { music, lastStart } = planner;
-  const wideKind = kind === 'wide' || kind === 'high';
+  const wideKind = !isCloseShot(kind);
   const random = decisionRandom(planner.seed, start, 'end');
   let wanted = start + between(random, wideKind ? t.wideWanted : t.closeWanted);
   let longest = Math.min(start + (wideKind ? t.maxWideSec : t.maxSec), latest);
@@ -2573,7 +2573,7 @@ function addShot(
   times: Pick<Shot, 'startSec' | 'endSec' | 'moveEndSec' | 'blendSec'>,
 ): void {
   const { kind } = candidate;
-  const wideKind = kind === 'wide' || kind === 'high';
+  const wideKind = !isCloseShot(kind);
   planner.planned.push({
     shot: {
       kind,
@@ -2625,7 +2625,7 @@ function holdPrevious(planner: Planner, cut: number): number | null {
     return null;
   }
   const { kind, startSec } = last.shot;
-  const wideKind = kind === 'wide' || kind === 'high';
+  const wideKind = !isCloseShot(kind);
   const longest = Math.max(0, startSec) + (wideKind ? SHOT_TIMES.maxWideSec : SHOT_TIMES.maxSec);
   const end = Math.min(chooseEnd(planner, cut, kind, longest), planner.lastStart);
   if (end > longest + 1e-9) {
