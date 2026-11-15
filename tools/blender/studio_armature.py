@@ -7,7 +7,7 @@
 
 The mesh of a hand rig is the source of truth. `add_surface()` runs on that mesh, also in a live
 Blender: it gives each face the color of the base color texture of the source (a GLB file or an
-image file) through the UVs of the mesh (`face_colors()` and `palette()` of `rig_mesh.py`), adds a
+image file) through the UVs of the mesh (`face_samples()` and `palette()` of `rig_mesh.py`), adds a
 gloss fan on each eye unless `eye_fans` is false, and makes the nose gloss (`features()`,
 `add_eye_shells()`). After this one run, the colors live in the face attributes `color` and
 `color_base`, and a person edits them in Blender.
@@ -64,14 +64,13 @@ DRIVERS = ('root',) + tuple(
 
 
 def rig_mesh_lib(bones=None):
-    """Loads the functions of `rig_mesh.py` with no run of its main step. `bones` sets the bone
-    list of the functions that read `BONES`, in the order of `STUDIO_BONES`."""
+    """Loads the functions of `rig_mesh.py` into a new namespace, so that each caller can set its
+    own `BONES`. `bones` sets the bone list of the functions that read `BONES`, in the order of
+    `STUDIO_BONES`."""
     with open(RIG_MESH) as f:
-        source = f.read().rstrip()
-    if not source.endswith('\nmain()'):
-        raise SystemExit(f'{RIG_MESH} does not end with main().')
+        source = f.read()
     names = {'__name__': 'rig_mesh_lib', '__file__': RIG_MESH}
-    exec(compile(source[: -len('main()')], RIG_MESH, 'exec'), names)
+    exec(compile(source, RIG_MESH, 'exec'), names)
     if bones is not None:
         names['BONES'] = tuple(bones)
     return names
@@ -83,7 +82,8 @@ def studio_order(rm):
 
 
 def config_bones(rm, config):
-    """Gives the bones of the rig of a config, as `main()` of `rig_mesh.py` adds them."""
+    """Gives the bones of the rig of a config: the body bones, the tail tip and the jaw when the
+    config has their joints, and the arm segments and the helpers with `armSegments`."""
     extra = tuple(b for b in (rm['TAIL_TIP'], rm['JAW']) if b in config['joints'])
     return rm['BONES'] + extra + (rm['segment_bones']() if 'armSegments' in config else ())
 
@@ -414,7 +414,7 @@ def base_texture(texture):
 
 def glb_texture(path):
     """Reads the base color texture of the first mesh of a GLB file as sRGB pixels (height ×
-    width × 3), in the row order of Blender, as `load_mesh()` of `rig_mesh.py` reads it."""
+    width × 3), in the row order of Blender."""
     with open(path, 'rb') as f:
         data = f.read()
     size = struct.unpack_from('<I', data, 12)[0]
@@ -436,8 +436,11 @@ def glb_texture(path):
 
 
 def polygon_colors(me, texture, rules, rm):
-    """Gives the sRGB color and the dark flag of each polygon by the rule of `face_colors()` of
-    `rig_mesh.py`, over the texture samples of all triangles of the polygon."""
+    """Gives the sRGB color and the dark flag of each polygon from the texture samples of all
+    triangles of the polygon (`face_samples()` of `rig_mesh.py`). A polygon is dark when the share
+    `eyeShare` of its samples is below the luminance `dark`. Its color is the mean of its dark
+    samples, or of its light samples. With `split`, a light polygon whose samples differ in
+    lightness by more than `split` takes the mean of the larger half."""
     grid = rm['sample_grid'](rules['samples'])
     uv = np.empty(len(me.loops) * 2)
     me.uv_layers.active.data.foreach_get('uv', uv)
@@ -553,8 +556,8 @@ def add_surface(body, species, texture=None, eye_fans=True, config=None):
 
 
 def import_source(path, weld):
-    """Adds the mesh of a source GLB file or FBX file in the units of the studio, as `load_mesh()`
-    of `rig_mesh.py` reads it: welded, 1 unit from the soles to the top, the soles at z = 0. The
+    """Adds the mesh of a source GLB file or FBX file in the units of the studio: welded, 1 unit
+    from the soles to the top, the soles at z = 0. The
     UVs and the faces stay: an FBX file keeps its quads, and a GLB file holds only triangles. The
     mesh takes no vertex group of the file, such as the weights of a Tripo armature."""
     before = set(bpy.data.objects)
