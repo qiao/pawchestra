@@ -321,21 +321,19 @@ the facts of its body in its `.blend` ("Hand rig").
 - It turns the animal to face -z and scales it. It drops the props and the clips of the GLB file,
   because the app keeps its own, and it joins the digits of a paw into one `fingers` bone.
 - It drops the eyes of the mesh, and puts the bead eyes of the app on eye bones of their own, so
-  that they blink. A body can scale, level, move, or turn its eyes (`eyeSize`, `eyeLevel`,
-  `eyeShift`, `eyeNormal`). A hand rig gives its eyes with objects of its `.blend` ("Hand rig"),
-  with no rule. A hand rig with no eye objects keeps the eyes of its mesh (`eyes` is `null`): each
-  eye bone lies at the middle of the sphere that fits the eye faces of its side (`ownEyesOf()`),
-  and the app adds no bead eyes. Such eyes follow the head bone. A lid on each eye blinks over them
-  (`StudioBody.lids`, "Hand rig"). An old eye that stands out as a ball in a
-  groove, or sits in a deep socket, shows a light rim or a gray groove around the bead eye, so the
-  head fills it first (`eyeFill`, the
-  elephant). Each eye bends to the head surface (`eyeBend()`), so its rim lies at the fur.
+  that they blink. A body of `pnpm rig-mesh` puts each bead eye on the head surface under the
+  middle of its old eye. A hand rig gives its eyes with objects of its `.blend` ("Hand rig"). A
+  hand rig with no eye objects keeps the eyes of its mesh (`eyes` is `null`): each eye bone lies at
+  the middle of the sphere that fits the eye faces of its side (`ownEyesOf()`), and the app adds no
+  bead eyes. Such eyes follow the head bone. A lid on each eye blinks over them
+  (`StudioBody.lids`, "Hand rig"). Each eye bends to the head surface (`eyeBend()`), so its rim
+  lies at the fur.
   `eyePush()` tests a coarse oval with no turn (`PUSH_OVAL`), so that the faces of the oval of the
   app do not move the eye places. A test of the oval of the app pushed single eyes out, and it
   closed no notch, because the fur covers a notch at the rim, which the push leaves in the head.
 - A notch of the fur in a bead eye, or a crease beside it, comes from a few faces of the old eye
-  socket. A body fixes it with `eyeShift` when a move of both eyes clears it, else with a point edit of its rig file (`<s>-edits.json`, the elephant) or
-  of its `.blend` (the polar bear).
+  socket. A body fixes it with a point edit of its rig file (`<s>-edits.json`, the elephant) or of
+  its `.blend` (the polar bear).
 - A bead eye is an oval of `EYE_SEGMENTS` faces around its long axis and `EYE_RINGS` steps up, and
   its light has the faces of `LIGHT_BALL`. Fewer steps showed an octagon and a hexagon in a close
   view. Each oval turns in the plane of its eye so that it is upright in the front view

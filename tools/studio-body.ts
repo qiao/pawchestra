@@ -192,41 +192,6 @@ export interface AnimalSettings {
    * (`StudioBody.cueLift`, design 5.4). With no value, the hand points `CUE_MOTION.cueLift` up.
    */
   readonly cueLift?: number;
-  /**
-   * True when each bead eye faces level: the direction of the eye keeps only its turn to the side
-   * and forward, with no turn up or down. A large head box behind the eyes, such as the ruff of
-   * the wolf, turns the eyes up, and the eyes then read as eyes that look up (design 4.5). With no
-   * value, each eye faces out from the middle of the head that shows.
-   */
-  readonly eyeLevel?: boolean;
-  /**
-   * The share of the turn of each bead eye from its direction toward the mean normal of the head
-   * faces within 0.09 H of its place, from 0 to 1. The bear takes 0.5: its eyes then face halfway
-   * between their direction and its face, which faces about 29° up at the eyes. With no value,
-   * each eye keeps its direction.
-   */
-  readonly eyeNormal?: number;
-  /**
-   * The move of the place of each bead eye from the middle of the old eye of the mesh, in `H` of
-   * the eyes: out to the side, away from the middle plane, and up. The moved place then goes to
-   * the nearest point of the head surface, as the old place does ({@link eyeOnHead}). A body
-   * takes it when the face under the old eye is too curved for a clean oval. With no value, each
-   * eye sits at the old eye.
-   */
-  readonly eyeShift?: readonly [out: number, up: number];
-  /**
-   * The factor of the size of each bead eye. A bead eye is a share of the head height that shows
-   * (`EYE` of `models/eyes.ts`), so a large head, such as the head of the elephant with its ears,
-   * gets large eyes. With no value, the factor is 1.
-   */
-  readonly eyeSize?: number;
-  /**
-   * The radius of the filled area around each old eye and the outer radius of the ring of its fit,
-   * in `H` of the eyes ({@link fillEye}). A body takes it when the old eye of the mesh stands out
-   * of the head as a ball in a groove, which shows as a light rim around the bead eye. With no
-   * value, the head keeps the form of the old eye.
-   */
-  readonly eyeFill?: readonly [inner: number, outer: number];
 }
 
 /**
@@ -255,15 +220,11 @@ const BODY_FACTS = [
 /** A setting of an animal that is a fact of its body ({@link BODY_FACTS}). */
 type BodyFact = (typeof BODY_FACTS)[number];
 
-/** A setting of the rules of the bead eyes of a body of `pnpm rig-mesh` ({@link EYE_RULES}). */
-type EyeRule = (typeof EYE_RULES)[number];
-
 /**
  * The entry of an animal in `ANIMALS`: all settings of a body of `pnpm rig-mesh`, or the settings
- * of a hand rig with no fact of the body and no eye rule, because its GLB file holds them
- * ({@link settingsOf}).
+ * of a hand rig with no fact of the body, because its GLB file holds them ({@link settingsOf}).
  */
-export type AnimalEntry = AnimalSettings | Omit<AnimalSettings, BodyFact | EyeRule>;
+export type AnimalEntry = AnimalSettings | Omit<AnimalSettings, BodyFact>;
 
 /**
  * The colors of the texture of the fox mesh, from which the tan palette maps (design 4.5): the
@@ -1026,12 +987,6 @@ interface FileEye {
   /** The head height `H` of the eye. */
   readonly size: number;
 }
-
-/**
- * The settings of the rules that place the bead eyes of a body of `pnpm rig-mesh` from the old eyes
- * of its mesh. A hand rig holds its eyes ({@link eyesOf}), so its settings give none of them.
- */
-const EYE_RULES = ['eyeLevel', 'eyeNormal', 'eyeShift', 'eyeSize', 'eyeFill'] as const;
 
 /** The largest difference of the sizes of the two eyes of a hand rig, as a share of the size. */
 const EYE_SIZE_GAP = 1e-5;
@@ -2217,101 +2172,6 @@ export function eyeOnHead(mesh: SourceMesh, middle: Vector3): Vector3 {
   return point;
 }
 
-/** The fill of one old eye ({@link fillEye}). */
-interface EyeFill {
-  /** The number of the moved vertices. */
-  readonly count: number;
-  /** The largest move. */
-  readonly largest: number;
-}
-
-/** The least number of vertices of the ring of a fit of {@link fillEye}: more than its 6 terms. */
-const FILL_LEAST_RING = 10;
-
-/**
- * Fills the form of an old eye of the mesh that stands out of the head as a ball in a groove
- * (`eyeFill` of {@link AnimalSettings}, design 4.5): a least squares fit of the heights of the
- * head along the normal of the eye, over the ring of the fur vertices of the head between `inner`
- * and `outer` from the axis, gives a smooth surface, and each fur vertex of the head within
- * `inner` of the axis moves along the normal onto it. Thus the ball and the groove go, and the pea
- * eye lies on the head as on a smooth face. The vertices of the gloss fan stay.
- *
- * @param mesh The welded mesh with no eye faces. Its vertices move.
- * @param middle The middle of the old eye, in the axes and the units of the studio.
- * @param inner The radius of the filled area around the axis, in the units of the studio.
- * @param outer The outer radius of the ring of the fit, in the units of the studio.
- * @returns The number of the moved vertices and the largest move, in the units of the studio.
- * @throws Error if fewer than {@link FILL_LEAST_RING} vertices lie in the ring.
- */
-function fillEye(mesh: SourceMesh, middle: Vector3, inner: number, outer: number): EyeFill {
-  const onHead = (v: SourceVertex | undefined): v is SourceVertex =>
-    v?.material === 'fur' && (v.skin.find(([bone]) => bone === 'head')?.[1] ?? 0) > 0.5;
-  const used = new Set<number>();
-  const normal = new Vector3();
-  const triangle = new Triangle();
-  for (const face of mesh.faces) {
-    const corners = face.corners.map((c) => mesh.vertices[c]);
-    const [a, b, c] = corners;
-    if (!onHead(a) || !onHead(b) || !onHead(c)) {
-      continue;
-    }
-    for (const k of face.corners) {
-      used.add(k);
-    }
-    triangle.set(a.position, b.position, c.position);
-    if (triangle.getMidpoint(new Vector3()).distanceTo(middle) < outer) {
-      normal.addScaledVector(triangle.getNormal(new Vector3()), triangle.getArea());
-    }
-  }
-  const n = normal.normalize();
-  const up = new Vector3(0, 1, 0).projectOnPlane(n).normalize();
-  const across = new Vector3().crossVectors(up, n);
-  const local = (p: Vector3) => {
-    const rel = p.clone().sub(middle);
-    const along = rel.dot(n);
-    return { u: rel.dot(across), w: rel.dot(up), along };
-  };
-  const terms = (u: number, w: number) => [1, u, w, u * u, u * w, w * w];
-  const sums = Array.from({ length: 6 }, () => [0, 0, 0, 0, 0, 0, 0]);
-  let ring = 0;
-  for (const k of used) {
-    const { u, w, along } = local(mesh.vertices[k]?.position ?? new Vector3());
-    const radius = Math.hypot(u, w);
-    if (radius < inner || radius > outer || Math.abs(along) > outer) {
-      continue;
-    }
-    const t = terms(u / outer, w / outer);
-    for (const [r, row] of sums.entries()) {
-      for (const [c, term] of t.entries()) {
-        row[c] = (row[c] ?? 0) + (t[r] ?? 0) * term;
-      }
-      row[6] = (row[6] ?? 0) + (t[r] ?? 0) * along;
-    }
-    ring++;
-  }
-  if (ring < FILL_LEAST_RING) {
-    throw new Error(`Only ${ring} vertices of the head lie in the ring of the eye fill.`);
-  }
-  const fit = solveLinear(sums);
-  let count = 0;
-  let largest = 0;
-  for (const k of used) {
-    const position = mesh.vertices[k]?.position;
-    if (!position) {
-      continue;
-    }
-    const { u, w, along } = local(position);
-    if (Math.hypot(u, w) >= inner || Math.abs(along) > inner) {
-      continue;
-    }
-    const surface = terms(u / outer, w / outer).reduce((s, t, c) => s + t * (fit[c] ?? 0), 0);
-    position.addScaledVector(n, surface - along);
-    count++;
-    largest = Math.max(largest, Math.abs(surface - along));
-  }
-  return { count, largest };
-}
-
 /** The number of samples of the head surface on each half axis of a bead eye ({@link eyeBend}). */
 const BEND_SAMPLES = 6;
 
@@ -3023,11 +2883,6 @@ interface Export {
    * a body with no bead eyes ({@link ownEyesOf}).
    */
   readonly eyePushes: Readonly<Record<Side, number>> | null;
-  /**
-   * The fill of each old eye ({@link fillEye}): the number of moved vertices and the largest move,
-   * in `H` of the eyes, or `null` with no `eyeFill`.
-   */
-  readonly eyeFills: Readonly<Record<Side, EyeFill>> | null;
 }
 
 /**
@@ -3063,10 +2918,6 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
   const fileEyes = eyesOf(glb);
   const ownEyes = ownEyesOf(glb);
   const handEyes = fileEyes !== null || ownEyes !== null;
-  const rule = handEyes ? EYE_RULES.find((key) => settings[key] !== undefined) : undefined;
-  if (rule) {
-    throw new Error(`The GLB file holds its eyes, so the settings give no ${rule}.`);
-  }
   const eyes = eyeVertices(mesh);
   if (handEyes && eyes.L.size + eyes.R.size > 0) {
     throw new Error(
@@ -3194,26 +3045,13 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
     .add(headShiftOf(glb))
     .setX(0);
 
-  // Each bead eye bone lies on the head surface under the middle of the old eye, or under that
-  // middle moved by `eyeShift`. Each eye faces out from the middle of the head that shows, as an
-  // eye on the round head of a parametric body does, or level with `eyeLevel`, and it can turn
-  // toward the normal of the head surface (`eyeNormal`). Its oval bends to the head surface
-  // (`eyeBend()`), so that the rim lies at the fur. Then it moves out along its direction until
-  // its front face shows (`eyePush()`).
+  // Each bead eye bone lies on the head surface under the middle of the old eye. Each eye faces
+  // out from the middle of the head that shows, as an eye on the round head of a parametric body
+  // does. Its oval bends to the head surface (`eyeBend()`), so that the rim lies at the fur. Then
+  // it moves out along its direction until its front face shows (`eyePush()`).
   const eyeHeight = (shown.max.y - shown.min.y) * scale;
-  const eyeSize = fileEyes
-    ? ((fileEyes.L.size + fileEyes.R.size) / 2) * scale
-    : eyeHeight * (settings.eyeSize ?? 1);
+  const eyeSize = fileEyes ? ((fileEyes.L.size + fileEyes.R.size) / 2) * scale : eyeHeight;
   const middle = toBind(shown.getCenter(new Vector3()));
-  // An old eye that stands out of the head as a ball in a groove goes first (`eyeFill`), so that
-  // the bead eye lies on a smooth face.
-  const fill = (side: Side) => {
-    const [inner, outer] = settings.eyeFill ?? [0, 0];
-    const units = eyeSize / scale;
-    const { count, largest } = fillEye(withoutEyes, eyeCenter(side), inner * units, outer * units);
-    return { count, largest: largest / units };
-  };
-  const eyeFills = settings.eyeFill ? { L: fill('L'), R: fill('R') } : null;
   // The faces of the head near a bead eye, in the model axes.
   const facesNear = (at: Vector3, reach: number): Triangle[] =>
     withoutEyes.faces.flatMap((face) => {
@@ -3228,32 +3066,11 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
     });
   const eyeAt = (side: Side) => {
     const old = eyeCenter(side);
-    // The studio puts the left side of the animal at +x, and `shown` is in the units of the
-    // studio.
-    const [shiftOut, shiftUp] = settings.eyeShift ?? [0, 0];
-    const place = old
-      .clone()
-      .add(
-        new Vector3((side === 'L' ? 1 : -1) * shiftOut, shiftUp, 0).multiplyScalar(
-          shown.max.y - shown.min.y,
-        ),
-      );
-    const point = eyeOnHead(withoutEyes, place);
+    const point = eyeOnHead(withoutEyes, old);
     const out = point.clone().sub(middle);
     const at = new Vector3(...model(point));
     const near = facesNear(at, 0.3 * eyeHeight);
-    const look = direction(settings.eyeLevel === true ? out.setY(0) : out);
-    // The eye turns toward the mean normal of the head surface under it by `eyeNormal`.
-    const normal = new Vector3();
-    for (const triangle of near) {
-      if (triangle.closestPointToPoint(at, new Vector3()).distanceTo(at) <= 0.09 * eyeHeight) {
-        normal.addScaledVector(triangle.getNormal(new Vector3()), triangle.getArea());
-      }
-    }
-    const toNormal = settings.eyeNormal ?? 0;
-    const turned = new Vector3(...look).lerp(normal.normalize(), toNormal).normalize();
-    const facing: Vec3 =
-      toNormal === 0 ? look : [round(turned.x), round(turned.y), round(turned.z)];
+    const facing = direction(out);
     // A bent eye has its middle on the head surface, so that its rim lies at the fur and the
     // facets of the head between the corners of the oval cover little of its front.
     const eye = { point: model(point), normal: facing };
@@ -3458,7 +3275,6 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
     sheetWeights: sheet.weights,
     eyeShifts,
     eyePushes,
-    eyeFills,
   };
 }
 
@@ -4124,7 +3940,7 @@ async function main(): Promise<void> {
 
   const file = studioGlbPath(animal, settings);
   const source = relative(ROOT, file);
-  const { body, sheetWeights, eyeShifts, eyePushes, eyeFills } = studioBody(
+  const { body, sheetWeights, eyeShifts, eyePushes } = studioBody(
     await readStudioGlb(file, animal),
     source,
     settings,
@@ -4148,11 +3964,6 @@ async function main(): Promise<void> {
   } else {
     console.log(
       `Eyes of the mesh: no bead eyes. Each eye bone lies at the middle of the eyeball of its side${body.lids ? ', and its lid turns about it' : ''}.`,
-    );
-  }
-  if (eyeFills) {
-    console.log(
-      `Eye fill: ${eyeFills.L.count} vertices (left) and ${eyeFills.R.count} vertices (right) move onto the head surface, at most ${eyeFills.L.largest.toFixed(3)} H (left) and ${eyeFills.R.largest.toFixed(3)} H (right).`,
     );
   }
 }
