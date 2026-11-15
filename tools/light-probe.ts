@@ -29,16 +29,15 @@
  */
 import { SpotLight } from 'three';
 
-import { ROW_STEP, layoutScene } from '../src/models/layout-scene.ts';
+import { ROW_STEP } from '../src/models/layout-scene.ts';
 import type { SceneLayout } from '../src/models/layout.ts';
-import { ModelCache } from '../src/models/model-cache.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
 import { defaultAim, hotSpotFactor, poolFactor } from '../src/scene/light-pool.ts';
 import { LIGHT_NAMES, createLights, spotIlluminance } from '../src/scene/lights.ts';
 import { applyLook, lookValueAt, parseLook } from '../src/scene/look-values.ts';
 import type { LookChanges, LookValue } from '../src/scene/look-values.ts';
 import type { QualityTier } from '../src/scene/quality.ts';
-import { scoreOf } from '../src/score/test-score.ts';
+import { demoLayout } from './demo-layout.ts';
 import { patchedDemo } from './patch-demos.ts';
 
 /** The height of the chest above the seat floor, in meters: the point of the light of a player. */
@@ -531,8 +530,7 @@ async function main(): Promise<void> {
   const demos = await Promise.all(
     args.demos.map(async (file) => {
       const demo = await patchedDemo(file);
-      const layout = layoutScene(scoreOf(demo.bytes), new ModelCache());
-      return { file, name: demo.id, layout };
+      return { file, name: demo.id, layout: demoLayout(demo.bytes).layout };
     }),
   );
   const measure = () => {

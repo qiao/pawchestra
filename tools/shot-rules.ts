@@ -37,17 +37,17 @@
  */
 import { writeFileSync } from 'node:fs';
 
+import { demoLayout } from './demo-layout.ts';
 import { patchedDemos } from './patch-demos.ts';
 import { probeBeside, shortHash, withoutOptions } from './ref-tree.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
 import { CONDUCTOR } from '../src/models/cast.ts';
-import { layoutObstacles, layoutScene } from '../src/models/layout-scene.ts';
+import { layoutObstacles } from '../src/models/layout-scene.ts';
 import type { SceneLayout } from '../src/models/layout.ts';
 import { ModelCache } from '../src/models/model-cache.ts';
 import type { PlayerModel } from '../src/models/player.ts';
 import { boneIndex } from '../src/models/rig.ts';
 import type { Transport } from '../src/pose/types.ts';
-import { buildScore } from '../src/score/score.ts';
 import { cameraAt, createCameraPose } from '../src/shots/camera-at.ts';
 import { SHOT_SEED, prepareShots } from '../src/shots/prepare.ts';
 import * as shotSubjects from '../src/shots/subjects.ts';
@@ -1056,13 +1056,10 @@ async function checkDemos(only: readonly string[]): Promise<RulesOutput> {
     if (only.length > 0 && !only.includes(name)) {
       continue;
     }
-    const result = buildScore(demo.bytes, 'auto');
-    if (!result.ok) {
-      throw new Error(`buildScore() refused the demo ${name}: ${result.error}.`);
-    }
-    const { score } = result;
-    const models = new ModelCache();
-    const layout = layoutScene(score, models);
+    const { score, layout, models } = demoLayout(
+      demo.bytes,
+      `buildScore() refused the demo ${name}`,
+    );
     const plan = prepareShots(score, layout, SHOT_SEED, models);
     const subjects = shotSubjects.prepareSubjects(score, layout, models);
     shots[name] = plan.shots.length;

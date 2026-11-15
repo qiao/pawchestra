@@ -10,11 +10,9 @@ import { DEFAULT_DEMO, DEMO_IDS } from '../src/app/demos.ts';
 import { VIEW_SHEETS } from '../src/gallery/sheets.ts';
 import type { DemoId } from '../src/app/demos.ts';
 import { FIRST_PLAY, SAMPLES_READY } from '../src/app/dev-hook.ts';
-import { layoutScene } from '../src/models/layout-scene.ts';
-import { ModelCache } from '../src/models/model-cache.ts';
-import { buildScore } from '../src/score/score.ts';
 import { SHOT_SEED, prepareShots } from '../src/shots/prepare.ts';
 import type { ShotKind, ShotPlan } from '../src/shots/types.ts';
+import { demoLayout } from './demo-layout.ts';
 import { startCinematic } from './cinematic-mode.ts';
 import { patchedDemos } from './patch-demos.ts';
 
@@ -217,12 +215,8 @@ export function cameraShots(id: DemoId, plan: ShotPlan): CameraShot[] {
  * @throws Error if the file is not valid.
  */
 function demoShotPlan(bytes: Uint8Array): ShotPlan {
-  const result = buildScore(bytes, 'auto');
-  if (!result.ok) {
-    throw new Error(`The demo is not valid: ${result.error}.`);
-  }
-  const models = new ModelCache();
-  return prepareShots(result.score, layoutScene(result.score, models), SHOT_SEED, models);
+  const { score, layout, models } = demoLayout(bytes, 'The demo is not valid');
+  return prepareShots(score, layout, SHOT_SEED, models);
 }
 
 /**

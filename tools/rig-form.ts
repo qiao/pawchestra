@@ -13,8 +13,6 @@
 import { writeFileSync } from 'node:fs';
 
 import type { Bounds } from '../src/models/bounds.ts';
-import { layoutScene } from '../src/models/layout-scene.ts';
-import { ModelCache } from '../src/models/model-cache.ts';
 import { playerFootprint } from '../src/models/footprint.ts';
 import { INSTRUMENT_SUPPORTS, buildPlayer } from '../src/models/player.ts';
 import type { PlayerModel } from '../src/models/player.ts';
@@ -24,7 +22,7 @@ import { isSpeciesId } from '../src/models/species.ts';
 import type { SpeciesId } from '../src/models/species.ts';
 import { INSTRUMENT_IDS } from '../src/models/instruments/catalog.ts';
 import type { InstrumentBone, InstrumentId } from '../src/models/instruments/types.ts';
-import { scoreOf } from '../src/score/test-score.ts';
+import { demoLayout } from './demo-layout.ts';
 import { patchedDemos } from './patch-demos.ts';
 
 /**
@@ -280,7 +278,7 @@ async function main(): Promise<void> {
 
   const stages = (await patchedDemos()).map((demo) => ({
     demo: demo.file,
-    side: layoutScene(scoreOf(demo.bytes), new ModelCache()).stageSide,
+    side: demoLayout(demo.bytes).layout.stageSide,
   }));
   const form: FormJson = { players: players.map(playerForm), stages };
   writeFileSync(json, formJson(form));

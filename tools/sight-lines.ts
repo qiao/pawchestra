@@ -39,11 +39,11 @@ import { createScenePose, poseAt } from '../src/pose/pose-at.ts';
 import { poseSkeleton } from '../src/pose/test-kinematics.ts';
 import { PLAYING, allAudible } from '../src/pose/test-scene.ts';
 import { posedCorner } from '../src/pose/test-skin.ts';
-import { buildScore } from '../src/score/score.ts';
 import type { Score } from '../src/score/types.ts';
 import { cameraAt, createCameraPose } from '../src/shots/camera-at.ts';
 import { SHOT_SEED, prepareShots } from '../src/shots/prepare.ts';
 import { CINEMA_ASPECT, defaultView } from '../src/shots/view.ts';
+import { demoLayout } from './demo-layout.ts';
 import { patchedDemos } from './patch-demos.ts';
 
 /** The shares of the song at which the probe poses the conductor. */
@@ -495,11 +495,8 @@ export async function main(): Promise<void> {
     if (demos.length > 0 && !demos.includes(id)) {
       continue;
     }
-    const built = buildScore(file.bytes, 'auto');
-    if (!built.ok) {
-      throw new Error(`buildScore() refused ${id}: ${built.error}.`);
-    }
-    const result = probeSight(id, built.score);
+    const { score, layout, models } = demoLayout(file.bytes, `buildScore() refused ${id}`);
+    const result = probeSight(id, score, models, layout);
     results.push(result);
     const blocked = result.sights
       .filter((s) => showAll || isBlocked(s))

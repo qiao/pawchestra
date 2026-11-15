@@ -23,9 +23,7 @@ import { chromium } from '@playwright/test';
 
 import { DEFAULT_DEMO } from '../src/app/demos.ts';
 import type { DemoId } from '../src/app/demos.ts';
-import { layoutScene } from '../src/models/layout-scene.ts';
-import { ModelCache } from '../src/models/model-cache.ts';
-import { scoreOf } from '../src/score/test-score.ts';
+import { demoLayout } from './demo-layout.ts';
 import { defaultRegions } from './look-regions.ts';
 import type { DefaultRegion } from './look-regions.ts';
 import { patchedDemo } from './patch-demos.ts';
@@ -581,8 +579,7 @@ export function lookSummary(frame: LookFrame): SummaryRow {
  * @returns The regions.
  */
 export async function lookRegions(): Promise<DefaultRegion[]> {
-  const models = new ModelCache();
-  const layout = layoutScene(scoreOf((await patchedDemo(`${LOOK_DEMO}.mid`)).bytes), models);
+  const { layout, models } = demoLayout((await patchedDemo(`${LOOK_DEMO}.mid`)).bytes);
   return defaultRegions(layout, models, LOOK_FRAME.width, LOOK_FRAME.height);
 }
 

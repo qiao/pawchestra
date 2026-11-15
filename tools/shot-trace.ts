@@ -19,19 +19,17 @@
  */
 import { writeFileSync } from 'node:fs';
 
+import { demoLayout } from './demo-layout.ts';
 import { patchedDemos } from './patch-demos.ts';
 import { probeBeside, shortHash, withoutOptions } from './ref-tree.ts';
 import { rulesMain } from './shot-rules.ts';
 import { writeSmf } from '../src/midi/test-smf.ts';
 import type { TestFile } from '../src/midi/test-smf.ts';
-import { layoutScene } from '../src/models/layout-scene.ts';
-import { ModelCache } from '../src/models/model-cache.ts';
 import {
   stringQuartetFile,
   violinPianoDuoFile,
   windQuintetFile,
 } from '../src/models/test-chamber.ts';
-import { buildScore } from '../src/score/score.ts';
 import { pianoSoloFile } from '../src/score/test-audit-files.ts';
 import * as planner from '../src/shots/prepare.ts';
 import type {
@@ -403,19 +401,17 @@ async function demoBytes(demo: string): Promise<Uint8Array> {
  * @throws Error if the demo is not valid.
  */
 async function traceDemo(options: TraceOptions): Promise<TraceOutput> {
-  const result = buildScore(await demoBytes(options.demo), 'auto');
-  if (!result.ok) {
-    throw new Error(`The demo is not valid: ${result.error}.`);
-  }
-  const models = new ModelCache();
-  const layout = layoutScene(result.score, models);
+  const { score, layout, models } = demoLayout(
+    await demoBytes(options.demo),
+    'The demo is not valid',
+  );
   const range = { fromSec: options.fromSec, toSec: options.toSec };
   // A commit of --base runs this script on its own src/, which can lack traceShots().
   if (!Reflect.has(planner, 'traceShots')) {
-    const plan = planner.prepareShots(result.score, layout, planner.SHOT_SEED, models);
+    const plan = planner.prepareShots(score, layout, planner.SHOT_SEED, models);
     return { traced: false, shots: shotRows(plan.shots, range.fromSec, range.toSec), cuts: [] };
   }
-  const trace = planner.traceShots(result.score, layout, planner.SHOT_SEED, range, models);
+  const trace = planner.traceShots(score, layout, planner.SHOT_SEED, range, models);
   return {
     traced: true,
     shots: shotRows(trace.plan.shots, range.fromSec, range.toSec),

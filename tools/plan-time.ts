@@ -23,11 +23,9 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { loadavg, tmpdir } from 'node:os';
 import { join } from 'node:path';
 
-import { layoutScene } from '../src/models/layout-scene.ts';
-import { ModelCache } from '../src/models/model-cache.ts';
 import { preparePoses } from '../src/pose/plan.ts';
-import { buildScore } from '../src/score/score.ts';
 import { SHOT_SEED, prepareShots } from '../src/shots/prepare.ts';
+import { demoLayout } from './demo-layout.ts';
 import { patchedDemos } from './patch-demos.ts';
 import { ROOT, runChild, shortHash, withProbeTree } from './ref-tree.ts';
 
@@ -141,19 +139,17 @@ async function timeDemos(demos: readonly string[], runs: number): Promise<Record
     if (demos.length > 0 && !demos.includes(name)) {
       continue;
     }
-    const result = buildScore(demo.bytes, 'auto');
-    if (!result.ok) {
-      throw new Error(`buildScore() refused the demo ${name}: ${result.error}.`);
-    }
-    const models = new ModelCache();
-    const layout = layoutScene(result.score, models);
+    const { score, layout, models } = demoLayout(
+      demo.bytes,
+      `buildScore() refused the demo ${name}`,
+    );
     // The app makes the pose plan before the shot plan, so the time leaves it out.
-    const poses = preparePoses(result.score, layout, TIMED_POSE_SEED, models);
-    prepareShots(result.score, layout, SHOT_SEED, models, poses);
+    const poses = preparePoses(score, layout, TIMED_POSE_SEED, models);
+    prepareShots(score, layout, SHOT_SEED, models, poses);
     const each: number[] = [];
     for (let i = 0; i < runs; i++) {
       const start = performance.now();
-      prepareShots(result.score, layout, SHOT_SEED, models, poses);
+      prepareShots(score, layout, SHOT_SEED, models, poses);
       each.push(performance.now() - start);
     }
     times[name] = median(each);

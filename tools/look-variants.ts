@@ -42,11 +42,9 @@ import { join, resolve } from 'node:path';
 import { chromium } from '@playwright/test';
 
 import { DEFAULT_DEMO } from '../src/app/demos.ts';
-import { layoutScene } from '../src/models/layout-scene.ts';
-import { ModelCache } from '../src/models/model-cache.ts';
 import { checkLook, parseLook, soloSeats } from '../src/scene/look-values.ts';
 import type { LookChanges } from '../src/scene/look-values.ts';
-import { scoreOf } from '../src/score/test-score.ts';
+import { demoLayout } from './demo-layout.ts';
 import { defaultSummary, lookRegions, lookSummary, readLookFrames } from './look-lab.ts';
 import type { LookFrame, SummaryRow } from './look-lab.ts';
 import { patchedDemo } from './patch-demos.ts';
@@ -156,9 +154,7 @@ async function checkVariants(variants: readonly Variant[]): Promise<string[]> {
   const lines: string[] = [];
   const solos = variants.filter((v) => v.solo !== null);
   const layout =
-    solos.length > 0
-      ? layoutScene(scoreOf((await patchedDemo(`${DEFAULT_DEMO}.mid`)).bytes), new ModelCache())
-      : null;
+    solos.length > 0 ? demoLayout((await patchedDemo(`${DEFAULT_DEMO}.mid`)).bytes).layout : null;
   for (const variant of variants) {
     try {
       const changes = checkLook(variant.look).map((c) => `${c.path} ${c.before} -> ${c.after}`);

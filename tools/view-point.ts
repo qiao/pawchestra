@@ -17,10 +17,8 @@
 import { Vector3 } from 'three';
 
 import { DEFAULT_DEMO } from '../src/app/demos.ts';
-import { layoutScene } from '../src/models/layout-scene.ts';
-import { ModelCache } from '../src/models/model-cache.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
-import { scoreOf } from '../src/score/test-score.ts';
+import { demoLayout } from './demo-layout.ts';
 import { defaultCamera } from './look-regions.ts';
 import { patchedDemo } from './patch-demos.ts';
 import { optionValue } from './ref-tree.ts';
@@ -68,8 +66,7 @@ async function main(): Promise<void> {
   const sideText = optionValue(args, '--side');
   const stageSide = sideText
     ? Number(sideText)
-    : layoutScene(scoreOf((await patchedDemo(`${DEFAULT_DEMO}.mid`)).bytes), new ModelCache())
-        .stageSide;
+    : demoLayout((await patchedDemo(`${DEFAULT_DEMO}.mid`)).bytes).layout.stageSide;
   if (!(stageSide > 0)) {
     throw new Error(`The option --side takes a stage side in meters, not "${sideText}".`);
   }
