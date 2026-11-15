@@ -1465,9 +1465,10 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
     stops, and falls into the ictus at full speed (`strokeOf()`, `strokeRebound`, `strokeFall`).
   - The knees dip only on accents, because knees that bob with each beat are a fault of a
     conductor. Two accents are at least `accentGapSec` apart.
-  - The upper body sways with the bar, more in a legato passage, and the hips move against the
-    sway (`shift`), so the weight stays over the feet. The chest twists further toward a cued
-    section (`cueTwist`), and the head keeps its aim.
+  - The upper body does not sway to the side with the beat or the bar, and the hips stay over
+    the feet. Reason: a real conductor keeps a grounded stance, and a side sway that changed its
+    side every bar or two read as a metronome. The chest twists further toward a cued section
+    (`cueTwist`), and the head keeps its aim.
   - A climax is rare: it needs `climaxStartSec` of music before it, and only the largest rises
     stay, one for each `climaxEverySec`, at least `climaxGapSec` apart.
   - The left paw turns its palm up or down with the dynamics (`LEFT_HAND_PLACES`, `palm`): it
@@ -1475,7 +1476,7 @@ fast bar in fewer beats, so the baton beats no faster than `ONE_BEAT_TEMPO` of `
     places, and the twist stops at `MAX_TWIST_L` (`twist` and `maxTwist` of `writeArm()`). The
     turn goes from the twist of the paw with no wrap. Reason: a roll toward the palm of the place
     asked for a twist near 180°, and the limit turned the paw 90° in one frame, from +45° to -45°.
-  - The places of the hands lean, sway, move, and drop with the body (`followBody()`), so the
+  - The places of the hands lean, move, and drop with the body (`followBody()`), so the
     paws keep their clearance to the head. The beat plane takes only a part of the lean
     (`BATON_LEAN`), so that the baton stays above the desk of the stand.
   - On a held final chord, the baton leaves the beat, holds, makes one circle before the end of

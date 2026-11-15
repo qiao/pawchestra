@@ -148,14 +148,6 @@ export const EXPRESSION_MOTION = {
   breathPrepMaxSec: 0.8,
   /** The chest comes down in this time after the entry. */
   breathReleaseSec: 0.4,
-  /** The side sway of the upper body with the phrase, in a legato passage. */
-  sway: 3.75 * MathUtils.DEG2RAD,
-  /** A staccato passage keeps this part of the sway. */
-  swayStaccato: 0.3,
-  /** One side of the sway is at least this long, in whole bars. */
-  swaySideSec: 2,
-  /** The hips move this far to the side of the weight with the sway, and the feet stay. */
-  shift: 0.03,
   /**
    * The chest turns this part of the turn of a cue further, so that the upper body twists toward
    * the cued section.
@@ -242,8 +234,6 @@ export interface ExpressionTrack {
   readonly accent: Float32Array;
   /** The dip of the knees at each beat, from 0 to 1: the accent, less on a beat that is not a downbeat. */
   readonly dip: Float32Array;
-  /** The phase of the side sway at each beat: one unit for each side. */
-  readonly sway: Float32Array;
   /** The entries that get a breath, sorted. */
   readonly breaths: Float64Array;
   /** The size of each breath, from 0 to 1. */
@@ -266,8 +256,6 @@ export interface ExpressionState {
   lean: number;
   /** The upward turn of the head, in radians. */
   head: number;
-  /** The side sway of the upper body, in radians. */
-  sway: number;
   /** The drop of the hips from a bend of the knees, in meters. */
   drop: number;
   /** The weight of the open arms of a climax, from 0 to 1. */
@@ -286,11 +274,6 @@ export interface ExpressionState {
   loud: number;
   /** The rise of the shoulders: the turn of each clavicle, in radians. */
   shrug: number;
-  /**
-   * The move of the hips along +x, in meters. The hips move against the side lean of the sway,
-   * so that the weight stays over the feet.
-   */
-  shift: number;
 }
 
 /**
@@ -302,7 +285,6 @@ export function createExpressionState(): ExpressionState {
   return {
     lean: 0,
     head: 0,
-    sway: 0,
     drop: 0,
     climax: 0,
     final: 0,
@@ -312,7 +294,6 @@ export function createExpressionState(): ExpressionState {
     rise: 0,
     loud: 0,
     shrug: 0,
-    shift: 0,
   };
 }
 
@@ -429,29 +410,6 @@ function snapsOf(
     }
   }
   return snaps;
-}
-
-/**
- * Gives the phase of the side sway at each beat (design 5.4). The upper body changes its side at
- * each downbeat, or at each second downbeat, so that one side lasts at least `swaySideSec`.
- *
- * @param beats The conducted beats, sorted by time.
- * @returns The phase at each beat.
- */
-function swayPhases(beats: readonly Beat[]): Float32Array {
-  const out = new Float32Array(beats.length);
-  let phase = 0;
-  for (const [k, beat] of beats.entries()) {
-    out[k] = phase;
-    const next = beats[k + 1];
-    if (!next) {
-      break;
-    }
-    const barSec = (next.timeSec - beat.timeSec) * beat.beatsInBar;
-    const bars = Math.max(1, Math.ceil(EXPRESSION_MOTION.swaySideSec / barSec - 1e-6));
-    phase += 1 / (beat.beatsInBar * bars);
-  }
-  return out;
 }
 
 /** The breaths of a score, in the order of their times. */
@@ -683,7 +641,6 @@ export function buildExpressionTrack(
     snap,
     accent,
     dip,
-    sway: swayPhases(beats),
     breaths: Float64Array.from(breaths.times),
     breathSizes: Float32Array.from(breaths.sizes),
     breathPreps: Float32Array.from(breaths.preps),
@@ -793,8 +750,9 @@ function climaxAt(track: ExpressionTrack, time: number): number {
 /**
  * Writes the expression of the conductor at a song time (design 5.4). Soft passages lean the
  * body in, bend the knees a little, and lower the head. Loud passages raise the body and the
- * head. A breath lifts the chest before each entry, an accent jolts the head and dips the knees,
- * and a legato passage sways the body with the phrase. A climax and the final chord raise the
+ * head. A breath lifts the chest before each entry, and an accent jolts the head and dips the
+ * knees. The body does not sway to the side with the beat or the bar: the stance stays grounded.
+ * A climax and the final chord raise the
  * body and the head.
  *
  * @param track The expression data.
@@ -806,8 +764,6 @@ export function expressionAt(track: ExpressionTrack, time: number, out: Expressi
   const { beats } = track;
   const soft = valueAt(beats, track.soft, time);
   const loud = valueAt(beats, track.loud, time);
-  const k = lastAtOrBefore(beats, time);
-  const snap = track.snap[Math.max(0, k)] ?? 0;
   const breath = breathAt(track, time);
   const jolt = beatPulse(beats, track.accent, time, m.joltLeadSec, m.joltPeakSec, m.joltDecaySec);
   const dip = beatPulse(beats, track.dip, time, m.dipLeadSec, m.dipPeakSec, m.dipDecaySec);
@@ -844,11 +800,6 @@ export function expressionAt(track: ExpressionTrack, time: number, out: Expressi
     m.breathShrug * breath,
     m.joltShrug * jolt,
   );
-  const phase = valueAt(beats, track.sway, time);
-  const legato = 1 - (1 - m.swayStaccato) * snap;
-  const side = legato * (1 - out.climax) * Math.cos(Math.PI * phase);
-  out.sway = m.sway * side;
-  out.shift = m.shift * side;
   out.drop = m.softCrouch * soft + m.dip * dip;
 }
 

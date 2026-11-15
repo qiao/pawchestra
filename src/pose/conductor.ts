@@ -412,15 +412,13 @@ export interface ConductorState {
    * the playing pose. The places of the hands lean with it.
    */
   lean: number;
-  /** The side sway of the expression, in radians, scaled by the playing pose. */
-  sway: number;
   /** The drop of the hips of the expression, in meters, scaled by the playing pose. */
   drop: number;
   /** The weight of the open arms of a climax, from 0 to 1. */
   climax: number;
   /** The rise of the shoulders of the expression: the turn of each clavicle, in radians. */
   shrug: number;
-  /** The move of the hips along +x of the expression, in meters. */
+  /** The move of the hips along +x in the steps of the turn at the song end, in meters. */
   shift: number;
 }
 
@@ -486,11 +484,10 @@ const restBaton = new Vector3();
 const bodyTurn = new Quaternion();
 /** The turn of a clavicle in the rise of the shoulders. Each call writes it first. */
 const shrugTurn = new Quaternion();
-const bodySway = new Quaternion();
 
 /**
- * Moves a point of the model axes with the expression of the body (design 5.4): the sway and the
- * lean of the spine around the `spine` bone, and the move and the drop of the hips. Thus the hands
+ * Moves a point of the model axes with the expression of the body (design 5.4): the lean of the
+ * spine around the `spine` bone, and the move and the drop of the hips. Thus the hands
  * keep their places to the head and the chest.
  *
  * @param rig The points of the conductor.
@@ -505,12 +502,11 @@ function followBody(
   state: ConductorState,
   leanShare = 1,
 ): Vector3 {
-  if (state.lean === 0 && state.sway === 0 && state.drop === 0 && state.shift === 0) {
+  if (state.lean === 0 && state.drop === 0 && state.shift === 0) {
     return point;
   }
   const [x, y, z] = rig.spineBind;
-  bodyTurn.setFromAxisAngle(Z_AXIS, state.sway);
-  bodyTurn.multiply(bodySway.setFromAxisAngle(X_AXIS, -state.lean * leanShare));
+  bodyTurn.setFromAxisAngle(X_AXIS, -state.lean * leanShare);
   point.x -= x;
   point.y -= y;
   point.z -= z;

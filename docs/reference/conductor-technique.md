@@ -201,11 +201,11 @@ each frame (`expressionAt()`). The values are in `EXPRESSION_RULES` and `EXPRESS
   `accentGapSec`, the larger stays, so the head does not jolt on each chord of a run. The breath
   before it is the gesture of the beat before. The knees do not bob on each beat, because section 6
   names that as a fault.
-- **The sway.** The upper body sways to the side with the bar, and a legato passage sways more
-  than a staccato passage (`sway`, `swayStaccato`) (derived from the fluid piano gestures of
-  section 1). The hips move against the sway (`shift`), so the weight stays over the feet, as the
-  grounded stance of section 6. For a cue, the chest twists further toward the section
-  (`cueTwist`), and a left cue takes away a part of a forward lean (`cueUpright`).
+- **The stance (section 6).** The upper body does not sway to the side with the beat or the bar,
+  and the hips stay over the feet: the grounded stance of section 6. A side sway with the bar,
+  derived from the fluid piano gestures of section 1, read as a metronome on the bear, so the app
+  has none. For a cue, the chest twists further toward the section (`cueTwist`), and a left cue
+  takes away a part of a forward lean (`cueUpright`).
 - **The climax (sections 1, 2, 6).** A climax is a loud downbeat after a rise of the level, at
   least `climaxStartSec` into the piece. Only the largest rises stay: one for each
   `climaxEverySec`, at least `climaxGapSec` apart. Both arms open wide and high for one bar: the

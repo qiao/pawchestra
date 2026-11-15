@@ -256,7 +256,6 @@ const stance: Stance = {
   liftL: 0,
   liftR: 0,
   weight: 0,
-  shift: 0,
   drop: 0,
 };
 const yawAxis = new Vector3();
@@ -820,15 +819,14 @@ function poseAnimal(
       // The body comes up from a forward lean for a cue of the left hand.
       const upright = 1 - EXPRESSION_MOTION.cueUpright * cue.hand;
       conductor.lean = expression.lean * arms * (expression.lean > 0 ? upright : 1);
-      conductor.sway = expression.sway * arms;
       conductor.climax = expression.climax * arms;
       conductor.shrug = expression.shrug * arms;
       // The upper body twists further toward a cued section, and the head keeps its aim.
       body.twist = EXPRESSION_MOTION.cueTwist * cue.torsoYaw;
       body.headTurn -= body.twist;
       cue.handYaw += body.twist;
-      // The hips move against the side lean of the sway and drop with the knees. The feet stay,
-      // except in the steps of a turn at the song end.
+      // The hips drop with the knees. The feet stay, except in the steps of a turn at the song
+      // end.
       const stepping = stepsLegs(end);
       if (stepping) {
         const height = note.rig.headHeight;
@@ -838,19 +836,18 @@ function poseAnimal(
         stance.liftL = end.stepL * TURN_STEPS.lift * height;
         stance.liftR = end.stepR * TURN_STEPS.lift * height;
         stance.weight = end.weight * TURN_STEPS.weight;
-        stance.shift = expression.shift * arms;
         stance.drop = end.knees * TURN_STEPS.knees * height + expression.drop * arms;
         stanceOffset(note.rig.legs, stance, pose.rootOffset);
       } else {
-        hipsOffset(note.rig.legs, expression.shift * arms, pose.rootOffset);
-        pose.rootOffset[1] -= expression.drop * arms;
+        pose.rootOffset[0] = 0;
+        pose.rootOffset[1] = -expression.drop * arms;
+        pose.rootOffset[2] = 0;
       }
       conductor.shift = pose.rootOffset[0];
       conductor.drop = -pose.rootOffset[1];
       // The bow at the song end bends the spine and the head forward, and the body turns around
       // the root over the feet (design 5.4).
       body.lean = end.bend + conductor.lean;
-      body.sway = conductor.sway;
       body.lift = cue.headPitch - end.bend * END_BOW.head + expression.head * arms;
       setBoneRotation(pose.rotations, BONES.root, turn.setFromAxisAngle(Y_AXIS, end.turn));
       writeBody(pose, player, scratch);
@@ -971,7 +968,6 @@ export function poseAt(
       ready: 0,
       left: createLeftHandState(),
       lean: 0,
-      sway: 0,
       drop: 0,
       climax: 0,
       shrug: 0,

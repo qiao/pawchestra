@@ -232,8 +232,6 @@ export interface Stance {
    * right ankle (negative), as a share of the way.
    */
   weight: number;
-  /** The side move of the hips in the axes of the turned body, in meters. */
-  shift: number;
   /** The drop of the hips below the height that the legs reach, in meters. */
   drop: number;
 }
@@ -264,7 +262,7 @@ function stanceAnkle(
 
 /**
  * Writes the root offset of a stance (design 5.4): the hips over the middle of the feet, moved
- * toward the foot that carries the weight and by the side move, and the drop that keeps each leg
+ * toward the foot that carries the weight, and the drop that keeps each leg
  * at most as long as in the bind pose, plus the drop of the stance.
  *
  * @param legs The legs.
@@ -291,7 +289,6 @@ export function stanceOffset(
     .applyAxisAngle(Y_AXIS, stance.turn)
     .add(center);
   middle.sub(move);
-  middle.add(move.set(stance.shift, 0, 0).applyAxisAngle(Y_AXIS, stance.turn));
   out[0] = middle.x;
   out[2] = middle.z;
 
