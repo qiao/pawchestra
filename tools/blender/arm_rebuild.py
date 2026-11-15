@@ -524,7 +524,7 @@ def measure_joints(s, bm, bvh):
 
 def step_measure(s):
     """Finds the settings of the rebuild from the joints and from rays through the source mesh,
-    and puts them into `s.spec` with the keys of `ANIMALS` of `violin_arms.py`:
+    and puts them into `s.spec` with the keys of `Session` of `violin_arms.py`:
 
     - `zone`, `gap`, and `wristGap`: the settings of `measure_joints()`.
     - `cut.shoulder`: the shoulder line of `measure_joints()`. `cut.wrist`: the first share of
@@ -778,9 +778,8 @@ def step_paint(s):
        beyond `FREE_ARM` of the upper arm, so that the paw and the forearm do not follow the
        trunk or the legs.
     3. The shoulder line: Smooth, 6 times, within `ROOT_BAND` loop radii of the center of each
-       shoulder cut loop, as `violin_arms.step_paint()` does on its box of the arm root.
-    4. The arms: Smooth, 4 times, on the vertices that hang at least 0.6 on the arm bones, as
-       `violin_arms.step_paint()` does.
+       shoulder cut loop.
+    4. The arms: Smooth, 4 times, on the vertices that hang at least 0.6 on the arm bones.
 
     Each fix ends with Limit Total 4 and Normalize All. Gives the counts of the vertices of each
     fix.

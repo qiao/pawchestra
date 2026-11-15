@@ -1,10 +1,9 @@
 """Gives the steps that rebuild the arms of an animal with a quad tube, which `arm_rebuild.py`
-and the species scripts reuse. Each species script puts its settings into `ANIMALS`.
+runs.
 
 The rebuild uses loop edges, retopology, and extra bones to fix the twist of the arms and the
-wrists. The session makes these steps in the live Blender through MCP, with an image after each
-step, and this script repeats them in the same order, as `polar_bear_arms.py` at cbc8db5e4 did
-for the polar bear:
+wrists. The steps repeat the steps of a session in the live Blender through MCP, with an image
+after each step:
 
 1. Import the mesh and Merge by Distance.
 2. Replace the faces of each arm from the shoulder line to the wrist with a quad tube: Bisect at
@@ -17,24 +16,14 @@ for the polar bear:
    image in a strip on top of the atlas, so that the mesh keeps one material, and write the new
    source `<animal>-arms.glb`.
 5. Add the studio skeleton with the arm segments and the elbow and wrist helpers (`armSegments`
-   of the rig config), parent with automatic weights, and paint the fixes with the Weight Paint
-   tools (`paint_weights()`).
-6. Write the weights for `paintedWeights` of the config (`<animal>-weights.json`).
+   of the rig config), and parent with automatic weights (`step_bind()`).
 
 Then `pnpm rig-mesh <animal>` and `pnpm studio-body <animal>` make the app body. The app turns the
 segments and the helpers from the joints of the pose (`poseArm()` of `src/models/studio-rig.ts`).
-
-Run it in a terminal from the root of the tree:
-
-    Blender -b --factory-startup -P tools/blender/violin_arms.py -- <animal> [<out dir>]
-
-In the live Blender of MCP, `run_steps()` runs one step at a time.
 """
 
-import json
 import math
 import os
-import sys
 
 import bmesh
 import bpy
@@ -44,21 +33,6 @@ ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 #: The weld of Merge by Distance, in meters of the source, as `weld` of the configs.
 WELD = 1e-5
-
-#: The settings of each animal, in the units of the studio (1 unit from the soles to the top of
-#: the source). `cut`: the shoulder line at the share `shoulder` of the upper arm from the
-#: shoulder joint, with its plane turned `tilt` degrees toward the side of the trunk, and the
-#: wrist at the share `wrist` of the paw from the wrist joint. `zone`: the faces of one arm are
-#: out from |x| `x` and within `radius` of the arm line. `gap`: the distance of the rings of a
-#: joint from the joint. `upper`: the shares of the upper arm with a ring. `fore`: the number of
-#: inner rings of the forearm. `texture`: the size of the arm image in pixels. `faces`: the most
-#: faces that one arm can have between its cuts. `paint`: the places of the Weight Paint fixes.
-#: `bake` (optional): the cage extrusion and the most ray distance of the bake, 0.006 and 0.017
-#: by default. `factor`: the length factor of the upper arm and the forearm, or a pair of factors
-#: (upper arm, forearm), and `slim`: the factors of their cross-sections, which `step_shape()`
-#: gives the mesh. The joints of the config are the joints of the shaped arm, and its `armFactor` is 1, because the rig with arm segments
-#: does not stretch the arms (`armSegments` of `tools/blender/rig_mesh.py`).
-ANIMALS = {}
 
 #: The vertices of each ring of a tube.
 RING_VERTS = 16
@@ -115,19 +89,23 @@ def source_joints(joints, factor):
 
 
 class Session:
-    """The state of one rebuild: the animal, its settings, its config, and the objects."""
+    """The state of one rebuild: the animal, its settings, its config, and the objects.
+    `Session` of `arm_rebuild.py` sets them.
 
-    def __init__(self, animal, out_dir=None):
-        self.animal = animal
-        self.spec = ANIMALS[animal]
-        with open(os.path.join(ROOT, self.spec['config'])) as f:
-            self.config = json.load(f)
-        self.out_dir = out_dir or os.path.join(ROOT, self.spec['folder'])
-        self.joints = source_joints(self.config['joints'], self.spec['factor'])
-        self.mesh = None
-        self.source = None
-        self.rig = None
-        self.fr = None
+    `spec` holds the settings, in the units of the studio (1 unit from the soles to the top of
+    the source). `cut`: the shoulder line at the share `shoulder` of the upper arm from the
+    shoulder joint, with its plane turned `tilt` degrees toward the side of the trunk, and the
+    wrist at the share `wrist` of the paw from the wrist joint. `zone`: the faces of one arm are
+    out from |x| `x` and within `radius` of the arm line. `gap`: the distance of the rings of a
+    joint from the joint. `upper`: the shares of the upper arm with a ring. `fore`: the number of
+    inner rings of the forearm. `texture`: the size of the arm image in pixels. `faces`: the most
+    faces that one arm can have between its cuts. `bake` (optional): the cage extrusion and the
+    most ray distance of the bake, 0.006 and 0.017 by default. `factor`: the length factor of the
+    upper arm and the forearm, or a pair of factors (upper arm, forearm), and `slim`: the factors
+    of their cross-sections, which `step_shape()` gives the mesh. The joints of the config are the
+    joints of the shaped arm, and its `armFactor` is 1, because the rig with arm segments does not
+    stretch the arms (`armSegments` of `tools/blender/rig_mesh.py`).
+    """
 
     def units(self, value):
         """Gives a length in units of the studio in meters of the source."""
@@ -870,49 +848,6 @@ def step_bind(s):
     bpy.ops.object.mode_set(mode='OBJECT')
 
 
-def drive_in_blender(rig):
-    """Adds Copy Rotation constraints that turn the segments and the helpers in Blender about as
-    the app turns them, for the test poses of the weight fixes. Each forearm segment copies its
-    share of the twist of the paw (the Y axis, in local space), and each helper copies half of the
-    turn of the bone after its joint (world space). The app ignores the constraints: `poseArm()`
-    of `src/models/studio-rig.ts` turns the bones."""
-    rm = rig_mesh()
-    for side in 'LR':
-        for k in range(rm['ARM_SEGMENTS']):
-            pb = rig.pose.bones[f'forearm_seg{k}_{side}']
-            con = pb.constraints.get('twist') or pb.constraints.new('COPY_ROTATION')
-            con.name = 'twist'
-            con.target, con.subtarget = rig, f'hand_{side}'
-            con.use_x = con.use_z = False
-            con.mix_mode = 'ADD'
-            con.target_space = con.owner_space = 'LOCAL'
-            con.influence = rm['segment_share'](k)
-        for name, target in ((f'elbow_{side}', f'forearm_{side}'), (f'wrist_{side}', f'hand_{side}')):
-            pb = rig.pose.bones[name]
-            con = pb.constraints.get('half') or pb.constraints.new('COPY_ROTATION')
-            con.name = 'half'
-            con.target, con.subtarget = rig, target
-            con.mix_mode = 'REPLACE'
-            con.target_space = con.owner_space = 'WORLD'
-            con.influence = 0.5
-
-
-def test_pose(rig, down=40.0, forward=30.0, elbow=100.0, twist=90.0):
-    """Poses both arms for a look at the weights: each upper arm turns `down` degrees down and
-    `forward` degrees forward, each elbow bends `elbow` degrees forward, and each paw turns `twist`
-    degrees about its own axis. Zero for all gives the rest pose."""
-    from mathutils import Euler
-    pose = rig.pose.bones
-    for side, sign in (('L', 1), ('R', -1)):
-        for b in ('upper_arm', 'forearm', 'hand'):
-            pose[f'{b}_{side}'].rotation_mode = 'XYZ'
-        pose[f'upper_arm_{side}'].rotation_euler = Euler((math.radians(down), 0,
-                                                          math.radians(sign * forward)))
-        pose[f'forearm_{side}'].rotation_euler = Euler((0, 0, math.radians(sign * elbow)))
-        pose[f'hand_{side}'].rotation_euler = Euler((0, math.radians(sign * twist), 0))
-    bpy.context.view_layer.update()
-
-
 def remove_from(mesh, names):
     """Removes the selected vertices from the vertex groups (Remove From Group)."""
     vg = mesh.vertex_groups
@@ -928,98 +863,9 @@ def arm_groups(sides='LR'):
     return [n for n in rm['segment_bones']() if n[-1] in sides]
 
 
-def step_paint(s):
-    """Paints the fixes of the session with the Weight Paint tools, in the order of the session.
-    The places are in the units of the studio (`Frame`), from `paint` of the animal.
-
-    1. Trunk under the armpits: Remove From Group of the arm bones inside |x| `trunk.x`, from
-       `trunk.y[0]` to `trunk.y[1]`, so that the side of the trunk does not follow the arm.
-    2. Shoulder line: Smooth on the band of the arm root (`root`), so that the weights of the long
-       faces of the armpit change gradually.
-    3. Arms: Smooth on the vertices that hang at least 0.6 on the arm bones, so that the turn
-       changes gradually from one segment to the next.
-    """
-    mesh, fr, paint = s.mesh, s.fr, s.spec['paint']
-
-    def place(p):
-        return (abs(p.co.x) / fr.height, (p.co.z - fr.floor) / fr.height)
-
-    arms = arm_groups()
-    trunk, root = paint['trunk'], paint['root']
-    paint_mode(mesh, lambda p: place(p)[0] < trunk['x'] and trunk['y'][0] < place(p)[1] < trunk['y'][1])
-    remove_from(mesh, arms)
-    bpy.ops.object.vertex_group_normalize_all(group_select_mode='BONE_DEFORM', lock_active=False)
-    paint_mode(mesh, lambda p: root['x'][0] < place(p)[0] < root['x'][1]
-               and root['y'][0] < place(p)[1] < root['y'][1])
-    bpy.ops.object.vertex_group_smooth(group_select_mode='BONE_DEFORM', factor=0.5, repeat=6)
-    limit_and_normalize()
-    bpy.ops.object.mode_set(mode='OBJECT')
-    names = {g.index: g.name for g in mesh.vertex_groups}
-    arm_set = set(arms) | {f'hand_{side}' for side in 'LR'}
-    paint_mode(mesh, lambda p: sum(g.weight for g in p.groups if names[g.group] in arm_set) > 0.6)
-    bpy.ops.object.vertex_group_smooth(group_select_mode='BONE_DEFORM', factor=0.5, repeat=4)
-    limit_and_normalize()
-    bpy.ops.object.mode_set(mode='OBJECT')
-    mesh.data.use_paint_mask_vertex = False
-
-
-def step_weights(s):
-    """Writes the weights for `paintedWeights` of the config: the deform bones, the place of each
-    vertex in the units of the studio, and its weights."""
-    rm = rig_mesh()
-    mesh, rig, fr = s.mesh, s.rig, s.fr
-    bones = [b.name for b in rig.data.bones if b.use_deform]
-    names = {g.index: g.name for g in mesh.vertex_groups}
-    rows, points = [], []
-    for vert in mesh.data.vertices:
-        w = {names[g.group]: g.weight for g in vert.groups if g.weight > 0}
-        rows.append([round(w.get(b, 0.0), 6) for b in bones])
-        p = rm['from_blender']([vert.co[:]])[0]
-        points.append([round(float(p[0]) / fr.height, 7),
-                       round((float(p[1]) - fr.floor) / fr.height, 7),
-                       round(float(p[2]) / fr.height, 7)])
-    data = {'note': 'Weights of the %s with the rebuilt arms, painted in Blender on 2026-10-24 '
-                    '(tools/blender/violin_arms.py): automatic weights and Weight Paint fixes. '
-                    'Points in the units of the studio.' % s.animal,
-            'bones': bones, 'points': points, 'weights': rows}
-    path = os.path.join(s.out_dir, s.animal + '-weights.json')
-    with open(path, 'w') as f:
-        json.dump(data, f, separators=(',', ':'))
-    return len(rows)
-
-
-#: The steps of the session, in order.
-STEPS = (import_mesh, step_cut_and_tube, step_wrap, step_bridge, step_beautify, step_uv, step_bake,
-         step_normals, step_shape, step_atlas, step_export, step_skeleton, step_bind, step_paint,
-         step_weights)
-
-
 def clear_scene():
     """Removes all objects of the scene."""
     if bpy.context.object and bpy.context.object.mode != 'OBJECT':
         bpy.ops.object.mode_set(mode='OBJECT')
     for o in list(bpy.data.objects):
         bpy.data.objects.remove(o, do_unlink=True)
-
-
-def run_steps(s, first=0, last=len(STEPS)):
-    """Runs the steps from `first` up to `last` (not included), and prints the result of each."""
-    for step in STEPS[first:last]:
-        print('%s: %s' % (step.__name__, step(s)))
-
-
-def main():
-    """Runs the steps of the session and writes the source mesh and the weights into the out dir
-    (the folder of the animal in `assets/models/` by default)."""
-    argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
-    animal = argv[0]
-    out_dir = os.path.abspath(argv[1]) if len(argv) > 1 else None
-    clear_scene()
-    s = Session(animal, out_dir)
-    run_steps(s)
-    print('violin_arms: wrote %s-arms.glb and %s-weights.json into %s'
-          % (animal, animal, s.out_dir))
-
-
-if __name__ == '__main__':
-    main()
