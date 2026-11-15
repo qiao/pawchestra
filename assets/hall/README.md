@@ -87,7 +87,7 @@ state.
 | License | CC BY 4.0, <https://creativecommons.org/licenses/by/4.0/>, from the Zenodo record |
 
 A range request can get the source file from the archive with no download of the full archive.
-Each request sends the neutral User-Agent `zoophony-build/1.0`.
+Each request sends the neutral User-Agent `pawchestra-build/1.0`.
 
 ### Credit of the Konzerthaus
 

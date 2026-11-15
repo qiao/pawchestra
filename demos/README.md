@@ -220,6 +220,6 @@ design 8.1.
   download of a file gets a bot check.
 - Wikimedia Commons has almost no full orchestral MIDI files.
 - Send the Wikimedia API requests at least 1.5 s apart. With less time between them, the APIs
-  answer HTTP 429 to the neutral User-Agent `zoophony-build/1.0`.
+  answer HTTP 429 to the neutral User-Agent `pawchestra-build/1.0`.
 - Measure the fame of a work with the page views of its en.wikipedia article over 12 months, from
   the Wikimedia REST API.

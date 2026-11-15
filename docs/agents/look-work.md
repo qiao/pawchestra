@@ -22,7 +22,7 @@ their traps. The head comment of each tool file gives its options.
 - The dev server reads the query `look`: JSON of look paths, such as `BACK_ROW_LIGHT.position.1`,
   and their values (`src/app/look-override.ts`). Add a new constant of the look to `LOOK_ROOTS` of
   `src/scene/look-values.ts`.
-- A value that a module reads at its load needs a read at use time, as `gradeLutData()` reads the
+- A value that a module reads at its load needs a read at use time, as `gradeLutDataSteps()` reads the
   tone curve. Until then, `LOAD_TIME_PATHS` refuses its path.
 - The query `solo` takes seats or species, such as `panda` or `13,14`. It clicks the solo buttons
   after the load, so the light, the sound, and the poses follow the solo.
