@@ -84,9 +84,8 @@ In both cases:
 - At the end of a round, run `tools/round-checks.sh`, with `--fast` when the app and the UI do not
   change, and read the exit code of each line. On request, a change of `src/ui/` runs
   `pnpm e2e-base <base>`: the Chromium tests on the tree and on the base, with the failures of the
-  tree that pass on the base. It runs Firefox and WebKit too only when it changes code that one
-  browser alone uses, because the three browsers gave the same result for the other UI changes. A
-  failure is a fault of the change only when the same test passes on the base.
+  tree that pass on the base. Run Firefox and WebKit too only for code that one browser alone
+  uses. A failure is a fault of the change only when the same test passes on the base.
 - Stop each dev server, preview server, and browser that you start, before you end your turn.
   `pgrep -fl 'vite|playwright|chrome-headless'` shows the processes that remain.
 
@@ -131,8 +130,8 @@ These rules hold for each test:
   from the cache changes the key, and the next run starts cold. The key has no environment
   variable, so run a variant that only the environment sets with `PROBE_NO_CACHE=1`.
 - The key also holds no file of `assets/`. After a change of only a rig file or a color map, run
-  the role views of `pnpm close-views` with `PROBE_NO_CACHE=1`: a cached role view showed the
-  old body of the Tripo fox in three runs. The mode `play` showed the new body.
+  the role views of `pnpm close-views` with `PROBE_NO_CACHE=1`, because a cached role view can
+  show the old body.
 - In the shell of an agent, `grep` is a shell function that runs ugrep with `--ignore-files`, so it
   skips `scratch/` and `node_modules/`. `command grep` runs the grep of the system.
 - Make a temporary edit with `perl -0pi -e`, because the `sed -i` of macOS needs a suffix. Make a
