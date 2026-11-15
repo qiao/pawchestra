@@ -63,7 +63,7 @@
  */
 import { writeFileSync } from 'node:fs';
 
-import { Quaternion, Vector3 } from 'three';
+import { Matrix4, Quaternion, Vector3 } from 'three';
 
 import {
   FOLD_ROLES,
@@ -116,7 +116,8 @@ import {
   sweepDemos,
 } from './pose-depth.ts';
 import type { DemoResult, GapsOf, StoredDepth, StoredResult } from './pose-depth.ts';
-import { armKeys } from './raise-fit.ts';
+import { STUDIO_BONES } from '../src/models/studio-format.ts';
+import type { Side } from '../src/models/studio-format.ts';
 import { probeBeside, shortHash, withoutOptions } from './ref-tree.ts';
 import { twistAngle } from '../src/models/studio-rig.ts';
 import type { StudioRig } from '../src/models/studio-rig.ts';
@@ -1051,10 +1052,46 @@ function forearmAxis(rig: StudioRig, side: 'L' | 'R'): Vector3 {
     .normalize();
 }
 
+/** The turns of one arm in a pose that the arm turn probe keeps. */
+interface ArmKeys {
+  /** The turn of the upper arm from the bind pose, in the axes of the chest. */
+  readonly upper: Quat;
+  /** The turn of the paw from the bind pose, in the axes of the forearm. */
+  readonly wrist: Quat;
+}
+
+/**
+ * Gives the turns of one arm from the skin matrices of a pose: the turn of the upper arm from the
+ * bind pose in the axes of the chest, and of the paw from the forearm (`poseStudioBones()` of
+ * `src/models/studio-rig.ts`).
+ *
+ * @param matrices The skin matrices, 16 numbers for each bone of `STUDIO_BONES`.
+ * @param side The arm.
+ * @returns The turns, in the model axes.
+ */
+function armKeys(matrices: ArrayLike<number>, side: Side): ArmKeys {
+  const m = new Matrix4();
+  const turnOf = (name: string): Quaternion => {
+    const at = STUDIO_BONES.findIndex((bone) => bone === name) * 16;
+    return new Quaternion().setFromRotationMatrix(
+      m.fromArray(Array.from({ length: 16 }, (...[, k]) => matrices[at + k] ?? 0)),
+    );
+  };
+  const chest = turnOf('chest').invert();
+  const upper = turnOf(`upper_arm_${side}`);
+  const fore = turnOf(`forearm_${side}`);
+  const hand = turnOf(`hand_${side}`);
+  const tuple = (q: Quaternion): Quat => [q.x, q.y, q.z, q.w];
+  return {
+    upper: tuple(chest.clone().multiply(upper)),
+    wrist: tuple(fore.clone().invert().multiply(hand)),
+  };
+}
+
 /**
  * Starts the probe of the arm turns of a fold probe: a visit that keeps the turn of each upper arm
- * in the axes of the chest and of each paw from its forearm in each sample (`armKeys()` of
- * `tools/raise-fit.ts`), and a function that gives the angles of their mean turns, with the twist
+ * in the axes of the chest and of each paw from its forearm in each sample ({@link armKeys}),
+ * and a function that gives the angles of their mean turns, with the twist
  * and the swing of each paw ({@link pawAngles}). The mean turns of the play show an upper arm that
  * a hold twists, such as elbows out and level, and a paw that twists on its forearm, such as a
  * mallet grip.
