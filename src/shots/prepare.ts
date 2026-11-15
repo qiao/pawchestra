@@ -1462,7 +1462,7 @@ function searchClose(
   name: string,
 ): Framing | null {
   const { held } = subjectLines(planner, subject);
-  const moveKey = `${subjectKey(subject)} ${move.size.share} ${subject.reach} ${move.pushIn} ${move.fov}`;
+  const moveKey = `${subjectKey(subject)} ${move.size.share} ${move.size.inside} ${subject.reach} ${move.pushIn} ${move.fov}`;
   const known = planner.moveCache.get(moveKey) ?? new Map<number, boolean>();
   planner.moveCache.set(moveKey, known);
   const frames = planner.frameCache.get(moveKey) ?? new Map<number, number>();
