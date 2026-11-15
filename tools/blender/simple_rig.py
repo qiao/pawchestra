@@ -11,8 +11,8 @@ the GLB file of the body, and `pnpm studio-body <animal>` writes its module.
 The steps:
  1. Import the source mesh (a GLB file, or an FBX file that keeps its quads), weld its vertices,
     and make each face flat. With `joinQuads` in the config, join each two triangles of a quad of a
-    GLB source into the quad again (`join_quads()` of `mesh_intake.py`), because a GLB file holds
-    only triangles. The join is a guess: two source triangles in a row can join too.
+    GLB source into the quad again (`join_quads()`), because a GLB file holds only triangles. The
+    join is a guess: two source triangles in a row can join too.
  2. Give each face the color of the texture (`texture` of the config, or the texture of a GLB
     source), and make the nose gloss (`add_surface()`).
  3. With `limbs` in the config, make the limbs longer along their bones (`limb_moves()`), and
@@ -39,7 +39,6 @@ import bpy
 import numpy as np
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-import mesh_intake as mi  # noqa: E402
 import studio_armature as sa  # noqa: E402
 import studio_eyes as se  # noqa: E402
 
@@ -186,7 +185,8 @@ def subdivide_rings(body, config):
             # The edges along the arm that cross the middle plane between the two rings.
             middle = (a + b) / 2
             starts = [
-                e for e in bm.edges
+                e
+                for e in bm.edges
                 if all(arm[v.index] for v in e.verts)
                 and (t[e.verts[0].index] - middle) * (t[e.verts[1].index] - middle) < 0
             ]
@@ -275,12 +275,32 @@ def smooth_weights(body, passes, share, rig=None):
             group.add([int(i)], float(w[i, k]), 'REPLACE')
 
 
+def join_quads(bm):
+    """Joins each two triangles that follow one another in the face order and share an edge into
+    one quad (`bmesh.utils.face_join()`). The glTF exporter writes the two triangles of a quad one
+    after the other. Gives the number of quads."""
+    bm.faces.ensure_lookup_table()
+    faces = list(bm.faces)
+    pairs, k = [], 0
+    while k + 1 < len(faces):
+        f, g = faces[k], faces[k + 1]
+        shared = set(f.verts) & set(g.verts)
+        if len(f.verts) == 3 and len(g.verts) == 3 and len(shared) == 2:
+            pairs.append((f, g))
+            k += 2
+        else:
+            k += 1
+    for f, g in pairs:
+        bmesh.utils.face_join([f, g])
+    return len(pairs)
+
+
 def join_source_quads(body):
     """Joins each two triangles of a quad of the source into the quad again. Gives the number of
     quads."""
     bm = bmesh.new()
     bm.from_mesh(body.data)
-    quads = mi.join_quads(bm)
+    quads = join_quads(bm)
     bm.to_mesh(body.data)
     bm.free()
     body.data.update()
