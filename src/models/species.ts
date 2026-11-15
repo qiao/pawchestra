@@ -225,8 +225,48 @@ export function instrumentScale(params: SpeciesParams, instrument: InstrumentId)
   return isScaledInstrument(instrument) ? (params[SCALE_PARAMS[instrument]] ?? 1) : 1;
 }
 
-/** The parameters of each species (design 4.3, 4.5). */
-export const SPECIES = {
+/**
+ * The parameters of a species in {@link SPECIES_ENTRIES}: those of {@link SpeciesParams} that the
+ * studio body and the palette do not give. A seat height overrides the seat of the studio body.
+ */
+type SpeciesEntry = Omit<SpeciesParams, 'colors' | 'headHeight' | 'seatHeight'> & {
+  /** The seat height in H, in place of the seat of the studio body. */
+  readonly seatHeight?: number;
+};
+
+/**
+ * Makes the parameters of each species from {@link SPECIES_ENTRIES}: the colors of its palette,
+ * the head height of its studio body, and the seat of the studio body in H.
+ *
+ * @returns The parameters of each species.
+ */
+function speciesTable(): Readonly<Record<SpeciesId, SpeciesParams>> {
+  const table: Partial<Record<SpeciesId, SpeciesParams>> = {};
+  for (const id of SPECIES_IDS) {
+    const entry: SpeciesEntry = SPECIES_ENTRIES[id];
+    const heights = STUDIO_HEIGHTS[entry.body];
+    const seat = heights.seatHeight === null ? null : heights.seatHeight / heights.headHeight;
+    const seatHeight = entry.seatHeight ?? seat;
+    if (seatHeight === null) {
+      throw new Error(`The species ${id} has no seat height.`);
+    }
+    table[id] = {
+      ...entry,
+      colors: SPECIES_COLORS[id],
+      headHeight: heights.headHeight,
+      seatHeight,
+    };
+  }
+  // SAFETY: the loop sets each id of SPECIES_IDS.
+  return table as Record<SpeciesId, SpeciesParams>;
+}
+
+/**
+ * The parameters of each species that its studio body and its palette do not give (design 4.3,
+ * 4.5). {@link SPECIES} adds the colors of `SPECIES_COLORS`, the head height of the studio body,
+ * and, unless an entry sets it, the seat height of the studio body in H.
+ */
+const SPECIES_ENTRIES = {
   /**
    * Rabbit, the first violins (reference image). It has the studio body of the hand rig of the
    * fourth Tripo P2 rabbit (`assets/models/rabbit/tripo-hand/rabbit.blend`, design 4.4), seated
@@ -254,12 +294,8 @@ export const SPECIES = {
    */
   rabbit: {
     body: 'studio-rabbit',
-    colors: SPECIES_COLORS.rabbit,
     violinScale: 0.9,
     bowGrip: { at: [-0.0084, -0.04, 0.0553], turn: 40 * (Math.PI / 180) },
-    headHeight: STUDIO_HEIGHTS['studio-rabbit'].headHeight,
-    seatHeight:
-      STUDIO_HEIGHTS['studio-rabbit'].seatHeight / STUDIO_HEIGHTS['studio-rabbit'].headHeight,
   },
   /**
    * Red-orange fox with a white face, the second violins (reference image). It has the studio body
@@ -283,11 +319,8 @@ export const SPECIES = {
    */
   'fox-red': {
     body: 'studio-fox',
-    colors: SPECIES_COLORS['fox-red'],
     violinScale: 0.83,
     bowGrip: { at: [-0.0145, -0.0148, -0.0875], turn: 50 * (Math.PI / 180) },
-    headHeight: STUDIO_HEIGHTS['studio-fox'].headHeight,
-    seatHeight: STUDIO_HEIGHTS['studio-fox'].seatHeight / STUDIO_HEIGHTS['studio-fox'].headHeight,
   },
   /**
    * Light tan fox, the flutes (reference image). It has the studio body of the red fox with the tan
@@ -299,9 +332,6 @@ export const SPECIES = {
   'fox-tan': {
     body: 'studio-fox',
     palette: 'tan',
-    colors: SPECIES_COLORS['fox-tan'],
-    headHeight: STUDIO_HEIGHTS['studio-fox'].headHeight,
-    seatHeight: STUDIO_HEIGHTS['studio-fox'].seatHeight / STUDIO_HEIGHTS['studio-fox'].headHeight,
   },
   /**
    * Wolf, the clarinets: a gray wolf with a cream chest, belly, and muzzle, dark lower legs, and a
@@ -316,9 +346,6 @@ export const SPECIES = {
    */
   wolf: {
     body: 'studio-wolf',
-    colors: SPECIES_COLORS.wolf,
-    headHeight: STUDIO_HEIGHTS['studio-wolf'].headHeight,
-    seatHeight: STUDIO_HEIGHTS['studio-wolf'].seatHeight / STUDIO_HEIGHTS['studio-wolf'].headHeight,
     violinScale: 0.75,
   },
   /**
@@ -331,10 +358,6 @@ export const SPECIES = {
    */
   elephant: {
     body: 'studio-elephant',
-    colors: SPECIES_COLORS.elephant,
-    headHeight: STUDIO_HEIGHTS['studio-elephant'].headHeight,
-    seatHeight:
-      STUDIO_HEIGHTS['studio-elephant'].seatHeight / STUDIO_HEIGHTS['studio-elephant'].headHeight,
   },
   /**
    * Bear, the conductor (reference image). It has the studio body of the hand rig of the Tripo P2
@@ -344,8 +367,6 @@ export const SPECIES = {
    */
   bear: {
     body: 'studio-bear',
-    colors: SPECIES_COLORS.bear,
-    headHeight: STUDIO_HEIGHTS['studio-bear'].headHeight,
     seatHeight: 0.75,
   },
   /**
@@ -371,12 +392,9 @@ export const SPECIES = {
    */
   cat: {
     body: 'studio-cat',
-    colors: SPECIES_COLORS.cat,
     seatedTail: 'curl',
     violaScale: 0.85,
     bowGrip: { at: [-0.002, 0.007, -0.079], turn: 50 * (Math.PI / 180) },
-    headHeight: STUDIO_HEIGHTS['studio-cat'].headHeight,
-    seatHeight: STUDIO_HEIGHTS['studio-cat'].seatHeight / STUDIO_HEIGHTS['studio-cat'].headHeight,
   },
   /**
    * Hippo, the contrabasses: a round gray-pink hippo with small ears, two small teeth, pale toes,
@@ -402,10 +420,6 @@ export const SPECIES = {
     body: 'studio-hippo',
     bassScale: 0.7,
     bowGrip: { at: [-0.0061, 0.0257, -0.0894], turn: 23 * (Math.PI / 180) },
-    colors: SPECIES_COLORS.hippo,
-    headHeight: STUDIO_HEIGHTS['studio-hippo'].headHeight,
-    seatHeight:
-      STUDIO_HEIGHTS['studio-hippo'].seatHeight / STUDIO_HEIGHTS['studio-hippo'].headHeight,
   },
   /**
    * Deer, the harp: a slim spotted fawn with a cream chest, belly, and muzzle, large ears, a long
@@ -425,9 +439,6 @@ export const SPECIES = {
   deer: {
     body: 'studio-deer',
     harpScale: 0.975,
-    colors: SPECIES_COLORS.deer,
-    headHeight: STUDIO_HEIGHTS['studio-deer'].headHeight,
-    seatHeight: STUDIO_HEIGHTS['studio-deer'].seatHeight / STUDIO_HEIGHTS['studio-deer'].headHeight,
   },
   /**
    * Panda, the trombones: a round plush panda with cream fur and dark ears, eye patches, shoulders,
@@ -445,10 +456,6 @@ export const SPECIES = {
    */
   panda: {
     body: 'studio-panda',
-    colors: SPECIES_COLORS.panda,
-    headHeight: STUDIO_HEIGHTS['studio-panda'].headHeight,
-    seatHeight:
-      STUDIO_HEIGHTS['studio-panda'].seatHeight / STUDIO_HEIGHTS['studio-panda'].headHeight,
   },
   /**
    * Mouse, the oboes: a gray-taupe mouse with a cream belly, large round pink ears, whiskers, pink
@@ -469,12 +476,8 @@ export const SPECIES = {
    */
   mouse: {
     body: 'studio-mouse',
-    colors: SPECIES_COLORS.mouse,
     oboeScale: 0.5,
     noChair: true,
-    headHeight: STUDIO_HEIGHTS['studio-mouse'].headHeight,
-    seatHeight:
-      STUDIO_HEIGHTS['studio-mouse'].seatHeight / STUDIO_HEIGHTS['studio-mouse'].headHeight,
   },
   /**
    * Beaver, the bassoons: a round, furry, orange-brown beaver with a light muzzle, two big front
@@ -491,12 +494,8 @@ export const SPECIES = {
    */
   beaver: {
     body: 'studio-beaver',
-    colors: SPECIES_COLORS.beaver,
     bassoonScale: 0.7,
     noChair: true,
-    headHeight: STUDIO_HEIGHTS['studio-beaver'].headHeight,
-    seatHeight:
-      STUDIO_HEIGHTS['studio-beaver'].seatHeight / STUDIO_HEIGHTS['studio-beaver'].headHeight,
   },
   /**
    * Dog, the cellos: a beagle with brown ears and a brown back. It has the studio body of the hand
@@ -522,10 +521,7 @@ export const SPECIES = {
     body: 'studio-dog',
     celloScale: 0.83,
     bowGrip: { at: [-0.0858, -0.0999, -0.0953], turn: 0 },
-    colors: SPECIES_COLORS.dog,
     hangingEars: true,
-    headHeight: STUDIO_HEIGHTS['studio-dog'].headHeight,
-    seatHeight: STUDIO_HEIGHTS['studio-dog'].seatHeight / STUDIO_HEIGHTS['studio-dog'].headHeight,
   },
   /**
    * Monkey, the trumpets: a brown macaque with a pink face, pink ears, hands, and feet, a cream
@@ -543,12 +539,8 @@ export const SPECIES = {
    */
   monkey: {
     body: 'studio-monkey',
-    colors: SPECIES_COLORS.monkey,
     noChair: true,
     trumpetScale: 0.75,
-    headHeight: STUDIO_HEIGHTS['studio-monkey'].headHeight,
-    seatHeight:
-      STUDIO_HEIGHTS['studio-monkey'].seatHeight / STUDIO_HEIGHTS['studio-monkey'].headHeight,
   },
   /**
    * Pig, the horns: a round pink pig with floppy ears, a pink snout disc, dark hooves, and a
@@ -559,9 +551,6 @@ export const SPECIES = {
    */
   pig: {
     body: 'studio-pig',
-    colors: SPECIES_COLORS.pig,
-    headHeight: STUDIO_HEIGHTS['studio-pig'].headHeight,
-    seatHeight: STUDIO_HEIGHTS['studio-pig'].seatHeight / STUDIO_HEIGHTS['studio-pig'].headHeight,
   },
   /**
    * Rhino, the tuba: a gray rhino with a pale belly, a large pale horn on the muzzle and a small
@@ -576,11 +565,7 @@ export const SPECIES = {
    */
   rhino: {
     body: 'studio-rhino',
-    colors: SPECIES_COLORS.rhino,
     tubaPipe: [0.25, 0.1],
-    headHeight: STUDIO_HEIGHTS['studio-rhino'].headHeight,
-    seatHeight:
-      STUDIO_HEIGHTS['studio-rhino'].seatHeight / STUDIO_HEIGHTS['studio-rhino'].headHeight,
   },
   /**
    * Badger, the percussion: a dark brown badger with a cream face, a dark brown stripe over each
@@ -595,10 +580,6 @@ export const SPECIES = {
   badger: {
     body: 'studio-badger',
     cymbalForm: 'suspended',
-    colors: SPECIES_COLORS.badger,
-    headHeight: STUDIO_HEIGHTS['studio-badger'].headHeight,
-    seatHeight:
-      STUDIO_HEIGHTS['studio-badger'].seatHeight / STUDIO_HEIGHTS['studio-badger'].headHeight,
   },
   /**
    * Penguin, the choir: a penguin with a black back, head, and flippers, a white belly, a pale
@@ -609,10 +590,6 @@ export const SPECIES = {
    */
   penguin: {
     body: 'studio-penguin',
-    colors: SPECIES_COLORS.penguin,
-    headHeight: STUDIO_HEIGHTS['studio-penguin'].headHeight,
-    seatHeight:
-      STUDIO_HEIGHTS['studio-penguin'].seatHeight / STUDIO_HEIGHTS['studio-penguin'].headHeight,
   },
   /**
    * Polar bear, the piano and the other keyboards. It has the studio body of the hand rig of the
@@ -623,11 +600,6 @@ export const SPECIES = {
    */
   'polar-bear': {
     body: 'studio-polar-bear',
-    colors: SPECIES_COLORS['polar-bear'],
-    headHeight: STUDIO_HEIGHTS['studio-polar-bear'].headHeight,
-    seatHeight:
-      STUDIO_HEIGHTS['studio-polar-bear'].seatHeight /
-      STUDIO_HEIGHTS['studio-polar-bear'].headHeight,
   },
   /**
    * Mannequin, a test body (design 4.4, "Test mannequin"): the animal preset of
@@ -639,13 +611,12 @@ export const SPECIES = {
    */
   mannequin: {
     body: 'studio-mannequin',
-    colors: SPECIES_COLORS.mannequin,
-    headHeight: STUDIO_HEIGHTS['studio-mannequin'].headHeight,
-    seatHeight:
-      STUDIO_HEIGHTS['studio-mannequin'].seatHeight / STUDIO_HEIGHTS['studio-mannequin'].headHeight,
     violinScale: 0.7,
   },
-} as const satisfies Readonly<Record<SpeciesId, SpeciesParams>>;
+} as const satisfies Readonly<Record<SpeciesId, SpeciesEntry>>;
+
+/** The parameters of each species (design 4.3, 4.5). */
+export const SPECIES: Readonly<Record<SpeciesId, SpeciesParams>> = speciesTable();
 
 /** The color of the eyes of all species (design 4.5). */
 export const EYE_COLOR = '#15110e';

@@ -84,7 +84,7 @@ describe('buildPlayer', () => {
 
   it('scales the violin and the bow of a species by its violin scale (design 4.6)', () => {
     const rabbit = buildPlayer('rabbit', 'violin');
-    const scale: number = SPECIES.rabbit.violinScale;
+    const scale = SPECIES.rabbit.violinScale ?? 1;
     const pieceAxis = (bone: 'instrument' | 'bow'): Vector3 =>
       new Vector3(1, 0, 0).applyQuaternion(
         new Quaternion(
