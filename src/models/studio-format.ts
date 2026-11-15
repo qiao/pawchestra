@@ -393,8 +393,7 @@ export interface StudioRaise {
 export interface StudioEyes {
   /**
    * The head height that sizes the eyes, in meters: the head that shows, from the chin to the top
-   * of the skull, times the eye size of the animal (`eyeSize` of `ANIMALS` in
-   * `tools/studio-body.ts`), or the size of the eye objects of a hand rig. It is larger than
+   * of the skull, or the size of the eye objects of a hand rig. It is larger than
    * {@link StudioBody.headHeight} when the rig grows the head (`headFactor` of `pnpm rig-mesh`), so
    * that the eyes fit the larger head.
    */
