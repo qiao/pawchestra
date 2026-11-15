@@ -55,6 +55,12 @@ def paw(X, e, params):
         m = np.array([sign, 1, 1])
         f, a = paw_axis(params['sourceJoints'], side)
         c = np.array(params['sourceJoints']['hand_L']['head'], float) * m
+        # An arm of the edit armStretch moves the wrist joint and the forearm joint along the arm
+        # line, so the frame of the paw takes their places after that edit.
+        stretch = next((ed for ed in params.get('edits', []) if ed['kind'] == 'armStretch'), None)
+        if stretch is not None:
+            f, c = arm_stretch(np.array([f, c]), stretch, params)
+            a = (c - f) / np.linalg.norm(c - f)
         w = rotation(a, paw_turn_angle(params, side)) @ (np.array(e['width'], float) * m)
         w -= (w @ a) * a
         w /= np.linalg.norm(w)
@@ -167,7 +173,8 @@ def arm_girth(X, e, params):
     the shoulder joint to the wrist joint of its side) in the plane square to the line, by the
     factor k(x) of `table` ([x, k] rows, linear between them, x of the left side). The share fades
     from 1 at the distance `reach`[0] from the line to 0 at `reach`[1], so that the trunk, the head,
-    and the whiskers stay. The joints lie on the line, so they stay."""
+    and the whiskers stay. The joints lie on the line, so they stay. The x of `table` is the x of
+    the source, so this edit comes before the edit `armStretch` in the params."""
     Y = X.copy()
     tab = np.array(e['table'], float)
     r0, r1 = e['reach']
@@ -348,7 +355,63 @@ def smile(X, e, params):
     return X + D
 
 
+def arm_stretch_parts(params, side):
+    """The line of the rest arm of a side for the edit `armStretch`: the shoulder joint a, the unit
+    direction u from it to the wrist joint, and the length t_w to the wrist joint."""
+    m = np.array([1.0 if side == 'L' else -1.0, 1, 1])
+    a = np.array(params['sourceJoints']['upper_arm_L']['head'], float) * m
+    w = np.array(params['sourceJoints']['hand_L']['head'], float) * m
+    t_w = float(np.linalg.norm(w - a))
+    return a, (w - a) / t_w, t_w
+
+
+def arm_stretch_g(t, e, t_w):
+    """The place along the arm line after the edit `armStretch`: g(t) = t + (k - 1) G(t), G the
+    integral of the band b from 0 to t. b is a smoothstep from 0 at -ramp to 1 at ramp, 1 to the
+    wrist, and a smoothstep to 0 from t_w - ramp to t_w + ramp. Thus the upper arm and the forearm
+    grow by k, and the paw past the wrist moves as one piece by (k - 1) t_w."""
+    r = e['ramp']
+    ts = np.linspace(-0.1, 0.6, 7001)
+    band = smoothstep(-r, r, ts) * (1 - smoothstep(t_w - r, t_w + r, ts))
+    G = np.concatenate([[0], np.cumsum((band[1:] + band[:-1]) / 2 * np.diff(ts))])
+    G -= np.interp(0.0, ts, G)
+    return t + (e['k'] - 1) * np.interp(t, ts, G)
+
+
+def arm_stretch(X, e, params):
+    """Makes the upper arm and the forearm of each side longer by the factor k (the edit
+    `armStretch`, as on the fox, the hippo, and the panda): each point of the side with |x| over
+    the shoulder joint moves along the line of the rest arm u (from the shoulder joint to the
+    wrist joint) from its place t on the line to g(t) (arm_stretch_g()). The share fades from 1 at
+    the distance reach[0] from the line to 0 at reach[1], so that the belly and the head stay. The
+    paw keeps its size, its form, and its turn. The paw turns of build.py come before this edit,
+    about the forearm axis of the source."""
+    Y = X.copy()
+    r0, r1 = e['reach']
+    for side, sign in (('L', 1.0), ('R', -1.0)):
+        a, u, t_w = arm_stretch_parts(params, side)
+        v = X - a
+        t = v @ u
+        dist = np.linalg.norm(v - np.outer(t, u), axis=1)
+        w = (1 - smoothstep(r0, r1, dist)) * (sign * X[:, 0] > a[0] * sign)
+        Y += (w * (arm_stretch_g(t, e, t_w) - t))[:, None] * u
+    return Y
+
+
+def arm_source_x(x, params):
+    """The x of the source for an x of the left arm after the edit `armStretch`, on the line of
+    the rest arm (the inverse of arm_stretch_g()). With no edit, x stays."""
+    e = next((e for e in params.get('edits', []) if e['kind'] == 'armStretch'), None)
+    if e is None:
+        return x
+    a, u, t_w = arm_stretch_parts(params, 'L')
+    ts = np.linspace(-0.1, 0.6, 7001)
+    t = (np.asarray(x, float) - a[0]) / u[0]
+    return a[0] + np.interp(t, arm_stretch_g(ts, e, t_w), ts) * u[0]
+
+
 EDITS = {
+    'armStretch': arm_stretch,
     'mouthFill': mouth_fill,
     'headWide': head_wide,
     'legs': legs,

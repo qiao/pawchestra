@@ -405,7 +405,9 @@ def segments(x, part, R):
 
 def arm_row(x, R):
     ctl = np.array(R['control'])
-    clav, elbow, wrist = (float(np.interp(x, ctl[:, 0], ctl[:, k])) for k in (1, 2, 3))
+    # The control rows hold x of the source: an arm of the edit armStretch maps back.
+    xs = float(ce.arm_source_x(x, P))
+    clav, elbow, wrist = (float(np.interp(xs, ctl[:, 0], ctl[:, k])) for k in (1, 2, 3))
     rest = 1 - clav - elbow - wrist
     row = {
         n: w * rest for n, w in segments(x, 'upper_arm' if x < R['elbow'] else 'forearm', R).items()
@@ -429,7 +431,8 @@ def blend_share(d, start, band, count):
 
 def exact_rows(body, rig, head_ids):
     """The exact rows of the arms and the paws, and {head 1} for the loose parts and the gloss
-    nose. An arm vertex is a vertex of a side with |x| from rows.start, y below the shoulder joint plus 0.07, and a
+    nose. An arm vertex is a vertex of a side with |x| from rows.start (x of the source, mapped
+    back through the edit armStretch), y below the shoulder joint plus 0.07, and a
     distance below rows.reach from the line of the rest arm (from the head of upper_arm to the
     head of hand). Its place is its x on the upper arm and the forearm, and the wrist place plus
     its distance d along the rest forearm axis past the head of hand on the paw.
@@ -464,7 +467,11 @@ def exact_rows(body, rig, head_ids):
             control=[[x, c, e, 0.0] for x, c, e in R['control']],
         )
         for i, p in enumerate(S):
-            if i in head_ids or sign * p[0] < R['start'] or p[1] > ua[1] + 0.07:
+            if (
+                i in head_ids
+                or ce.arm_source_x(sign * p[0], P) < R['start']
+                or p[1] > ua[1] + 0.07
+            ):
                 continue
             v = p - ua
             if np.linalg.norm(v - (v @ line) * line) > R['reach']:
