@@ -12,7 +12,7 @@ import { conductorBeatPoint } from '../pose/conductor.ts';
 import type { PosePlan } from '../pose/plan.ts';
 import { createScenePose, poseAt } from '../pose/pose-at.ts';
 import type { ScenePoseBuffer } from '../pose/pose-at.ts';
-import { mixHash, mulberry32 } from '../pose/random.ts';
+import { decisionRandom } from '../pose/random.ts';
 import type { Transport } from '../pose/types.ts';
 import { FOCUS_PULL, cameraAt, createCameraPose } from './camera-at.ts';
 import { keyDistance, writeKeyPosition } from './camera-keys.ts';
@@ -27,7 +27,14 @@ import type { ClearBox, Segment, StageClearance } from './clearance.ts';
 import { ANIMAL_FLOOR, animalTooNear, foregroundHead, inFrame, lensScale } from './foreground.ts';
 import type { StageBody, StageHead } from './foreground.ts';
 import { FILM_GRAMMAR, keepsLine } from './grammar.ts';
-import { INSERT_FRAME, cutsFace, insertCover, posePlayer, posedPoint } from './insert-frame.ts';
+import {
+  INSERT_FRAME,
+  cutsFace,
+  insertCover,
+  middleOf,
+  posePlayer,
+  posedPoint,
+} from './insert-frame.ts';
 import type { InsertDetailPart, InsertView, PosedPlayer } from './insert-frame.ts';
 import { entriesIn, musicIn } from './music.ts';
 import type { ScoreMusic, WindowMusic } from './music.ts';
@@ -223,17 +230,6 @@ export interface InsertInputs {
 }
 
 /**
- * Gives the middle of two points.
- *
- * @param a A point.
- * @param b Another point.
- * @returns The middle.
- */
-function middle(a: Vec3, b: Vec3): Vec3 {
-  return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
-}
-
-/**
  * Gives the point of a target of the instrument in the model axes, or `null` for a target on a
  * piece that hangs in the bind pose, such as a mallet or the bow.
  *
@@ -328,7 +324,7 @@ function modelDetails(model: PlayerModel): ModelDetail[] {
     case 'bassoon': {
       const left = palm('palmL');
       const right = palm('palmR');
-      point('fingers', left && right ? middle(left, right) : null);
+      point('fingers', left && right ? middleOf(left, right) : null);
       break;
     }
     case 'trombone':
@@ -904,22 +900,6 @@ function detailView(
 }
 
 /**
- * Makes the seeded generator of one insert.
- *
- * @param seed The seed of the plan.
- * @param time The start of the insert, in song seconds.
- * @param name The name of the decision.
- * @returns The generator.
- */
-function insertRandom(seed: number, time: number, name: string): () => number {
-  let hash = mixHash(seed, Math.round(time * 1000));
-  for (let i = 0; i < name.length; i++) {
-    hash = mixHash(hash, name.charCodeAt(i));
-  }
-  return mulberry32(hash);
-}
-
-/**
  * Gives the seats that carry the lead in a window, as one key.
  *
  * @param window The music of the window.
@@ -1073,7 +1053,7 @@ export function planInserts(inputs: InsertInputs, shots: readonly Shot[]): Shot[
     const latestEnd = shot.endSec - R.mainAfterSec;
     let placed = false;
     for (const start of cutTimes(music, earliest, latestEnd - R.lengthSec[0])) {
-      const random = insertRandom(seed, start, 'insert');
+      const random = decisionRandom(seed, start, 'insert');
       const wanted = R.wantedSec[0] + (R.wantedSec[1] - R.wantedSec[0]) * random();
       const end = insertEnd(music, start, wanted, latestEnd);
       if (end === null) {
@@ -1132,7 +1112,7 @@ export function planInserts(inputs: InsertInputs, shots: readonly Shot[]): Shot[
         const camera = insertCamera(
           inputs,
           view,
-          insertRandom(seed, start, `${spot.owner} ${spot.detail}`),
+          decisionRandom(seed, start, `${spot.owner} ${spot.detail}`),
           (c) =>
             cutKeepsGrammar(into, c.camera, target, c.half) &&
             cutKeepsGrammar(back, c.camera, target, c.half),

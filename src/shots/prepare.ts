@@ -5,7 +5,7 @@ import type { Vec3 } from '../models/tuples.ts';
 import { lastAtOrBefore } from '../pose/blend.ts';
 import { POSE_SEED, preparePoses } from '../pose/plan.ts';
 import type { PosePlan } from '../pose/plan.ts';
-import { mixHash, mulberry32 } from '../pose/random.ts';
+import { decisionRandom } from '../pose/random.ts';
 import { smoothstep } from '../pose/rest.ts';
 import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
@@ -680,26 +680,6 @@ interface Framing {
    * lead player of the window ({@link leadHero}).
    */
   readonly hero: number | null;
-}
-
-/**
- * Makes the seeded generator of one decision of the plan (design 5.6): a framing, a jitter, or an
- * end. The seed, the time, and the name of the decision set its numbers, so the numbers do not
- * depend on the other decisions. With one generator for the full plan, each camera search took
- * numbers from it. When the search of one candidate changed, all later shots changed. A move of
- * the players by 1 to 2 cm then changed 30 of 31 shots of the Boulanger demo.
- *
- * @param seed The seed of the plan.
- * @param time The time of the decision, in song seconds: the cut, or the start of the shot.
- * @param name The name of the decision, for example `jitter solo 3`.
- * @returns The generator.
- */
-function decisionRandom(seed: number, time: number, name: string): () => number {
-  let hash = mixHash(seed, Math.round(time * 1000));
-  for (let i = 0; i < name.length; i++) {
-    hash = mixHash(hash, name.charCodeAt(i));
-  }
-  return mulberry32(hash);
 }
 
 /**

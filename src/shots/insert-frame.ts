@@ -292,7 +292,7 @@ export function posedPoint(posed: PosedPlayer, bone: number, point: Vec3): Vec3 
  * @param b Another point.
  * @returns The middle.
  */
-function middleOf(a: Vec3, b: Vec3): Vec3 {
+export function middleOf(a: Vec3, b: Vec3): Vec3 {
   return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2];
 }
 
