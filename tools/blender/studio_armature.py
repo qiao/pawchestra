@@ -1,7 +1,5 @@
 """Starts the hand rig of a studio body (design 4.4, "Hand rig") with the conventions of the studio.
 
-    blender -b --factory-startup --python tools/blender/studio_armature.py -- <animal> \
-        --out <file.blend> [--source <glb>] [--auto-weights]
     blender -b --factory-startup --python tools/blender/studio_armature.py -- --drive <file.blend>
     blender -b --factory-startup --python tools/blender/studio_armature.py -- --rolls <file.blend>
 
@@ -12,12 +10,7 @@ gloss fan on each eye unless `eye_fans` is false, and makes the nose gloss (`fea
 `add_eye_shells()`). After this one run, the colors live in the face attributes `color` and
 `color_base`, and a person edits them in Blender.
 
-The first form above starts a new species from `tools/mesh-rigs/<animal>.json`: the mesh of the
-source (`source` of the config, or `--source`) in the units of the studio with `add_surface()`, the
-armature in the T-pose at the joints of the config with the arm segments and the helpers
-(`joints_of()`, `segment_joints()`) with the roll hints of the joints, and the Action `bind` of the
-seat rules of the config (`bind_turns()`). With `--auto-weights`, the mesh takes the automatic
-weights of Blender, at most four bones for each vertex. `--drive` keys the arm segments and the
+`--drive` keys the arm segments and the
 helpers of the Action `bind` by the rule of the app, and `--rolls` gives each bone the roll of its
 hint. The command line runs headless only. In a live Blender, import this module and call
 `add_surface()`, `drive_segments()`, `fix_rolls()`, `set_weight_row()` (one vertex), and
@@ -675,27 +668,7 @@ def main():
         bpy.ops.wm.save_mainfile()
         print(f'studio_armature: wrote {rest[1]}', flush=True)
         return
-    if '--out' not in rest:
-        raise SystemExit(
-            'Usage: studio_armature.py -- <animal> --out <file.blend> '
-            '[--source <glb>] [--auto-weights], or -- --drive|--rolls <file.blend>'
-        )
-    config = load_config(rest[0])
-    out = rest[rest.index('--out') + 1]
-    source = rest[rest.index('--source') + 1] if '--source' in rest else config['source']
-    bpy.ops.wm.read_factory_settings(use_empty=True)
-    body = import_source(os.path.join(ROOT, source), config['weld'])
-    counts = add_surface(body, rest[0], source)
-    rm = rig_mesh_lib()
-    rm['BONES'] = config_bones(rm, config)
-    rig = build_armature(config, rm)
-    empty = skin_mesh(body, rig, '--auto-weights' in rest)
-    bpy.ops.wm.save_as_mainfile(filepath=os.path.abspath(out))
-    print(
-        f'studio_armature: wrote {out}: {counts}, {len(rig.data.bones)} bones, {empty} vertices '
-        f'with no weight',
-        flush=True,
-    )
+    raise SystemExit('Usage: studio_armature.py -- --drive|--rolls <file.blend>')
 
 
 if __name__ == '__main__':
