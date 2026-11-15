@@ -113,7 +113,7 @@ in a line at the back, as the Vienna Philharmonic seats them. The diagram shows 
   example, the tail of the Tripo mouse lies straight back, and the tail of the old mouse curled to
   the side. The whiskers of the fourth Tripo rabbit make its head box wider, and its ears hide other
   sight lines. The trunk of the Tripo fox is deeper than that of the older fox, so its chair is
-  deeper, and its head and trunk hide other sight lines (`TODO.md`).
+  deeper, and its head and trunk hide other sight lines.
 
 ## 4.3 Species
 

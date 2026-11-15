@@ -235,7 +235,7 @@ With the smaller paws and a curl of 115 degrees, the right finger tips stood 0.8
 the notes that open the right keys, and the right paw grasped in 79 % of the play samples. The bell
 does not reach between the knees: the clarinet is shorter than the line from the mouth to the knees.
 The folds of the arms (`pnpm arm-check`, folds p95) go from 53 to 66 (left) and from 48 to 55
-(right), over the limit of 8 before and after (`TODO.md`).
+(right), over the limit of 8 before and after.
 
 **Color map** (`tools/wolf-maps.py`). The tool scales the source to 2048 pixels (Lanczos), keeps
 0.7 of its detail finer than a blur of 2 texels (`DETAIL_SHARE`), and writes WebP quality 60,

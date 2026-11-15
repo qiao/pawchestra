@@ -76,8 +76,6 @@ when another agent works on the repository at the same time. Then these rules ho
 - Never merge a conflict in a generated file by hand. The merge script writes a studio module or
   `src/models/studio-heights.ts` again. Write a fitted table, such as `DEMO_LOUDNESS`
   (`pnpm loudness --fit --write`), again with its tool after the merge.
-- Merge a conflict in `TODO.md` by hand, because `git checkout --theirs TODO.md` drops the newer
-  lines of `main`. Then finish the cherry-pick, and run the merge script with `--resume`.
 - Git ignores `scratch/` and `reports/`, so `git worktree remove --force` deletes them. The merge
   script copies them first. Do the same before a remove by hand.
 
@@ -229,7 +227,7 @@ floor. Open the cells of a part before you report its fault or its fix.
 
 When a change has a side effect on the look that you cannot explain, render one pair of the base
 and the change with only the suspected cause removed. Report the side effect as an open problem
-with the images, and add it to `TODO.md`.
+with the images.
 
 ## Ending a turn
 

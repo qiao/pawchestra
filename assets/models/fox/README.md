@@ -324,7 +324,7 @@ and 72 on the violin, and 8 steps gave 113 and 60, so the left turn stays at 7 s
 
 The left upper arm of the flutist goes into its arm root at each moment, also at rest. A clavicle
 share from 0.55 at x 0.09 to 0 at x 0.14 gave 3.2 cm, and the rows of step 2 give 2.9 cm. The
-paws of the violinist go into the violin as on the fox before. Both are open (`TODO.md`).
+paws of the violinist go into the violin as on the fox before. Both are open.
 
 **Color map.** `tools/fox-maps.py` writes `fox-color.webp`, `fox-tan-color.webp`, and
 `fox-normal.webp` from the source maps and the rig file:

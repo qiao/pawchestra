@@ -79,7 +79,7 @@ necessary.
 ## 9.5 Order of work
 
 The steps put the largest risks first. A step is done only when its "done" criterion is true and
-its review (9.8) is done. `TODO.md` splits each step into tasks, and holds the status of the work.
+its review (9.8) is done.
 
 | Step | Work | Done when |
 |---|---|---|

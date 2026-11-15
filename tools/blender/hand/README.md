@@ -54,5 +54,5 @@ and the rig config are the same byte for byte for the same chain.
 ## One copy of build.py for each species
 
 Each `build.py` is a copy that grew from the build of another species. The copies share most
-functions, but the eyes, the lids, the tail rows, and the hooves differ in code. `TODO.md` gives
-the plan to merge them into one shared `build.py`.
+functions, but the eyes, the lids, the tail rows, and the hooves differ in code. One shared `build.py` can
+replace them.

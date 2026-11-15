@@ -1492,7 +1492,7 @@ const CAT_HOLD = {
  *   that the forearm rises from the elbow to the neck, as a cellist holds the left elbow out from
  *   the body (`docs/reference/string-technique.md`, section 1.8). The left upper arm of the Tripo
  *   beagle is then about level in the play: from 1° up to 5° down in the mean of a play. A
- *   cellist holds it lower (the task of the dog cellist left elbow in `TODO.md`). The elbow turns
+ *   cellist holds it lower. The elbow turns
  *   up 15° further from the fourth position to the sixth position (`highElbow`), so that the
  *   forearm keeps out of the upper bout: with the 6° of {@link CELLO_HOLD}, the left forearm goes
  *   1.7 cm into the cello in a high position of `boulanger-matin`.

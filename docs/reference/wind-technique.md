@@ -646,7 +646,7 @@ The app does not follow these facts:
 - **The trumpet thumb (2.1).** The right thumb lies above the lead pipe.
 - **The shared trumpet fingers (2.1).** The right fingers of a recast trumpeter stay nearly
   straight, and the paw points only a part of the way across the valves, so the fingers do not
-  arch down onto the valve caps (`TODO.md`).
+  arch down onto the valve caps.
 - **The trumpet elbows (2.1).** Both elbows point down and out, and the forearms rise steeply. The
   big head of the monkey puts the mouthpiece high above the shoulder joints. With the elbows out
   and level, the right upper arm goes flat.

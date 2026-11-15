@@ -187,7 +187,7 @@ float lightPoolHot = 1.0 + uLightPoolLevels.y * exp( -dot( lightPoolS, lightPool
 /**
  * The GLSL after the light of one spotlight. three.js puts the spotlights with a shadow first, so
  * the hot spot goes to the key light, and on the high and medium tiers also to the side lights,
- * which cast shadows there (`TODO.md`).
+ * which cast shadows there.
  */
 const SPOT_POOL_GLSL = /* glsl */ `
 		directLight.color *= lightPool;

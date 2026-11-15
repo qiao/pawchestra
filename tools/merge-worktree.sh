@@ -158,8 +158,7 @@ if [ "$RESUME" = 0 ]; then
     if [ "${#CONFLICTS[@]}" -eq 0 ] || [ "${#CONFLICTS[@]}" -ne "${#GENERATED[@]}" ]; then
       echo "The cherry-pick stopped in $INTO. Conflicts:"
       git diff --name-only --diff-filter=U
-      echo "Resolve each file by hand, and never a generated file. In TODO.md, keep the lines of"
-      echo "both sides: \`git checkout --theirs TODO.md\` drops the newer lines of the target."
+      echo "Resolve each file by hand, and never a generated file."
       echo "Then run \`git add <file>\` and \`GIT_EDITOR=true git cherry-pick --continue\`, and"
       echo "run this script again with --resume."
       exit 3

@@ -497,7 +497,7 @@ The app does not follow these facts:
   little over the neck (`BowedHold.tiltL`), and the wrist stays on the side of the back of the
   instrument. The thumb has no bone, so no thumb lies on the neck.
 - **The thick wrist (1.9).** The thick wrist end of the left forearm of some bodies touches the
-  upper bout of the violin in the play (`TODO.md`). The forearm of a real player keeps free of the
+  upper bout of the violin in the play. The forearm of a real player keeps free of the
   body of the instrument, and the back of the hand is in a straight line with the elbow in the
   low positions [68]. The short arm of the cat reached the fingerboard only near the upper bout,
   so the cat plays the largest viola with which its forearm keeps out of the upper bout. The

@@ -520,7 +520,7 @@ The rest of each family:
   the fit of the hold alone turned the paw of a thinner body past its accepted grip. A real player
   keeps the shoulders down, and the clavicle rises only a little when the arm rises (winds 1.8), so
   the lift stays in that range and does not read as a shrug. Thus it clears only a part of the deep
-  root clips, as on the pig (`TODO.md`).
+  root clips, as on the pig.
 - **Bent arms in the moves.** In the lift and the lowering of a shared wind hold with the rule,
   the wrist of the free hanging paw stays within `BENT_REACH` of the length of the arm from the
   shoulder joint (`keepBent()`). The limit fades to the whole length at the rest and at the play,
@@ -543,7 +543,7 @@ The rest of each family:
   (winds 1.4, 2.1). A forward lean of the chest does not help, because the head and the instrument
   move with the chest. The shared flute has no rule, because a bow puts the left grip of a slim body
   past the accepted grip. The bow does not clear the snout clips of the trumpet, and the heaviest
-  bodies still miss the valves at `MAX_BOW` (`TODO.md`). The own trumpet hold of the monkey
+  bodies still miss the valves at `MAX_BOW`. The own trumpet hold of the monkey
   (`MONKEY_TRUMPET`) takes the rule with an own fit: the big head of the Tripo monkey puts its mouth
   farther than its arm from the shoulders, and with the head up, the straight arms stop short of the
   valves. It plays a smaller trumpet (`trumpetScale`, 4.6), its spine turns a little back in the
@@ -720,7 +720,7 @@ The rest of each family:
   in the moves. A thinner wrist and the own holds keep their grip. Reason: a real player keeps the
   forearm free of the body of the instrument (strings 1.9), and at the grip of the hold, the thick
   wrist end goes into the upper bout. The play keeps its grip, because no move of the wrist and no
-  turn of the elbow moves the thick wrist end out of the upper bout (`TODO.md`).
+  turn of the elbow moves the thick wrist end out of the upper bout.
 - **Left forearm clear of the upper bout.** The left wrist of a violin or a viola stays on the
   side of the back of the instrument, so that the forearm passes under the upper bout, as the
   wrist of a real player stays under the neck (strings 1.9). The cat tilts its paw less over the
@@ -729,7 +729,7 @@ The rest of each family:
   arm of the cat runs nearly straight from the shoulder to the neck, and it reached the
   fingerboard only near the upper bout. With the wrist over the plane of the top plate, its
   forearm went through the upper bout in each sample of the play and of the rest. The forearm of
-  the rabbit still touches the back of the violin (`TODO.md`).
+  the rabbit still touches the back of the violin.
 - **Bow clear of a wide head.** The stick of the bow keeps off the head over the whole stroke. The
   head of the cat is wider than its shoulders, so the cat holds the tail end of the viola on the
   left collarbone, left of the middle line (`CAT_HOLD.playShift`), and its bow slants in the plane
@@ -755,9 +755,9 @@ The rest of each family:
   strings (strings 1.8), and further in the high positions (`highElbow`). Reason: with the
   nearly level elbow of the shared hold, the upper arm stood out level from the shoulder, and the
   elbow made a sharp point behind the forearm. The left upper arm of the Tripo beagle is about
-  level in the play, and a cellist holds it lower (`TODO.md`). The elbow turn of the high positions keeps the forearm out of the upper bout. The shared hold
-  keeps its nearly level elbow until a cast matrix run checks the new elbow on the recast bodies
-  (`TODO.md`).
+  level in the play, and a cellist holds it lower. The elbow turn of the high positions keeps the
+  forearm out of the upper bout. The shared hold keeps its nearly level elbow until a cast matrix
+  run checks the new elbow on the recast bodies.
 
 **Woodwinds and brass** (`pose/wind-notes.ts`, `pose/winds.ts`, winds 4):
 

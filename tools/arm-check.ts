@@ -485,7 +485,7 @@ export const ACCEPTED_GRIPS: ReadonlyMap<string, Readonly<Record<Side, number>>>
   ['singer', { L: -34, R: -34 }],
   // The hanging left arm of the badger, from accepted 2x crops. The paw hangs free and holds
   // nothing. `hangingHand()` of `pose/hang.ts` turns the bind paw by the shortest arc from straight
-  // down, so the straight bind of the freed arm turns the hanging paw from -22 to -44 (TODO.md).
+  // down, so the straight bind of the freed arm turns the hanging paw from -22 to -44.
   ['bass-drummer', { L: -44, R: 74 }],
   // The wrist lifts the tip of the stick or the mallet over its spot between strikes, and the paws
   // close on their sticks and mallets, from accepted paw crops.

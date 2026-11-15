@@ -24,9 +24,8 @@ This file holds the rules of each round. The modules in `docs/agents/` hold the 
   message texts.
 - **Assets.** The `README.md` files of `demos/` and of each folder of `assets/` give the sources,
   the licenses, and the checksums.
-- **Tasks.** Take the next task from `TODO.md`, and follow the rules at its top. A step is done
-  when its "done" criterion is true and the manager accepts the report and the images (design
-  9.8).
+- **Tasks.** The user gives the task of each round. A step is done when its "done" criterion is
+  true and the manager accepts the report and the images (design 9.8).
 
 ## Hard rules
 
