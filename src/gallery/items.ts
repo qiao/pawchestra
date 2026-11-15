@@ -12,6 +12,7 @@ import { boneIndex } from '../models/rig.ts';
 import { REST_TIMES, liftScale } from '../pose/rest.ts';
 import type { RestMotion } from '../pose/rest.ts';
 import type { Transport } from '../pose/types.ts';
+import { clamp01 } from '../math.ts';
 
 /** One model of the gallery: a species with an instrument, or an instrument alone. */
 export interface GalleryItem {
@@ -387,7 +388,7 @@ export function galleryMove(search: URLSearchParams): GalleryMove | null {
     const text = search.get(kind)?.trim() ?? '';
     const share = Number(text);
     if (text !== '' && Number.isFinite(share)) {
-      return { kind, share: Math.min(1, Math.max(0, share)) };
+      return { kind, share: clamp01(share) };
     }
   }
   return null;

@@ -35,6 +35,7 @@ import { BASE_SOUNDFONT, PRESET_ALIASES, PRESET_RECIPES, SOURCES } from './sound
 import type { PartRecipe, PresetRecipe, SourceId } from './soundfont-recipes.ts';
 import { SOUNDFONT_PATH, presetTarget, splitPreset } from './split-soundfont.ts';
 import { decodeWav } from './wav.ts';
+import { clamp01 } from '../src/math.ts';
 
 /** The path of the checksums of all source files. */
 export const LOCK_PATH = join(import.meta.dirname, 'soundfont-lock.json');
@@ -131,7 +132,7 @@ export function headroomComment(db: number): string {
  * @returns The length in seconds. Keys outside 24 to 96 take the nearest end value.
  */
 export function maxSecAt(maxSec: readonly [number, number], key: number): number {
-  const t = Math.min(1, Math.max(0, (key - 24) / 72));
+  const t = clamp01((key - 24) / 72);
   return maxSec[0] + t * (maxSec[1] - maxSec[0]);
 }
 

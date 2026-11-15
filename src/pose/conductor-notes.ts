@@ -5,7 +5,7 @@ import type { ExpressionTrack } from './conductor-expression.ts';
 import { COUNT_IN, inCountIn } from './count-in.ts';
 import type { CountIn } from './count-in.ts';
 import { gestureSize } from './loudness.ts';
-import { smoothstep } from '../math.ts';
+import { clamp01, smoothstep } from '../math.ts';
 
 /** A point in the beat plane of the conductor: to the right and up, in units of the pattern. */
 export type PatternPoint = readonly [x: number, y: number];
@@ -232,7 +232,7 @@ function onArc(
   snap = 0,
   energy = 0,
 ): void {
-  const part = strokeOf(Math.min(1, Math.max(0, progress)), snap, energy);
+  const part = strokeOf(clamp01(progress), snap, energy);
   const along = smoothstep(part);
   out.x = from[0] + (to[0] - from[0]) * along;
   out.y = from[1] + (to[1] - from[1]) * along + arc * Math.sin(Math.PI * part);

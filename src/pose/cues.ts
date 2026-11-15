@@ -6,7 +6,7 @@ import { lastAtOrBefore } from './blend.ts';
 import type { BatonTrack } from './conductor-notes.ts';
 import { beatLengthAt } from './count-in.ts';
 import type { MotionFamily } from './family.ts';
-import { smoothstep } from '../math.ts';
+import { clamp01, smoothstep } from '../math.ts';
 import { CONDUCTOR_MOTION, seatHeight } from './rest.ts';
 import type { SeatAudibility } from './types.ts';
 
@@ -623,7 +623,7 @@ export function handWeight(cue: Cue, time: number): number {
  */
 function bendOf(cue: Cue, time: number): number {
   const prep = prepOf(cue);
-  const progress = Math.min(1, Math.max(0, 1 - (cue.landSec - time) / prep));
+  const progress = clamp01(1 - (cue.landSec - time) / prep);
   return Math.cos((Math.PI / 2) * progress);
 }
 

@@ -3,6 +3,7 @@ import type { PlacedBox } from '../models/footprint.ts';
 import type { SceneLayout } from '../models/layout.ts';
 import type { ModelCache } from '../models/model-cache.ts';
 import type { Vec3 } from '../models/tuples.ts';
+import { clamp01 } from '../math.ts';
 
 /** The clearance rules of a camera (design 5.6). */
 export const CLEARANCE = {
@@ -301,8 +302,7 @@ function flatDistanceSquared(x: number, z: number, s: Segment): number {
   const dx = s.bx - s.ax;
   const dz = s.bz - s.az;
   const length2 = dx * dx + dz * dz;
-  const t =
-    length2 > 0 ? Math.min(1, Math.max(0, ((x - s.ax) * dx + (z - s.az) * dz) / length2)) : 0;
+  const t = length2 > 0 ? clamp01(((x - s.ax) * dx + (z - s.az) * dz) / length2) : 0;
   const ex = s.ax + dx * t - x;
   const ez = s.az + dz * t - z;
   return ex * ex + ez * ez;
@@ -323,9 +323,7 @@ function pointSegmentDistanceSquared(x: number, y: number, z: number, s: Segment
   const dz = s.bz - s.az;
   const length2 = dx * dx + dy * dy + dz * dz;
   const t =
-    length2 > 0
-      ? Math.min(1, Math.max(0, ((x - s.ax) * dx + (y - s.ay) * dy + (z - s.az) * dz) / length2))
-      : 0;
+    length2 > 0 ? clamp01(((x - s.ax) * dx + (y - s.ay) * dy + (z - s.az) * dz) / length2) : 0;
   const ex = s.ax + dx * t - x;
   const ey = s.ay + dy * t - y;
   const ez = s.az + dz * t - z;

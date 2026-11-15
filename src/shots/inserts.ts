@@ -41,6 +41,7 @@ import type { ScoreMusic, WindowMusic } from './music.ts';
 import { frontOf, onStage } from './subjects.ts';
 import type { InsertDetail, Shot, ShotKey, ShotPlan } from './types.ts';
 import { CINEMA_ASPECT } from './view.ts';
+import { clamp01 } from '../math.ts';
 
 /** Degrees to radians. */
 const DEG = Math.PI / 180;
@@ -472,9 +473,7 @@ function detailAt(spot: DetailSpot, posed: PosedPlayer, meanKey: number): PosedD
   }
   const to = place(end);
   const t =
-    keys && meanKey > 0
-      ? Math.min(1, Math.max(0, (meanKey - keys[0]) / Math.max(1, keys[1] - keys[0])))
-      : 0.5;
+    keys && meanKey > 0 ? clamp01((meanKey - keys[0]) / Math.max(1, keys[1] - keys[0])) : 0.5;
   const target: Vec3 = [
     from[0] + (to[0] - from[0]) * t,
     from[1] + (to[1] - from[1]) * t,

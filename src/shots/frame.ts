@@ -1,4 +1,5 @@
 import { VIEW_OFFSET_Y } from './view.ts';
+import { clamp01 } from '../math.ts';
 
 /**
  * The part of the canvas that shows the frame of the camera, in CSS pixels (design 4.5, camera).
@@ -157,11 +158,11 @@ export function clearFirstScreen(stage: ScreenBox, ring: ScreenBox): FrameClear 
   const height = (stage.top + stage.bottom) / 2;
   if (ring.left > (middle + stage.right) / 2) {
     const room = ring.left - FIRST_SCREEN_MARGIN - stage.left;
-    const factor = Math.min(1, Math.max(0, room / (stage.right - stage.left)));
+    const factor = clamp01(room / (stage.right - stage.left));
     return { factor, x: stage.left, y: height };
   }
   const room = ring.top - FIRST_SCREEN_MARGIN - stage.top;
-  const factor = Math.min(1, Math.max(0, room / (stage.bottom - stage.top)));
+  const factor = clamp01(room / (stage.bottom - stage.top));
   return { factor, x: middle, y: stage.top };
 }
 

@@ -6,6 +6,7 @@ import type { PlayerModel } from './player.ts';
 import { boneIndex } from './rig.ts';
 import { PODIUM_SIZE } from './stage.ts';
 import type { Vec3 } from './tuples.ts';
+import { clamp01 } from '../math.ts';
 
 /** The podium center: the origin of the points of {@link sightTargets}. */
 const PODIUM_CENTER: Vec3 = [0, 0, 0];
@@ -393,8 +394,7 @@ function nearSegment(from: Vec3, to: Vec3, o: Obstacle, margin: number): boolean
   const dx = to[0] - from[0];
   const dz = to[2] - from[2];
   const length = dx * dx + dz * dz;
-  const t =
-    length > 0 ? Math.min(1, Math.max(0, ((cx - from[0]) * dx + (cz - from[2]) * dz) / length)) : 0;
+  const t = length > 0 ? clamp01(((cx - from[0]) * dx + (cz - from[2]) * dz) / length) : 0;
   const ex = from[0] + t * dx - cx;
   const ez = from[2] + t * dz - cz;
   return ex * ex + ez * ez <= reach * reach;

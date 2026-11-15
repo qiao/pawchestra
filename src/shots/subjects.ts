@@ -14,6 +14,7 @@ import { angleDifference, azimuthOf } from './camera-keys.ts';
 import { CONDUCTOR_OWNER } from './clearance.ts';
 import type { SightPoints } from './clearance.ts';
 import type { BodyPart, StageBody, StageHead } from './foreground.ts';
+import { clamp01 } from '../math.ts';
 
 /**
  * The groups of the section shots (design 5.6). `ensemble` is the two-shot of all players of a
@@ -762,7 +763,7 @@ export function prepareBodies(layout: SceneLayout, models: ModelCache): StageBod
 function backOf(subjects: StageSubjects, z: number): number {
   const podiumZ = subjects.podium[2];
   const value = (podiumZ - z) / (podiumZ + subjects.stageSide / 2);
-  return Math.min(1, Math.max(0, value));
+  return clamp01(value);
 }
 
 /**

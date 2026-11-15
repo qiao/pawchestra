@@ -1,3 +1,5 @@
+import { clamp01 } from '../math.ts';
+
 /**
  * The time with no pointer motion after which the bar hides during play, in seconds (2.3). In
  * Cinematic mode, all controls and panels hide after this time ({@link uiShown}).
@@ -118,6 +120,6 @@ export function volumeGain(volume: number, muted: boolean): number {
   if (muted) {
     return 0;
   }
-  const share = Math.min(1, Math.max(0, volume / 100));
+  const share = clamp01(volume / 100);
   return share * share;
 }

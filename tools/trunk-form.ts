@@ -34,6 +34,7 @@ import { poseSkeleton } from '../src/pose/test-kinematics.ts';
 import { sceneOf } from '../src/pose/test-scene.ts';
 import type { RoleSweep, SweepPlayer, SweepSample } from '../src/pose/test-sweep.ts';
 import { SWEEP_ROLES } from '../src/pose/test-sweep-roles.ts';
+import { clamp01 } from '../src/math.ts';
 
 /** The text of the usage. */
 const USAGE = `Usage: pnpm trunk-form <${Object.keys(SWEEP_ROLES).join(' | ')}> [--sets <set>[@<n>],...] [--demo <id>] [--from <f>] [--to <f>] [--light <dark>:<light>] [--base <ref>] [--json <file>]`;
@@ -327,7 +328,7 @@ function cutOutlines(mesh: TrunkMesh, options: Options): CutOutlines {
       leftSide = Math.max(leftSide, p[1], q[1]);
       rightSide = Math.max(rightSide, -p[1], -q[1]);
       if (p[0] + q[0] > 0) {
-        const share = Math.min(1, Math.max(0, ((mesh.lightness[t] ?? 0) - dark) / (bright - dark)));
+        const share = clamp01(((mesh.lightness[t] ?? 0) - dark) / (bright - dark));
         softLeft += share * Math.abs(Math.max(0, p[1]) - Math.max(0, q[1]));
         softRight += share * Math.abs(Math.max(0, -p[1]) - Math.max(0, -q[1]));
       }

@@ -13,6 +13,7 @@ import {
 } from './packed-bytes.ts';
 import type { ByteReader } from './packed-bytes.ts';
 import type { Quat, Vec3 } from './tuples.ts';
+import { clamp01 } from '../math.ts';
 
 /**
  * The number of deform segments of each upper arm and of each forearm of a body with arm segments
@@ -747,7 +748,7 @@ function paletteOf(triangles: readonly StudioTriangle[]): Palette {
   const keys = new Map<string, number>();
   const colors: (readonly [Vec3, Finish])[] = [];
   const triangleColors = triangles.map((t) => {
-    const steps = t.color.map((c) => Math.round(Math.min(1, Math.max(0, c)) * COLOR_STEPS));
+    const steps = t.color.map((c) => Math.round(clamp01(c) * COLOR_STEPS));
     const key = `${steps.join(' ')} ${t.finish}`;
     let index = keys.get(key);
     if (index === undefined) {
@@ -780,7 +781,7 @@ export function packStudioPalette(
   for (const [steps, finish] of colors) {
     const linear: Vec3 = [steps[0] / COLOR_STEPS, steps[1] / COLOR_STEPS, steps[2] / COLOR_STEPS];
     for (const c of map(linear, finish)) {
-      writeVarint(out, Math.round(Math.min(1, Math.max(0, c)) * COLOR_STEPS));
+      writeVarint(out, Math.round(clamp01(c) * COLOR_STEPS));
     }
   }
   return toBase64(out);

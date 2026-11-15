@@ -2,6 +2,7 @@ import type { SpeciesColors } from '../src/models/colors.ts';
 import { srgb } from '../src/models/mesh.ts';
 import type { Finish } from '../src/models/mesh.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
+import { clamp01 } from '../src/math.ts';
 
 /**
  * The map of another palette of a studio body (design 4.4, 4.5): the colors of the species of the
@@ -50,7 +51,7 @@ export function linearOfOklab([lightness, a, b]: Vec3): Vec3 {
   const l = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3;
   const m = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3;
   const s = (lightness - 0.0894841775 * a - 1.291485548 * b) ** 3;
-  const clip = (value: number): number => Math.min(1, Math.max(0, value));
+  const clip = (value: number): number => clamp01(value);
   return [
     clip(4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s),
     clip(-1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s),

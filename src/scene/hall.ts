@@ -18,7 +18,7 @@ import type { Rgb } from '../models/mesh.ts';
 import { rimLightPlace } from '../models/beam.ts';
 import { STAGE_THICKNESS } from '../models/stage.ts';
 import { RIM_LIGHT } from './lights.ts';
-import { smoothstep } from '../math.ts';
+import { clamp01, smoothstep } from '../math.ts';
 
 /**
  * The concert hall around the stage (design 4.5, hall). The values are parts of the hall unit
@@ -208,7 +208,7 @@ export function hallLight(point: Vec3, normal: Vec3, unit: number): number {
   );
   const reach = light.glowReach * unit;
   const glow = light.glow / (1 + (distance / reach) ** 2);
-  const height = Math.min(1, Math.max(0, (y + STAGE_THICKNESS) / (HALL.wallHeight * unit)));
+  const height = clamp01((y + STAGE_THICKNESS) / (HALL.wallHeight * unit));
   const fade = 1 + (light.top - 1) * height;
   return (light.ambient + glow * (0.3 + 0.7 * facing)) * fade;
 }

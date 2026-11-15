@@ -31,6 +31,7 @@ import { sideSegmentBones } from './arm-segments.ts';
 import type { Side, StudioBody } from '../src/models/studio-format.ts';
 import { UPPER_TWIST_BONES, standingBody } from '../src/models/studio-rig.ts';
 import { weightOn } from './skin-weight.ts';
+import { clamp01 } from '../src/math.ts';
 
 /** The smallest share of the weight of a vertex on a group of bones that puts it in the group. */
 const GAP_SHARE = 0.5;
@@ -82,7 +83,7 @@ function armPlace(p: Vector3, joints: readonly [Vector3, Vector3, Vector3]): num
   const [shoulder, elbow, wrist] = joints;
   const along = (a: Vector3, b: Vector3) => {
     const ab = b.clone().sub(a);
-    const t = Math.min(1, Math.max(0, p.clone().sub(a).dot(ab) / Math.max(1e-12, ab.lengthSq())));
+    const t = clamp01(p.clone().sub(a).dot(ab) / Math.max(1e-12, ab.lengthSq()));
     return { t, d: a.clone().addScaledVector(ab, t).distanceTo(p) };
   };
   const upper = along(shoulder, elbow);

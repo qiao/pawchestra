@@ -25,6 +25,7 @@ import { SHOT_DEMOS, shotDemos, shotSceneOf } from './test-shots.ts';
 import type { ShotScene } from './test-shots.ts';
 import type { Shot } from './types.ts';
 import { BAR_COVER, viewFrame, viewOffset } from './frame.ts';
+import { clamp01 } from '../math.ts';
 
 /**
  * Gives the smallest count of checks of a test of a scene, so that the test of a demo is not
@@ -142,7 +143,7 @@ function crossesBox(
   const dz = b[2] - a[2];
   const length2 = dx * dx + dz * dz;
   return obstacles.some(({ obstacle: o }) => {
-    const t = Math.min(1, Math.max(0, ((o.x - a[0]) * dx + (o.z - a[2]) * dz) / length2));
+    const t = clamp01(((o.x - a[0]) * dx + (o.z - a[2]) * dz) / length2);
     if (Math.hypot(a[0] + dx * t - o.x, a[2] + dz * t - o.z) > o.radius) {
       return false;
     }

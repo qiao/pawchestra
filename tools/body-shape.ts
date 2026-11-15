@@ -52,6 +52,7 @@ import { sceneOf } from '../src/pose/test-scene.ts';
 import type { RoleSweep, SweepPlayer } from '../src/pose/test-sweep.ts';
 import { SWEEP_ROLES } from '../src/pose/test-sweep-roles.ts';
 import { weightOn } from './skin-weight.ts';
+import { clamp01 } from '../src/math.ts';
 
 /** The text of the usage. */
 const USAGE = 'Usage: pnpm body-shape <role> [--demo <id>] [--base <ref>] [--json <file>]';
@@ -300,7 +301,7 @@ function trunkRows(rig: StudioRig): FormRow[] {
   const rows: FormRow[] = [];
   for (let i = 0; i < LEVELS; i++) {
     const y = bottom + ((i + 0.5) / LEVELS) * (heads.neck[1] - bottom);
-    const t = Math.min(1, Math.max(0, (y - heads.hips[1]) / (heads.neck[1] - heads.hips[1])));
+    const t = clamp01((y - heads.hips[1]) / (heads.neck[1] - heads.hips[1]));
     const zMid = heads.hips[2] + t * (heads.neck[2] - heads.hips[2]);
     const cut = cutMesh(
       rig.mesh,
@@ -554,7 +555,7 @@ function restRows(
   const mouth = local(posedPoint(posed, 'head', model.body.mouth));
   const axisDistance = (p: Vector3): number => {
     const d = neck.clone().sub(hips);
-    const t = Math.max(0, Math.min(1, p.clone().sub(hips).dot(d) / d.lengthSq()));
+    const t = clamp01(p.clone().sub(hips).dot(d) / d.lengthSq());
     const q = hips.clone().addScaledVector(d, t);
     return Math.hypot(p.x - q.x, p.z - q.z);
   };

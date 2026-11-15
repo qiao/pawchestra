@@ -25,12 +25,13 @@ import {
 } from './lights.ts';
 import { conductorOn } from '../models/layout-scene.ts';
 import { TIER_SETTINGS } from './quality.ts';
+import { clamp01 } from '../math.ts';
 
 /** The cone factor of a three.js spotlight at an angle from its axis (`getSpotAttenuation`). */
 function coneFactor(spot: SpotLight, angle: number): number {
   const outer = Math.cos(spot.angle);
   const inner = Math.cos(spot.angle * (1 - spot.penumbra));
-  const t = Math.min(1, Math.max(0, (Math.cos(angle) - outer) / (inner - outer)));
+  const t = clamp01((Math.cos(angle) - outer) / (inner - outer));
   return t * t * (3 - 2 * t);
 }
 

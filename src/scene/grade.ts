@@ -2,7 +2,7 @@ import { Data3DTexture, LinearFilter, NoColorSpace, RGBAFormat, UnsignedByteType
 
 import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
-import { smoothstep } from '../math.ts';
+import { clamp01, smoothstep } from '../math.ts';
 
 /** A color with three channels from 0 to 1. */
 type GradeColor = readonly [r: number, g: number, b: number];
@@ -152,7 +152,7 @@ function lumaOf(color: GradeColor): number {
  */
 function gradeColor(color: GradeColor, curve: (x: number) => number): [number, number, number] {
   const g = GRADE;
-  const clamped = color.map((value) => Math.min(1, Math.max(0, value)));
+  const clamped = color.map((value) => clamp01(value));
   const [r0 = 0, g0 = 0, b0 = 0] = clamped;
   const before = lumaOf([r0, g0, b0]);
   const factor = before > 1e-4 ? curve(before) / before : 1;
@@ -202,7 +202,7 @@ function* gradeLutDataSteps(size: number): Steps<Uint8Array> {
         const graded = gradeColor([r / (size - 1), g / (size - 1), b / (size - 1)], curve);
         const i = ((b * size + g) * size + r) * 4;
         for (const [channel, value] of graded.entries()) {
-          data[i + channel] = Math.round(Math.min(1, Math.max(0, value)) * 255);
+          data[i + channel] = Math.round(clamp01(value) * 255);
         }
         data[i + 3] = 255;
       }

@@ -27,6 +27,7 @@ import type {
 } from './studio-format.ts';
 import { toVec3 } from './tuples.ts';
 import type { Quat, Vec3 } from './tuples.ts';
+import { clamp01 } from '../math.ts';
 
 /**
  * The bone of the player that each bone of a studio body follows (design 4.4, 4.7). A bone of the
@@ -680,10 +681,7 @@ function standingArmCorrectives(
       .sub(new Vector3().setFromMatrixPosition(blend))
       .applyMatrix3(new Matrix3().setFromMatrix4(blend).invert())
       .sub(new Vector3().fromArray(standing, at));
-    const share = Math.min(
-      1,
-      Math.max(0, leftMove.fromArray(left, at).dot(total) / total.lengthSq()),
-    );
+    const share = clamp01(leftMove.fromArray(left, at).dot(total) / total.lengthSq());
     move.clone().multiplyScalar(share).toArray(left, at);
     move.multiplyScalar(1 - share).toArray(right, at);
   }
@@ -1058,7 +1056,7 @@ function withUpperTwist(body: StudioBody, mesh: StudioMesh): StudioMesh {
           .fromArray(mesh.positions, v * 3)
           .sub(shoulderAt)
           .dot(axis) / length;
-      const share = Math.min(1, Math.max(0, (to - along) / (to - from)));
+      const share = clamp01((to - along) / (to - from));
       const w = weights[v * 4 + k] ?? 0;
       const skin: [number, number][] = [0, 1, 2, 3]
         .filter((i) => i !== k && (weights[v * 4 + i] ?? 0) > 0)
@@ -1320,7 +1318,7 @@ export function poseStudioBones(
     current.copy(upper).applyQuaternion(chestInverse);
     span.fromArray(arm.sheet).sub(upperBind.fromArray(arm.upper));
     const weight = current.sub(upperBind).dot(span) / span.lengthSq();
-    out.correctives[arm.side === 'L' ? 0 : 1] = Math.min(1, Math.max(0, weight));
+    out.correctives[arm.side === 'L' ? 0 : 1] = clamp01(weight);
     for (let k = 0; k < raises.length; k++) {
       const raise = raises[k];
       if (!raise || raise.side !== arm.side) {
@@ -1361,7 +1359,7 @@ export function raiseWeight(raise: StudioRaise, turn: Quat): number {
   const dot = Math.abs(x * turn[0] + y * turn[1] + z * turn[2] + w * turn[3]);
   const angle = 2 * Math.acos(Math.min(1, dot));
   const [full, none] = raise.fade;
-  const t = Math.min(1, Math.max(0, (none - angle) / (none - full)));
+  const t = clamp01((none - angle) / (none - full));
   return t * t * (3 - 2 * t);
 }
 
@@ -1384,13 +1382,10 @@ export function palmTurnAngle(side: Side, hand: Quaternion, forearm: Vector3): n
   palmFore.copy(forearm).applyQuaternion(palmHand.copy(hand).invert());
   const inPlane = Math.hypot(palmFore.y, palmFore.z);
   const [low, high] = PAW_TURN.fade;
-  const fade = Math.min(1, Math.max(0, (inPlane - low) / (high - low)));
+  const fade = clamp01((inPlane - low) / (high - low));
   const planeAngle = Math.atan2(-palmFore.z, -palmFore.y);
   // Near π, the angle jumps to the other side, so the turn fades out there.
-  const back = Math.min(
-    1,
-    Math.max(0, (Math.PI - Math.abs(planeAngle)) / (Math.PI - PAW_TURN.back)),
-  );
+  const back = clamp01((Math.PI - Math.abs(planeAngle)) / (Math.PI - PAW_TURN.back));
   const angle = planeAngle * fade * fade * (3 - 2 * fade);
   const limited =
     Math.min(PAW_TURN.max, Math.max(-PAW_TURN.max, angle)) * back * back * (3 - 2 * back);

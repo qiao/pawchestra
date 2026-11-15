@@ -20,6 +20,7 @@ import type { PosedSkeleton } from './test-kinematics.ts';
 import { posedCorner } from './test-skin.ts';
 import { PLAYING } from './test-scene.ts';
 import type { TestScene } from './test-scene.ts';
+import { clamp01 } from '../math.ts';
 
 /** The bones of the head and the face of an animal. */
 export const HEAD_BONES = [
@@ -312,7 +313,7 @@ function segmentDistance(p1: Vector3, q1: Vector3, p2: Vector3, q2: Vector3): nu
   const a = d1.dot(d1);
   const e = d2.dot(d2);
   const f = d2.dot(r);
-  const clamp = (x: number): number => Math.max(0, Math.min(1, x));
+  const clamp = (x: number): number => clamp01(x);
   let s = 0;
   let t = 0;
   if (a <= 1e-12 && e <= 1e-12) {

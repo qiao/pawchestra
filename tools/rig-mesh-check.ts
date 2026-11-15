@@ -29,6 +29,7 @@ import {
   worldMatrices,
 } from './studio-body.ts';
 import type { AnimalSettings } from './studio-body.ts';
+import { clamp01 } from '../src/math.ts';
 
 /** The largest error of the standing body against the long-armed source, in meters. */
 const STANDING_LIMIT = 0.001;
@@ -83,7 +84,7 @@ interface ThinFace {
  */
 function segmentDistance(p: Vector3, a: Vector3, b: Vector3): number {
   const ab = b.clone().sub(a);
-  const t = Math.min(1, Math.max(0, p.clone().sub(a).dot(ab) / Math.max(ab.lengthSq(), 1e-12)));
+  const t = clamp01(p.clone().sub(a).dot(ab) / Math.max(ab.lengthSq(), 1e-12));
   return a.clone().addScaledVector(ab, t).distanceTo(p);
 }
 

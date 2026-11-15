@@ -10,6 +10,7 @@ import { blurAt, heroFocusDepth } from '../scene/focus.ts';
 import { cameraAxes } from './camera-keys.ts';
 import type { StageClearance } from './clearance.ts';
 import { onStage } from './subjects.ts';
+import { clamp01 } from '../math.ts';
 
 /**
  * The frame rules of a detail insert (design 5.6). Inserts of the bell of a trumpet showed the
@@ -474,9 +475,7 @@ function segmentDistance(x: number, y: number, z: number, a: Vec3, b: Vec3): num
   const dz = b[2] - a[2];
   const length2 = dx * dx + dy * dy + dz * dz;
   const t =
-    length2 > 0
-      ? Math.min(1, Math.max(0, ((x - a[0]) * dx + (y - a[1]) * dy + (z - a[2]) * dz) / length2))
-      : 0;
+    length2 > 0 ? clamp01(((x - a[0]) * dx + (y - a[1]) * dy + (z - a[2]) * dz) / length2) : 0;
   return Math.hypot(x - a[0] - dx * t, y - a[1] - dy * t, z - a[2] - dz * t);
 }
 

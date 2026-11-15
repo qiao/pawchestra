@@ -1,6 +1,7 @@
 import { END_BOW_SEC } from '../pose/end-bow.ts';
 import { DEMO_IDS } from './demos.ts';
 import type { DemoId } from './demos.ts';
+import { clamp01 } from '../math.ts';
 
 /**
  * The times of the end card (design 2.8), in seconds after the song end. The card comes after the
@@ -52,11 +53,11 @@ export function endCardView(frame: EndCardFrame): EndCardView {
 
   const { inSec, fadeInSec, countSec } = END_CARD;
   const t = frame.sinceEndSec - inSec;
-  const countShare = Math.min(1, Math.max(0, t / countSec));
+  const countShare = clamp01(t / countSec);
   if (frame.still) {
     return { level: t >= 0 ? 1 : 0, countShare };
   }
-  return { level: Math.min(1, Math.max(0, t / fadeInSec)), countShare };
+  return { level: clamp01(t / fadeInSec), countShare };
 }
 
 /**

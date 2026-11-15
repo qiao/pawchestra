@@ -8,6 +8,7 @@ import { createIcon, setIcon } from './icons.ts';
 import type { IconName } from './icons.ts';
 import type { PlaybackSlots } from './settings.ts';
 import type { Tooltips } from './tooltip.ts';
+import { clamp01 } from '../math.ts';
 
 /** The actions of the controls of the bar. */
 export interface BarActions {
@@ -76,7 +77,7 @@ const THUMB_PX = 14;
 function pointerSeconds(input: HTMLInputElement, clientX: number): number {
   const box = input.getBoundingClientRect();
   const track = Math.max(1, box.width - THUMB_PX);
-  const share = Math.min(1, Math.max(0, (clientX - box.left - THUMB_PX / 2) / track));
+  const share = clamp01((clientX - box.left - THUMB_PX / 2) / track);
   return Math.round(share * Number(input.max));
 }
 
