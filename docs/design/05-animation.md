@@ -748,7 +748,13 @@ The rest of each family:
   under the instrument (strings 1.10). At rest, it points out (`RABBIT_HOLD.restPoleL`). Reason:
   the paw of the Tripo P2 hand rig turns far from its source paw in this hold, and the two
   elbows move a part of that turn from the forearm into the upper arm, so that no arm part shows
-  a twist of its skin (design 4.4).
+  a twist of its skin (design 4.4). The longer arms of the rabbit and its smaller violin (4.4,
+  4.6) let the left paw stop the strings from the nut (`BowedRig.stopRange`), so in the first
+  position the paw holds the neck next to the pegbox, and the forearm rises under the neck, free
+  of the upper bout. At rest, the left elbow bends less than the elbow of the shared hold
+  (`RABBIT_HOLD.restArms`), so that the paw of the longer arm keeps the lower end of the violin
+  just above the lap. Reason: a violinist in the first position holds the neck near the scroll,
+  with the back of the hand in line with the forearm (strings 1.9).
 - **Cello left elbow of the dog.** In the play, the left elbow of the dog points out to the side
   and a little down (`DOG_HOLD.poleL`), so that the forearm rises from the elbow to the neck. It
   goes up for each lower string (`elbowPerString`), as a cellist raises the elbow for the lower

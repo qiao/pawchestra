@@ -207,17 +207,17 @@ longer, as on the red fox: the shoulder joint to the wrist joint is 0.343 m (0.2
 source), and the arms reach 0.367 m to the middle of the palm. The paws keep their size.
 
 **Arm twist.** The turns of the arms in the play of the hold `RABBIT_HOLD` of
-`src/pose/bowed-rig.ts` (`pnpm hold-fit violinist`): the left upper arm 50 degrees, the left paw 21
-degrees (a forearm twist of -13 and a swing of 16), the right upper arm 56 degrees, and the right
-paw 16 degrees (a twist of 10 and a swing of 12). With the left paw turned 5 steps (-163.6
+`src/pose/bowed-rig.ts` (`pnpm hold-fit violinist`): the left upper arm 42 degrees, the left paw 25
+degrees (a forearm twist of -10 and a swing of 23), the right upper arm 33 degrees, and the right
+paw 26 degrees (a twist of 13 and a swing of 23). With the left paw turned 5 steps (-163.6
 degrees), the left forearm twisted -46 degrees.
 
 **Violin.** The arms reach 0.367 m from the shoulder joint to the middle of the palm. The violin is
-0.9 of the violin of the app (0.456 m, `violinScale` of `src/models/species.ts`): the left paw
-reaches the fingerboard from 0.24 of its length from the nut, and the bow paw 0.110 m to 0.385 m of
-the hair (`pnpm hold-reach rabbit --instrument violin`). The rest grip holds the neck at 0.35 of
-the fingerboard (`RABBIT_HOLD.restPlace`), so that the lower end of the violin stands 2.1 cm above
-the lap of the longer legs.
+0.75 of the violin of the app (0.380 m, `violinScale` of `src/models/species.ts`), near a 1/16
+violin: the left paw reaches the fingerboard from the nut, and the bow paw 0.110 m to 0.320 m of
+the hair (`pnpm hold-reach rabbit --instrument violin`). The rest grip holds the neck at 0.25 of
+the fingerboard (`RABBIT_HOLD.restPlace`) with the left elbow bent 32.5 degrees, so that the lower
+end of the violin stands 2.0 cm above the lap.
 
 **Seat.** The thighs slope 15 degrees down and 8 degrees out in the bind, the shins lean 6
 degrees forward, and each foot turns 15 degrees with the heel up, with the toes flat on the floor

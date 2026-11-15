@@ -1661,8 +1661,8 @@ const HIPPO_HOLD = {
 /**
  * The hold of the violin of the rabbit: the shoulder hold ({@link SHOULDER_HOLD}) with the left
  * elbow of the Tripo P2 hand rig (design 4.4, 5.3). In the play, the left elbow comes in under
- * the violin, straight down and forward, (0, -1, -0.5), as a real violinist swings the left elbow
- * under the instrument (`docs/reference/string-technique.md`, section 1.10). At rest, the left
+ * the violin, down, forward, and a little out, (-0.3, -1, -0.5), as a real violinist swings the
+ * left elbow under the instrument (`docs/reference/string-technique.md`, section 1.10). At rest, the left
  * elbow points out, down, and a little back, (-1, -0.9, -0.2). The two elbows and the rest turn
  * move a part of the turn of the left paw from the forearm to the upper arm.
  *
@@ -1671,17 +1671,25 @@ const HIPPO_HOLD = {
  * only 25° down toward the right. With the 50° of the chin hold, the violin read as upright on the
  * chest, and the bow at the frog stood up beside the face. The violin sits 0.03 H higher than in
  * the shoulder hold, so that the jaw lies on it, and the left shoulder bone turns 25° forward
- * (`reachL`), so that the left paw reaches the fingerboard of the violin of 0.9
- * (`SpeciesParams.violinScale`) from 0.64 of its length.
+ * (`reachL`). The arms of the body are 1.25 times longer than the arms of the mesh, and the violin
+ * is 0.75 of the violin of the app (`SpeciesParams.violinScale`), so the left paw stops the
+ * strings from the nut (`stopRange` 0 to 1), as a violinist in the first position. In the play,
+ * the paw holds the neck next to the pegbox, the forearm rises under the neck from the elbow under
+ * the violin, and the back of the paw stays near the line of the forearm
+ * (`docs/reference/string-technique.md`, section 1.9). With the arms of the mesh and a violin of
+ * 0.9, the paw stopped the strings only from 0.64 of the fingerboard, next to the upper bout.
+ * With the elbow straight down and forward, (0, -1, -0.5), the left upper arm went 4.4 cm into the
+ * belly in the play (3.1 cm with this elbow, `pnpm hold-fit violinist`).
  *
  * At rest, the rabbit sits as a seated orchestra violinist (`docs/reference/string-technique.md`,
  * section 2.9): the violin stands upright on the lap (`rest.axis` (0, 1, 0)), the left paw holds
  * its neck, and the right paw holds the bow up with a fist around the frog. The left upper arm hangs 35°
- * forward and the left elbow bends 80° (`restArms`), so that the elbow stays near the side: with
- * the 49° and 63° of the first hold of this body, the arm reached forward and held the violin up
- * in front of the chest. The left paw holds the neck at 0.25 of the fingerboard (`restPlace`),
- * with the palm 1.5 cm off the fingerboard (`restGapL`), and turns 45° in the plane of its palm
- * around its contact with the strings (`restPawTurnL`). The paw then stays 1 cm off the nut, the
+ * forward and the left elbow bends 32.5° (`restArms`), so that the elbow stays near the side and
+ * the lower end of the violin stands 2 cm above the lap: with the bend of 80° of the shorter arm,
+ * the longer arm held the violin 15 cm above the lap, and with 49° and 63°, the arm reached
+ * forward and held the violin up in front of the chest. The left paw holds the neck at 0.25 of
+ * the fingerboard (`restPlace`), with the palm 1.5 cm off the fingerboard (`restGapL`), and turns
+ * 45° in the plane of its palm around its contact with the strings (`restPawTurnL`). The paw then stays 1 cm off the nut, the
  * wrist stays above the upper bout, and the paw bends 23° on its forearm. At 0.35 with a turn of
  * 90°, the wrist lay beside the upper bout: the left forearm went 2.0 cm into the violin at rest,
  * and the violin 1.4 cm into the chest (`pnpm body-clip violinist`, limit 1.4 cm).
@@ -1712,7 +1720,7 @@ const HIPPO_HOLD = {
  * in the lowering. With the tip (0.7, 0.3, -1), the tip came to the right eye in the lowering.
  * With the tip (1, 0.2, -0.5), the right paw turned at 17,169°/s in a lowering (limit 3,000,
  * `pnpm arm-check violinist`). In the play of the fourth Tripo rabbit, the left forearm
- * twists 13° and the right forearm 10° (`pnpm hold-fit violinist`, assets/models/rabbit/README.md,
+ * twists 10° and the right forearm 13° (`pnpm hold-fit violinist`, assets/models/rabbit/README.md,
  * "Arm twist").
  *
  * In the middle of the lift and the lowering, the left wrist moves 0.3 H up and 0.15 H to the
@@ -1722,10 +1730,11 @@ const HIPPO_HOLD = {
  * further out to the left took the violin less deep into the head at the start of the lowering,
  * but it left the short arc by up to 57°.
  *
- * The bow slants 10° in the plane of the strings (`slant`), with the tip toward the scroll, so
- * that the short bow arm reaches 0.17 m of the hair of 0.46 m: with the 5° of the shoulder hold,
- * it reaches 0.14 m. With 15°, it reaches 0.20 m, but the stick goes up to 2.0 cm into the fur of
- * the left cheek in the play of `mozart-k525` (1.4 cm with 5° and with 10°).
+ * The bow slants 10° in the plane of the strings (`slant`), with the tip toward the scroll. With
+ * the longer arms, the bow paw reaches the hair from 0.11 m to 0.32 m of 0.38 m, all the hair
+ * past the free hair at the frog and at the tip, with 5° and with 10°. With 15°, the stick went up
+ * to 2.0 cm into the fur of the left cheek in the play of `mozart-k525` (1.4 cm with 5° and with
+ * 10°).
  */
 const RABBIT_HOLD = {
   ...SHOULDER_HOLD,
@@ -1736,10 +1745,10 @@ const RABBIT_HOLD = {
   rest: { ...SHOULDER_HOLD.rest, axis: [0, 1, 0] },
   restPlace: 0.25,
   restArms: {
-    L: { forward: 35 * MathUtils.DEG2RAD, bend: 80 * MathUtils.DEG2RAD },
+    L: { forward: 35 * MathUtils.DEG2RAD, bend: 32.5 * MathUtils.DEG2RAD },
     R: { forward: 10 * MathUtils.DEG2RAD, bend: 50 * MathUtils.DEG2RAD },
   },
-  poleL: [0, -1, -0.5],
+  poleL: [-0.3, -1, -0.5],
   restPoleL: [-1, -0.9, -0.2],
   restPawTurnL: 45 * MathUtils.DEG2RAD,
   restGapL: 0.050251,
