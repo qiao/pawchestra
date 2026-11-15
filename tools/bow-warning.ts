@@ -13,7 +13,7 @@ import type { RoleSweep } from '../src/pose/test-sweep.ts';
  * a long note takes 0.8 of the reached part (`BOW_MOTION.length`), so a shorter part moves the
  * bow paw less than 8 cm.
  */
-export const SHORT_BOW = 0.1;
+const SHORT_BOW = 0.1;
 
 /** The values of a rig that the warning reads. */
 type BowReach = Pick<BowedRig, 'bowRange' | 'bowReached' | 'hairLength'>;

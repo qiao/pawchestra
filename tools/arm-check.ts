@@ -1891,7 +1891,7 @@ export type Verdict = 'PASS' | 'OPEN' | 'WORSE' | 'REBIND' | 'FAIL';
  * such a value is `WORSE` with exit code 0. For a measure whose smaller values are worse, the
  * value fails below the limit divided by this share.
  */
-export const NEAR_LIMIT = 0.8;
+const NEAR_LIMIT = 0.8;
 
 /**
  * Gives the verdict of one value against its limit and the base. A value that is worse than the
