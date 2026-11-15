@@ -16,20 +16,21 @@
 import json
 import os
 import struct
-import subprocess
 import sys
-import tempfile
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from fur_maps import (  # noqa: E402
+    SIZE, linear, linear_of_oklab, normal_map, oklab, smoothstep, srgb8,
+)
 
 SOURCE = 'assets/models/polar-bear/tripo-p2/polar-bear.fbm/polar-bear_basecolor.jpg'
 NORMAL_SOURCE = 'assets/models/polar-bear/tripo-p2/polar-bear.fbm/polar-bear_normal.jpg'
 RIG = 'assets/models/polar-bear/tripo-hand/polar-bear.rig.glb'
 COLOR_OUT = 'assets/models/polar-bear/tripo-hand/polar-bear-color.webp'
 NORMAL_OUT = 'assets/models/polar-bear/tripo-hand/polar-bear-normal.webp'
-SIZE = 2048
-NORMAL_SIZE = 1024
 QUALITY = 60
 
 #: The Oklab lightness, chroma, and hue (degrees) of the tan fur of the source map: the median
@@ -71,11 +72,6 @@ NOSE = (0.22, 0.012, 55.0)
 #: The share of the lightness steps of the nose texels around their median that the nose keeps,
 #: so that the nostrils of the source still show.
 NOSE_STEPS = 0.5
-#: The largest length of the x, y tilt of a normal of the source, and the gain of the stored tilts
-#: (`NORMAL_MAP_GAIN` of src/scene/fur.ts). A larger tilt is a baked eye rim, nose, or claw edge of
-#: the source mesh, which the edited mesh does not have.
-NORMAL_LIMIT = 0.2
-NORMAL_GAIN = 4
 #: The paint of the eyeballs. 'source' keeps the eye of the source map: a black pupil in a brown
 #: iris with a painted white light, and white at the outer corner. 'centered' keeps the same paint,
 #: and moves the iris with its pupil and its light to the middle of the eye opening of the view of
@@ -155,42 +151,6 @@ EYE_FILL = 4
 EDGE = 1e-4
 #: The step of the grid of the front rays over each eye, in units of the rig file.
 RAY_STEP = 0.0005
-
-
-def linear(srgb):
-    c = np.asarray(srgb, np.float64) / 255.0
-    return np.where(c <= 0.04045, c / 12.92, ((c + 0.055) / 1.055) ** 2.4)
-
-
-def srgb8(lin):
-    c = np.clip(lin, 0.0, 1.0)
-    c = np.where(c <= 0.0031308, c * 12.92, 1.055 * c ** (1 / 2.4) - 0.055)
-    return np.round(c * 255.0).astype(np.uint8)
-
-
-def oklab(lin):
-    m1 = np.array([[0.4122214708, 0.5363325363, 0.0514459929],
-                   [0.2119034982, 0.6806995451, 0.1073969566],
-                   [0.0883024619, 0.2817188376, 0.6299787005]])
-    m2 = np.array([[0.2104542553, 0.7936177850, -0.0040720468],
-                   [1.9779984951, -2.4285922050, 0.4505937099],
-                   [0.0259040371, 0.7827717662, -0.8086757660]])
-    return np.cbrt(lin @ m1.T) @ m2.T
-
-
-def linear_of_oklab(lab):
-    m1 = np.array([[1.0, 0.3963377774, 0.2158037573],
-                   [1.0, -0.1055613458, -0.0638541728],
-                   [1.0, -0.0894841775, -1.2914855480]])
-    m2 = np.array([[4.0767416621, -3.3077115913, 0.2309699292],
-                   [-1.2684380046, 2.6097574011, -0.3413193965],
-                   [-0.0041960863, -0.7034186147, 1.7076147010]])
-    return ((lab @ m1.T) ** 3) @ m2.T
-
-
-def smoothstep(x, a, b):
-    t = np.clip((x - a) / (b - a), 0.0, 1.0)
-    return t * t * (3 - 2 * t)
 
 
 def read_rig(path):
@@ -301,7 +261,7 @@ def white_fur(lab):
     fur[..., 2] = fur_chroma * np.sin(hue)
     dark = lab.copy()
     dark[..., 1:] *= DARK_CHROMA
-    share = smoothstep(lightness, *DARK)[..., None]
+    share = smoothstep(*DARK, lightness)[..., None]
     return dark + share * (fur - dark)
 
 
@@ -434,12 +394,6 @@ def ball_image(rig, out, taken):
     filled = fill_around(out, taken)
     out[padding] = filled[padding]
     return Image.fromarray(np.round(out).clip(0, 255).astype(np.uint8))
-
-
-def smooth(a, b, x):
-    """Gives the smoothstep from 0 at a to 1 at b."""
-    t = np.clip((x - a) / (b - a), 0.0, 1.0)
-    return t * t * (3 - 2 * t)
 
 
 def ball_frame(rig, faces):
@@ -722,7 +676,7 @@ def far_tone(rig, image):
     luma = colors @ [0.2126, 0.7152, 0.0722]
     top, low = colors.max(axis=1), colors.min(axis=1)
     saturation = (top - low) / np.maximum(top, 1)
-    w = smooth(*WHITE_LUMA, luma) * (1 - smooth(*WHITE_SATURATION, saturation))
+    w = smoothstep(*WHITE_LUMA, luma) * (1 - smoothstep(*WHITE_SATURATION, saturation))
     lab = oklab(linear(colors))
     lab[:, 0] *= IRIS_SHADE * (1 - w) + SCLERA_SHADE * w
     lab[:, 1:] += w[:, None] * np.array(SCLERA_WARM)
@@ -780,7 +734,7 @@ def color_map(rig):
     # The dark texels of the nose take the nose color, and a texel between dark and fur takes a
     # smooth mix, so that the fur of the muzzle around the nose stays.
     nose, nose_count = nose_mask(rig, SIZE)
-    dark = 1 - smoothstep(lab[nose][:, 0], *DARK)
+    dark = 1 - smoothstep(*DARK, lab[nose][:, 0])
     tone = np.tile(lch(*NOSE), (int(nose.sum()), 1))
     tone[:, 0] += NOSE_STEPS * (lab[nose][:, 0] - np.median(lab[nose][dark > 0.5][:, 0]))
     moved[nose] += dark[:, None] * (tone - moved[nose])
@@ -793,38 +747,13 @@ def color_map(rig):
           f'({int(nose.sum())} texels), {os.path.getsize(COLOR_OUT)} bytes')
 
 
-def normal_map():
-    """Writes the normal map of the fur: each x, y tilt of the source limited to the length
-    NORMAL_LIMIT, a box scale to NORMAL_SIZE, then the tilts times NORMAL_GAIN in red and green,
-    255 in blue (the shader does not read it), and cwebp -q 60 -sharp_yuv -m 6. The limit comes
-    before the gain, so that no stored value clips."""
-    a = np.asarray(Image.open(NORMAL_SOURCE).convert('RGB')).astype(np.float64) / 255 * 2 - 1
-    t = a[..., :2].copy()
-    length = np.linalg.norm(t, axis=-1)
-    over = length > NORMAL_LIMIT
-    t[over] *= (NORMAL_LIMIT / length[over])[:, None]
-    k = t.shape[0] // NORMAL_SIZE
-    small = t.reshape(NORMAL_SIZE, k, NORMAL_SIZE, k, 2).mean(axis=(1, 3))
-    v = np.clip(small * NORMAL_GAIN, -1, 1)
-    rgb = np.zeros((NORMAL_SIZE, NORMAL_SIZE, 3), np.uint8)
-    rgb[..., :2] = np.round((v + 1) / 2 * 255).astype(np.uint8)
-    rgb[..., 2] = 255
-    with tempfile.TemporaryDirectory() as folder:
-        png = os.path.join(folder, 'normal.png')
-        Image.fromarray(rgb).save(png)
-        subprocess.run(['cwebp', '-quiet', '-q', '60', '-sharp_yuv', '-m', '6', png, '-o', NORMAL_OUT],
-                       check=True)
-    print(f'{NORMAL_OUT}: {NORMAL_SIZE} x {NORMAL_SIZE}, {over.mean() * 100:.2f} % of the source '
-          f'tilts limited, mean normal {np.round(a.reshape(-1, 3).mean(axis=0), 3).tolist()}, '
-          f'{int((a[..., 2] < 0).sum())} texels with z below 0')
-
-
 def main():
     which = sys.argv[1:] or ['color', 'normal']
     if 'color' in which:
         color_map(read_rig(RIG))
     if 'normal' in which:
-        normal_map()
+        a = normal_map(NORMAL_SOURCE, NORMAL_OUT)
+        print(f'{NORMAL_OUT}: {int((a[..., 2] < 0).sum())} texels with z below 0')
 
 
 if __name__ == '__main__':
