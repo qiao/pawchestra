@@ -1,9 +1,7 @@
 import type { Vec3 } from '../models/tuples.ts';
 import { cameraAxes } from './camera-keys.ts';
 import type { Composition, ShotKey } from './types.ts';
-
-/** Degrees to radians. */
-const DEG = Math.PI / 180;
+import { DEG } from '../math.ts';
 
 /**
  * The rules of film grammar of the shot planner (design 5.6, `docs/reference/camera-technique.md`).

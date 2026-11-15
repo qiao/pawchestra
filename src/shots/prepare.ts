@@ -6,7 +6,7 @@ import { lastAtOrBefore } from '../pose/blend.ts';
 import { POSE_SEED, preparePoses } from '../pose/plan.ts';
 import type { PosePlan } from '../pose/plan.ts';
 import { decisionRandom } from '../pose/random.ts';
-import { smoothstep } from '../math.ts';
+import { DEG, smoothstep } from '../math.ts';
 import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
 import type { Score } from '../score/types.ts';
@@ -88,9 +88,6 @@ import {
   defaultView,
   landscapeZoom,
 } from './view.ts';
-
-/** Degrees to radians. */
-const DEG = Math.PI / 180;
 
 /**
  * The seed of the shot plan of the app. A fixed seed gives each demo the same film on each visit

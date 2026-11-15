@@ -1,3 +1,6 @@
+/** The radians of one degree. */
+export const DEG = Math.PI / 180;
+
 /**
  * Limits a number to [0, 1].
  *

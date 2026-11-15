@@ -41,10 +41,7 @@ import type { ScoreMusic, WindowMusic } from './music.ts';
 import { frontOf, onStage } from './subjects.ts';
 import type { InsertDetail, Shot, ShotKey, ShotPlan } from './types.ts';
 import { CINEMA_ASPECT } from './view.ts';
-import { clamp01 } from '../math.ts';
-
-/** Degrees to radians. */
-const DEG = Math.PI / 180;
+import { clamp01, DEG } from '../math.ts';
 
 /**
  * The rules of the detail inserts (design 5.6, `camera-technique.md`). A concert film cuts away
