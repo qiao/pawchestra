@@ -13,9 +13,8 @@
  */
 import { createHash } from 'node:crypto';
 import type { Hash } from 'node:crypto';
-import { readFile, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 
 import { buildBiped } from '../src/models/biped.ts';
 import type { BodyBones } from '../src/models/biped.ts';
@@ -38,7 +37,8 @@ import { NOT_STARTED, PLAYING, allAudible, sceneOf } from '../src/pose/test-scen
 import type { TestScene } from '../src/pose/test-scene.ts';
 import type { AnimalPose, Transport } from '../src/pose/types.ts';
 import { patchedDemos } from './patch-demos.ts';
-import { checkFormat, formatVersion, runChild, withProbeTree } from './ref-tree.ts';
+import { probeCommit, probeJson, runCompareModes } from './probe-compare.ts';
+import type { ProbeComparison } from './probe-compare.ts';
 
 /** The supports of each species in the probe: each seat, and standing. */
 const PROBE_SUPPORTS = ['chair', 'stool', 'bench', 'stand'] as const satisfies readonly Support[];
@@ -144,13 +144,6 @@ export interface Probe extends BodiesProbe {
 }
 
 /** The comparison of two probes. */
-interface ProbeComparison {
-  /** The counts of the equal bodies, players, and pose sets. */
-  readonly counts: readonly string[];
-  /** One line for each difference. */
-  readonly differences: readonly string[];
-}
-
 /**
  * Rounds a number to micrometers, so that the noise of a refactor below that does not count.
  *
@@ -726,35 +719,12 @@ export const PROBE_FORMAT = 1;
  * @returns The text, with a line end at the end.
  */
 export function probeText(probe: Probe): string {
-  return `${JSON.stringify({ version: PROBE_FORMAT, ...probe }, null, 1)}\n`;
-}
-
-/** A probe file and the format version of its JSON. */
-interface ProbeFile {
-  /** The probe. */
-  readonly probe: Probe;
-  /** The format version of the JSON. */
-  readonly version: number;
+  return probeJson(PROBE_FORMAT, probe);
 }
 
 /**
- * Reads a probe file that this tool wrote.
- *
- * @param file The path of the file.
- * @returns The probe and the format version of its JSON.
- */
-async function readProbe(file: string): Promise<ProbeFile> {
-  const text = await readFile(file, 'utf8');
-  // SAFETY: the file is the output of this tool, which writes a Probe as JSON.
-  return { probe: JSON.parse(text) as Probe, version: formatVersion(text) };
-}
-
-/**
- * Probes the bodies and the poses of a commit. The folder of `withProbeTree()` holds the code, the
- * demos, and the tools of the commit, so the probe runs `tools/body-probe.ts` of the commit. A
- * commit with no such script gets the script of the working tree. The probe runs there in a child
- * process, so that the caller can probe the working tree at the same time. The folder goes away
- * at the end, also after a failure or a stop (INT or TERM).
+ * Probes the bodies and the poses of a commit ({@link probeCommit}) with `tools/body-probe.ts`
+ * of the commit. A commit with no such script gets the script of the working tree.
  *
  * @param ref The commit, a branch, or a tag.
  * @param parent The folder that holds the temporary folder.
@@ -764,19 +734,14 @@ async function readProbe(file: string): Promise<ProbeFile> {
  *   its JSON has another format version than {@link PROBE_FORMAT}.
  */
 export function probeRef(ref: string, parent: string = tmpdir(), poses = true): Promise<Probe> {
-  return withProbeTree(
-    ref,
-    async (dir) => {
-      // The child starts before the first await, so it runs beside a probe of the caller.
-      const out = join(dir, 'probe.json');
-      const args = [join('tools', 'body-probe.ts'), '--out', out, ...(poses ? [] : ['--no-poses'])];
-      await runChild(process.execPath, args, dir);
-      const { probe, version } = await readProbe(out);
-      checkFormat('body-probe.ts', ref, version, PROBE_FORMAT);
-      return probe;
-    },
-    { parent, prefix: 'body-probe-' },
-  );
+  return probeCommit(ref, {
+    script: 'body-probe.ts',
+    args: poses ? [] : ['--no-poses'],
+    format: PROBE_FORMAT,
+    parent,
+    prefix: 'body-probe-',
+    scripts: [],
+  });
 }
 
 /**
@@ -801,50 +766,14 @@ export function summarize(probe: Probe, json: string): string[] {
   ];
 }
 
-/**
- * Prints a comparison, and ends the process: with 1 when there is a difference.
- *
- * @param title The first line, or `null` for none.
- * @param comparison The comparison.
- */
-function printComparison(title: string | null, comparison: ProbeComparison): never {
-  const lines = [...comparison.counts, ...comparison.differences];
-  console.log((title ? [title, ...lines] : lines).join('\n'));
-  process.exit(comparison.differences.length > 0 ? 1 : 0);
-}
-
 if (import.meta.main) {
   const args = process.argv.slice(2);
-  const baseAt = args.indexOf('--base');
-  if (baseAt >= 0) {
-    const ref = args[baseAt + 1];
-    if (!ref || ref.startsWith('--')) {
-      throw new Error('Usage: pnpm body-probe --base <ref>');
-    }
-    // Both probes end before a failure stops the process, so the temporary folder goes away.
-    const [base, next] = await Promise.allSettled([probeRef(ref), runProbe()]);
-    if (base.status === 'rejected') {
-      throw base.reason;
-    }
-    if (next.status === 'rejected') {
-      throw next.reason;
-    }
-    printComparison(`base ${ref}, new: the working tree`, compareProbes(base.value, next.value));
-  }
-  const compare = args.indexOf('--compare');
-  if (compare >= 0) {
-    const [baseFile, nextFile] = [args[compare + 1], args[compare + 2]];
-    if (!baseFile || !nextFile) {
-      throw new Error('Usage: pnpm body-probe --compare <base.json> <new.json>');
-    }
-    const [base, next] = [await readProbe(baseFile), await readProbe(nextFile)];
-    if (base.version !== next.version) {
-      throw new Error(
-        `The probe file ${baseFile} has the format version ${base.version}, and ${nextFile} has the format version ${next.version}. A compare of two formats gives false differences.`,
-      );
-    }
-    printComparison(null, compareProbes(base.probe, next.probe));
-  }
+  await runCompareModes(args, {
+    name: 'body-probe',
+    probeRef: (ref) => probeRef(ref),
+    runProbe,
+    compare: compareProbes,
+  });
   // The JSON is about 1 MB, so only --out writes it. The summary is a few lines.
   const outIndex = args.indexOf('--out');
   const probe: Probe = args.includes('--no-poses') ? probeBodies() : await runProbe();

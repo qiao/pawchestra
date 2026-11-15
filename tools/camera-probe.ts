@@ -18,9 +18,8 @@
  *        pnpm camera-probe --base <ref>
  */
 import { createHash } from 'node:crypto';
-import { readFile, writeFile } from 'node:fs/promises';
+import { writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
 import { crc32 } from 'node:zlib';
 
 import { layoutScene } from '../src/models/layout-scene.ts';
@@ -32,7 +31,8 @@ import { SHOT_SEED, prepareShots } from '../src/shots/prepare.ts';
 import type { CameraView } from '../src/shots/types.ts';
 import { CINEMA_ASPECT } from '../src/shots/view.ts';
 import { patchedDemos } from './patch-demos.ts';
-import { checkFormat, formatVersion, runChild, withProbeTree } from './ref-tree.ts';
+import { probeCommit, probeJson, runCompareModes } from './probe-compare.ts';
+import type { ProbeComparison } from './probe-compare.ts';
 
 /** The step of the song time between two samples, in seconds. */
 const CAMERA_STEP = 0.25;
@@ -82,13 +82,6 @@ interface CameraProbe {
 }
 
 /** The comparison of two probes. */
-interface CameraComparison {
-  /** The count of the equal demos, and the count of the changed samples of all demos. */
-  readonly counts: readonly string[];
-  /** One line for each difference. */
-  readonly differences: readonly string[];
-}
-
 /** The close flag of a sample, as one byte after its values. */
 const CLOSE_BYTES = { close: Uint8Array.of(1), open: Uint8Array.of(0) } as const;
 
@@ -215,7 +208,7 @@ export async function runProbe(): Promise<CameraProbe> {
  * @param next The probe to check.
  * @returns The counts and the differences.
  */
-export function compareProbes(base: CameraProbe, next: CameraProbe): CameraComparison {
+export function compareProbes(base: CameraProbe, next: CameraProbe): ProbeComparison {
   const lines: string[] = [];
   let equal = 0;
   let changed = 0;
@@ -267,34 +260,13 @@ export const PROBE_FORMAT = 2;
  * @returns The text, with a line end at the end.
  */
 export function probeText(probe: CameraProbe): string {
-  return `${JSON.stringify({ version: PROBE_FORMAT, ...probe }, null, 1)}\n`;
-}
-
-/** A probe file and the format version of its JSON. */
-interface ProbeFile {
-  /** The probe. */
-  readonly probe: CameraProbe;
-  /** The format version of the JSON. */
-  readonly version: number;
+  return probeJson(PROBE_FORMAT, probe);
 }
 
 /**
- * Reads a probe file that this tool wrote.
- *
- * @param file The path of the file.
- * @returns The probe and the format version of its JSON.
- */
-async function readProbe(file: string): Promise<ProbeFile> {
-  const text = await readFile(file, 'utf8');
-  // SAFETY: the file is the output of this tool, which writes a CameraProbe as JSON.
-  return { probe: JSON.parse(text) as CameraProbe, version: formatVersion(text) };
-}
-
-/**
- * Probes the camera of a commit. The folder of `withProbeTree()` holds the code, the demos, and
- * the tools of the commit, with the script of the working tree in place of its
- * `tools/camera-probe.ts`, so that both probes keep the CRC-32 of each sample. The probe runs in a
- * child process, so that the caller can probe the working tree at the same time.
+ * Probes the camera of a commit ({@link probeCommit}), with the script of the working tree in
+ * place of its `tools/camera-probe.ts`, so that both probes keep the CRC-32 of each sample. The
+ * script brings `tools/probe-compare.ts` of the working tree, which it imports.
  *
  * @param ref The commit, a branch, or a tag.
  * @returns The probe of the commit.
@@ -302,63 +274,19 @@ async function readProbe(file: string): Promise<ProbeFile> {
  *   its JSON has another format version than {@link PROBE_FORMAT}.
  */
 export function probeRef(ref: string): Promise<CameraProbe> {
-  return withProbeTree(
-    ref,
-    async (dir) => {
-      const out = join(dir, 'camera-probe.json');
-      await runChild(process.execPath, [join('tools', 'camera-probe.ts'), '--out', out], dir);
-      const { probe, version } = await readProbe(out);
-      checkFormat('camera-probe.ts', ref, version, PROBE_FORMAT);
-      return probe;
-    },
-    { parent: tmpdir(), prefix: 'camera-probe-', scripts: ['camera-probe.ts'] },
-  );
-}
-
-/**
- * Prints a comparison, and ends the process: with 1 when there is a difference.
- *
- * @param title The first line, or `null` for none.
- * @param comparison The comparison.
- */
-function printComparison(title: string | null, comparison: CameraComparison): never {
-  const lines = [...comparison.counts, ...comparison.differences];
-  console.log((title ? [title, ...lines] : lines).join('\n'));
-  process.exit(comparison.differences.length > 0 ? 1 : 0);
+  return probeCommit(ref, {
+    script: 'camera-probe.ts',
+    args: [],
+    format: PROBE_FORMAT,
+    parent: tmpdir(),
+    prefix: 'camera-probe-',
+    scripts: ['camera-probe.ts', 'probe-compare.ts'],
+  });
 }
 
 if (import.meta.main) {
   const args = process.argv.slice(2);
-  const baseAt = args.indexOf('--base');
-  if (baseAt >= 0) {
-    const ref = args[baseAt + 1];
-    if (!ref || ref.startsWith('--')) {
-      throw new Error('Usage: pnpm camera-probe --base <ref>');
-    }
-    // Both probes end before a failure stops the process, so the temporary folder goes away.
-    const [base, next] = await Promise.allSettled([probeRef(ref), runProbe()]);
-    if (base.status === 'rejected') {
-      throw base.reason;
-    }
-    if (next.status === 'rejected') {
-      throw next.reason;
-    }
-    printComparison(`base ${ref}, new: the working tree`, compareProbes(base.value, next.value));
-  }
-  const compare = args.indexOf('--compare');
-  if (compare >= 0) {
-    const [baseFile, nextFile] = [args[compare + 1], args[compare + 2]];
-    if (!baseFile || !nextFile) {
-      throw new Error('Usage: pnpm camera-probe --compare <base.json> <new.json>');
-    }
-    const [base, next] = [await readProbe(baseFile), await readProbe(nextFile)];
-    if (base.version !== next.version) {
-      throw new Error(
-        `The probe file ${baseFile} has the format version ${base.version}, and ${nextFile} has the format version ${next.version}. A compare of two formats gives false differences.`,
-      );
-    }
-    printComparison(null, compareProbes(base.probe, next.probe));
-  }
+  await runCompareModes(args, { name: 'camera-probe', probeRef, runProbe, compare: compareProbes });
   const probe = await runProbe();
   const outAt = args.indexOf('--out');
   const out = outAt >= 0 ? args[outAt + 1] : undefined;
