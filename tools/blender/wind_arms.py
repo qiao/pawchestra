@@ -1,34 +1,22 @@
 """The shared steps of a Blender session that rebuilds the arms of a wind player.
 
-The rebuild uses loop edges, retopology, and extra bones to fix the arm and wrist twist. The
-session used the steps of `violin_arms.py` on the old mouse oboist, in the live Blender through
-MCP, with an image after each step. This module repeats them in the same order with the settings
-of an animal (`ANIMALS`). `arm_rebuild.py` runs these steps. The steps are the steps of
-`violin_arms.py`, with four changes (marked *):
+The rebuild uses loop edges, retopology, and extra bones to fix the arm and wrist twist.
+`arm_rebuild.py` runs these steps between the steps of `violin_arms.py`. They change the steps of
+`violin_arms.py` in these ways:
 
-1. Import the mesh and Merge by Distance.
-2. Replace the faces of each arm from the shoulder line to the wrist with a quad tube, wrap it onto
-   the source arm, bridge it to the trunk and to the paw, and beautify the bridge triangles.
-   * The rings of the elbow and of the wrist can have their own gaps (`arm_stations()`).
-   * Collapse Edges removes the thin faces that the Bisect and the bridge leave at each cut loop
-     (`step_clean_cut()`, `step_clean_bridge()`).
-3. Give the new arm faces a UV layout, bake the fur color of the source arm, and transfer the
-   custom normals of the source surface.
-4. Make each arm `factor` times longer (`step_shape()`), as the rule `armFactor` of a rig config
-   does, put the arm image in a strip of the atlas, and write `<animal>-arms.glb`.
-5. Add the studio skeleton with the arm segments and the helpers, parent with automatic weights,
-   and paint the fixes with the Weight Paint tools.
-   * The paint has more fixes: the side of the trunk, the elbows, and the front of the armpit
-     (`step_paint()`).
-6. Write the weights for `paintedWeights` of the config (`<animal>-weights.json`).
-   * Each point is in the units of the rig config (`config_points()`).
+- The rings of the elbow and of the wrist can have their own gaps (`arm_stations()`,
+  `step_cut_and_tube()`).
+- Collapse Edges removes the thin faces that the Bisect and the bridge leave at each cut loop
+  (`step_clean_cut()`, `step_clean_bridge()`).
+- The skeleton takes the joints in the units of the source, and each wrist helper can span twice
+  `wristGap` (`step_skeleton()`).
+- Each point of the weights file is in the units of the rig config (`config_points()`,
+  `step_weights()`).
 
 A config can scale the source (`proportions`) in `load_mesh()` of `rig_mesh.py`. Then its
 joints are in the units of the scaled source. The session works in the units of the source:
 `source_units()` gives the arm joints there, and `step_weights()` writes each point in the units
 of the scaled source, as `rig_mesh.py` reads it.
-
-In the live Blender of MCP, `run_steps()` runs one step at a time.
 """
 
 import importlib.util
@@ -55,13 +43,6 @@ def load_violin_arms():
 
 
 va = load_violin_arms()
-
-#: The settings of each animal, with the keys of `ANIMALS` of `violin_arms.py`. A route that uses
-#: these steps puts the settings of its animal here. `paint` can also
-#: name the fixes of `step_paint()`: `side`, the side of the trunk below the armpit, `elbow`, the
-#: vertices near each elbow joint, and `pit`, the front of the armpit.
-ANIMALS = {}
-
 
 _QUIET = {}
 
@@ -102,75 +83,6 @@ def source_units(joints, rule):
             if isinstance(spec.get(key), list):
                 out[name][key] = source_point(spec[key], rule)
     return out
-
-
-class Session(va.Session):
-    """A session of `violin_arms.py` with the joints in the units of the source."""
-
-    def __init__(self, animal, out_dir=None):
-        va.ANIMALS.update(ANIMALS)
-        super().__init__(animal, out_dir)
-        rule = self.config.get('proportions')
-        if rule:
-            self.joints = va.source_joints(source_units(self.config['joints'], rule),
-                                           self.spec['factor'])
-
-
-def step_paint(s):
-    """Paints the fixes of `step_paint()` of `violin_arms.py`, then the fixes of `paint` of the
-    animal, with the Weight Paint tools. The places are in the units of the studio (`Frame`).
-
-    1. `side`: Remove From Group of the arm bones on the original vertices of the trunk inside
-       |x| `side.x`, from `side.y[0]` to `side.y[1]`, and Smooth on them `side.repeat` times. On
-       the mouse, the side of the trunk below the armpit followed the arm, and its faces folded
-       when the arm hung against the body at rest.
-    2. `elbow`: Smooth `elbow.repeat` times on the vertices within `elbow.radius` of each elbow
-       joint, so that the weights of the elbow helper fade over the rings of the joint. On the
-       mouse, faces of the inner elbow folded at rest.
-    3. `pit`: Smooth `pit.repeat` times on the vertices in front of the armpit: |x| from `pit.x[0]`
-       to `pit.x[1]`, the height from `pit.y[0]` to `pit.y[1]`, and z beyond `pit.front`. On the
-       mouse, the long faces there folded at rest with the right elbow out and back.
-    """
-    va.step_paint(s)
-    mesh, fr, paint = s.mesh, s.fr, s.spec['paint']
-
-    def place(p):
-        return (abs(p.co.x) / fr.height, (p.co.z - fr.floor) / fr.height)
-
-    side = paint.get('side')
-    if side:
-        attr = mesh.data.attributes['arm_part'].data
-        va.paint_mode(mesh, lambda p: place(p)[0] < side['x'] and side['y'][0] < place(p)[1]
-                      < side['y'][1] and attr[p.index].value == 0)
-        va.remove_from(mesh, va.arm_groups())
-        bpy.ops.object.vertex_group_normalize_all(group_select_mode='BONE_DEFORM',
-                                                  lock_active=False)
-        bpy.ops.object.vertex_group_smooth(group_select_mode='BONE_DEFORM', factor=0.5,
-                                           repeat=side['repeat'])
-        va.limit_and_normalize()
-        bpy.ops.object.mode_set(mode='OBJECT')
-    elbow = paint.get('elbow')
-    if elbow:
-        joint = s.config['joints']['forearm_L']['head']
-        if s.config.get('proportions'):
-            joint = source_point(joint, s.config['proportions'])
-        points = [fr.point(joint, k) for k in (1, -1)]
-        va.paint_mode(mesh, lambda p: min((p.co - q).length for q in points)
-                      < elbow['radius'] * fr.height)
-        bpy.ops.object.vertex_group_smooth(group_select_mode='BONE_DEFORM', factor=0.5,
-                                           repeat=elbow['repeat'])
-        va.limit_and_normalize()
-        bpy.ops.object.mode_set(mode='OBJECT')
-    pit = paint.get('pit')
-    if pit:
-        va.paint_mode(mesh, lambda p: pit['x'][0] < place(p)[0] < pit['x'][1]
-                      and pit['y'][0] < place(p)[1] < pit['y'][1]
-                      and -p.co.y / fr.height > pit['front'])
-        bpy.ops.object.vertex_group_smooth(group_select_mode='BONE_DEFORM', factor=0.5,
-                                           repeat=pit['repeat'])
-        va.limit_and_normalize()
-        bpy.ops.object.mode_set(mode='OBJECT')
-    mesh.data.use_paint_mask_vertex = False
 
 
 def arm_stations(s, line):
@@ -283,51 +195,6 @@ def step_clean_cut(s):
     return count
 
 
-def step_clean_pit(s):
-    """Collapses the thin faces of the source in front of and under each armpit (Collapse Edges),
-    in the box `cleanPit` of the animal: |x| from `x[0]` to `x[1]` and the height from `y[0]` to
-    `y[1]`, in the units of the studio. On the mouse, the upper arm joins the trunk there, and
-    thin faces of the source with corners of 5° to 10° folded in each pose. While a face in the box
-    has a corner below `CUT_ANGLE`, its shortest edge collapses to its middle, and a merged vertex
-    of a cut loop stays a vertex of the loop. Gives the number of collapsed edges.
-    """
-    import bmesh
-
-    box = s.spec.get('cleanPit')
-    if not box:
-        return 0
-    mesh, fr = s.mesh, s.fr
-    bpy.context.view_layer.objects.active = mesh
-    bpy.ops.object.mode_set(mode='EDIT')
-    bm = bmesh.from_edit_mesh(mesh.data)
-    part = bm.verts.layers.int['arm_part']
-
-    def inside(f):
-        c = f.calc_center_median()
-        x, y = abs(c.x) / fr.height, (c.z - fr.floor) / fr.height
-        return box['x'][0] < x < box['x'][1] and box['y'][0] < y < box['y'][1]
-
-    count = 0
-    for _ in range(200):
-        thin = next((f for f in bm.faces if all(p[part] == 0 or p[part] in (1, 11) for p in f.verts)
-                     and inside(f)
-                     and min(math.degrees(c.calc_angle()) for c in f.loops) < CUT_ANGLE), None)
-        if thin is None:
-            break
-        edge = min(thin.edges, key=lambda e: e.calc_length())
-        code = max(p[part] for p in edge.verts)
-        bmesh.ops.collapse(bm, edges=[edge], uvs=True)
-        count += 1
-        if code:
-            for p in bm.verts:
-                if p.is_valid and p[part] == 0 and p.is_boundary and any(
-                        e.other_vert(p)[part] == code for e in p.link_edges):
-                    p[part] = code
-    bmesh.update_edit_mesh(mesh.data)
-    bpy.ops.object.mode_set(mode='OBJECT')
-    return count
-
-
 def step_clean_bridge(s):
     """Collapses the thin bridge triangles (Collapse Edges), after Beautify Faces.
 
@@ -433,19 +300,3 @@ def step_weights(s):
     with open(path, 'w') as f:
         json.dump(data, f, separators=(',', ':'))
     return len(rows)
-
-
-#: The steps of the session, in order: the steps of `violin_arms.py`, with the clean cut, the
-#: clean bridge, the skeleton, the paint, and the weights file above.
-STEPS = tuple(
-    out for step in va.STEPS
-    for out in {va.step_skeleton: (step_skeleton,), va.step_weights: (step_weights,),
-                va.step_cut_and_tube: (step_cut_and_tube, step_clean_cut, step_clean_pit),
-                va.step_beautify: (va.step_beautify, step_clean_bridge),
-                va.step_paint: (step_paint,)}.get(step, (step,)))
-
-
-def run_steps(s, first=0, last=len(STEPS)):
-    """Runs the steps from `first` up to `last` (not included), and prints the result of each."""
-    for step in STEPS[first:last]:
-        print('%s: %s' % (step.__name__, step(s)))

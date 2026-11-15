@@ -524,7 +524,7 @@ def measure_joints(s, bm, bvh):
 
 def step_measure(s):
     """Finds the settings of the rebuild from the joints and from rays through the source mesh,
-    and puts them into `s.spec` with the keys of `ANIMALS` of `violin_arms.py` and `wind_arms.py`:
+    and puts them into `s.spec` with the keys of `ANIMALS` of `violin_arms.py`:
 
     - `zone`, `gap`, and `wristGap`: the settings of `measure_joints()`.
     - `cut.shoulder`: the shoulder line of `measure_joints()`. `cut.wrist`: the first share of
