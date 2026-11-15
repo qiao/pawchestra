@@ -211,8 +211,12 @@ export function tilingNoise(size: number): Uint8Array {
         const px = (x / size) * cells;
         const py = (y / size) * cells;
         const pz = (z / size) * cells;
-        const [ix, iy, iz] = [Math.floor(px), Math.floor(py), Math.floor(pz)];
-        const [fx, fy, fz] = [smooth(px - ix), smooth(py - iy), smooth(pz - iz)];
+        const ix = Math.floor(px);
+        const iy = Math.floor(py);
+        const iz = Math.floor(pz);
+        const fx = smooth(px - ix);
+        const fy = smooth(py - iy);
+        const fz = smooth(pz - iz);
         let value = 0;
         for (let corner = 0; corner < 8; corner++) {
           const dx = corner & 1;
@@ -526,12 +530,19 @@ function coneUniforms(stageSide: number) {
 }
 
 /**
+ * The texels of the noise texture ({@link tilingNoise}), made at the first haze. The noise does not
+ * change, so each layout build uses the same texels.
+ */
+let noiseData: Uint8Array | null = null;
+
+/**
  * Creates the noise texture of the beam (see {@link tilingNoise}).
  *
  * @returns The texture, with a linear filter and repeat on each axis.
  */
 function noiseTexture(): Data3DTexture {
-  const texture = new Data3DTexture(tilingNoise(NOISE_SIZE), NOISE_SIZE, NOISE_SIZE, NOISE_SIZE);
+  noiseData ??= tilingNoise(NOISE_SIZE);
+  const texture = new Data3DTexture(noiseData, NOISE_SIZE, NOISE_SIZE, NOISE_SIZE);
   texture.format = RedFormat;
   texture.minFilter = LinearFilter;
   texture.magFilter = LinearFilter;
