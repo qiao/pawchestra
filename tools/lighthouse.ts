@@ -26,16 +26,13 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 
 import { computeMedianRun } from 'lighthouse/core/lib/median-run.js';
 
-import { optionValue } from './ref-tree.ts';
+import { ROOT, optionValue } from './ref-tree.ts';
 import { startSiteServer } from './site-server.ts';
 import type { Network, RunningSite } from './site-server.ts';
-
-/** The root of the repository. */
-const ROOT = resolve(import.meta.dirname, '..');
 
 /** The command line of the pinned Lighthouse. */
 const LIGHTHOUSE_CLI = join(ROOT, 'node_modules', 'lighthouse', 'cli', 'index.js');

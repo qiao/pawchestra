@@ -19,12 +19,10 @@ import type { SpeciesId, SpeciesParams } from '../src/models/species.ts';
 import { isStudioBodyName } from '../src/models/studio-body.ts';
 import type { StudioBodyName } from '../src/models/studio-body.ts';
 import type { StudioBody } from '../src/models/studio-format.ts';
+import { ROOT } from './ref-tree.ts';
 import { trackChild, trackFolder } from './stop-cleanup.ts';
 import { ANIMALS, studioBody, studioModule } from './studio-body.ts';
 import type { AnimalEntry, AnimalSettings } from './studio-body.ts';
-
-/** The repository root. */
-const ROOT = join(import.meta.dirname, '..');
 
 /** The paths of the working tree that the copy holds as files. */
 const COPIED = ['src', 'package.json'] as const;

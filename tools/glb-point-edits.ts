@@ -17,8 +17,7 @@ import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
 
-/** The repository root. */
-const ROOT = join(import.meta.dirname, '..');
+import { ROOT } from './ref-tree.ts';
 
 /** The component type of a 32-bit float in glTF. */
 const FLOAT = 5126;

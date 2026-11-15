@@ -49,10 +49,7 @@ import { BODY_OBSTACLE } from '../src/pose/test-sweep.ts';
 import type { SweepObstacle } from '../src/pose/test-sweep.ts';
 import { chromiumArgs } from './chromium-args.ts';
 import { grid } from './close-views.ts';
-import { optionValue } from './ref-tree.ts';
-
-/** The root of the repository. */
-const ROOT = join(import.meta.dirname, '..');
+import { ROOT, optionValue } from './ref-tree.ts';
 
 /** The usage line. */
 const USAGE =

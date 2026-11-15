@@ -15,11 +15,10 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync } from 'node
 import type { IncomingHttpHeaders, OutgoingHttpHeaders } from 'node:http';
 import { createSecureServer } from 'node:http2';
 import type { Http2ServerRequest, Http2ServerResponse } from 'node:http2';
-import { extname, join, normalize, resolve } from 'node:path';
+import { extname, join, normalize } from 'node:path';
 import { brotliCompressSync, constants, gzipSync } from 'node:zlib';
 
-/** The root of the repository. */
-const ROOT = resolve(import.meta.dirname, '..');
+import { ROOT } from './ref-tree.ts';
 
 /** The text types that the server compresses, as GitHub Pages and Vercel do. */
 const TEXT_TYPES = new Set(['.html', '.js', '.css', '.json', '.svg', '.txt', '.xml']);

@@ -27,11 +27,8 @@ import { Matrix4, Quaternion, Vector3 } from 'three';
 import { readSourceFile } from '../src/models/source-clips.ts';
 import type { SourceFile } from '../src/models/source-clips.ts';
 import { MIXAMO_BONES, isMixamoBone } from '../src/pose/mixamo-bones.ts';
-import { optionValue } from './ref-tree.ts';
+import { ROOT, optionValue } from './ref-tree.ts';
 import { trackChild } from './stop-cleanup.ts';
-
-/** The root of the repository. */
-const ROOT = join(import.meta.dirname, '..');
 
 /** The Blender script of the conversion. */
 const SCRIPT = join(ROOT, 'tools', 'blender', 'mixamo_import.py');

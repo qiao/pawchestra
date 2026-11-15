@@ -49,6 +49,7 @@ import {
 import type { ReachInstrument } from './hold-reach.ts';
 import type { DemoFile } from './patch-demos.ts';
 import { probeDemos } from './probe-demos.ts';
+import { ROOT } from './ref-tree.ts';
 import { isPercussion, strikeCell, strikeReach } from './strike-reach.ts';
 import {
   blenderArgs,
@@ -65,9 +66,6 @@ import type { ThinRule } from './rig-mesh-check.ts';
 import { trackChild } from './stop-cleanup.ts';
 import { ANIMALS, hasBodyFacts, readAccessor, readGlb, worldMatrices } from './studio-body.ts';
 import type { AnimalSettings } from './studio-body.ts';
-
-/** The repository root. */
-const ROOT = join(import.meta.dirname, '..');
 
 /** The Python script that draws the image of the options. */
 const PLOT_SCRIPT = join(ROOT, 'tools', 'mesh_options.py');

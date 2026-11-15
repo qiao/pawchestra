@@ -24,10 +24,8 @@ import {
   takeGlb,
   withGlbBody,
 } from './glb-swap.ts';
+import { ROOT } from './ref-tree.ts';
 import { ANIMALS, rigMeshSettings, studioGlbPath } from './studio-body.ts';
-
-/** The repository root. */
-const ROOT = join(import.meta.dirname, '..');
 
 describe('takeGlb', () => {
   it('gives no file and the same arguments with no option', () => {

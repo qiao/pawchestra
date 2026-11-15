@@ -44,11 +44,9 @@ import type {
   StudioVertex,
 } from '../src/models/studio-format.ts';
 import type { Quat, Vec3 } from '../src/models/tuples.ts';
+import { ROOT } from './ref-tree.ts';
 import { paletteMap } from './studio-palette.ts';
 import type { PaletteMap } from './studio-palette.ts';
-
-/** The repository root. */
-const ROOT = join(import.meta.dirname, '..');
 
 /** The folder of the modules of the studio bodies (design 4.4). */
 const STUDIO_DIR = join(ROOT, 'src', 'models', 'studio');

@@ -13,13 +13,11 @@
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 import { parseArgs } from 'node:util';
 
 import { APP_NAME } from '../src/app/page-title.ts';
-
-/** The root of the repository. */
-const ROOT = resolve(import.meta.dirname, '..');
+import { ROOT } from './ref-tree.ts';
 
 /** The font file of the wordmark, with no change (`assets/fraunces/README.md`). */
 const FONT = join(ROOT, 'assets', 'fraunces', 'fraunces.ttf');

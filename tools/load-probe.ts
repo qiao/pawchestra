@@ -31,11 +31,8 @@ import { join, resolve } from 'node:path';
 import { chromium } from '@playwright/test';
 
 import { chromiumArgs } from './chromium-args.ts';
-import { optionValue, runChild, shortHash, withRefBuild } from './ref-tree.ts';
+import { ROOT, optionValue, runChild, shortHash, withRefBuild } from './ref-tree.ts';
 import { FAST_4G, NO_LIMIT, startSiteServer } from './site-server.ts';
-
-/** The root of the repository. */
-const ROOT = resolve(import.meta.dirname, '..');
 
 /** The usage text of the tool. */
 const USAGE =

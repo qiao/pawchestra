@@ -24,15 +24,12 @@ import { measureLines, measureRig, triangleLine } from './rig-mesh-check.ts';
 import { FORM_FORMAT, readFormJson } from './rig-form.ts';
 import type { FormJson, PlayerForm } from './rig-form.ts';
 import { setHolds } from './hold-sets.ts';
-import { checkFormat, formatVersion, runChild, sha256, withProbeTree } from './ref-tree.ts';
+import { ROOT, checkFormat, formatVersion, runChild, sha256, withProbeTree } from './ref-tree.ts';
 import { trackChild, trackFolder } from './stop-cleanup.ts';
 import { gzipSize } from './studio-budgets.ts';
 import type { ThinRule } from './rig-mesh-check.ts';
 import { ANIMALS, rigMeshSettings, studioBody, writeStudioModule } from './studio-body.ts';
 import type { AnimalSettings } from './studio-body.ts';
-
-/** The repository root. */
-const ROOT = join(import.meta.dirname, '..');
 
 /** The folder of the configs of the mesh rigs. */
 const CONFIG_DIR = join(ROOT, 'tools', 'mesh-rigs');

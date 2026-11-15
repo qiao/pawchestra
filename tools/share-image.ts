@@ -28,14 +28,11 @@ import { FIRST_PLAY, SAMPLES_READY } from '../src/app/dev-hook.ts';
 import { SHARE_IMAGE } from '../src/app/page-title.ts';
 import type { CameraPose } from '../src/shots/types.ts';
 import { aimPlugin, startVariantSite } from './close-views.ts';
-import { optionValue } from './ref-tree.ts';
+import { ROOT, optionValue } from './ref-tree.ts';
 import { openShot } from './screenshots.ts';
 import type { Site } from './screenshots.ts';
 import { composeCard } from './share-card.ts';
 import type { CardSize } from './share-card.ts';
-
-/** The root of the repository. */
-const ROOT = resolve(import.meta.dirname, '..');
 
 /** The time from the click on play to the image, in seconds. The bar hides after 3 s. */
 const PLAY_SEC = 6;
