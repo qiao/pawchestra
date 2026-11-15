@@ -835,7 +835,7 @@ about the middle of the sphere of its eyeball, and a lid of the usual size and t
 Its legs keep the length of the source, and its feet stay flat in the bind. The Tripo polar bear
 (`assets/models/polar-bear/tripo-hand/`) keeps the eyeballs of its source, and its irises take the
 middle of the opening in the view of the play of the pianist (`gaze_targets()` of
-`tools/polar-bear-maps.py`), its painted light gives the `varnish` finish and no eye light, and
+`tools/gaze_shift.py`), its painted light gives the `varnish` finish and no eye light, and
 its eyes keep the size of the source ball. Its map also gives each eye a darker iris and a softer
 warm white (`far_tone()`), with the values of the dark iris of the earlier fox map tool. Reason: in the hall view
 each eye is a few pixels across, and the bright white read dim. Its source paints white only at the

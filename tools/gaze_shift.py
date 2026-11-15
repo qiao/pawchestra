@@ -1,8 +1,9 @@
 # The gaze shift of the eyes of a Tripo hand rig (design 4.5): it moves the painted iris of each
 # eyeball, with its pupil and its painted light, as one decal on the ball, so that the eyes look at
 # a chosen view. It paints nothing new and darkens nothing: each moved texel is a copy of a texel
-# of the same ball. tools/fox-maps.py and tools/rabbit-maps.py use it. The method is the method of
-# the earlier fox and rabbit map tools (`center_irises()` in the git history of tools/fox-maps.py).
+# of the same ball. tools/fox-maps.py, tools/rabbit-maps.py, and tools/polar-bear-maps.py use it.
+# The method is the method of the earlier fox and rabbit map tools (`center_irises()` in the git
+# history of tools/fox-maps.py).
 import json
 import struct
 import sys

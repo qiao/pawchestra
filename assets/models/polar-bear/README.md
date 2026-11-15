@@ -192,13 +192,14 @@ their length, so they are shorter than on main.
 
 1. **Eyes.** `EYE_PAINT = 'centered'` keeps the eye paint of the source and moves each iris, with
    its pupil and its light, to the middle of its opening in the view of the play
-   (`center_irises()`, `gaze_targets()`). The head of the pianist turns down 5.2 degrees in the
-   play moments (`pnpm pose-preview pianist`), and the front camera of the test page lies 0.3
-   degrees above the eyes, so the view looks down 5.5 degrees. The target then turns 6 degrees out
-   and 5 up, the same on both sides. The source paints the left iris at the inner corner and the
-   right iris near the middle: the left iris (34 degrees) moves 22.4 degrees, the right iris (25
-   degrees) 12.2 degrees on the ball. The old place of the iris takes the white across, and the lash
-   line stays (`LASH_LINE`). With `EYE_PAINT = 'source'` the paint of the source stays.
+   (`shift_gaze()` and `gaze_targets()` of `tools/gaze_shift.py`). The head of the pianist turns
+   down 5.2 degrees in the play moments (`pnpm pose-preview pianist`), and the front camera of the
+   test page lies 0.3 degrees above the eyes, so the view looks down 5.5 degrees. The target then
+   turns 6 degrees out and 5 up, the same on both sides. The source paints the left iris at the
+   inner corner and the right iris near the middle: the left iris (34 degrees) moves 22.4 degrees,
+   the right iris (25 degrees) 12.2 degrees on the ball. The old place of the iris takes the white
+   across, and the lash line stays (`LASH_LINE`). With `EYE_PAINT = 'source'` the paint of the
+   source stays.
 2. **Far tone** (`far_tone()`). Each eyeball texel takes the lightness factor 0.9 for the iris and
    0.85 for the white, and the white a warm step, by a soft white share: the values of
    `far_eyes()` of the fox and the rabbit for a dark iris (the brown iris has the median Oklab L
