@@ -9,23 +9,16 @@
 # Usage: uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/tripo-maps.py
 #     <species> [color] [normal]
 import os
-import subprocess
 import sys
-import tempfile
 
 import numpy as np
 from PIL import Image, ImageFilter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import band_fade  # noqa: E402
+from fur_maps import SIZE, normal_map  # noqa: E402
 
-SIZE = 2048
-NORMAL_SIZE = 1024
 QUALITY = 60
-#: The largest length of the x, y tilt of a normal of the source, and the gain of the stored tilts
-#: (`NORMAL_MAP_GAIN` of src/scene/fur.ts). A larger tilt is a baked edge of the source mesh.
-NORMAL_LIMIT = 0.2
-NORMAL_GAIN = 4
 #: The radius in texels at SIZE of the fine color detail that `detail` of a species softens.
 DETAIL_RADIUS = 2.0
 
@@ -74,41 +67,6 @@ def color_map(species, settings, bands):
     print(f'{out}: {SIZE} x {SIZE}, {os.path.getsize(out)} bytes')
 
 
-def normal_map(species, settings, bands):
-    """Writes the normal map of the fur: each x, y tilt of the source limited to the length
-    NORMAL_LIMIT, a box scale to NORMAL_SIZE, the band fade, then the tilts times the share `tilt`
-    and NORMAL_GAIN in red and green, 255 in blue (the shader does not read it), and cwebp -q 60
-    -sharp_yuv -m 6. The limit comes before the gain, so that no stored value clips."""
-    kind = settings.get('normal', 'jpg')
-    source = f'assets/models/{species}/tripo-p2/{species}.fbm/{species}_normal.{kind}'
-    out = f'assets/models/{species}/tripo-hand/{species}-normal.webp'
-    a = np.asarray(Image.open(source).convert('RGB')).astype(np.float64) / 255 * 2 - 1
-    t = a[..., :2].copy()
-    length = np.linalg.norm(t, axis=-1)
-    over = length > NORMAL_LIMIT
-    t[over] *= (NORMAL_LIMIT / length[over])[:, None]
-    k = t.shape[0] // NORMAL_SIZE
-    small = t.reshape(NORMAL_SIZE, k, NORMAL_SIZE, k, 2).mean(axis=(1, 3))
-    if bands is not None:
-        small, _ = band_fade.fade_bands(small, bands)
-    if 'tilt' in settings:
-        small = small * settings['tilt']
-    v = np.clip(small * NORMAL_GAIN, -1, 1)
-    rgb = np.zeros((NORMAL_SIZE, NORMAL_SIZE, 3), np.uint8)
-    rgb[..., :2] = np.round((v + 1) / 2 * 255).astype(np.uint8)
-    rgb[..., 2] = 255
-    with tempfile.TemporaryDirectory() as folder:
-        png = os.path.join(folder, 'normal.png')
-        Image.fromarray(rgb).save(png)
-        subprocess.run(
-            ['cwebp', '-quiet', '-q', '60', '-sharp_yuv', '-m', '6', png, '-o', out], check=True
-        )
-    print(
-        f'{out}: {NORMAL_SIZE} x {NORMAL_SIZE}, {over.mean() * 100:.2f} % of the source '
-        f'tilts limited, mean normal {np.round(a.reshape(-1, 3).mean(axis=0), 3).tolist()}'
-    )
-
-
 def main():
     if len(sys.argv) < 2 or sys.argv[1] not in SPECIES:
         raise SystemExit(f'Usage: tools/tripo-maps.py <{"|".join(SPECIES)}> [color] [normal]')
@@ -121,7 +79,13 @@ def main():
     if 'color' in which:
         color_map(species, settings, bands)
     if 'normal' in which:
-        normal_map(species, settings, bands)
+        kind = settings.get('normal', 'jpg')
+        normal_map(
+            f'assets/models/{species}/tripo-p2/{species}.fbm/{species}_normal.{kind}',
+            f'assets/models/{species}/tripo-hand/{species}-normal.webp',
+            bands=bands,
+            share=settings.get('tilt'),
+        )
 
 
 if __name__ == '__main__':
