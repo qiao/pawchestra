@@ -1466,8 +1466,8 @@ def band_uvs(body):
         log(f'band UVs: {len(band)} faces about UV {rule["uv"]} at {density:.3f} UV for each unit')
     fade = P.get('bandFade')
     if fade:
-        # The band faces keep the UVs of the old band, and tools/elephant-maps.py paints them as a
-        # fade from the forearm skin to the turned stump skin (tools/band_fade.py).
+        # The band faces keep the UVs of the old band, and `tools/tripo-maps.py elephant` paints
+        # them as a fade from the forearm skin to the turned stump skin (tools/band_fade.py).
         count = bf.write_bands(
             me,
             flags,
