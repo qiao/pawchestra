@@ -49,6 +49,7 @@ import { setRecastHolds } from './recast-scale.ts';
 import { STUDIO_BONES, STUDIO_RAISES } from '../src/models/studio-format.ts';
 import type { Side } from '../src/models/studio-format.ts';
 import type { Quat } from '../src/models/tuples.ts';
+import { smoothstep } from '../src/math.ts';
 
 /** The keys of one arm: the turns that the shapes of `raise` read, and the turn of the clavicle. */
 const ARM_KEYS = ['clavicle', 'upper', 'elbow', 'wrist'] as const;
@@ -216,8 +217,7 @@ function turnFurther(turn: Quat, degrees: number): Quat {
  */
 function fadeWeight(angle: number, fade: readonly [number, number]): number {
   const [full, none] = fade;
-  const t = Math.min(1, Math.max(0, (none - angle) / (none - full)));
-  return t * t * (3 - 2 * t);
+  return smoothstep((none - angle) / (none - full));
 }
 
 /**

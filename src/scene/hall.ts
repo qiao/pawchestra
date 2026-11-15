@@ -18,6 +18,7 @@ import type { Rgb } from '../models/mesh.ts';
 import { rimLightPlace } from '../models/beam.ts';
 import { STAGE_THICKNESS } from '../models/stage.ts';
 import { RIM_LIGHT } from './lights.ts';
+import { smoothstep } from '../math.ts';
 
 /**
  * The concert hall around the stage (design 4.5, hall). The values are parts of the hall unit
@@ -601,8 +602,7 @@ export function hallCutaway(stageSide: number, camera: Vec3): HallCutaway {
   const dz = camera[2] - HALL.centerZ * unit;
   const distance = Math.hypot(dx, dz);
   const radius = HALL.wallRadius * unit;
-  const t = Math.min(1, Math.max(0, (distance / radius - 0.85) / 0.15));
-  const open = t * t * (3 - 2 * t);
+  const open = smoothstep((distance / radius - 0.85) / 0.15);
   // From 2 (no cut) down to the cosine of the cutaway angle.
   const limit = 2 + (Math.cos(HALL.cutawayAngle) - 2) * open;
   return { direction: distance > 0 ? [dx / distance, dz / distance] : [0, 1], limit };

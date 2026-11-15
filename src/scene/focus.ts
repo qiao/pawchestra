@@ -1,4 +1,5 @@
 import type { Vec3 } from '../models/tuples.ts';
+import { smoothstep } from '../math.ts';
 
 /**
  * The lens of the depth of field (design 4.5, post effects). The focus follows the nearer eye of
@@ -93,8 +94,7 @@ export interface Focus {
  */
 export function apertureAt(distance: number, stageSide: number): number {
   const [open, closed] = LENS.closing;
-  const t = Math.min(1, Math.max(0, (distance / stageSide - open) / (closed - open)));
-  return LENS.aperture * (1 - t * t * (3 - 2 * t));
+  return LENS.aperture * (1 - smoothstep((distance / stageSide - open) / (closed - open)));
 }
 
 /**

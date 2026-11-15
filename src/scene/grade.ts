@@ -2,6 +2,7 @@ import { Data3DTexture, LinearFilter, NoColorSpace, RGBAFormat, UnsignedByteType
 
 import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
+import { smoothstep } from '../math.ts';
 
 /** A color with three channels from 0 to 1. */
 type GradeColor = readonly [r: number, g: number, b: number];
@@ -127,9 +128,8 @@ function monotoneCurve(points: readonly CurvePoint[]): (x: number) => number {
  * @param x The value.
  * @returns A value from 0 to 1.
  */
-function smoothstep(edge0: number, edge1: number, x: number): number {
-  const t = Math.min(1, Math.max(0, (x - edge0) / (edge1 - edge0)));
-  return t * t * (3 - 2 * t);
+function smoothstepBetween(edge0: number, edge1: number, x: number): number {
+  return smoothstep((x - edge0) / (edge1 - edge0));
 }
 
 /**
@@ -161,12 +161,13 @@ function gradeColor(color: GradeColor, curve: (x: number) => number): [number, n
   const luma = lumaOf([r, gr, b]);
   const top = Math.max(r, gr, b);
   const pale = top > 0 ? 1 - (top - Math.min(r, gr, b)) / top : 1;
-  const shadows = g.shadowSaturation + (1 - g.shadowSaturation) * smoothstep(0.03, 0.3, luma);
+  const shadows =
+    g.shadowSaturation + (1 - g.shadowSaturation) * smoothstepBetween(0.03, 0.3, luma);
   const saturation = g.saturation * (1 + g.vibrance * pale * pale) * shadows;
 
   // The tint of the shadows fades in above black, so that black stays black.
-  const shadowWeight = (1 - smoothstep(0, 0.45, luma)) * smoothstep(0, 0.08, luma);
-  const highlightWeight = smoothstep(0.4, 1, luma);
+  const shadowWeight = (1 - smoothstepBetween(0, 0.45, luma)) * smoothstepBetween(0, 0.08, luma);
+  const highlightWeight = smoothstepBetween(0.4, 1, luma);
   const grade = (value: number, i: number): number =>
     luma +
     (value - luma) * saturation +

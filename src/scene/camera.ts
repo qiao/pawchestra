@@ -29,6 +29,7 @@ import { letterbox, mixBox } from './letterbox.ts';
 import type { FrameBox } from './letterbox.ts';
 import { blendShare, mix, modeBlendWeight, startOrbitBlend, stepOrbitBlend } from './mode-blend.ts';
 import type { OrbitBlend, OrbitView } from './mode-blend.ts';
+import { clamp01, smoothstep } from '../math.ts';
 
 /**
  * The move of the orbit target to the stage center after a change from a close shot to Free mode
@@ -577,8 +578,8 @@ export class StageCamera {
       const center = defaultView(this.#stageSide, 1, 1).target;
       const t = this.#reducedMotion
         ? 1
-        : Math.min(1, Math.max(0, (nowMs - this.#glide.startMs) / FREE_TARGET_GLIDE.durationMs));
-      const u = t * t * (3 - 2 * t);
+        : clamp01((nowMs - this.#glide.startMs) / FREE_TARGET_GLIDE.durationMs);
+      const u = smoothstep(t);
       const { from, position, outDistance } = this.#glide;
       target.set(
         from.x + (center[0] - from.x) * u,
@@ -628,10 +629,8 @@ export class StageCamera {
     }
     this.#fitGlide ??= { from: this.#fit, startMs: nowMs };
     const { from, startMs } = this.#fitGlide;
-    const t = this.#reducedMotion
-      ? 1
-      : Math.min(1, Math.max(0, (nowMs - startMs) / FREE_TARGET_GLIDE.durationMs));
-    this.#fit = from * (1 - t * t * (3 - 2 * t));
+    const t = this.#reducedMotion ? 1 : clamp01((nowMs - startMs) / FREE_TARGET_GLIDE.durationMs);
+    this.#fit = from * (1 - smoothstep(t));
     if (t >= 1) {
       this.#fit = 0;
       this.#fitGlide = null;

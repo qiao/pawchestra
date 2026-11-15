@@ -1,3 +1,5 @@
+import { smoothstep } from '../math.ts';
+
 /**
  * The times of the title card of Cinematic mode (design 2.8), in song seconds. The card shows the
  * composer and the piece title in the lower part of the frame at the song start, as the main title
@@ -17,17 +19,6 @@ const TITLE_CARD = {
   /** The length of the fade out. */
   fadeOutSec: 1.5,
 } as const;
-
-/**
- * Calculates a smoothstep from 0 to 1.
- *
- * @param x The input, from 0 to 1. Values outside are clamped.
- * @returns The eased value.
- */
-function ease(x: number): number {
-  const t = Math.min(1, Math.max(0, x));
-  return t * t * (3 - 2 * t);
-}
 
 /** The state of the frame that decides the title card. */
 interface TitleCardFrame {
@@ -58,5 +49,5 @@ export function titleCardLevel(frame: TitleCardFrame): number {
   if (frame.still) {
     return t >= inSec && t < outSec + fadeOutSec / 2 ? 1 : 0;
   }
-  return Math.min(ease((t - inSec) / fadeInSec), 1 - ease((t - outSec) / fadeOutSec));
+  return Math.min(smoothstep((t - inSec) / fadeInSec), 1 - smoothstep((t - outSec) / fadeOutSec));
 }

@@ -7,6 +7,7 @@ import { keyLightPlace, rimLightPlace, rimLightXs } from '../models/beam.ts';
 import { createBeam, setBeamTier } from './beam.ts';
 import { TIER_SETTINGS } from './quality.ts';
 import type { QualityTier } from './quality.ts';
+import { smoothstep } from '../math.ts';
 
 /**
  * The key light (design 4.5): the stage spotlight, and the only light that casts shadows on the
@@ -598,8 +599,7 @@ export function spotIlluminance(spot: SpotLight, point: Vec3, normal: Vec3): num
   const angleCos = to.clone().normalize().dot(axis.normalize());
   const outer = Math.cos(spot.angle);
   const inner = Math.cos(spot.angle * (1 - spot.penumbra));
-  const t = Math.min(1, Math.max(0, (angleCos - outer) / (inner - outer)));
-  const cone = t * t * (3 - 2 * t);
+  const cone = smoothstep((angleCos - outer) / (inner - outer));
   const facing = Math.max(0, -to.normalize().dot(new Vector3(...normal)));
   return (spot.intensity * cone * facing) / distanceSquared;
 }

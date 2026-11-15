@@ -1,5 +1,6 @@
 import { MathUtils } from 'three';
 import type { Vec3 } from '../models/tuples.ts';
+import { smoothstep } from '../math.ts';
 
 /** The vertical field of view of the camera, in degrees (design 4.5, camera). */
 export const FIELD_OF_VIEW = 30;
@@ -183,8 +184,7 @@ export const PORTRAIT_RULE = {
  * @returns The share, from 0 to 1.
  */
 export function portraitShare(aspect: number): number {
-  const x = Math.min(1, Math.max(0, (1 - aspect) / (1 - PORTRAIT_RULE.fullAspect)));
-  return x * x * (3 - 2 * x);
+  return smoothstep((1 - aspect) / (1 - PORTRAIT_RULE.fullAspect));
 }
 
 /** The camera of a wide view after the portrait rule. */
