@@ -169,14 +169,38 @@ export function parsePatches(text: string): DemoPatch[] {
 }
 
 /**
+ * The demos of {@link patchedDemos} by their folder. A tool reads, checks, and patches each folder
+ * one time in its process, also when a sweep asks for the demos once for each demo and variant.
+ */
+const DEMO_CACHE = new Map<string, Promise<DemoFile[]>>();
+
+/**
  * Reads each demo input of demos/src/, checks its SHA-256, and applies `demos/patches.json`
- * (design 8.3).
+ * (design 8.3). The first call for a folder reads it, and each later call gets the same files
+ * ({@link DEMO_CACHE}) in a new list.
  *
  * @param dir The demos folder.
  * @returns The changed files, and the files with no patch as they are, sorted by name.
  * @throws Error if a checksum differs, or if a patch names a file that does not exist.
  */
 export async function patchedDemos(dir = DEMOS_DIR): Promise<DemoFile[]> {
+  let demos = DEMO_CACHE.get(dir);
+  if (!demos) {
+    demos = readPatchedDemos(dir);
+    DEMO_CACHE.set(dir, demos);
+  }
+  return [...(await demos)];
+}
+
+/**
+ * Reads each demo input of a folder, checks its SHA-256, and applies its `patches.json` (design
+ * 8.3), for {@link patchedDemos}.
+ *
+ * @param dir The demos folder.
+ * @returns The changed files, and the files with no patch as they are, sorted by name.
+ * @throws Error if a checksum differs, or if a patch names a file that does not exist.
+ */
+async function readPatchedDemos(dir: string): Promise<DemoFile[]> {
   const checksums = readChecksums(await readFile(join(dir, 'README.md'), 'utf8'));
   const patches = parsePatches(await readFile(join(dir, 'patches.json'), 'utf8'));
   const files = (await readdir(join(dir, 'src')))
