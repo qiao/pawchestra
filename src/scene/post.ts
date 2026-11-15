@@ -478,6 +478,11 @@ export class PostPipeline {
    * separate pass at half size costs less.
    */
   readonly #depth: DepthDraw;
+  /**
+   * The visibility of each hidden object before the depth pass of the depth of field, so that the
+   * pass gives each object its own visibility back. Each frame writes it first.
+   */
+  readonly #depthShown: boolean[] = [];
   #width = 0;
   #height = 0;
 
@@ -955,7 +960,10 @@ export class PostPipeline {
       // nothing.
       this.#pass(copy, depth);
     }
+    const shown = this.#depthShown;
+    shown.length = 0;
     for (const object of hidden) {
+      shown.push(object.visible);
       object.visible = false;
     }
     renderer.setRenderTarget(depth);
@@ -965,8 +973,8 @@ export class PostPipeline {
       renderer.render(scene, camera);
     });
     renderer.autoClear = autoClear;
-    for (const object of hidden) {
-      object.visible = true;
+    for (const [k, object] of hidden.entries()) {
+      object.visible = shown[k] ?? true;
     }
     renderer.shadowMap.autoUpdate = shadows;
   }
