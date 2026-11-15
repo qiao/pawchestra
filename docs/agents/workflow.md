@@ -156,6 +156,9 @@ These rules hold for each test:
   thread limits the frame rate, so the frame time alone does not show a GPU change.
 - A change of the material IDs can change the order of the draws, and thus the pixels. Run
   `pnpm frozen` after such a change.
+- `pnpm frozen` does not repeat exactly. One tree against itself (`--base HEAD`) changes up to
+  about 15 pixels of `conductor` and 8 of `perf-wide`, by small steps. Compare a difference with
+  such a run before you look for its cause.
 
 These traps make a load measure wrong:
 
