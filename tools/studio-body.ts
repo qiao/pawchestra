@@ -611,13 +611,6 @@ const EYE_SIDE = 0.02;
 const NOSE_PLANE = 0.03;
 
 /**
- * The distance of the tip of the nose and of the mouth below it from the middle plane, in meters,
- * above which `pnpm rig-mesh --check` and `pnpm mesh-options` warn (`noseWarning()` of
- * `tools/rig-mesh-check.ts`).
- */
-export const NOSE_WARNING = 0.02;
-
-/**
  * The band of the lower lip below the mouth line, in H, in which {@link mouthOf} looks for the
  * front of the lips. The crease of the pig mouth goes 1.5 cm into the head, and its lower lip is
  * about 1 cm high. The upper lip of the pig joins the underside of the snout disc 0.4 cm above

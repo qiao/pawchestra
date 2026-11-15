@@ -99,12 +99,12 @@ describe('probeScripts', () => {
       'body-probe.ts',
       'body-probe.test.ts',
       'blender',
-      'rig-form.ts',
-      'rig-form.test.ts',
+      'hold-fit.ts',
+      'hold-fit.test.ts',
       'studio-body.ts',
     ];
     const own = ['blender', 'body-probe.ts', 'body-probe.test.ts', 'studio-body.ts'];
-    expect(probeScripts(files, own)).toEqual(['rig-form.ts']);
+    expect(probeScripts(files, own)).toEqual(['hold-fit.ts']);
   });
 });
 
@@ -121,7 +121,9 @@ describe('withProbeTree', () => {
           expect(existsSync(join(dir, 'tools', 'pose-depth.ts'))).toBe(true);
           // Only the tree of the commit has the tests and the rig configs of tools/.
           expect(existsSync(join(dir, 'tools', 'ref-tree.test.ts'))).toBe(true);
-          expect(existsSync(join(dir, 'tools', 'mesh-rigs', 'mannequin.json'))).toBe(true);
+          expect(existsSync(join(dir, 'tools', 'mesh-rigs', 'simple', 'wolf-tripo.json'))).toBe(
+            true,
+          );
           expect(existsSync(join(dir, 'node_modules', 'three', 'package.json'))).toBe(true);
           return Promise.resolve();
         },

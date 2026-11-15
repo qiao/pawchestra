@@ -20,20 +20,10 @@ import {
   windRig,
 } from '../src/pose/winds.ts';
 import type { WindInstrument } from '../src/pose/winds.ts';
-import {
-  animalHandRig,
-  glbAnimal,
-  runTool,
-  speciesAnimal,
-  takeGlb,
-  withGlbBody,
-} from './glb-swap.ts';
+import { runTool, speciesAnimal, takeGlb, withGlbBody } from './glb-swap.ts';
 import { setHolds } from './hold-sets.ts';
-import { existsSync, readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import type { DemoFile } from './patch-demos.ts';
 import { probeDemos } from './probe-demos.ts';
-import { armReach, parseConfig } from './rig-mesh.ts';
 import {
   PERCUSSION_INSTRUMENTS,
   isPercussion,
@@ -321,45 +311,6 @@ interface SizeReach {
   readonly rebuilt: number;
   /** The factor of the current upper arm and forearm that gives the reach ({@link armFactorFor}). */
   readonly factor: number;
-  /**
-   * The arm factor of the mesh rig of the species (`pnpm rig-mesh`) that gives the reach, or
-   * `null` with no config of a mesh rig.
-   */
-  readonly rigFactor: number | null;
-}
-
-/** The arm of a mesh rig, in the meters of the app. */
-interface RigArm {
-  /** The config file, relative to the repository. */
-  readonly file: string;
-  /** The arm factor of the config. */
-  readonly armFactor: number;
-  /** The reach of the left arm with the factor 1. */
-  readonly short: number;
-  /** The part of the left arm from the wrist to the middle of the palm. */
-  readonly paw: number;
-}
-
-/**
- * Reads the arm of the mesh rig of a species from `tools/mesh-rigs/<animal>.json`.
- *
- * @param species The species.
- * @returns The arm, or `null` when the species has no mesh rig config next to this script, as in
- *   the copy of `--glb`, or when it has a hand rig, whose joints live only in its `.blend`.
- */
-function rigArm(species: SpeciesId): RigArm | null {
-  const animal = speciesAnimal(species);
-  const path = animal ? join(import.meta.dirname, 'mesh-rigs', `${animal}.json`) : '';
-  if (!animal || !existsSync(path) || animalHandRig(animal) !== null) {
-    return null;
-  }
-  const config = parseConfig(readFileSync(path, 'utf8'));
-  return {
-    file: `tools/mesh-rigs/${animal}.json`,
-    armFactor: config.armFactor,
-    short: armReach(config, 'L', 1),
-    paw: armReach(config, 'L', 0),
-  };
 }
 
 /** The reach that each size of the violin needs in the hold of a species. */
@@ -372,8 +323,6 @@ export interface SizeReport {
   readonly scale: number;
   /** The length of the violin now, in meters. */
   readonly length: number;
-  /** The arm of the mesh rig of the species, or `null`. */
-  readonly rig: RigArm | null;
   /** The reach of each size, in the order of the scales. */
   readonly sizes: readonly SizeReach[];
 }
@@ -401,7 +350,6 @@ export function sizeReach(
     ...(model.skeleton.positions[boneIndex('handL')] ?? [0, 0, 0]),
   ).distanceTo(new Vector3(...model.body.palmL));
   const scale = size / STRING_SCALES.violin;
-  const rig = rigArm(species);
   const sizes: SizeReach[] = scales.map((wanted) => {
     const reach = scrollReach(toVec3(tail), toVec3(scroll), toVec3(shoulder), wanted / scale);
     return {
@@ -410,10 +358,9 @@ export function sizeReach(
       reach,
       rebuilt: violinReachAt(species, support, wanted).scroll,
       factor: armFactorFor(reach, arm, paw),
-      rigFactor: rig ? armFactorFor(reach, rig.short, rig.paw) : null,
     };
   });
-  return { arm, paw, scale, length: VIOLIN.length * size, rig, sizes };
+  return { arm, paw, scale, length: VIOLIN.length * size, sizes };
 }
 
 /**
@@ -429,20 +376,18 @@ function sizeReachLines(
   support: ReachSupport,
   scales: readonly number[],
 ): string[] {
-  const { arm, paw, scale, length, rig, sizes } = sizeReach(species, support, scales);
+  const { arm, paw, scale, length, sizes } = sizeReach(species, support, scales);
   const m = (value: number): string => `${value.toFixed(3)} m`;
   return [
     `Violin sizes of ${species} on the ${support} (--size): the tail end stays in its place in the playing pose, and the violin grows along its axis.`,
     `  Arm L now ${m(arm)}, with a paw of ${m(paw)} from the wrist to the middle of the palm. Violin now ${m(length)}, scale ${scale.toFixed(3)}.`,
-    rig
-      ? `  Mesh rig ${rig.file}: arm factor ${rig.armFactor}, arm L ${m(rig.short)} with the factor 1, paw ${m(rig.paw)}.`
-      : '  No config of a mesh rig next to the script (the copy of --glb holds none), so the table gives only the factor of the current arm: 1 at the size that the arm fits.',
+    '  The factor of the current arm is 1 at the size that the arm fits.',
     '',
-    '| Scale | Violin m | Reach m | Rebuilt m | Arm factor of the rig | Factor of the current arm |',
-    '|---:|---:|---:|---:|---:|---:|',
+    '| Scale | Violin m | Reach m | Rebuilt m | Factor of the current arm |',
+    '|---:|---:|---:|---:|---:|',
     ...sizes.map(
       (row) =>
-        `| ${row.scale.toFixed(3)} | ${row.length.toFixed(3)} | ${row.reach.toFixed(3)} | ${row.rebuilt.toFixed(3)} | ${row.rigFactor === null ? '-' : row.rigFactor.toFixed(3)} | ${row.factor.toFixed(3)} |`,
+        `| ${row.scale.toFixed(3)} | ${row.length.toFixed(3)} | ${row.reach.toFixed(3)} | ${row.rebuilt.toFixed(3)} | ${row.factor.toFixed(3)} |`,
     ),
   ];
 }
@@ -985,7 +930,7 @@ export function holdReachVariantLines(
  * Runs the tool: `node tools/hold-reach.ts <species> [options]`. With `--glb <file>`, the species
  * gets the studio body that the export makes from the file, in a copy of `src/`
  * (`tools/glb-swap.ts`). A species with no studio body takes the body when it has a rig config
- * (`glbAnimal()` of `tools/glb-swap.ts`).
+ * (`speciesAnimal()` of `tools/glb-swap.ts`).
  */
 async function main(): Promise<void> {
   const [species = '', ...args] = process.argv.slice(2);
@@ -1021,7 +966,7 @@ async function main(): Promise<void> {
     throw new Error('The option --size takes the violin only.');
   }
   if (glb) {
-    const animal = glbAnimal(species);
+    const animal = speciesAnimal(species);
     if (!animal) {
       throw new Error(
         `The species ${species} has no studio body and no rig config tools/mesh-rigs/${species}.json, so --glb does not apply.`,

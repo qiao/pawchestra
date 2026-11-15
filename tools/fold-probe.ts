@@ -6,47 +6,36 @@
  * the tool prints the samples, the samples with a fold, their share, and the most folded faces.
  * Then it prints the main bone of the folded faces. With `--faces <n>`, it also prints the `n`
  * faces that fold in the most samples, with their places, their corner angles, and the mark `ALL`
- * of a face that folds in each sample. For the body of a mesh rig, the table also gives the middle
- * of each face in the units of the source, ready for `weights.rigid` of the config
- * ({@link sourceMiddles}). A table of their corners in the worst fold of each face
+ * of a face that folds in each sample. A table of their corners in the worst fold of each face
  * follows: the places in the bind pose and in the posed skin, the moves of the corrective shapes,
  * and the weights. With `--json <file>`, it also writes the counts of each sample set into the
- * file for `pnpm rig-mesh --check`, and `--middles <faces>` adds the middle of each named face to
- * the file, so that `--watch` of the check pairs the faces of a rig with other corners. With
+ * file, and `--middles <faces>` adds the middle of each named face to the file. With
  * `--turns <face>`, it also prints the mean turn of the
  * upper arm of the side of the face in the axes of the chest in the samples in which the face
  * folds, and the share of the samples with a fold by the angle from that turn. Each `--set` changes
- * the holds in memory, as `pnpm pose-depth --set` does, so that `pnpm rig-mesh --check --hold`
- * fits a corrective shape to a hold with no commit. With `--base <ref> --faces-of <faces>`, the
+ * the holds in memory, as `pnpm pose-depth --set` does. With `--base <ref> --faces-of <faces>`, the
  * faces of the commit pair with the folded faces of the working tree by their middles
  * ({@link pairBaseFaces}).
  *
  * `--bins <face>` gives the turn of each bone of the arm of the face from its bind pose with a fold
  * and with no fold, and the share of the samples with a fold by that turn ({@link binProbe}).
  *
- * `--glb <file>` gives the role the studio body of another GLB file, such as a file of
- * `pnpm rig-mesh --check --keep`, in a copy of `src/` (`tools/glb-swap.ts`). With `--base`, the
+ * `--glb <file>` gives the role the studio body of another GLB file, in a copy of `src/` (`tools/glb-swap.ts`). With `--base`, the
  * working tree takes the body of the file, and the commit keeps its own ({@link compareFolds}).
  *
  * Usage: pnpm fold-probe <role> [--demo <id>]... [--step <seconds>] [--faces <n>] [--turns <face>]
  * [--bins <face>] [--set <changes>]... [--json <file> [--middles <faces>]] [--glb <file>]
  * [--base <ref> [--faces-of <faces>]]
  */
-import { execFile } from 'node:child_process';
 import { createHash } from 'node:crypto';
-import { existsSync, mkdtempSync } from 'node:fs';
-import { readFile, rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { promisify } from 'node:util';
+import { writeFile } from 'node:fs/promises';
 
 import { Matrix4, Quaternion, Vector3 } from 'three';
 
 import { faceList } from './face-shares.ts';
-import { rigConfigPath, runTool, speciesAnimal, takeGlb, withGlbBody } from './glb-swap.ts';
+import { runTool, speciesAnimal, takeGlb, withGlbBody } from './glb-swap.ts';
 import { setHolds } from './hold-sets.ts';
 import { probeBeside, shortHash, withoutOptions } from './ref-tree.ts';
-import { trackFolder } from './stop-cleanup.ts';
 import type { RefRole } from './ref-tree.ts';
 import type { DemoFile } from './patch-demos.ts';
 import { probeDemos } from './probe-demos.ts';
@@ -1166,21 +1155,14 @@ function cornerLines(report: FoldReport, faces: readonly number[]): string[] {
  * its index, the share of the samples of each set in which it folds, the mark `ALL` when it folds
  * in each sample ({@link foldsInAll}), its main bone, its middle, its corner angles
  * ({@link faceFacts}), and its worst fold with the bone whose turn changes its normal most
- * ({@link worstFold}). With the source middles of a mesh rig ({@link sourceMiddles}), a column
- * gives the middle of each face in the units of the source. The table of the corners of each face
+ * ({@link worstFold}). The table of the corners of each face
  * in its worst sample ({@link cornerLines}) follows it.
  *
  * @param report The report.
  * @param count The number of faces.
- * @param sources The middle of each face of the module in the units of the source, or `null` for
- *   no column.
  * @returns The lines, or a line that names no face when no face folds.
  */
-export function faceLines(
-  report: FoldReport,
-  count: number,
-  sources: readonly (Vec3 | null)[] | null = null,
-): string[] {
+export function faceLines(report: FoldReport, count: number): string[] {
   const totals = new Map<number, number>();
   for (const set of SAMPLE_SETS) {
     for (const [face, n] of report.sets[set].byFace) {
@@ -1204,119 +1186,17 @@ export function faceLines(
   return [
     `The ${top.length} faces that fold in the most samples, with the places of the bind pose. The mark ALL shows a face that folds in each sample of each set with samples.`,
     '',
-    `| Face | ${SAMPLE_SETS.map((set) => `${set[0]?.toUpperCase()}${set.slice(1)}`).join(' | ')} | Mark | Main bone | Middle (m) |${sources ? ' Source middle (u) |' : ''} Corner angles | Worst sample, angle, bone of the fold |`,
-    `|---:|${SAMPLE_SETS.map(() => '---:|').join('')}---|---|---|${sources ? '---|' : ''}---|---|`,
+    `| Face | ${SAMPLE_SETS.map((set) => `${set[0]?.toUpperCase()}${set.slice(1)}`).join(' | ')} | Mark | Main bone | Middle (m) | Corner angles | Worst sample, angle, bone of the fold |`,
+    `|---:|${SAMPLE_SETS.map(() => '---:|').join('')}---|---|---|---|---|`,
     ...top.map((face) => {
       const facts = faceFacts(mesh, face);
       const middle = facts.middle.map((x) => x.toFixed(3)).join(', ');
       const angles = facts.angles.map((a) => `${a.toFixed(1)}°`).join(', ');
       const mark = foldsInAll(report, face) ? 'ALL' : '';
-      const source = sources?.[face];
-      const sourceCell = sources
-        ? ` ${source ? `[${source.join(', ')}]` : 'no source face'} |`
-        : '';
-      return `| ${face} | ${SAMPLE_SETS.map((set) => share(set, face)).join(' | ')} | ${mark} | ${facts.bone} | ${middle} |${sourceCell} ${angles} | ${worstText(worstFold(report, face))} |`;
+      return `| ${face} | ${SAMPLE_SETS.map((set) => share(set, face)).join(' | ')} | ${mark} | ${facts.bone} | ${middle} | ${angles} | ${worstText(worstFold(report, face))} |`;
     }),
     ...(corners.length > 0 ? ['', ...corners] : []),
   ];
-}
-
-/** The Blender script of the mesh rigs, which gives the source middles of the faces. */
-const RIG_SCRIPT = join(import.meta.dirname, 'blender', 'rig_mesh.py');
-
-/**
- * Reads the JSON text of the source middles of the rig script, with no face of an eye shell: the
- * export drops these faces for the bead eyes, so the other faces keep their order in the module.
- *
- * @param text The text.
- * @returns The middle of each face, or `null` for a face with no source face, or `null` when the
- *   text holds no such list.
- */
-function parseMiddles(text: string): (Vec3 | null)[] | null {
-  const value: unknown = JSON.parse(text);
-  if (!Array.isArray(value)) {
-    return null;
-  }
-  const out: (Vec3 | null)[] = [];
-  for (const item of value) {
-    if (item === 'eye') {
-      continue;
-    }
-    if (item === null) {
-      out.push(null);
-      continue;
-    }
-    const point: unknown[] = Array.isArray(item) ? item : [];
-    const [x = Number.NaN, y = Number.NaN, z = Number.NaN] = point.map(Number);
-    if (point.length !== 3 || ![x, y, z].every(Number.isFinite)) {
-      return null;
-    }
-    out.push([x, y, z]);
-  }
-  return out;
-}
-
-/** The source middles of the faces of a module, or the reason why the tool has none. */
-interface SourceMiddles {
-  /** The middle of each face, or `null` for a face with no source face, or `null` for none. */
-  readonly middles: readonly (Vec3 | null)[] | null;
-  /** The reason why the tool has no middles, or `null`. */
-  readonly note: string | null;
-}
-
-/**
- * Gives the middle of each face of the module of a mesh rig in the units of the source, as
- * `weights.rigid` of its config takes it: a run of the rig script of Blender with the config of
- * the working tree and `--faces`, into a temporary folder (`face_sources()` of
- * `tools/blender/rig_mesh.py`), in about 2 s. A face that a ring adds or a face of an eye has no
- * source face. Blender comes from the variable `BLENDER`, or from the path.
- *
- * @param animal The animal of the studio body.
- * @param faces The number of faces of the module, which the rig must have.
- * @returns The middle of each face, or the reason why the tool has none.
- */
-async function sourceMiddles(animal: string, faces: number): Promise<SourceMiddles> {
-  const config = rigConfigPath(animal);
-  if (!existsSync(config) || !existsSync(RIG_SCRIPT)) {
-    return {
-      middles: null,
-      note: `The ${animal} has no mesh rig here, so the table has no source middles.`,
-    };
-  }
-
-  const dir = mkdtempSync(join(tmpdir(), 'fold-probe-faces-'));
-  const release = trackFolder(dir);
-  try {
-    const file = join(dir, 'faces.json');
-    const blender = process.env['BLENDER'] ?? 'blender';
-    const args = ['-b', '--factory-startup', '--python-exit-code', '1', '--python', RIG_SCRIPT];
-    await promisify(execFile)(blender, [
-      ...args,
-      '--',
-      config,
-      join(dir, 'rig.glb'),
-      '--faces',
-      file,
-    ]);
-    const middles = parseMiddles(await readFile(file, 'utf8'));
-    if (!middles) {
-      return { middles: null, note: 'The rig script gave no list of source middles.' };
-    }
-    if (middles.length !== faces) {
-      const note = `The rig of tools/mesh-rigs/${animal}.json has ${middles.length} faces and the module ${faces}, so the table has no source middles. Rig the config into the module first.`;
-      return { middles: null, note };
-    }
-    return { middles, note: null };
-  } catch (error) {
-    const cause = error instanceof Error ? error.message.split('\n')[0] : String(error);
-    return {
-      middles: null,
-      note: `The rig script failed, so the table has no source middles: ${cause}`,
-    };
-  } finally {
-    await rm(dir, { recursive: true, force: true });
-    release();
-  }
 }
 
 /** The width of an angle bin of the turn probe of `--turns`, in degrees. */
@@ -2266,11 +2146,7 @@ async function main(): Promise<void> {
   }
   console.log(foldLines(name, report, step).join('\n'));
   if (faces > 0) {
-    const sources = report.mesh ? await sourceMiddles(roleAnimal(role), report.faces) : null;
-    if (sources?.note) {
-      console.log(`\n${sources.note}`);
-    }
-    console.log(['', ...faceLines(report, faces, sources?.middles ?? null)].join('\n'));
+    console.log(['', ...faceLines(report, faces)].join('\n'));
   }
   if (turns) {
     console.log(['', ...turns.lines()].join('\n'));

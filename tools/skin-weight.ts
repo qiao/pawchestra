@@ -1,6 +1,6 @@
 /**
  * Sums the skin weights of a vertex of a studio mesh on some bones, for the tools that measure the
- * skin of a body (`arm-check`, `arm-gap`, `arm-look`, `arm-shape`, and `body-shape`).
+ * skin of a body (`arm-check`, `arm-shape`, and `body-shape`).
  */
 import type { StudioMesh } from '../src/models/studio-format.ts';
 

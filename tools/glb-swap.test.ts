@@ -80,8 +80,6 @@ describe('copiedTool', () => {
     const tools = join(ROOT, 'tools');
     expect(copiedTool(tools)).toBe(true);
     expect(copiedTool(join(tools, 'hold-reach.ts'))).toBe(true);
-    expect(copiedTool(join(tools, 'mesh-rigs'))).toBe(true);
-    expect(copiedTool(join(tools, 'mesh-rigs', 'mannequin.json'))).toBe(true);
     expect(copiedTool(join(tools, 'glb-bodies', 'bear.json'))).toBe(false);
   });
 });
@@ -109,14 +107,12 @@ describe('withGlbBody', () => {
     copyFileSync(studioGlbPath('rabbit', ANIMALS.get('rabbit')), file);
     const out = join(parent, 'source.txt');
     let copy = '';
-    let configs = '';
 
     const code = await withGlbBody(
       'rabbit',
       file,
       async (dir) => {
         copy = dir;
-        configs = readFileSync(join(dir, 'tools', 'mesh-rigs', 'mannequin.json'), 'utf8');
         writeFileSync(
           join(dir, 'tools', 'print-source.ts'),
           [
@@ -132,7 +128,6 @@ describe('withGlbBody', () => {
 
     expect(code).toBe(0);
     expect(readFileSync(out, 'utf8')).toBe(relative(ROOT, file));
-    expect(configs).toBe(readFileSync(join(ROOT, 'tools', 'mesh-rigs', 'mannequin.json'), 'utf8'));
     expect(studioBodyOf('studio-rabbit').source).not.toBe(relative(ROOT, file));
     expect(copy).not.toBe('');
     expect(existsSync(copy)).toBe(false);

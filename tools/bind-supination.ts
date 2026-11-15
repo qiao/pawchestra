@@ -32,11 +32,10 @@ import { CAST_ROLES, CAST_SAMPLE, pairName, roleDemo, setPair } from './cast-mat
 import { FOLD_ROLES, SAMPLE_SETS, findRole, findSweep, probeFolds } from './fold-probe.ts';
 import type { RoleSource, SampleSet } from './fold-probe.ts';
 import {
-  glbAnimal,
   handRigOf,
   handRigPath,
-  rigConfigPath,
   runTool,
+  speciesAnimal,
   takeGlb,
   withGlbBody,
 } from './glb-swap.ts';
@@ -323,7 +322,7 @@ interface SupinationNow {
  * @returns The absolute path of the summary, or `null` for an animal with no hand rig.
  */
 function handRigSummary(species: SpeciesId, glb: string | null): string | null {
-  const animal = glbAnimal(species);
+  const animal = speciesAnimal(species);
   const file = animal === null ? undefined : ANIMALS.get(animal)?.glb;
   if (animal === null || file === undefined || handRigOf(animal, file) === null) {
     return null;
@@ -333,21 +332,14 @@ function handRigSummary(species: SpeciesId, glb: string | null): string | null {
 
 /**
  * Gives the supination of now of each arm: the value of `--from`, else the bind supination of the
- * export summary of a hand rig ({@link handRigSummary}), else `studio.bindSupination` of the rig
- * config of the animal of the species, with 0 for an arm with no value. A hand rig keeps its
- * values only in its `.blend`, so the rig config does not count for it.
+ * export summary of a hand rig ({@link handRigSummary}), else 0 for each arm.
  *
- * @param species The species.
  * @param from The value of `--from`, or `null`.
  * @param summary The export summary of a hand rig, or `null`.
  * @returns The supination of each arm.
  * @throws Error if `--from` is not two numbers, or if the summary has no bind supination.
  */
-function supinationNow(
-  species: SpeciesId,
-  from: string | null,
-  summary: string | null,
-): SupinationNow {
+function supinationNow(from: string | null, summary: string | null): SupinationNow {
   if (from !== null) {
     const [left = Number.NaN, right = Number.NaN, ...rest] = from.split(',').map(Number);
     if (!Number.isFinite(left) || !Number.isFinite(right) || rest.length > 0) {
@@ -368,17 +360,7 @@ function supinationNow(
     const shown = summary.startsWith(ROOT) ? relative(ROOT, summary) : summary;
     return { value: { L, R }, source: shown };
   }
-  const animal = glbAnimal(species);
-  const path = animal === null ? null : rigConfigPath(animal);
-  if (path === null || !existsSync(path)) {
-    return { value: { L: 0, R: 0 }, source: 'no rig config' };
-  }
-  // SAFETY: the rig config is a JSON file of the repository with an object `studio`.
-  const config = JSON.parse(readFileSync(path, 'utf8')) as {
-    readonly studio?: { readonly bindSupination?: Partial<Record<Side, number>> };
-  };
-  const value = config.studio?.bindSupination ?? {};
-  return { value: { L: value.L ?? 0, R: value.R ?? 0 }, source: `tools/mesh-rigs/${animal}.json` };
+  return { value: { L: 0, R: 0 }, source: 'no hand rig' };
 }
 
 /**
@@ -459,7 +441,7 @@ async function main(): Promise<number> {
     throw new Error(`No species has the id "${species}".\n${USAGE}`);
   }
   if (glb) {
-    const animal = glbAnimal(species);
+    const animal = speciesAnimal(species);
     if (animal === null) {
       throw new Error(`The ${species} has no studio body and no rig config for --glb.`);
     }
@@ -485,8 +467,8 @@ async function main(): Promise<number> {
   }
   const from = values.get('--from') ?? null;
   const summary = values.get('--summary') ?? (from === null ? handRigSummary(species, null) : null);
-  const now = supinationNow(species, from, summary);
-  const animal = glbAnimal(species);
+  const now = supinationNow(from, summary);
+  const animal = speciesAnimal(species);
   const glbFile = animal === null ? undefined : ANIMALS.get(animal)?.glb;
   const handRig =
     from === null && summary !== null && animal !== null && glbFile !== undefined
