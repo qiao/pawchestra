@@ -35,7 +35,7 @@ export const HAND_MOTION = {
    * hand gets to its keys ahead of time (`docs/reference/piano-technique.md` section 9.3). With
    * no early start, the right forearm of the polar bear turned faster than 1,000° per second in
    * 384 frames of `bach-bwv1050` at 120 frames per second, with 1.5 m/s in 55, and with 1.0 m/s
-   * in 54 (`scratch/piano-jumps.ts`). The length of a move counts the change of the height over
+   * in 54. The length of a move counts the change of the height over
    * the other hand (`HandTrack.hovers`): with the place alone, a left paw that came down 8 cm from
    * over the right paw and 8 cm in toward the fallboard got 66 ms, and the left forearm snapped 25°
    * in one frame at 30 frames per second. At 0.75 m/s, the snaps over 15° in one frame of
@@ -63,7 +63,7 @@ export const HAND_MOTION = {
    * height `over`, in meters, when it makes way for one note and then comes back to its keys. That
    * hand comes down next to the other hand while the other hand rises from its keys, and the two
    * paws pass at the same height. With no draw back, the paws of the polar bear touched there in
-   * `bach-bwv1050` (`scratch/paw-gap.ts`), and with 0.03 m they stay apart. A draw back of each
+   * `bach-bwv1050`, and with 0.03 m they stay apart. A draw back of each
    * hand that makes way turned the left forearm faster than 1,000° per second in 3 more frames, and
    * a draw back toward the fallboard put the paws 0.1 to 0.2 cm into each other.
    */

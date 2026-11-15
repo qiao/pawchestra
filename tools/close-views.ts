@@ -1139,7 +1139,7 @@ interface CloseViewsArgs {
   /** The names of the moments of `--moments`, or `null` for the moments of the role. */
   readonly moments: readonly string[] | null;
   /**
-   * The lineup of `--lineup` ({@link lineupImage}), or `null` for none: the rows of the commit, the
+   * The lineup of `--lineup` ({@link writeLineups}), or `null` for none: the rows of the commit, the
    * working tree, and each role of `--with`, one image for each moment.
    */
   readonly lineup: RoleLineup | null;
@@ -4072,7 +4072,7 @@ interface DemoLayout {
 /**
  * Gives the score and the layout of a demo as the app plans them: the demo after
  * `demos/patches.json`, or the file of `--midi` with no patch, the section size "Auto", and the
- * layout of `planScene()` of `src/app/app.ts`.
+ * layout of `planSceneSteps()` of `src/app/scene-plan.ts`.
  *
  * @param demo The demo.
  * @param midi The path of the file of `--midi`, which replaces the demo, or `null`.
@@ -4098,7 +4098,7 @@ async function demoLayout(
 
 /**
  * Chooses the shot of `--shot` as the app plans it: the layout of the demo ({@link demoLayout}),
- * the shots of `planScene()` of `src/app/app.ts`, and the seed of the app. It is the first solo or
+ * the shots of `planSceneSteps()` of `src/app/scene-plan.ts`, and the seed of the app. It is the first solo or
  * section shot of the subject with a frame time ({@link shotFrameSec}), because a detail insert
  * can fill the whole middle of a short shot.
  *

@@ -284,7 +284,7 @@ function topsOf(points: readonly (readonly number[])[]): SourceTops {
 
 /**
  * Measures the heights of the source GLB file of a rig in the units of the studio, as
- * `load_source()` of `tools/blender/rig_mesh.py` reads it: the vertices of each mesh in world
+ * `load_mesh()` of `tools/blender/rig_mesh.py` reads it: the vertices of each mesh in world
  * space, with the soles at 0 and the highest vertex at 1. The scale of a variant takes the skull
  * top of the source plus the rise of the legs ({@link sizeShoulders}). A head factor, a neck
  * factor, or a trunk factor of the config also moves the skull top, so the table gives the head

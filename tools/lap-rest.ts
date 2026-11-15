@@ -748,7 +748,7 @@ export function scanSamples(
 
 /**
  * Builds the note layer of a player again with the holds of now (`holdOf()` and `windHoldOf()`),
- * as `noteLayerOf()` of `pose/plan.ts` builds it. Only the rig changes: the strokes of a bowed
+ * as `noteLayerSteps()` of `pose/plan.ts` builds it. Only the rig changes: the strokes of a bowed
  * player and the track of a wind player keep the rig of the old layer, and the rest pose before
  * the first play does not read them.
  *
