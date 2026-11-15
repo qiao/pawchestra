@@ -54,7 +54,6 @@
     "mixamo-import": "node tools/mixamo-import.ts",
     "studio-body": "node tools/studio-body.ts",
     "regen-studio": "tools/regen-studio.sh",
-    "glb-point-edits": "node tools/glb-point-edits.ts",
     "view-point": "node tools/view-point.ts",
     "close-views": "sh -c 'node tools/close-views.ts --check \"$@\" && pnpm build && node tools/close-views.ts \"$@\"' close-views",
     "fold-probe": "node tools/fold-probe.ts",

@@ -228,9 +228,9 @@ traps of the rig.
 - **Fidelity.** A source mesh stays as it is. The rig adds no stretch of a limb, unless a
   product choice sets an arm or a leg factor. The props and the instruments fit the body: each
   chair fits the legs, and a species with short arms plays a smaller instrument in place of
-  longer arms (4.6). Each edit goes into a copy that a script of `tools/blender/` makes, so the
-  source file stays unchanged and a run gives the same bytes again. A point edit of a rig file
-  goes into an edit file, and `pnpm glb-point-edits` writes it into the rig file of a base commit.
+  longer arms (4.6). Each edit is a point edit of the chain of the body (`redits.py` and `edits`
+  of `params.json` in `tools/blender/hand/<s>/`), which `build.py` applies to a copy of the
+  source FBX. Thus the source file stays unchanged, and a run gives the same bytes again.
 - **Replacing body.** A new body of a species keeps three things of its old body in the app view:
   the chair, the seat height, and the leg length. The source mesh sets the head, the face, the
   girths of the arms and the legs, the paws, and the tail. Reason: rules that copied the old body (a
@@ -331,8 +331,7 @@ the facts of its body in its `.blend` ("Hand rig").
   app do not move the eye places. A test of the oval of the app pushed single eyes out, and it
   closed no notch, because the fur covers a notch at the rim, which the push leaves in the head.
 - A notch of the fur in a bead eye, or a crease beside it, comes from a few faces of the old eye
-  socket. A body fixes it with a point edit of its rig file (`<s>-edits.json`, the elephant) or of
-  its `.blend` (the polar bear).
+  socket. A body fixes it with a point edit of its chain.
 - A bead eye is an oval of `EYE_SEGMENTS` faces around its long axis and `EYE_RINGS` steps up, and
   its light has the faces of `LIGHT_BALL`. Fewer steps showed an octagon and a hexagon in a close
   view. Each oval turns in the plane of its eye so that it is upright in the front view

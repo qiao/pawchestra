@@ -52,8 +52,11 @@ These rules hold for each route:
   joint blends only in its own rings, with one row for each ring. Each vertex outside the rings
   follows one bone. Write no fade formula over a region, and paint no brush strokes through MCP.
   After a change of the bind, check all weights again.
-- **Point edits by hand.** Fix a mesh with point edits in the live Blender, on a copy of the
-  source. Never change the form to remove a dark band.
+- **Point edits in the chain.** Change the form of a source only with point edits of its chain:
+  a pure map of points in `redits.py`, with its values in `edits` of `params.json`. `build.py`
+  moves the mesh with the map, and `make_config.py` moves the joints with it, so that the bones
+  fit. Try an edit in the live Blender first, then write it into the chain. Cut no arm free of the
+  trunk, and never change the form to remove a dark band.
 - **App body.** A new body or route goes into the app only after the user approves its look there.
 
 ## The asset chain
@@ -66,9 +69,7 @@ Two routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each on
 - **Hand rig.** A person or an agent makes the `.blend` in Blender, and `pnpm rig-export` exports
   it. A script chain makes the `.blend` of each Tripo body.
 
-A point edit of a rig file goes into `assets/models/<s>/<s>-edits.json`, and
-`pnpm glb-point-edits <file>` writes it into the rig file of its base commit. Test a
-change of a shared hold on the mannequin with
+Test a change of a shared hold on the mannequin with
 `pnpm arm-check violinist@mannequin clarinetist@mannequin`.
 
 ### Steps of a new body
