@@ -7,9 +7,8 @@ round.
 
 Each species has a studio body (`'studio-<a>'`) with the role-neutral bind (design 4.4). "Hand
 rig" means the hand rig of a Tripo P2 mesh in `assets/models/<s>/tripo-hand/`, with no arm cut and
-no stretch. A chain in `tools/blender/hand/<s>/` makes each one. "Rebuilt arms"
-means quad arm tubes, Blender weights, and arm segments of the mesh rig. The `README.md` of each
-model folder gives the files of each step.
+no stretch. A chain in `tools/blender/hand/<s>/` makes each one. The `README.md` of each model
+folder gives the files of each step.
 
 | Species | Body | Role |
 | --- | --- | --- |
@@ -32,7 +31,7 @@ model folder gives the files of each step.
 | rhino | Hand rig, arms 1.2 times longer, the left paw turned by 5 ring steps, face rows on the long muzzle (`faceRows`). Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
 | deer | Hand rig of the fawn, arms 1.5 times longer. Sits on the harp stool, with the harp of 0.975 (`harpScale`) in front of the chest. | `harpist` |
 | penguin | Hand rig. Stands on its riser. | `singer` |
-| mannequin | The test body: the animal preset of `mannequin.py`, its own faces (`arm_rebuild.py --keep-faces`). | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
+| mannequin | The test body: the animal preset of `mannequin.py`, as the fixed rig file `mannequin.rig.glb`. | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
 
 ## Rules of the mesh
 
@@ -59,11 +58,9 @@ These rules hold for each route:
 
 ## The asset chain
 
-Three routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each one. Design 4.4
-("Models") gives the chain in a diagram.
+Two routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each one. Design 4.4
+("Models") gives the chain in a diagram. A source mesh needs its arms apart from the trunk.
 
-- **Mesh rig.** `arm_rebuild.py` or `<a>_arms.py` rebuilds the arms, and `pnpm rig-mesh` rigs
-  the mannequin. A mesh whose arms join the trunk takes this route.
 - **Simple route.** `simple_rig.py` writes the `.blend` of a hand rig from a clean quad mesh with
   the arms apart (design 4.4). The skill `pawchestra-body` runs it in a candidate tree.
 - **Hand rig.** A person or an agent makes the `.blend` in Blender, and `pnpm rig-export` exports
@@ -71,26 +68,17 @@ Three routes make the rig file `<s>.rig.glb`, and `pnpm studio-body` packs each 
 
 A point edit of a rig file goes into `assets/models/<s>/<s>-edits.json`, and
 `pnpm glb-point-edits <file>` writes it into the rig file of its base commit. Test a
-change of the chain on the mannequin first: `pnpm rig-mesh mannequin --check` and
+change of a shared hold on the mannequin with
 `pnpm arm-check violinist@mannequin clarinetist@mannequin`.
 
 ### Steps of a new body
 
-Steps 1 to 4 are the steps of the mesh rig. Steps 5 and 6 hold for each route.
-
-1. **Joints.** Measure the joints on cuts of the mesh, and write them with a note on each measure
-   in `tools/mesh-rigs/<a>.json`. `pnpm rig-mesh <a> --check` gives the arm factor of the reach.
-2. **Form.** A body that is shorter or wider than the mesh takes `proportions`, and a head that
-   keeps its form takes `"keep": "head"`. A larger head grows `H`, so fit the holds again.
-3. **Options.** Run `pnpm mesh-options`, and fix each warning. Then ask the user about the size,
-   the arms, and the legs with `options.md` and `options.png`.
-4. **Rig.** Check the mesh with `pnpm mesh-intake`, and run `arm_rebuild.py`. Look at each
-   variant with `pnpm rig-mesh <a> --check --preview <dir>`. Keep the budgets, and keep the
-   standing body within 1 mm of the source.
-5. **Export.** Add the animal to `ANIMALS` with the landmark of its scale, the crease angle of its
+1. **Rig.** Make the `.blend` by the simple route or by hand ("Steps of a hand rig"), and export
+   it with `pnpm rig-export`. Keep the budgets.
+2. **Export.** Add the animal to `ANIMALS` with the landmark of its scale, the crease angle of its
    reference crops, and the seat settings. Run `pnpm studio-body <a>`, add the module to
    `STUDIO_BODIES`, and give the species the body.
-6. **Holds.** Fit the holds (`SPECIES_HOLDS`, `SPECIES_WIND_HOLDS` with `LEG_RESTS`, or
+3. **Holds.** Fit the holds (`SPECIES_HOLDS`, `SPECIES_WIND_HOLDS` with `LEG_RESTS`, or
    `PERCUSSION_HOLDS`) in the `H` of the new body with `pnpm hold-fit`, `pnpm hold-reach`, and
    `pnpm pose-depth`.
 
@@ -148,32 +136,7 @@ Design 4.4 ("Arm gate") gives the measures.
 - A `WORSE` value is inside `NEAR_LIMIT` of its limit and stops nothing. Check its arm in the
   crops.
 
-## The rebuild of the arms in Blender
-
-This section holds for the mesh rig. Rebuild the arms for a spiral crease, a sharp elbow, slivers,
-or slits. Fix all three causes, because they add up:
-
-- **Faces.** Long thin triangles across a joint fold into a spiral. New quad faces fix it.
-- **Bones.** The linear blend collapses the skin under a large twist on one bone. Short segments
-  keep each step below about 25°.
-- **Hold.** A paw turned about 160° folds the wrist, and a real forearm turns about 90°. Then
-  change the hold or the instrument first.
-
-Run `tools/blender/arm_rebuild.py` first (`--keep-faces` for a clean quad mesh). Write a species
-script `tools/blender/<a>_arms.py` only for a fault that it does not fix.
-
-- Ask the user before the first rebuild of a species. Change only the limb faces from the
-  shoulder line to the wrist, or from the haunch line to the ankle.
-- Work one step at a time (`run_steps()`), and look at an image after each step. Write no weight
-  algorithm of your own. Keep the source file, and note the copy in its `README.md`.
-- Never call `read_factory_settings`, because it stops the MCP server.
-- Merge by Distance first, because automatic weights fail on split seams.
-- In Weight Paint, remove the arm bones from the trunk below the armpits. Look at the arm down,
-  forward, an elbow at 100°, and a forearm turn of 90°.
-- New faces move the bone heat of the whole mesh, so give the kept vertices the old bone heat
-  (`heatSource`).
-
-### Bones
+## Arm bones
 
 Each upper arm and each forearm has 4 deform segments, and each elbow and wrist a helper bone. The
 old arm bones hold no skin and only drive the new bones (`armSegments`).
@@ -252,7 +215,7 @@ Design 4.4 gives the rule and the reason of each config key.
 - Limit Total 4 can drop the belly thigh shares under the arms, so the seated chest stands over
   the belly as a ledge. Fade them out by exact rows (`belly_rows()`, pig).
 - Add a ring at a joint (`refine.rings`) only where `pnpm fold-probe` finds folds. A straight bind
-  folds a thick inner elbow: put its rings one arm radius from the joint (`arm_rebuild.py --spec`).
+  folds a thick inner elbow: put its rings one arm radius from the joint.
 - Automatic weights give the clavicle most of a thick arm root, and the wrist helper half of a
   short paw. Check both. `weights.fingers` 1 closes a paw around a tube.
 - A helper share below 1 at the elbow joint makes the bend share jump there. Let it rise from 0
@@ -276,8 +239,8 @@ Design 4.4 gives the rule and the reason of each config key.
   (`move[A] = False`): a cut at the mean place of a slanted ring shears the wrist into a pinch.
 - A turned paw keeps its UVs, so a ring line with a step of tone shows at the band. Fade the band
   texels in the maps (`bandFade`). A planar patch (`bandPatch`) shows one fur piece on each quad.
-- When no weight rule or ring removes a fold, fit a `raise` shape after the hold with
-  `pnpm raise-fit`. A shape fixes only the poses near its rule, and design 4.4 gives its limits.
+- When no weight rule or ring removes a fold, fit a `raise` shape after the hold. A shape fixes
+  only the poses near its rule, and design 4.4 gives its limits.
 - A grip far in front of a deep chest turns the shoulder past any shape. Turn the shoulder bone
   forward with the arm (`reachL`).
 - On an arm joined to the trunk, start an elbow shape with `below` 0, because `below` 0.3 also
@@ -294,8 +257,6 @@ Design 4.4 gives the merges of each copy.
   back. Give the caps the skin normals, and check the flat rig view (front, below, back).
 - A flap, a shard, or a dent at a seam is often a source form that the hanging arm hid. Look at the
   sheets of `pnpm close-views audit`.
-- A tube that `arm_rebuild.py` wraps onto a freed arm can keep its lowest inner vertices on the
-  trunk as fins. Merge each into the next vertex of its ring on the arm.
 - A free arm corner that turns away from a trunk hole leaves a notch beside the cap. Move it toward
   the trunk with `weightMoves`, beyond the plane of `armSplit`.
 - After a cut, the inner root of a bow arm swings into the chest. Give the rule weights a chest
@@ -330,8 +291,6 @@ Design 4.4 gives the merges of each copy.
   stays (step 3 of "Steps of a hand rig").
 - The eye box and the nose box of `add_surface()` are in the units of the source. Run it before
   the legs lift the body, or lower the mesh for the run.
-- A `soften` moves source points, so the painted weights find no vertex there. Put the `soften` in
-  the config, and run `arm_rebuild.py`, which writes the softened places into the weights file.
 
 ### Blender scripts
 

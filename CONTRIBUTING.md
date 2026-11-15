@@ -20,7 +20,7 @@ section of an area before you change it. A pointer "design X.Y" in the code name
    pnpm dev
    ```
 
-The rigging tools (`pnpm rig-mesh`) also need [Blender](https://www.blender.org/). The app and
+The rigging tools (`pnpm rig-export`, `pnpm hand-chain`) also need [Blender](https://www.blender.org/). The app and
 the other checks do not need it.
 
 ## Core commands

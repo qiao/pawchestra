@@ -122,4 +122,4 @@ Each brief of a round needs these rules. Copy this list into `<scratch>/rules-co
   reach). Put each choice and its reason into its design section.
 
 The code lists are `ANIMALS`, `STUDIO_BODIES`, `SPECIES`, `SWEEP_ROLES`, `ROLE_VIEWS`,
-`FOLD_ROLES`, and the hold tables of step 6 of "Steps of a new body" of [`rigging.md`](rigging.md).
+`FOLD_ROLES`, and the hold tables of step 3 of "Steps of a new body" of [`rigging.md`](rigging.md).

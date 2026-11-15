@@ -68,7 +68,7 @@ This file holds the rules of each round. The modules in `docs/agents/` hold the 
   the clearance sweep, the body probe, the cast matrix, and the image sets. `pnpm frame` also runs
   for a change whose goal is speed, and its table goes into the commit message (design 9.7).
   This rule wins over the check rules of the modules. A probe that helps you find a cause
-  (`fold-probe`, `arm-look`, `pose-depth`, a render) is a tool: use it when it is faster than a
+  (`fold-probe`, `arm-shape`, `pose-depth`, a render) is a tool: use it when it is faster than a
   guess.
 - **Tests.** All tests are paused. A change adds no test and runs no break test. A change that
   needs a check runs one file with `pnpm test:paused <path>`.

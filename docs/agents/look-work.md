@@ -42,7 +42,7 @@ their traps. The head comment of each tool file gives its options.
   shadow map by the hot spot. On the players, the hot spot holds only the podium
   (`LIGHT_POOL.playerSpot`). Keep the hot spot of `pnpm light-probe` on, and use `--tier low` for
   the low tier.
-- **Shared palettes.** Another species can use the face colors of a mesh rig through `palettes`, as
+- **Shared palettes.** Another species can use the face colors of a rig through `palettes`, as
   the tan fox uses the red fox rig. A color rule of a rig changes only `COLOR_0`, and each palette
   maps from the colors before the rule (`COLOR_1`). Check that `pnpm body-probe` shows only the
   target species.
@@ -50,4 +50,4 @@ their traps. The head comment of each tool file gives its options.
   stronger hot spot on the floor can clip a close shot with no more light on the player. After a
   change of the light of the floor, measure the close shots too.
 - **Gamut.** A darker color reaches the sRGB gamut early, and a larger chroma factor then has no
-  effect. Read the gamut count of the `shift:` line of the `pnpm rig-mesh` log for each variant.
+  effect. Read the gamut count of the color shift for each variant.
