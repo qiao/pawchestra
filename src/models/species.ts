@@ -603,8 +603,8 @@ const SPECIES_ENTRIES = {
   },
   /**
    * Mannequin, a test body (design 4.4, "Test mannequin"): the animal preset of
-   * `tools/blender/mannequin.py`, with the markers of the twist and of the side, which `pnpm
-   * rig-mesh mannequin` rigs. No section casts it. The role tools test the rig chain with the
+   * `tools/blender/mannequin.py`, with the markers of the twist and of the side, from the fixed rig
+   * file `mannequin.rig.glb`. No section casts it. The role tools test the rig chain with the
    * recast roles `violinist@mannequin` and `clarinetist@mannequin`. The app does not load its
    * body. The violin size is the rule of a violin shop for the arm of the mannequin with the violin on the
    * shoulder (0.704), rounded to 0.7 (`pnpm hold-reach mannequin --instrument violin`).

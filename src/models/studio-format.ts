@@ -22,7 +22,7 @@ import { clamp01 } from '../math.ts';
 export const ARM_SEGMENTS = 4;
 
 /**
- * The arm segments and the helpers of a mesh rig with `armSegments` (design 4.4, 4.7), the left
+ * The arm segments and the helpers of a rig with `armSegments` (design 4.4, 4.7), the left
  * side first: for each side, {@link ARM_SEGMENTS} segments of the upper arm and of the forearm
  * from the shoulder out, then the elbow helper and the wrist helper. They hold the skin of the
  * arms, and the pose code turns them from the joints of the arm (`poseArm()` of
@@ -79,7 +79,7 @@ export const DIGIT_BONES = [
 export const DIGITS = 5;
 
 /**
- * The thumb bones of a mesh rig whose paw is one fist with a free thumb (design 4.4), the left side
+ * The thumb bones of a rig whose paw is one fist with a free thumb (design 4.4), the left side
  * first. Each thumb is a child of the paw (`hand`), with its head at the root of the thumb and its
  * tail at the thumb tip, because the thumb of a real hand starts at the wrist. The pose code turns
  * each thumb about its close axis ({@link StudioBody.thumbAxes}) by the bend of digit 1 of its paw
@@ -88,7 +88,7 @@ export const DIGITS = 5;
 const THUMB_BONES = ['thumb_L', 'thumb_R'] as const;
 
 /**
- * The bones of a studio body (design 4.4, 4.7): the 30 body bones of a rig of `pnpm rig-mesh`, in
+ * The bones of a studio body (design 4.4, 4.7): the 30 body bones of a rig file, in
  * parent order, the two eye bones that `pnpm studio-body` adds, so that the eyes blink (design
  * 5.1), and the optional bones ({@link OPTIONAL_STUDIO_BONES}): the tip of a tail of two bones,
  * the jaw of a beak, the arm segments and helpers ({@link ARM_SEGMENT_BONES}), the digit bones
@@ -166,7 +166,7 @@ export type RequiredStudioBone = Exclude<StudioBone, OptionalStudioBone>;
 export type StudioHeads = Readonly<Record<RequiredStudioBone, Vec3>> &
   Readonly<Partial<Record<OptionalStudioBone, Vec3>>>;
 
-/** The parent of each bone of a studio body: the hierarchy of a rig of `pnpm rig-mesh`. */
+/** The parent of each bone of a studio body: the hierarchy of a rig file. */
 export const STUDIO_PARENTS = {
   root: null,
   hips: 'root',
@@ -265,8 +265,8 @@ type StudioTailBone = (typeof STUDIO_TAIL_BONES)[number];
 
 /**
  * The trunk bones of a studio body, which turn when a seated body with a reclined trunk stands
- * (design 4.4): the rig of a mesh reclines the trunk on the seat (`studio.trunk` of
- * `pnpm rig-mesh`), and the standing trunk is upright again.
+ * (design 4.4): the rig reclines the trunk on the seat (`studio.trunk` of the rig config), and the
+ * standing trunk is upright again.
  */
 export const STUDIO_TRUNK_BONES = ['hips', 'spine', 'spine1', 'chest', 'neck', 'head'] as const;
 
@@ -348,8 +348,8 @@ export type StudioPalette = (typeof STUDIO_PALETTES)[number];
 export const STUDIO_RAISES = 4;
 
 /**
- * The pose of a corrective shape of a raised arm of a mesh rig (design 4.4, `raise` of the config
- * of `pnpm rig-mesh`). The shape relaxes the faces that the skin turns over near that pose, such as
+ * The pose of a corrective shape of a raised arm of a rig (design 4.4, a shape key
+ * `arm_raise_<side>`). The shape relaxes the faces that the skin turns over near that pose, such as
  * the front of the right shoulder of the red fox, whose bow arm is out to the side and down. Its
  * weight comes from the turn of the upper arm alone (`raiseWeight()` of `models/studio-rig.ts`).
  * The shape of a bent elbow takes its weight from the turn of the forearm from the upper arm, as
@@ -394,8 +394,7 @@ export interface StudioEyes {
   /**
    * The head height that sizes the eyes, in meters: the head that shows, from the chin to the top
    * of the skull, or the size of the eye objects of a hand rig. It is larger than
-   * {@link StudioBody.headHeight} when the rig grows the head (`headFactor` of `pnpm rig-mesh`), so
-   * that the eyes fit the larger head.
+   * {@link StudioBody.headHeight} when the rig grows the head, so that the eyes fit the larger head.
    */
   readonly headHeight: number;
   /**
@@ -452,7 +451,7 @@ export interface StudioTexture {
 }
 
 /**
- * A studio body (design 4.4): the mesh of a rig of `pnpm rig-mesh` in its bind pose, with its own
+ * A studio body (design 4.4): the mesh of a rig file in its bind pose, with its own
  * skeleton, its skin of up to four bones for each vertex, and its corrective shapes.
  * `pnpm studio-body <animal>` writes the module of an animal. The axes are the axes of the model:
  * the animal faces -z, its left side is -x, the soles are on y = 0, and the middle plane is
@@ -483,7 +482,7 @@ export interface StudioBody {
   readonly sheetArms: Readonly<Record<Side, Vec3>>;
   /**
    * The head height `H` of the holds: from the chin to the top of the skull. When the rig grows
-   * the head (`headFactor` of `pnpm rig-mesh`), `H` is the head height before the factor, so that
+   * the head, `H` is the head height before the factor, so that
    * the holds in head heights keep their places.
    */
   readonly headHeight: number;
@@ -584,14 +583,14 @@ export interface StudioBody {
    */
   readonly cueLift?: number;
   /**
-   * The caps of the arms that the cut of a mesh rig makes (design 4.4), as indices of the
+   * The caps of the arms that the cut of a rig makes (design 4.4), as indices of the
    * triangles of the packed mesh. With `cut.bodyNormals` of the config of the rig, they also hold
    * the caps of the body and the two faces at the top of each cut. Each corner of a cap takes the
    * normal of the skin at its vertex (`studioNormals()`). A body with no such rule has none.
    */
   readonly caps?: readonly number[];
   /**
-   * The skin faces around the caps of the body of the cut of a mesh rig (`cut.bodyNormals` of the
+   * The skin faces around the caps of the body of the cut of a rig (`cut.bodyNormals` of the
    * config of the rig, design 4.4), as indices of the triangles of the packed mesh. Each corner
    * of a rim face takes the normal of the skin at its vertex with no crease angle
    * (`studioNormals()`). A body with no such rule has none.
@@ -633,7 +632,7 @@ export interface StudioBody {
   /**
    * The unit close axis of each thumb in the bind pose of a body with thumb bones (design 4.4,
    * {@link THUMB_BONES}): a turn about it by a positive angle moves the thumb tip across the palm
-   * (`thumbs` of the config of `pnpm rig-mesh`). A body with no thumbs has none.
+   * (`thumbs` of the rig config). A body with no thumbs has none.
    */
   readonly thumbAxes?: Readonly<Record<Side, Vec3>>;
 }

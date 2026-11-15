@@ -13,7 +13,7 @@ const MATTE = FINISH_ORDER.indexOf('matte');
  * edge with a larger angle, such as an ear rim, stays sharp. A face of another finish, such as
  * the gloss of an eye, keeps its own normal at each corner, so it stays flat.
  *
- * The faces of `caps` close the holes of the arms that the cut of a mesh rig makes (design 4.4).
+ * The faces of `caps` close the holes of the arms that the cut of a rig makes (design 4.4).
  * Their normals point into the gap between the arm and the trunk, away from the light. So a
  * corner of a cap gets the mean of the normals of all `matte` faces at its vertex that are no
  * caps, and a cap shades as the skin around it. A corner of another face does not count the caps.
