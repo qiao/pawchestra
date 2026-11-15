@@ -38,6 +38,7 @@ import type {
   StudioPalette,
   StudioRaise,
   StudioStanding,
+  StudioTexture,
   StudioTriangle,
   StudioTriangleUvs,
   StudioVertex,
@@ -3223,10 +3224,11 @@ export function studioBody(bytes: Uint8Array, source: string, entry: AnimalEntry
         throw new Error(`The color map ${file} of a palette is no file of the repository.`);
       }
     }
-    body = {
-      ...body,
-      texture: { file: texture, uvs: packStudioUvs(uvs, packed), ...(maps && { palettes: maps }) },
-    };
+    let textured: StudioTexture = { file: texture, uvs: packStudioUvs(uvs, packed) };
+    if (maps) {
+      textured = { ...textured, palettes: maps };
+    }
+    body = { ...body, texture: textured };
   }
   if (settings.palettes) {
     const bases = baseTriangles(ordered.faces, withoutEyes.faces);
