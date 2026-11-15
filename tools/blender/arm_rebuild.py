@@ -26,7 +26,7 @@ joints of `tools/mesh-rigs/<animal>.json` and from rays through the source mesh
    and run Limit Total 4 and Normalize All (`wind_arms.step_skeleton()`,
    `violin_arms.step_bind()`).
 7. Fix the weights with the rules of `step_paint()`, and keep the share `weights.fingers` of the
-   config on the fingers (`fox_arms.step_fingers()`).
+   config on the fingers (`step_fingers()`).
 8. Write `<animal>-weights.json` in the units of the rig config (`wind_arms.step_weights()`).
 
 Run it in a terminal from the root of the tree:
@@ -75,7 +75,6 @@ va = wa.va
 # the side wall when it loads. This script has no side wall, so it puts the plain versions back.
 PLAIN = (va.arm_faces, va.arm_verts)
 import cat_arms as ca  # noqa: E402
-import fox_arms as fa  # noqa: E402
 
 va.arm_faces, va.arm_verts = PLAIN
 
@@ -866,6 +865,26 @@ def step_paint(s):
     return counts
 
 
+def step_fingers(s):
+    """Keeps the share `fingers` of the weight of each finger bone (Weight Paint, Levels with
+    that gain), and gives the rest to the other bones of the vertex (Normalize All with the finger
+    group locked), as the rule `weights.fingers` of the config does for rule weights. 1 keeps the
+    automatic weights. With the full finger weights of the automatic weights, the curl of the
+    fingers at rest folds the faces of the paws."""
+    share = s.spec['fingers']
+    if share >= 1:
+        return 0
+    mesh = s.mesh
+    groups = mesh.vertex_groups
+    va.paint_mode(mesh)
+    for side in 'LR':
+        groups.active_index = groups[f'fingers_{side}'].index
+        bpy.ops.object.vertex_group_levels(group_select_mode='ACTIVE', gain=share)
+        bpy.ops.object.vertex_group_normalize_all(group_select_mode='BONE_DEFORM', lock_active=True)
+    bpy.ops.object.mode_set(mode='OBJECT')
+    return share
+
+
 def step_skeleton(s):
     """Adds the studio skeleton with the segments and the helpers (`wind_arms.step_skeleton()`).
     In Blender, the elbow helper spans twice `gap` and the wrist helper twice `wristGap`, so that
@@ -1003,7 +1022,7 @@ STEPS = (
     step_skeleton,
     va.step_bind,
     step_paint,
-    fa.step_fingers,
+    step_fingers,
     step_weights,
 )
 
@@ -1019,7 +1038,7 @@ KEEP_STEPS = (
     step_skeleton,
     va.step_bind,
     step_paint,
-    fa.step_fingers,
+    step_fingers,
     step_weights,
 )
 
