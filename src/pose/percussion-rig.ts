@@ -1074,12 +1074,6 @@ function triangleCorner(): readonly (readonly [number, Vec3, Vec3])[] {
 }
 
 /**
- * The key of the target of the head of the tambourine in the left paw (`SwitchRig`). Key 1 is the
- * head of the tambourine on the trap table, and keys 2 and 3 are the roll targets of the triangle.
- */
-export const HELD_TAMBOURINE_KEY = 4;
-
-/**
  * The hold of the tambourine in the left paw and the strikes of the right paw on it (design 5.3),
  * as a real player holds the tambourine by its frame at or a little below the chest, tilted in,
  * and strikes it with the fingertips, the fingers, or the knuckles by the dynamic
@@ -1944,7 +1938,7 @@ function tablePaw(
  * @param toB The second target direction.
  * @returns The rotation.
  */
-export function turnOfPair(fromA: Vector3, fromB: Vector3, toA: Vector3, toB: Vector3): Quaternion {
+function turnOfPair(fromA: Vector3, fromB: Vector3, toA: Vector3, toB: Vector3): Quaternion {
   const basis = (a: Vector3, b: Vector3): Matrix4 => {
     const x = a.clone().normalize();
     const y = b.clone().projectOnPlane(x).normalize();
