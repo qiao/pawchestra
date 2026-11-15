@@ -24,8 +24,6 @@ This file holds the rules of each round. The modules in `docs/agents/` hold the 
   message texts.
 - **Assets.** The `README.md` files of `demos/` and of each folder of `assets/` give the sources,
   the licenses, and the checksums.
-- **Tasks.** The user gives the task of each round. A step is done when its "done" criterion is
-  true and the manager accepts the report and the images (design 9.8).
 
 ## Hard rules
 
@@ -50,9 +48,9 @@ This file holds the rules of each round. The modules in `docs/agents/` hold the 
 - **Privacy.** Keep the personal data of the user out of each request to an outside service: no
   email address or name in a header, a User-Agent, a URL, or a payload. When an API asks for
   contact data, send a neutral value such as `pawchestra-build/1.0`.
-- **Frame time.** Run `pnpm frame` only when the user or the manager asks, or for a change whose
-  goal is speed, and then give its table in the commit message (design 9.7).
-- **Work order.** Follow the steps of design 9.5. The largest risks come first.
+- **Work order.** Follow the steps of design 9.5, which put the largest risks first. A step is
+  done when its "done" criterion is true and the manager accepts the report and the images
+  (design 9.8).
 
 ## Work rules
 
@@ -67,7 +65,8 @@ This file holds the rules of each round. The modules in `docs/agents/` hold the 
   - The fast loop (`loop`) of the skill `pawchestra-body`, in a body round.
 
   Each other gate runs only when the user or the manager asks: `check-commits.sh`, the arm gate,
-  the clearance sweep, the body probe, the cast matrix, the frame measure, and the image sets.
+  the clearance sweep, the body probe, the cast matrix, and the image sets. `pnpm frame` also runs
+  for a change whose goal is speed, and its table goes into the commit message (design 9.7).
   This rule wins over the check rules of the modules. A probe that helps you find a cause
   (`fold-probe`, `arm-look`, `pose-depth`, a render) is a tool: use it when it is faster than a
   guess.
@@ -81,16 +80,16 @@ This file holds the rules of each round. The modules in `docs/agents/` hold the 
 ## Modules
 
 - [`workflow.md`](docs/agents/workflow.md): the docs rules, commits, worktrees, merges, probes,
-  and images. Read it at the start of each round.
+  and images. Read it in each round.
 - [`writing.md`](docs/agents/writing.md): Simplified Technical English, the prose checks, and the
   length limits. Read it before you write prose.
 - [`code.md`](docs/agents/code.md): the compiler options, the lint rules, and the code style.
   Read it before you write TypeScript.
-- [`commands.md`](docs/agents/commands.md): each command with its options, output, and run time,
-  and CI. Read it before you run a tool that you do not know.
-- [`rigging.md`](docs/agents/rigging.md): the bodies and roles, the routes of a rig, the arm gate,
-  and the traps. Read it before work on a body, a rig, a hold, or a seat.
+- [`commands.md`](docs/agents/commands.md): each command with its options. Read it before you
+  run a tool that you do not know.
+- [`rigging.md`](docs/agents/rigging.md): the bodies, the rig routes, the arm gate, and the traps.
+  Read it before work on a body, a rig, a hold, or a seat.
 - [`rig-rounds.md`](docs/agents/rig-rounds.md): the brief of a rigging round and the docs
   checklist. Read it before you brief or start a rigging round.
-- [`look-work.md`](docs/agents/look-work.md): the loop of a look round, the look override, and the
-  traps. Read it before a round of the light, the colors, or the grade.
+- [`look-work.md`](docs/agents/look-work.md): the look rounds. Read it before work on the light,
+  the colors, or the grade.
