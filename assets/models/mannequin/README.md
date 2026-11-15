@@ -24,16 +24,9 @@ blender -b --factory-startup --python tools/blender/mannequin.py -- animal --out
 Two runs give the same bytes. The script runs Blender again with `PYTHONHASHSEED=0`, because the
 FBX exporter makes its ids from the string hash. The docstring of the script gives the steps.
 
-Then give the animal preset its arm bones and weights, and rig it. The mesh has clean quad rings
-(`pnpm mesh-intake` gives `keep faces`), so the arms keep their faces. Two runs of the arm step
-give the same bytes too:
-
-```sh
-pnpm mesh-intake assets/models/mannequin/mannequin-animal.glb --config tools/mesh-rigs/mannequin.json
-blender -b --factory-startup --python tools/blender/arm_rebuild.py -- mannequin --keep-faces
-pnpm rig-mesh mannequin
-pnpm studio-body mannequin
-```
+The rig file `mannequin.rig.glb` of the animal preset is a fixed file. The mesh rig route of the
+app made it, and that route is retired: commit `dffd5dc5d` removed its tools. `pnpm studio-body
+mannequin` makes the module of the body from the rig file.
 
 ## Files
 
@@ -42,13 +35,11 @@ FBX files.
 
 | File | Contents | Use |
 |---|---|---|
-| `mannequin-<preset>.glb` | The mesh in an A-pose (each arm 40 degrees down), with no skeleton | The input of the arm step (`armSource` of the config) |
+| `mannequin-<preset>.glb` | The mesh in an A-pose (each arm 40 degrees down), with no skeleton | The source of the rig of the animal preset |
 | `mannequin-<preset>-tpose.fbx` | The mesh in a T-pose, with no skeleton | An upload to mixamo.com |
 | `mannequin-<preset>-mixamo.glb` | The T-pose mesh with the Mixamo skeleton (65 bones), weights of at most 4 bones, and the test clips | The input of the Mixamo adapter |
 | `mannequin-<preset>-mixamo.fbx` | The same as an FBX file in centimeters, with one take for each clip (`Armature\|<clip>`) | The input of the Mixamo adapter |
-| `mannequin-arms.glb` | A copy of the bytes of `mannequin-animal.glb` (`tools/blender/arm_rebuild.py --keep-faces`): the arms keep the faces of the source | `source` of `tools/mesh-rigs/mannequin.json` |
-| `mannequin-weights.json` | The Blender weights of the same run, at the place of each vertex | `paintedWeights` of the config |
-| `mannequin.rig.glb` | The studio rig of `mannequin-arms.glb` (`tools/mesh-rigs/mannequin.json`) | The input of `pnpm studio-body mannequin` |
+| `mannequin.rig.glb` | The fixed rig of the animal preset, with its faces | The input of `pnpm studio-body mannequin` |
 
 The presets:
 
@@ -128,5 +119,4 @@ by side in it.
 | `mannequin-animal-tpose.fbx` | 103,980 | `3b9ac703f7e7ad66a98cb453476d6aa5b5b5a762e86d12f9a99147de7452996f` |
 | `mannequin-animal-mixamo.glb` | 564,632 | `973682ee26bff0c1f405d50436bf744ab5b75bd3facff9f855694acb185562d6` |
 | `mannequin-animal-mixamo.fbx` | 1,870,156 | `d65c2d482fd1d1d28d280b513a2571611993c537de08c8b0394b04e6bde2cbc7` |
-| `mannequin-arms.glb` | 116,076 | `c4b94597490424d88e8c8ede9c98b2748f39e6552896e93b1e02c4137cd4438f` |
-| `mannequin-weights.json` | 481,262 | `259a6eac87ba73132a570aa2f4ceaef2f25cfa079707f27900b7aa436bb26be0` |
+| `mannequin.rig.glb` | 347,536 | `f47a3b993f55f2155853b86fd0b765243331e8e3f3cd0d480aed64d8a00eaa7f` |
