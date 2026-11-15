@@ -1681,6 +1681,29 @@ function arcSign(planner: Planner, seeded: number): number {
 }
 
 /**
+ * Makes the framing of a wide, high, or opening shot: a move between two cameras around a target,
+ * with no subject players and no fit to a frame.
+ *
+ * @param target The point that the cameras look at.
+ * @param from The camera at the start of the shot.
+ * @param to The camera at the end of the shot.
+ * @returns The framing.
+ */
+function farFraming(target: Vec3, from: ShotKey, to: ShotKey): Framing {
+  return {
+    target,
+    halfHeight: 0,
+    from,
+    to,
+    seats: [],
+    part: null,
+    held: new Set(),
+    composition: null,
+    hero: null,
+  };
+}
+
+/**
  * Makes the framing of a wide shot: one of the four variants, with a push-in or an arc. The seeded
  * variant, or the next one that makes no jump cut, or else the seeded variant.
  *
@@ -1716,17 +1739,7 @@ function wideFraming(planner: Planner): Framing {
   const to: ShotKey = push
     ? { ...from, zoom: from.zoom * k.pushIn }
     : { ...from, azimuth: from.azimuth + arcSign(planner, signOf(random)) * k.arc * DEG };
-  return {
-    target: DEFAULT_TARGET,
-    halfHeight: 0,
-    from,
-    to,
-    seats: [],
-    part: null,
-    held: new Set(),
-    composition: null,
-    hero: null,
-  };
+  return farFraming(DEFAULT_TARGET, from, to);
 }
 
 /**
@@ -1745,17 +1758,7 @@ function openingFraming(planner: Planner): Framing {
     elevation: lowered(DEFAULT_TARGET, distance, DEFAULT_ELEVATION),
     fov: WIDE_FOV,
   };
-  return {
-    target: DEFAULT_TARGET,
-    halfHeight: 0,
-    from,
-    to,
-    seats: [],
-    part: null,
-    held: new Set(),
-    composition: null,
-    hero: null,
-  };
+  return farFraming(DEFAULT_TARGET, from, to);
 }
 
 /**
@@ -1793,17 +1796,7 @@ function highFraming(planner: Planner): Framing | null {
       azimuth: azimuth - side * k.arc * DEG,
       elevation: lowered(target, distance, nominal + k.rise * DEG),
     };
-    return {
-      target,
-      halfHeight: 0,
-      from,
-      to,
-      seats: [],
-      part: null,
-      held: new Set(),
-      composition: null,
-      hero: null,
-    };
+    return farFraming(target, from, to);
   }
   return null;
 }
@@ -2913,17 +2906,7 @@ function* planShotsSteps(
   addShot(
     planner,
     { kind: 'wide', id: 'wide', group: null },
-    {
-      target: DEFAULT_TARGET,
-      halfHeight: 0,
-      from: { ...to, elevation: low },
-      to,
-      seats: [],
-      part: null,
-      held: new Set(),
-      composition: null,
-      hero: null,
-    },
+    farFraming(DEFAULT_TARGET, { ...to, elevation: low }, to),
     {
       startSec: cut,
       endSec: Infinity,
