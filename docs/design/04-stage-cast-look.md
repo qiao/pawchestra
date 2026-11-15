@@ -571,8 +571,8 @@ that Blender shows the eyes of the app, and no rule of `pnpm studio-body` moves 
 `.blend` with no eye objects shows the eyes of its mesh, which the color map paints. The
 facts of the body (`BODY_FACTS` of `tools/studio-body.ts`), such as the scale, the crease angle,
 and the width of the chair, are custom properties of the armature, so that each fact has one
-place beside the rig that it fits. `ANIMALS` keeps only the settings of the app: the landmark,
-the role, the constant, and the GLB file. A tool reads each value from the export
+place beside the rig that it fits. `ANIMALS` keeps only the settings of the app: the role, the
+constant, and the GLB file. A tool reads each value from the export
 (`<s>.rig.glb` or its summary `<s>.rig.json`), never from the rig config
 `tools/mesh-rigs/<s>.json`, which keeps the values of the old chain. `pnpm rig-mesh <s>` stops
 for a body with a `.blend` beside its GLB file (`handRigOf()` of `tools/glb-swap.ts`).

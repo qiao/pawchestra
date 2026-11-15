@@ -59,11 +59,9 @@ const STUDIO_DIR = join(ROOT, 'src', 'models', 'studio');
  */
 export interface AnimalSettings {
   /**
-   * The landmark of the scale (design 4.4): the shoulder joints of the standing body
-   * ({@link standingShoulder}).
+   * The height of the landmark of the scale above the floor in the app, in meters (design 4.4): the
+   * shoulder joints of the standing body ({@link standingShoulder}). It sets the scale.
    */
-  readonly landmark: 'shoulders';
-  /** The height of the landmark above the floor in the app, in meters. It sets the scale. */
   readonly height: number;
   /**
    * True for a body of a seated role. Its bind pose has the legs bent for the seat, with the hips
@@ -242,7 +240,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'bear',
     {
-      landmark: 'shoulders',
       seated: false,
       soloist: false,
       constant: 'STUDIO_BEAR',
@@ -258,7 +255,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'polar-bear',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: false,
       constant: 'STUDIO_POLAR_BEAR',
@@ -276,7 +272,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'rabbit',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: true,
       constant: 'STUDIO_RABBIT',
@@ -293,7 +288,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'fox',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: true,
       constant: 'STUDIO_FOX',
@@ -312,7 +306,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'cat',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: true,
       constant: 'STUDIO_CAT',
@@ -328,7 +321,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'dog',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: false,
       constant: 'STUDIO_DOG',
@@ -345,7 +337,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'panda',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: true,
       constant: 'STUDIO_PANDA',
@@ -362,7 +353,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'hippo',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: true,
       constant: 'STUDIO_HIPPO',
@@ -379,7 +369,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'mouse',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: true,
       constant: 'STUDIO_MOUSE',
@@ -396,7 +385,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'elephant',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: false,
       constant: 'STUDIO_ELEPHANT',
@@ -412,7 +400,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'beaver',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: true,
       constant: 'STUDIO_BEAVER',
@@ -428,7 +415,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'pig',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: true,
       constant: 'STUDIO_PIG',
@@ -443,7 +429,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'wolf',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: true,
       constant: 'STUDIO_WOLF',
@@ -457,7 +442,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'mannequin',
     {
-      landmark: 'shoulders',
       height: 1.025662,
       seated: true,
       soloist: true,
@@ -475,7 +459,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'badger',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: true,
       constant: 'STUDIO_BADGER',
@@ -494,7 +477,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'monkey',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: false,
       constant: 'STUDIO_MONKEY',
@@ -510,7 +492,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'rhino',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: true,
       constant: 'STUDIO_RHINO',
@@ -528,7 +509,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'deer',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: false,
       constant: 'STUDIO_DEER',
@@ -545,7 +525,6 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   [
     'penguin',
     {
-      landmark: 'shoulders',
       seated: true,
       soloist: true,
       constant: 'STUDIO_PENGUIN',
@@ -3479,7 +3458,6 @@ export function inspectStudioGlb(bytes: Uint8Array, entry: AnimalEntry | null): 
 
   // The scale of the settings, as the export finds it.
   const used = settings ?? {
-    landmark: 'shoulders',
     height: 1,
     seated: false,
     soloist: false,
@@ -3491,7 +3469,7 @@ export function inspectStudioGlb(bytes: Uint8Array, entry: AnimalEntry | null): 
   const landmark = standingShoulder(glb, readSkeleton(glb));
   const owner = gltf.asset?.extras?.body ? 'the armature of the hand rig' : 'ANIMALS';
   const scaleFrom = settings
-    ? `${owner}: the ${used.landmark} at ${used.height} m`
+    ? `${owner}: the shoulders at ${used.height} m`
     : 'assumed: the shoulders at 1 m, because the animal is not in ANIMALS';
 
   // The joints, by what the export does with them.

@@ -605,7 +605,6 @@ async function rigVariant(
   const known = ANIMALS.get(args.animal);
   const settings: AnimalSettings = {
     ...(known && hasBodyFacts(known) ? known : scratchSettings(args.animal, config.app.shoulders)),
-    landmark: 'shoulders',
     height: config.app.shoulders,
     glb: relative(ROOT, glb),
   };

@@ -249,7 +249,6 @@ describe('the check of pnpm rig-mesh', () => {
     });
     expect(rigSettings('red-panda', figure(1.4))).toEqual({
       settings: {
-        landmark: 'shoulders',
         height: 0.5,
         seated: true,
         soloist: true,

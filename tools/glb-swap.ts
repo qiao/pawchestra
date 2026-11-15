@@ -220,7 +220,6 @@ function studioConstant(animal: string): string {
  */
 export function scratchSettings(animal: string, shoulders: number): AnimalSettings {
   return {
-    landmark: 'shoulders',
     height: shoulders,
     seated: true,
     soloist: true,
