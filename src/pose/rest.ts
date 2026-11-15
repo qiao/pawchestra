@@ -114,7 +114,7 @@ export const REST_MOTION = {
  * @param instrument The instrument of the player.
  * @returns True for a carried instrument.
  */
-export function carriesInstrument(instrument: InstrumentId): boolean {
+function carriesInstrument(instrument: InstrumentId): boolean {
   return (
     instrument === 'violin' ||
     instrument === 'viola' ||

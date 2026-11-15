@@ -654,7 +654,7 @@ export const COLOR_STEPS = 65535;
  * The number of steps of a packed texture coordinate from 0 to 1: a quarter texel of a map of
  * 2048 pixels.
  */
-export const UV_STEPS = 8192;
+const UV_STEPS = 8192;
 
 /**
  * The texture coordinate of a corner with no texture, such as a corner of the gloss nose or of a

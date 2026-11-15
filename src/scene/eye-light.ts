@@ -116,7 +116,7 @@ function solve4(m: number[], v: number[]): number[] {
  * @returns The axes and the middles.
  * @throws Error if a side has no eyeball triangles, or if its vertices fit no single sphere.
  */
-export function eyeBallsOf(body: StudioBody, mesh: StudioMesh): EyeBalls {
+function eyeBallsOf(body: StudioBody, mesh: StudioMesh): EyeBalls {
   const { positions, corners } = mesh;
   const sums = [new Vector3(), new Vector3()];
   const vertices = [new Set<number>(), new Set<number>()];

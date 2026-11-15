@@ -444,7 +444,7 @@ function turnShare(motion: EndMotion, audienceTurn: number): number {
  * @param out The motion to write.
  * @returns `out`.
  */
-export function endMotionAt(elapsed: number, audienceTurn: number, out: EndMotion): EndMotion {
+function endMotionAt(elapsed: number, audienceTurn: number, out: EndMotion): EndMotion {
   const b = END_BOW;
   noEndMotion(turnFrom);
   if (elapsed < BACK_START) {

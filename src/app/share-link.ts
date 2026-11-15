@@ -2,10 +2,10 @@
 export const COPY_LINK_TEXT = 'Copy link';
 
 /** The status after the link is in the clipboard (design 2.8). */
-export const LINK_COPIED_TEXT = 'The link is copied.';
+const LINK_COPIED_TEXT = 'The link is copied.';
 
 /** The status after the browser did not copy the link (design 2.8). */
-export const LINK_FAILED_TEXT = 'The link did not copy. Copy it from the address bar.';
+const LINK_FAILED_TEXT = 'The link did not copy. Copy it from the address bar.';
 
 /** The result of a click on "Copy link". */
 export type ShareResult = 'shared' | 'copied' | 'cancelled' | 'failed';

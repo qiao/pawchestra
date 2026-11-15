@@ -39,7 +39,7 @@ export interface Ray {
  * @param ray The ray.
  * @returns The distance along the ray, in units of its direction, or `null` for a miss.
  */
-export function rayBoxDistance(box: PlacedBox, ray: Ray): number | null {
+function rayBoxDistance(box: PlacedBox, ray: Ray): number | null {
   const [ox, oy, oz] = ray.origin;
   const [dx, dy, dz] = ray.direction;
   const rx = ox - box.x;

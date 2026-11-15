@@ -14,7 +14,7 @@ const METER_FLOOR = 0.15;
 const STILL_LEVELS = [0.35, 0.55, 0.8, 0.6, 0.95, 0.7, 0.5, 0.65, 0.4] as const;
 
 /** The start of the name of the row of a file of the user (design 2.8). */
-export const OWN_FILE_TEXT = 'Your file';
+const OWN_FILE_TEXT = 'Your file';
 
 /** The current row of the list: a demo, the file of the user, or none. */
 export type DemoListRow = DemoId | 'file' | null;

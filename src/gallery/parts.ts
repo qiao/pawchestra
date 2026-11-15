@@ -35,10 +35,10 @@ export interface PartView {
 }
 
 /** The lowest elevation of a part view, in degrees. */
-export const MIN_PART_ELEVATION = -89;
+const MIN_PART_ELEVATION = -89;
 
 /** The highest elevation of a part view, in degrees. */
-export const MAX_PART_ELEVATION = 89;
+const MAX_PART_ELEVATION = 89;
 
 /** The margin of a part view with no query `margin`. */
 const DEFAULT_PART_MARGIN = 0.25;

@@ -37,7 +37,7 @@ function createJoints(): ArmJoints {
  * @param softness The length of the curve below the limit, in meters, 0 or more.
  * @returns The limited distance.
  */
-export function softLimit(distance: number, limit: number, softness: number): number {
+function softLimit(distance: number, limit: number, softness: number): number {
   if (softness <= 0) {
     return Math.min(distance, limit);
   }
