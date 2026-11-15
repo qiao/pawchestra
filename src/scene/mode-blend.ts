@@ -1,5 +1,5 @@
 import type { Vec3 } from '../models/tuples.ts';
-import { smoothstep } from '../pose/rest.ts';
+import { smoothstep } from '../math.ts';
 import type { Focus } from './focus.ts';
 
 /**

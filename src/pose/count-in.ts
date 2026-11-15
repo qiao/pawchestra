@@ -1,5 +1,5 @@
 import { lastAtOrBefore } from './blend.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /** The times of the count-in, in song seconds (design 5.2, 5.4). */
 export const COUNT_IN = {

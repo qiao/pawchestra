@@ -1,6 +1,6 @@
 import type { PlayerNote } from '../score/types.ts';
 import { lastAtOrBefore } from './blend.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /**
  * A note that starts at most this long after the first note of a group joins the group, as a

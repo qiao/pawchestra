@@ -1,6 +1,6 @@
 import { lastAtOrBefore } from './blend.ts';
 import type { NoteGroup } from './note-groups.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 import { STRIKE_MOTION } from './strikes.ts';
 
 /** The MIDI key of the tambourine (design 4.6). The other keys of the player strike the triangle. */

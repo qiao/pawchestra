@@ -1,6 +1,6 @@
 import type { PlayerNote } from '../score/types.ts';
 import { groupChords, joinSpans, spanEnvelope } from './note-groups.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /** The values of the passages of a player (design 5.1, the beat layer). */
 export const PASSAGE_MOTION = {

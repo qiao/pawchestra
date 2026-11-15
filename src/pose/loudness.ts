@@ -1,5 +1,5 @@
 import type { Score, SynthEvent } from '../score/types.ts';
-import { clamp01 } from './rest.ts';
+import { clamp01 } from '../math.ts';
 
 /** The controllers that set the loudness of a gesture (design 5.3). */
 const VOLUME = 7;

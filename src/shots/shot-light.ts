@@ -1,4 +1,4 @@
-import { smoothstep } from '../pose/rest.ts';
+import { smoothstep } from '../math.ts';
 import { KEY_PLACE } from '../models/beam.ts';
 import type { Vec3 } from '../models/tuples.ts';
 import type { ShotKind } from './types.ts';

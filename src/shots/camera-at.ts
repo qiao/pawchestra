@@ -2,7 +2,7 @@ import { MathUtils } from 'three';
 
 import type { Vec3 } from '../models/tuples.ts';
 import { lastAtOrBefore } from '../pose/blend.ts';
-import { smoothstep } from '../pose/rest.ts';
+import { smoothstep } from '../math.ts';
 import type { Transport } from '../pose/types.ts';
 import { SHOT_BEAM_OPACITY } from './beam-opacity.ts';
 import { keyDistance, writeKeyPosition } from './camera-keys.ts';

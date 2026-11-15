@@ -9,7 +9,7 @@ import { lastAtOrBefore } from './blend.ts';
 import { setBoneRotation } from './frames.ts';
 import { createArmPose, solveArm } from './ik.ts';
 import type { ArmBind } from './ik.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /**
  * The side move of the body of a standing player behind its notes (design 5.3), as a real

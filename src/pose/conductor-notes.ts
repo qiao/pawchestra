@@ -5,7 +5,7 @@ import type { ExpressionTrack } from './conductor-expression.ts';
 import { COUNT_IN, inCountIn } from './count-in.ts';
 import type { CountIn } from './count-in.ts';
 import { gestureSize } from './loudness.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /** A point in the beat plane of the conductor: to the right and up, in units of the pattern. */
 export type PatternPoint = readonly [x: number, y: number];

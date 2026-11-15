@@ -1,6 +1,6 @@
 import type { PlayerNote } from '../score/types.ts';
 import { lastAtOrBefore } from './blend.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /**
  * The rules of the left hand of the conductor between its cues (design 5.4). The values come from

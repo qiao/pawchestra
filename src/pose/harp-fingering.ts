@@ -3,7 +3,7 @@ import { lastAtOrBefore } from './blend.ts';
 import type { PlayerNote } from '../score/types.ts';
 import type { HandNote } from './hand-notes.ts';
 import { CHORD_SEC } from './note-groups.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /**
  * The rules of the harp fingering (design 5.3, `docs/reference/harp-technique.md` section 7). A

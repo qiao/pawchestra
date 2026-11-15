@@ -6,7 +6,8 @@ import { lastAtOrBefore } from './blend.ts';
 import type { BatonTrack } from './conductor-notes.ts';
 import { beatLengthAt } from './count-in.ts';
 import type { MotionFamily } from './family.ts';
-import { CONDUCTOR_MOTION, seatHeight, smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
+import { CONDUCTOR_MOTION, seatHeight } from './rest.ts';
 import type { SeatAudibility } from './types.ts';
 
 /** The rules that select the entries that the conductor cues (design 5.4). */

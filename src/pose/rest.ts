@@ -1,4 +1,5 @@
 import type { InstrumentId } from '../models/instruments/types.ts';
+import { clamp01, smoothstep } from '../math.ts';
 import { isInFamily } from './family.ts';
 import { hashUnit, mixHash } from './random.ts';
 import type { SeatAudibility, Transport } from './types.ts';
@@ -11,27 +12,6 @@ export const REST_TIMES = {
    */
   hold: 3,
 } as const;
-
-/**
- * Limits a number to [0, 1].
- *
- * @param x The number.
- * @returns The number in [0, 1].
- */
-export function clamp01(x: number): number {
-  return x < 0 ? 0 : x > 1 ? 1 : x;
-}
-
-/**
- * Eases a linear weight, so that a lift or a lowering starts and stops with no jump of speed.
- *
- * @param x The linear weight, in [0, 1].
- * @returns The eased weight, in [0, 1].
- */
-export function smoothstep(x: number): number {
-  const t = clamp01(x);
-  return t * t * (3 - 2 * t);
-}
 
 /**
  * The timing of one move of the instruments of an animal: a lift or a lowering (design 5.2). The

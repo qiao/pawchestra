@@ -1,6 +1,6 @@
 import type { PlayerNote } from '../score/types.ts';
 import { beatLengthAt } from './count-in.ts';
-import { clamp01, smoothstep } from './rest.ts';
+import { clamp01, smoothstep } from '../math.ts';
 
 /**
  * The planned looks of a player at the conductor, or at the leader of a chamber group (design

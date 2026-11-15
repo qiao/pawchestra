@@ -44,7 +44,7 @@ import { DAMP_MOTION, dampTrack } from './damps.ts';
 import type { DampState, DampTrack, DampWish } from './damps.ts';
 import { buildSideTrack, sideMoveAt } from './side-move.ts';
 import type { SideTrack } from './side-move.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 import {
   STRIKE_MOTION,
   alternateHands,

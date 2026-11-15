@@ -35,7 +35,7 @@ import { lapHand } from './lap.ts';
 import type { LapHand } from './lap.ts';
 import type { ArmRig } from './ik.ts';
 import { pedalFoot } from './pedal.ts';
-import { clamp01 } from './rest.ts';
+import { clamp01 } from '../math.ts';
 import type { PedalFoot } from './pedal.ts';
 import { buildDigitTrack } from './piano-digits.ts';
 import type { DigitTrack } from './piano-digits.ts';

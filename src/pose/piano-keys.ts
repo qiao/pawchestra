@@ -2,7 +2,7 @@ import { PIANO } from '../models/instruments/piano.ts';
 import type { PlayerNote } from '../score/types.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { CHORD_SEC } from './note-groups.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /** The number of keys of the piano, from A0 to C8. */
 export const PIANO_KEY_COUNT = PIANO.keys[1] - PIANO.keys[0] + 1;

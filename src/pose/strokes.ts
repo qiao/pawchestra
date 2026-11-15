@@ -12,7 +12,7 @@ import {
 } from './fingering.ts';
 import type { HandStep, StrokePitch } from './fingering.ts';
 import { CHORD_SEC, PHRASE_GAP_SEC, groupChords } from './note-groups.ts';
-import { clamp01, smoothstep } from './rest.ts';
+import { clamp01, smoothstep } from '../math.ts';
 
 /** The bowed strings of design 4.6. */
 type Bowed = InstrumentOf<'bowed'>;

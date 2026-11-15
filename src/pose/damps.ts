@@ -1,5 +1,5 @@
 import { lastAtOrBefore } from './blend.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /**
  * The timing of a move of a hand after a strike (design 5.3): a damp, in which the hand stops the

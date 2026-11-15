@@ -1,6 +1,6 @@
 import { MathUtils } from 'three';
 
-import { clamp01, smoothstep } from './rest.ts';
+import { clamp01, smoothstep } from '../math.ts';
 import type { Transport } from './types.ts';
 
 /**

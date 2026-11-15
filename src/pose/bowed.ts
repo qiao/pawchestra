@@ -12,7 +12,7 @@ import { HAND_FRAMES, handPlaceOf } from './fingering.ts';
 import { ARM_REACH, createArmPose, poseShoulder, solveArm, writeArm, writeCurl } from './ik.ts';
 import type { ArmRig } from './ik.ts';
 import { keepMoveBend, liftShoulder } from './round-arms.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 import type { BowState } from './strokes.ts';
 
 /** The sizes of the hand motion of the bowed strings, in meters and radians (design 5.3). */

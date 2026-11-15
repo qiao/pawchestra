@@ -3,7 +3,7 @@ import type { PlayerNote } from '../score/types.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { gestureSize } from './loudness.ts';
 import { PHRASE_GAP_SEC, groupChords, joinSpans, spanEnvelope } from './note-groups.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /** The motion of a singer (design 5.3). */
 export const CHOIR_MOTION = {

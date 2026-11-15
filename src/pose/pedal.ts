@@ -12,7 +12,7 @@ import { lastAtOrBefore } from './blend.ts';
 import { setBoneRotation } from './frames.ts';
 import { createArmPose, solveArm } from './ik.ts';
 import type { ArmBind } from './ik.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /**
  * The time of one press or one release of the damper pedal, in seconds. A pianist changes the

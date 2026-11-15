@@ -6,7 +6,7 @@ import { lastAtOrBefore } from '../pose/blend.ts';
 import { POSE_SEED, preparePoses } from '../pose/plan.ts';
 import type { PosePlan } from '../pose/plan.ts';
 import { decisionRandom } from '../pose/random.ts';
-import { smoothstep } from '../pose/rest.ts';
+import { smoothstep } from '../math.ts';
 import { runAll } from '../score/steps.ts';
 import type { Steps } from '../score/steps.ts';
 import type { Score } from '../score/types.ts';

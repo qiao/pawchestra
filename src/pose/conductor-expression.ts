@@ -4,7 +4,7 @@ import type { Beat, PlayerNote } from '../score/types.ts';
 import { lastAtOrBefore } from './blend.ts';
 import type { BatonState } from './conductor-notes.ts';
 import { beatLevels, limitRate, meanIn, rampOf, valueAt } from './conductor-left.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /**
  * The rules that read the expression of the conductor from the score (design 5.4,

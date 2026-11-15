@@ -1,7 +1,7 @@
 import type { PlayerNote } from '../score/types.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { PHRASE_GAP_SEC, groupChords, joinSpans, spanEnvelope } from './note-groups.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 import { planSlide, windFingering } from './wind-fingering.ts';
 import type { Brass, Woodwind } from './wind-fingering.ts';
 

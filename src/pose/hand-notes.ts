@@ -3,7 +3,7 @@ import type { PlayerNote } from '../score/types.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { gestureSize } from './loudness.ts';
 import { groupChords } from './note-groups.ts';
-import { clamp01, smoothstep } from './rest.ts';
+import { clamp01, smoothstep } from '../math.ts';
 import { fingerClosesAt } from './harp-fingering.ts';
 import type { FingerCloses, HarpFingering } from './harp-fingering.ts';
 

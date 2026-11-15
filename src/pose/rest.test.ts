@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { mulberry32 } from './random.ts';
+import { smoothstep } from '../math.ts';
 import {
   CONDUCTOR_MOTION,
   LIFT_FIT_SEC,
@@ -12,7 +13,6 @@ import {
   restMotion,
   seatHeight,
   seatSettled,
-  smoothstep,
   transportHeight,
   transportSettled,
 } from './rest.ts';

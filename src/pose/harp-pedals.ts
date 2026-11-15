@@ -2,7 +2,7 @@ import { HARP_PEDALS, harpString } from '../models/instruments/harp.ts';
 import type { HarpPedal } from '../models/instruments/harp.ts';
 import type { PlayerNote } from '../score/types.ts';
 import { lastAtOrBefore } from './blend.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /**
  * The times of the pedal moves of a harpist, in seconds (design 5.3,

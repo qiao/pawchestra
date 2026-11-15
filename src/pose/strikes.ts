@@ -3,7 +3,7 @@ import { MathUtils } from 'three';
 import type { Vec3 } from '../models/tuples.ts';
 import { lastAtOrBefore } from './blend.ts';
 import { gestureSize } from './loudness.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /**
  * The times of a strike of a mallet, a stick, a beater, or a cymbal (design 5.3). The sizes of

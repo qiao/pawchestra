@@ -2,7 +2,7 @@ import { MathUtils } from 'three';
 
 import type { HandNote } from './hand-notes.ts';
 import type { PianoFingering } from './piano-fingering.ts';
-import { smoothstep } from './rest.ts';
+import { smoothstep } from '../math.ts';
 
 /** The number of claws of a paw: the digits 1 (the thumb side) to 5. */
 const DIGIT_COUNT = 5;
