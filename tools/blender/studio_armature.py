@@ -15,13 +15,13 @@ gloss fan on each eye unless `eye_fans` is false, and makes the nose gloss (`fea
 The first form above starts a new species from `tools/mesh-rigs/<animal>.json`: the mesh of the
 source (`source` of the config, or `--source`) in the units of the studio with `add_surface()`, the
 armature in the T-pose at the joints of the config with the arm segments and the helpers
-(`joints_of()`, `segment_joints()`) and the rolls of `frame()`, and the Action `bind` of the seat
-rules of the config (`bind_turns()`). With `--auto-weights`, the mesh takes the automatic weights of
-Blender, at most four bones for each vertex. `--drive` keys the arm segments and the helpers of the
-Action `bind` by the rule of the app, and `--rolls` gives each bone the roll of its hint. The
-command line runs headless only. In a live Blender, import this module and call `add_surface()`,
-`drive_segments()`, `fix_rolls()`, `set_weight_row()` (one vertex), and `ring_spread()` (the
-shares of the weights across each edge ring of a limb).
+(`joints_of()`, `segment_joints()`) with the roll hints of the joints, and the Action `bind` of the
+seat rules of the config (`bind_turns()`). With `--auto-weights`, the mesh takes the automatic
+weights of Blender, at most four bones for each vertex. `--drive` keys the arm segments and the
+helpers of the Action `bind` by the rule of the app, and `--rolls` gives each bone the roll of its
+hint. The command line runs headless only. In a live Blender, import this module and call
+`add_surface()`, `drive_segments()`, `fix_rolls()`, `set_weight_row()` (one vertex), and
+`ring_spread()` (the shares of the weights across each edge ring of a limb).
 """
 
 import json
@@ -591,8 +591,8 @@ def import_source(path, weld):
 
 
 def build_armature(config, rm):
-    """Adds the armature of a config in the T-pose of the source, with the rolls of `frame()`, the
-    custom properties `palm`, `seat`, and `hinges`, and the Action `bind` of the seat rules."""
+    """Adds the armature of a config in the T-pose of the source, with the roll hints of the joints,
+    the custom properties `palm`, `seat`, and `hinges`, and the Action `bind` of the seat rules."""
     # The joints of the config hold no segment: the segments follow from the arm joints.
     bones = rm['BONES']
     rm['BONES'] = tuple(b for b in bones if b not in rm['SEGMENT_PARENTS'])

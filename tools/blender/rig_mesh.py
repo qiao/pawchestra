@@ -296,14 +296,6 @@ def joints_of(config):
     return heads, ends, rolls, children
 
 
-def frame(head, tail, roll):
-    """Gives the rotation of a bone frame: y along the bone, z toward the roll hint, x = y × z."""
-    y = unit(np.asarray(tail) - head)
-    z = np.asarray(roll, float) - np.dot(roll, y) * y
-    z = unit(z)
-    return np.stack([np.cross(y, z), y, z], axis=1)
-
-
 #: The number of deform segments of each upper arm and each forearm with `armSegments` of the
 #: config (`ARM_SEGMENTS` of `src/models/studio-rig.ts`).
 ARM_SEGMENTS = 4
@@ -437,47 +429,6 @@ THUMB_BONES = ('thumb_L', 'thumb_R')
 PARENTS.update({name: f'hand_{name[-1]}' for name in THUMB_BONES})
 
 
-def curve_samples(points, steps=40):
-    """Gives the samples of a Catmull-Rom curve through the points, `steps` on each span, and the
-    length along the curve at each sample."""
-    p = np.asarray(points, float)
-    ext = np.vstack([2 * p[0] - p[1], p, 2 * p[-1] - p[-2]])
-    out = []
-    for i in range(len(p) - 1):
-        p0, p1, p2, p3 = ext[i:i + 4]
-        for t in np.linspace(0.0, 1.0, steps + 1)[:-1]:
-            out.append(0.5 * (2 * p1 + (p2 - p0) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t
-                              + (3 * p1 - p0 - 3 * p2 + p3) * t ** 3))
-    out.append(p[-1])
-    out = np.asarray(out)
-    return out, np.concatenate([[0.0], np.cumsum(np.linalg.norm(np.diff(out, axis=0), axis=1))])
-
-
-def curl_line(rule, root):
-    """Gives the samples of the curled tail of the seated bind (`studio.tailCurl`): a Catmull-Rom
-    curve from the root of the tail through `points`, the places relative to the root in the
-    units of the studio. Gives the samples, their tangents, and the length at each sample."""
-    samples, lengths = curve_samples(np.vstack([[0.0, 0.0, 0.0],
-                                                np.asarray(rule['points'], float)]) + root)
-    tangents = np.gradient(samples, axis=0)
-    tangents /= np.linalg.norm(tangents, axis=1)[:, None]
-    return samples, tangents, lengths
-
-
-def curl_directions(rule, heads, ends):
-    """Gives the bind direction of each tail bone on the curled tail (`studio.tailCurl`): the root
-    bone points from the root to the place of the bend along the curve, and the tip bone from its
-    head to the place of the tip along the curve."""
-    root, bend, tip = heads['tail'], heads[TAIL_TIP], ends[TAIL_TIP]
-    first = float(np.linalg.norm(bend - root))
-    total = first + float(np.linalg.norm(tip - bend))
-    samples, _, lengths = curl_line(rule, np.zeros(3))
-    at = [np.array([np.interp(s, lengths, samples[:, k]) for k in range(3)])
-          for s in (first, total)]
-    head = first * unit(at[0])
-    return {'tail': unit(at[0]), TAIL_TIP: unit(at[1] - head)}
-
-
 def taubin(points, tris, ids, share, rounds):
     """Smooths the vertices `ids` by the method of Taubin (1995): in each round, each vertex moves
     a half of the way to the middle of its neighbors, then 0.53 of the way back, so that a tube
@@ -495,11 +446,6 @@ def taubin(points, tris, ids, share, rounds):
             mids = np.array([out[r].mean(axis=0) for r in rings])
             out[ids] += (factor * share)[:, None] * (mids - out[ids])
     return out
-
-
-def move(rotation, src, dst):
-    """Gives the (3 × 4) matrix that turns a point around `src` and moves `src` to `dst`."""
-    return np.concatenate([rotation, (dst - rotation @ src)[:, None]], axis=1)
 
 
 #: The bones that turn with each trunk bone of the shares of `studio.trunk`: the clavicles with
@@ -596,8 +542,7 @@ def bind_turns(config, heads, ends, rolls, turn=0.0):
     if TAIL_TIP in BONES:
         # Each tail bone turns the least way onto its bind direction after the turn of its parent.
         parent = np.eye(3)
-        targets = (curl_directions(studio['tailCurl'], heads, ends) if 'tailCurl' in studio
-                   else studio['tailBind'])
+        targets = studio['tailBind']
         for name in ('tail', TAIL_TIP):
             now = parent @ unit(ends[name] - heads[name])
             turns[name] = swing(now, np.asarray(targets[name], float)) @ parent
@@ -671,21 +616,17 @@ def posed_heads(heads, turns):
     return out
 
 
-def seat_masks(points, weights, chair, root=None):
+def seat_masks(points, weights, chair):
     """Gives the masks of the seat of a seated body: the vertices
     over the seat, the vertices of the shins and the feet that hang in front of it, and the
     vertices of the tail. Gives also the share of each vertex on these hanging bones and on the
-    tail and arm bones. With `root` (two shares of the tail), the tail share of a vertex counts
-    only by its smoothstep over these shares, so that the vertices of the root of the tail, which
-    share their weight with the hips, count as the haunch."""
+    tail and arm bones."""
     hw, front, back = chair['halfWidth'], chair['front'], chair['back']
     lower = [BONES.index(f'{b}_{s}') for b in ('shin', 'foot', 'toes') for s in 'LR']
     tails = [BONES.index(b) for b in ('tail', TAIL_TIP) if b in BONES]
     arms = [BONES.index(n) for s in 'LR' for n in arm_bones(s)]
     hanging = weights[:, lower].sum(axis=1)
     tail = weights[:, tails].sum(axis=1)
-    if root:
-        tail = smoothstep(tail, *root)
     free = hanging + tail + weights[:, arms].sum(axis=1)
     seat = (np.abs(points[:, 0]) <= hw) & (points[:, 2] >= back) & (points[:, 2] <= front)
     return seat, hanging > 0.5, tail > 0.5, np.clip(free, 0.0, 1.0)
@@ -888,13 +829,11 @@ def add_eye_shells(verts, bind, tris, colors, dark, eyes, rule):
             np.concatenate(new_colors), material, old, near)
 
 
-def correctives(src, bind, weights, turns, src_heads, bind_heads, upper_share=None):
+def correctives(src, bind, weights, turns, src_heads, bind_heads):
     """Finds the move of each vertex in the bind pose that the skin of the clip `reference` takes
     to its source place: d = A⁻¹ (source − b) − bind, with the skin A p + b of the clip. Gives the
     moves, the smallest determinant of A, and the vertex of it. `turns` holds the world turn of
-    each bone from the bind pose to the source (`clip_turns()`). With a share `upper_share`,
-    `weights` holds the twist bones of the upper arms after the bones (`upper_twist()`), and they
-    turn as in the app (`twist_matrices()`)."""
+    each bone from the bind pose to the source (`clip_turns()`)."""
     a = np.zeros((len(src), 3, 3))
     b = np.zeros((len(src), 3))
     for k, name in enumerate(BONES):
@@ -904,11 +843,6 @@ def correctives(src, bind, weights, turns, src_heads, bind_heads, upper_share=No
         back = turns[name]
         a += w[:, None, None] * back
         b += w[:, None] * (src_heads[name] - back @ bind_heads[name])
-    if upper_share is not None:
-        for k, m in enumerate(twist_matrices(turns, bind_heads, src_heads, upper_share)):
-            w = weights[:, len(BONES) + k]
-            a += w[:, None, None] * m[:, :3]
-            b += w[:, None] * m[:, 3]
     det = np.linalg.det(a)
     worst = int(np.argmin(np.abs(det)))
     moves = np.linalg.solve(a, (src - b)[:, :, None])[:, :, 0] - bind
@@ -940,25 +874,6 @@ def split_shapes(moves, weights, bind):
         out[f'{kind}_L'] = part * side[:, None]
         out[f'{kind}_R'] = part * (1 - side)[:, None]
     return {name: out[name] for name in SHAPES}
-
-
-def twist_matrices(turns, heads, posed_at, share):
-    """Gives the matrices of the twist bones of the upper arms in a pose, as `poseArm()` of
-    `src/models/studio-rig.ts` turns them: each twist bone takes the share `share` of the roll of
-    its upper arm from the chest, around the bind axis of the upper arm."""
-    out = []
-    for side in 'LR':
-        upper = turns[f'upper_arm_{side}']
-        chest = turns['chest']
-        rest = unit(heads[f'forearm_{side}'] - heads[f'upper_arm_{side}'])
-        frame = swing(chest @ rest, upper @ rest) @ chest
-        x, y, z, w = matrix_quat(frame.T @ upper)
-        roll = 2 * np.arctan2(np.array([x, y, z]) @ rest, w)
-        roll = (roll + np.pi) % (2 * np.pi) - np.pi
-        half = (share - 1) * roll / 2
-        turn = upper @ quat_matrix([*(np.sin(half) * rest), np.cos(half)])
-        out.append(move(turn, heads[f'upper_arm_{side}'], posed_at[f'upper_arm_{side}']))
-    return out
 
 
 def seat_extras(rule, prop, top):
