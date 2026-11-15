@@ -8,14 +8,12 @@ import { STUDIO_BONES, unpackStudioMesh } from '../src/models/studio-format.ts';
 import type { StudioBody } from '../src/models/studio-format.ts';
 import type { Vec3 } from '../src/models/tuples.ts';
 import { CHAIR } from '../src/models/props.ts';
-import type { AnimalSettings } from './studio-body.ts';
 import {
   ANIMALS,
   eyeOnHead,
   eyePush,
   headRig,
   ownBone,
-  rigMeshSettings,
   studioBody,
   studioGlbPath,
   ungrown,
@@ -28,28 +26,6 @@ describe('pnpm studio-body with four digits on each paw (design 4.4)', () => {
     expect(ownBone('hand_L')).toBe('hand_L');
   });
 });
-
-/**
- * Gives the settings of an animal with no seat height, so that the export drops a seated body
- * until its lowest point is on the floor.
- *
- * @param settings The settings.
- * @returns The settings with no seat height.
- */
-function onFloor(settings: AnimalSettings): AnimalSettings {
-  const floor: AnimalSettings = {
-    landmark: settings.landmark,
-    height: settings.height,
-    seated: settings.seated,
-    soloist: settings.soloist,
-    constant: settings.constant,
-    crease: settings.crease,
-  };
-  if (settings.glb) {
-    return { ...floor, glb: settings.glb };
-  }
-  return floor;
-}
 
 describe('pnpm studio-body with a tail of two bones (design 4.4)', async () => {
   const settings = ANIMALS.get('fox');
@@ -305,33 +281,6 @@ describe('pnpm studio-body with a head that the rig grows (design 4.4)', () => {
         expect(back.distanceTo(source.clone().add(rig.drop))).toBeLessThan(1e-9);
       }
     }
-  });
-});
-
-describe('pnpm studio-body with a seat height in the settings (design 4.4)', async () => {
-  const settings = rigMeshSettings('rabbit');
-  if (!settings?.glb) {
-    throw new Error('The rabbit has no settings with a GLB file.');
-  }
-  const bytes = await readFile(join(import.meta.dirname, '..', settings.glb));
-  const floor = onFloor(settings);
-
-  it('puts the seat top at the height of the settings, with the feet above the floor', () => {
-    const high = studioBody(bytes, settings.glb ?? '', { ...floor, seat: 0.3 }).body;
-    const low = studioBody(bytes, settings.glb ?? '', floor).body;
-    expect(high.seatHeight).toBeCloseTo(0.3, 6);
-    expect(low.seatHeight ?? 1).toBeLessThan(0.3);
-    const lowest = (body: typeof high): number => {
-      const { positions } = unpackStudioMesh(body.mesh);
-      let y = Infinity;
-      for (let v = 1; v < positions.length; v += 3) {
-        y = Math.min(y, positions[v] ?? 0);
-      }
-      return y;
-    };
-    // The packed mesh keeps each place within 0.1 mm.
-    expect(lowest(low)).toBeCloseTo(0, 3);
-    expect(lowest(high)).toBeCloseTo(0.3 - (low.seatHeight ?? 0), 3);
   });
 });
 

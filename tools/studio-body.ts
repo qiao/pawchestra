@@ -76,12 +76,6 @@ export interface AnimalSettings {
    */
   readonly soloist: boolean;
   /**
-   * The height of the seat top of a seated role above the floor, in meters (design 4.4, 4.5). The
-   * export puts the seat top at this height, and the feet hang above the floor. With no value,
-   * the body drops until its lowest point is on the floor, and the seat fits its legs.
-   */
-  readonly seat?: number;
-  /**
    * The move of a seated body on a chair back toward the chair back, in meters (design 4.4, 4.5).
    * The front edge of the chair of the app then lies this far in front of the front edge of the
    * chair of the rig under the body. The chair grows forward when the move would put the trunk
@@ -2544,8 +2538,6 @@ function reclines(glb: Glb): boolean {
  * its place: the soles of the studio are on the floor. A seated body drops until the lowest point
  * of its mesh, a sole, is on the floor, and moves forward so that the front edge of the seat of
  * the rig (a bench or a chair, {@link SeatExtras}) is at the front edge of the seat of the app.
- * A seated role with a seat height in its settings then rises until its seat is at that height,
- * and its feet hang above the floor.
  *
  * @param glb The file.
  * @param skeleton The bind pose.
@@ -2587,12 +2579,6 @@ function sceneFrame(
     chairWidth: seat.prop === 'chair' ? (settings.seatWidth ?? null) : null,
     bench,
   };
-  if (settings.seat === undefined) {
-    return frame;
-  }
-  // The body rises from the floor until the lowest point over the seat is at the seat height.
-  const low = seatHeightOf(glb, mesh, frame);
-  frame.offset.y += (settings.seat - low) / scale;
   return frame;
 }
 

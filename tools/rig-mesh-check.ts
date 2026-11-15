@@ -410,8 +410,8 @@ interface RigMeasures {
   /** The studio body with the settings of the animal. */
   readonly body: StudioBody;
   /**
-   * The seat that fits the legs of a seated body, in meters: the seat height of the export with no
-   * seat of `ANIMALS` ({@link legSettings}), or `null` for a body that stands.
+   * The seat that fits the legs of a seated body, in meters: the seat height of the export, or
+   * `null` for a body that stands.
    */
   readonly legSeat: number | null;
   /** The arm of each side from the shoulder joint to the middle of the palm, in meters. */
@@ -457,9 +457,7 @@ export function measureRig(
   return {
     triangles: mesh.corners.length / 3,
     body,
-    legSeat: settings.seated
-      ? studioBody(bytes, source, legSettings(settings)).body.seatHeight
-      : null,
+    legSeat: settings.seated ? body.seatHeight : null,
     arms: { L: meters(facts.arms.L), R: meters(facts.arms.R) },
     standing: standingError(bytes, standing, obj),
     floor: {
@@ -468,19 +466,6 @@ export function measureRig(
     },
     thin: thinFaces(mesh, body.heads, rule, body.scale),
   };
-}
-
-/**
- * Gives the settings of an animal with no seat height. The export then drops the seated body until
- * its lowest point is on the floor, and the seat fits its legs (design 4.4), as the seat of a
- * form change before the seat of `ANIMALS`.
- *
- * @param settings The settings of the animal.
- * @returns The settings with no `seat`.
- */
-export function legSettings(settings: AnimalSettings): AnimalSettings {
-  const { seat, ...legs } = settings;
-  return seat === undefined ? settings : legs;
 }
 
 /**
