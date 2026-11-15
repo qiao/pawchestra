@@ -267,7 +267,6 @@ export function* buildBodySteps(
     palette ? colorsWith(name, palette) : rig.mesh.colors,
     body.crease,
     body.colorBlend ?? 0,
-    body.caps,
   );
   yield;
   const skins = playerSkins(rig);
@@ -418,13 +417,13 @@ function* rigSmoothNormalsSteps(rig: BodyRig): Steps<SmoothNormals> {
   let normals = rigNormals.get(rig);
   if (!normals) {
     const { positions, correctives } = rig.mesh;
-    const { caps, rim, eyeballs, crease } = rig.body;
-    const corners = bodyNormals(rig.mesh, crease, caps, rim, eyeballs);
+    const { rim, eyeballs, crease } = rig.body;
+    const corners = bodyNormals(rig.mesh, crease, rim, eyeballs);
     const moves: Float32Array[] = [];
     for (const corrective of correctives) {
       yield;
       const moved = positions.map((p, i) => p + (corrective[i] ?? 0));
-      const after = bodyNormals({ ...rig.mesh, positions: moved }, crease, caps, rim, eyeballs);
+      const after = bodyNormals({ ...rig.mesh, positions: moved }, crease, rim, eyeballs);
       const move = new Float32Array(corners.length);
       for (let i = 0; i < corners.length; i++) {
         move[i] = (after[i] ?? 0) - (corners[i] ?? 0);

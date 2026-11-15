@@ -506,11 +506,6 @@ PARENTS.update(SEGMENT_PARENTS)
 DIGIT_PARENTS = {name: f'fingers_{name[-1]}' for name in digit_bones()}
 PARENTS.update(DIGIT_PARENTS)
 
-#: The optional thumb bones of a paw that is one fist with a free thumb (`THUMB_BONES` of
-#: `src/models/body-format.ts`), each a child of the paw of its side, after all other bones.
-THUMB_BONES = ('thumb_L', 'thumb_R')
-PARENTS.update({name: f'hand_{name[-1]}' for name in THUMB_BONES})
-
 
 def taubin(points, tris, ids, share, rounds):
     """Smooths the vertices `ids` by the method of Taubin (1995): in each round, each vertex moves

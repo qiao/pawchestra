@@ -21,31 +21,25 @@
  * Each sample set prints the median and the worst 5% of each value for each side, and the folds of
  * `pnpm fold-probe`. `--rings` adds the median roll and collapse of each ring. Each `--set`
  * changes the holds in memory, as `pnpm fold-probe --set` does, and `--glb <file>` gives the role
- * the body of the file. `--json <file>` writes the values of the table. `--body
- * <key>=<value>` sets a rule of the body of the role in memory, such as `upperTwist=0.5`
- * (`Body`), as a variant with no change of the body module.
+ * the body of the file. `--json <file>` writes the values of the table.
  *
  * Usage: pnpm arm-shape <role> [--demo <id>]... [--step <seconds>] [--set <changes>]...
- * [--body <key>=<value>]... [--rings] [--glb <file>] [--json <file>]
+ * [--rings] [--glb <file>] [--json <file>]
  */
 import { writeFile } from 'node:fs/promises';
 
 import { Quaternion, Vector3 } from 'three';
 
-import { FOLD_ROLES, SAMPLE_SETS, probeFolds, roleAnimal, roleSpecies } from './fold-probe.ts';
+import { FOLD_ROLES, SAMPLE_SETS, probeFolds, roleAnimal } from './fold-probe.ts';
 import type { FoldReport, SampleSet } from './fold-probe.ts';
 import { runTool, takeGlb, withGlbBody } from './glb-swap.ts';
 import { setHolds } from './hold-sets.ts';
 import { patchedDemos } from './patch-demos.ts';
-import { SPECIES } from '../src/models/species.ts';
-import type { SpeciesParams } from '../src/models/species.ts';
-import { bodyOf } from '../src/models/body.ts';
-import type { BodyName } from '../src/models/body.ts';
 import { BODY_BONES } from '../src/models/body-format.ts';
 import { sideSegmentBones } from './arm-segments.ts';
 import { matrixOf, turnOf, wrap } from './bone-turns.ts';
-import type { Side, Body, BodyBone, BodyMesh } from '../src/models/body-format.ts';
-import { UPPER_TWIST_BONES, twistAngle } from '../src/models/body-rig.ts';
+import type { Side, BodyBone, BodyMesh } from '../src/models/body-format.ts';
+import { twistAngle } from '../src/models/body-rig.ts';
 import type { BodyRig } from '../src/models/body-rig.ts';
 import { weightOn } from './skin-weight.ts';
 
@@ -209,12 +203,10 @@ function armBind(rig: BodyRig, side: Side): ArmBind {
     fore: boneAt(`forearm_${side}`),
     hand: boneAt(`hand_${side}`),
   };
-  // The twist bone of the upper arm (`Body.upperTwist`) and the arm segments and helpers
-  // (`sideSegmentBones()`) hold the arm weight of a body with them, so the rings of such a body
-  // take the same vertices as with no such bone.
+  // The arm segments and helpers (`sideSegmentBones()`) hold the arm weight of a body with them,
+  // so the rings of such a body take the same vertices as with no such bone.
   const armBones = [
     bones.upper,
-    UPPER_TWIST_BONES[side],
     bones.fore,
     boneAt(`forearm_twist_${side}`),
     bones.hand,
@@ -244,9 +236,7 @@ function armBind(rig: BodyRig, side: Side): ArmBind {
       const v = mesh.corners[f * 3 + k] ?? 0;
       corner.fromArray(mesh.positions, v * 3);
       middle.addScaledVector(corner, 1 / 3);
-      onUpper ||=
-        weightOn(mesh, v, [bones.upper, UPPER_TWIST_BONES[side], boneAt(`clavicle_${side}`)]) >=
-        SPIKE_WEIGHT;
+      onUpper ||= weightOn(mesh, v, [bones.upper, boneAt(`clavicle_${side}`)]) >= SPIKE_WEIGHT;
     }
     if (onUpper && middle.distanceTo(joints.shoulder) <= SPIKE_REACH * upperLength) {
       faces.push(...mesh.corners.subarray(f * 3, f * 3 + 3));
@@ -687,66 +677,6 @@ function armJson(report: ArmReport): string {
   return `${JSON.stringify({ demos: report.folds.demos, sets }, null, 1)}\n`;
 }
 
-/** The rules of a body that `--body` can set in memory, with the parse of each value. */
-const BODY_RULES: Readonly<Partial<Record<keyof Body, (text: string) => string | number>>> = {
-  upperTwist: (text) => {
-    const share = Number(text);
-    if (!(share >= 0 && share <= 1)) {
-      throw new Error(`The rule upperTwist takes a share from 0 to 1, and not "${text}".`);
-    }
-    return share;
-  },
-};
-
-/**
- * Sets rules of the bodies of a role in memory (`--body <key>=<value>`).
- *
- * @param bodies The bodies of the role.
- * @param rules The rules, such as `upperTwist=0.5`.
- * @returns A function that puts the old values back.
- * @throws Error for an unknown rule or a wrong value.
- */
-function setBodyRules(bodies: readonly BodyName[], rules: readonly string[]): () => void {
-  const undo: (() => void)[] = [];
-  for (const rule of rules) {
-    const [key = '', text = ''] = rule.split('=');
-    const parse = Object.entries(BODY_RULES).find(([k]) => k === key)?.[1];
-    if (!parse) {
-      throw new Error(
-        `The rule ${key} is not a body rule of --body: ${Object.keys(BODY_RULES).join(', ')}.`,
-      );
-    }
-    const value = parse(text);
-    for (const name of bodies) {
-      const body = bodyOf(name);
-      const had = Object.hasOwn(body, key);
-      const old: unknown = Object.entries(body).find(([k]) => k === key)?.[1];
-      Reflect.set(body, key, value);
-      undo.push(() => (had ? Reflect.set(body, key, old) : Reflect.deleteProperty(body, key)));
-    }
-  }
-  return () => {
-    for (const step of undo.toReversed()) {
-      step();
-    }
-  };
-}
-
-/**
- * Gives the bodies of the species of a role.
- *
- * @param role The name of a role of `FOLD_ROLES`.
- * @returns The names of the bodies.
- */
-function roleBodyNames(role: string): BodyName[] {
-  const source = FOLD_ROLES.get(role);
-  const names = (source ? roleSpecies(source) : []).flatMap((species) => {
-    const params: SpeciesParams = SPECIES[species];
-    return params.body ? [params.body] : [];
-  });
-  return [...new Set(names)];
-}
-
 /**
  * Runs the tool from the command line. With `--glb <file>`, the role gets the body that
  * the export makes from the file, in a copy of `src/` (`tools/glb-swap.ts`).
@@ -757,7 +687,7 @@ async function main(): Promise<void> {
   const source = FOLD_ROLES.get(role);
   if (!source) {
     throw new Error(
-      `Usage: pnpm arm-shape <role> [--demo <id>]... [--step <seconds>] [--set <changes>]... [--body <key>=<value>]... [--rings] [--glb <file>] [--json <file>], with a role of: ${[...FOLD_ROLES.keys()].join(', ')}.`,
+      `Usage: pnpm arm-shape <role> [--demo <id>]... [--step <seconds>] [--set <changes>]... [--rings] [--glb <file>] [--json <file>], with a role of: ${[...FOLD_ROLES.keys()].join(', ')}.`,
     );
   }
   if (glb) {
@@ -788,17 +718,11 @@ async function main(): Promise<void> {
   const demos = chosen.length > 0 ? all.filter((demo) => chosen.includes(demo.file)) : all;
   const holds = args.flatMap((arg, i) => (args[i - 1] === '--set' ? [arg] : [])).join(';');
   const changes = holds ? setHolds(holds) : null;
-  const rules = args.flatMap((arg, i) => (args[i - 1] === '--body' ? [arg] : []));
-  const undoRules = setBodyRules(roleBodyNames(role), rules);
   let report: ArmReport;
   try {
     report = await probeArms(role, demos, step);
   } finally {
-    undoRules();
     changes?.undo();
-  }
-  if (rules.length > 0) {
-    console.log(`Body rules: ${rules.join(', ')}`);
   }
   if (changes) {
     console.log(`Hold changes: ${changes.text}`);

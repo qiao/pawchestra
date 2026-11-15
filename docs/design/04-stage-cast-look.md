@@ -349,8 +349,6 @@ the shoulder then twists the skin and squeezes the arm flat. So a body takes arm
 helper bone at the elbow and at the wrist (`armSegments`). The bind paw sets the zero of the paw twist, so
 the rig turns it toward supination where a hold supinates far (`bind.bindSupination`).
 
-**Thumb bones.** The format has a thumb bone for each paw (`THUMB_BONES`), with a close axis
-(`Body.thumbAxes`). No body of the app uses them now.
 
 **Straight bind.** A bind that bends a thick elbow or paw (`bind.bindArms`) makes the rest shape
 a linear blend of that bend, with the skin on the inner side already pressed. Each pose then blends
@@ -547,12 +545,12 @@ chain, so each worktree and each later round can make the body again byte for by
 | `ownEyes` | With no eye objects: the middle of the sphere that fits the faces with the boolean face attribute `eye` and no `plain` on each side, in the bind (`own_eyes_of()`), and the triangles of all eye faces of the side (`faces`). Each eye vertex follows only `head`. |
 | `lids` | With eye faces and the custom property `lids` of the armature: the turn from open to closed, the hinge axis of each side turned by the head into the bind, and the triangles with the boolean face attribute `lid` of each side (`lids_of()`). Each lid vertex follows only `head`, and lies farther from the middle of its eye than each vertex of the ball. |
 | `body` | The custom properties of the armature that hold the facts of the body (`BODY_FACTS`). |
-| `caps`, `rim` | The boolean face attributes `cap` and `rim`. |
+| `rim` | The boolean face attribute `rim`. |
 | `TEXCOORD_0`, `texture` | With the custom property `texture` of the mesh object (the web copy of the color map): the active UV map, with v from the top edge. A gloss face and a face with the boolean face attribute `plain`, such as a whisker, take (-1, -1). |
 | `trunk` | Calculated: the largest turn of a trunk bone from the pose of the sheet to the bind. |
 | `headShift` | The custom property `headShift` of the armature, in the body axes. `pnpm body-module` adds it to the head center of the holds. A nose that goes from the slot `gloss` to the slot `fur` moves the head box forward, so the Tripo wolf, beagle, and cat set it, and no hold moves. |
 | `headFactor` | The custom property `headFactor` of the armature. A hand rig that scales the head about the neck joint by the head weights, as the Tripo beagle, sets it, and `pnpm body-module` measures H and the head center before the factor, so no hold moves. |
-| `neckFactor`, `upperTwist` | None. The mesh holds the form, and the arm segments replace the twist bone. |
+| `neckFactor` | None. The mesh holds the form. |
 
 The layout of the `.blend`:
 
@@ -2195,11 +2193,10 @@ type BoneName =
 - **Body bones.** A body has a skeleton of its own: the 30 body bones, two
   eye bones for the bead eyes (for the lids of a body with the eyes of its mesh), and the
   optional bones (`OPTIONAL_BODY_BONES`): a tail tip (`tail_tip`), the jaw of a beak (`jaw`),
-  the arm segments and helpers (`ARM_SEGMENT_BONES`), the digits of a hand rig (`DIGIT_BONES`),
-  and the thumbs of a fist (`THUMB_BONES`). The optional bones come after the other bones, so
+  the arm segments and helpers (`ARM_SEGMENT_BONES`), and the digits of a hand rig
+  (`DIGIT_BONES`). The optional bones come after the other bones, so
   that a new one keeps each other index. The scene gives the mesh the body bones and the bones
-  of the player, and `poseBodyBones()` writes their matrices from the pose of the player. A
-  pose also holds the twist bones of the upper arms (`UPPER_TWIST_BONES`).
+  of the player, and `poseBodyBones()` writes their matrices from the pose of the player.
 - **Arm segments.** `poseArm()` writes each segment from the turns of its arm, around the joint at
   the start of its part. The readers of the bind mesh read the upper arm or the forearm of the
   player for them (`BODY_FOLLOWS`).

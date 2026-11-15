@@ -831,35 +831,17 @@ interface Gltf {
        */
       readonly raise?: RaiseExtras | readonly RaiseExtras[];
       /**
-       * The caps of the arm of the cut that take the normals of the skin (`cut.skinNormals` of
-       * the config of the mesh rig), as indices of the triangles of the primitive `fur`. With
-       * `cut.bodyNormals`, they also hold the caps of the body and the two faces at the top of
-       * each cut. The file has none with no such rule.
-       */
-      readonly caps?: readonly number[];
-      /**
-       * The skin faces around the caps of the body of the cut that take the normals of the skin
-       * with no crease angle (`cut.bodyNormals` of the config of the mesh rig), as indices of the
-       * triangles of the primitive `fur`. The file has none with no such rule.
+       * The faces of a fold of the bind that take the normals of the skin with no crease angle
+       * (`Body.rim`), as indices of the triangles of the primitive `fur`. The file has none
+       * with no fold.
        */
       readonly rim?: readonly number[];
-      /**
-       * The share of the roll of each upper arm that its twist bone takes (`upperTwist.share` of
-       * the config of the mesh rig, `Body.upperTwist`). The file has none with no such rule.
-       */
-      readonly upperTwist?: number;
       /**
        * The unit elbow axis of each arm in the bind pose of a rig with straight bind arms
        * (`bind.straightArms` of the config of the mesh rig, `Body.hinges`), in the axes
        * of the file. The file has none with no such rule.
        */
       readonly hinges?: Readonly<Record<Side, readonly number[]>>;
-      /**
-       * The unit close axis of each thumb in the bind pose of a rig with thumb bones (`thumbs` of
-       * the config of the mesh rig, `Body.thumbAxes`), in the axes of the file. The file has
-       * none with no such rule.
-       */
-      readonly thumbs?: Readonly<Record<Side, readonly number[]>>;
       /**
        * The seat under the seated bind pose, or under the sit pose of a standing bind. A file of
        * another tool has none.
@@ -1016,39 +998,19 @@ export interface Glb {
 }
 
 /**
- * Gives the faces of the cut of the rig of a GLB file (`pnpm rig-mesh`) that take the normals of
- * the skin around them in the app (design 4.4): the caps, or the rim of the caps of the body.
+ * Gives the faces of a fold of the bind of a GLB file that take the normals of the skin around
+ * them in the app with no crease angle (`Body.rim`, design 4.4).
  *
  * @param glb The file.
- * @param key The list of the extras: `caps` or `rim`.
  * @returns The indices of the triangles of the primitive `fur`, or none for a file with no list.
  * @throws Error if an index is not a whole number of at least 0.
  */
-function cutFacesOf(glb: Glb, key: 'caps' | 'rim'): ReadonlySet<number> {
-  const faces = glb.json.asset?.extras?.[key] ?? [];
+function rimFacesOf(glb: Glb): ReadonlySet<number> {
+  const faces = glb.json.asset?.extras?.rim ?? [];
   if (faces.some((t) => !Number.isInteger(t) || t < 0)) {
-    throw new Error(`The ${key} ${JSON.stringify(faces)} of the file are not triangle indices.`);
+    throw new Error(`The rim ${JSON.stringify(faces)} of the file are not triangle indices.`);
   }
   return new Set(faces);
-}
-
-/**
- * Gives the share of the roll of each upper arm that its twist bone takes in the rig of a GLB file
- * (`upperTwist.share` of the config of `pnpm rig-mesh`, design 4.4).
- *
- * @param glb The file.
- * @returns The share, or `null` for a file with no twist bone of the upper arm.
- * @throws Error if the share is not a number from 0 to 1.
- */
-function upperTwistOf(glb: Glb): number | null {
-  const share = glb.json.asset?.extras?.upperTwist;
-  if (share === undefined) {
-    return null;
-  }
-  if (!(share >= 0 && share <= 1)) {
-    throw new Error(`The upper twist ${share} of the file is not a share from 0 to 1.`);
-  }
-  return share;
 }
 
 /**
@@ -1061,18 +1023,6 @@ function upperTwistOf(glb: Glb): number | null {
  */
 function hingesOf(glb: Glb): Record<Side, Vector3> | null {
   return sideAxes(glb.json.asset?.extras?.hinges, 'hinge');
-}
-
-/**
- * Gives the unit close axes of the thumbs in the rig of a GLB file with thumb bones (`thumbs` of
- * the config of `pnpm rig-mesh`, design 4.4), in the axes of the file.
- *
- * @param glb The file.
- * @returns The axis of each side, or `null` for a file with no thumbs.
- * @throws Error if an axis is not a unit vector of three numbers.
- */
-function thumbAxesOf(glb: Glb): Record<Side, Vector3> | null {
-  return sideAxes(glb.json.asset?.extras?.thumbs, 'thumb axis');
 }
 
 /**
@@ -1777,9 +1727,7 @@ interface SourceMesh {
      */
     readonly base?: Vec3;
     readonly finish: Finish;
-    /** True for a cap of the cut of the rig ({@link cutFacesOf}). */
-    readonly cap?: boolean;
-    /** True for a face of the rim of the caps of the body of the cut ({@link cutFacesOf}). */
+    /** True for a face of a fold of the bind ({@link rimFacesOf}). */
     readonly rim?: boolean;
     /** The side of a face of a lid ({@link lidsOf}), or `null` for each other face. */
     readonly lid?: Side | null;
@@ -1822,8 +1770,7 @@ export function weldMesh(
   }
 
   const jointNames = skin.joints.map((j) => ownBone(glb.json.nodes[j]?.name ?? ''));
-  const caps = cutFacesOf(glb, 'caps');
-  const rim = cutFacesOf(glb, 'rim');
+  const rim = rimFacesOf(glb);
   const lids = lidsOf(glb)?.faces ?? new Map<number, Side>();
   const eyeballs = ownEyeFacesOf(glb);
   const vertices: SourceVertex[] = [];
@@ -1910,16 +1857,11 @@ export function weldMesh(
         base: [base[0] ?? 0, base[1] ?? 0, base[2] ?? 0],
         finish: eyeball ? eyeFinish : finish,
         eyeball,
-        cap: material === 'fur' && caps.has(t / 3),
         rim: material === 'fur' && rim.has(t / 3),
         lid: material === 'fur' ? (lids.get(t / 3) ?? null) : null,
         uvs: uvsOf([a, b, c]),
       });
     }
-  }
-  const capCount = faces.filter((face) => face.cap === true).length;
-  if (capCount !== caps.size) {
-    throw new Error(`The file names ${caps.size} caps, and the primitive fur has ${capCount}.`);
   }
   const rimCount = faces.filter((face) => face.rim === true).length;
   if (rimCount !== rim.size) {
@@ -3171,10 +3113,6 @@ export function glbBody(bytes: Uint8Array, source: string, entry: AnimalEntry): 
       mouth: model(mouthOf(mesh, -frame.offset.x, settings.mouthHeight, band)),
     };
   }
-  const caps = withoutEyes.faces.flatMap((face, t) => (face.cap === true ? [t] : []));
-  if (caps.length > 0) {
-    body = { ...body, caps };
-  }
   const rim = withoutEyes.faces.flatMap((face, t) => (face.rim === true ? [t] : []));
   if (rim.length > 0) {
     body = { ...body, rim };
@@ -3183,17 +3121,9 @@ export function glbBody(bytes: Uint8Array, source: string, entry: AnimalEntry): 
   if (eyeballs.length > 0) {
     body = { ...body, eyeballs };
   }
-  const upperTwist = upperTwistOf(glb);
-  if (upperTwist !== null) {
-    body = { ...body, upperTwist };
-  }
   const hinges = hingesOf(glb);
   if (hinges !== null) {
     body = { ...body, hinges: { L: direction(hinges.L), R: direction(hinges.R) } };
-  }
-  const thumbAxes = thumbAxesOf(glb);
-  if (thumbAxes !== null) {
-    body = { ...body, thumbAxes: { L: direction(thumbAxes.L), R: direction(thumbAxes.R) } };
   }
   if (frame.chairWidth !== null) {
     body = { ...body, chairWidth: frame.chairWidth };

@@ -13,16 +13,10 @@ const MATTE = FINISH_ORDER.indexOf('matte');
  * edge with a larger angle, such as an ear rim, stays sharp. A face of another finish, such as
  * the gloss of an eye, keeps its own normal at each corner, so it stays flat.
  *
- * The faces of `caps` close the holes of the arms that the cut of a rig makes (design 4.4).
- * Their normals point into the gap between the arm and the trunk, away from the light. So a
- * corner of a cap gets the mean of the normals of all `matte` faces at its vertex that are no
- * caps, and a cap shades as the skin around it. A corner of another face does not count the caps.
- *
- * The faces of `rim` are skin faces around the caps of the body. The side of the trunk curls in
- * where it joins the hanging arm, so these faces turn more than the crease angle from the skin
- * around them, and a raised arm shows them as a dark crack. So a corner of a rim face gets the
- * mean of the normals of all `matte` faces at its vertex that are no caps, with no crease angle.
- * A hand rig also marks the faces of a fold of its bind, such as a seated crotch, as `rim`.
+ * The faces of `rim` are the faces of a fold of the bind that a hand rig marks, such as a seated
+ * crotch. They turn more than the crease angle from the skin around them, and a pose shows them as
+ * a dark crack. So a corner of a rim face gets the mean of the normals of all `matte` faces at its
+ * vertex, with no crease angle.
  *
  * The faces of `eyeballs` are the `eye` faces of the mesh of a hand rig. A corner of such a
  * face gets the mean of the normals of the eyeball faces at its vertex, with no crease angle, so
@@ -30,22 +24,18 @@ const MATTE = FINISH_ORDER.indexOf('matte');
  *
  * @param mesh The places of the welded vertices, the corners, and the finishes of the mesh.
  * @param crease The crease angle in degrees.
- * @param caps The `matte` triangles of the caps of the arms (`Body.caps`).
- * @param rim The `matte` triangles of the rim of the caps and of the folds of the body
- *   (`Body.rim`).
+ * @param rim The `matte` triangles of the folds of the body (`Body.rim`).
  * @param eyeballs The triangles of the eyes of the mesh (`Body.eyeballs`).
  * @returns x, y, z of the unit normal of each corner, in the order of `mesh.corners`.
  */
 export function bodyNormals(
   mesh: Pick<BodyMesh, 'positions' | 'corners' | 'finishes'>,
   crease: number,
-  caps: readonly number[] = [],
   rim: readonly number[] = [],
   eyeballs: readonly number[] = [],
 ): Float32Array {
   const { corners, finishes } = mesh;
   const cornerCount = corners.length;
-  const isCap = faceFlags(cornerCount / 3, caps);
   const isRim = faceFlags(cornerCount / 3, rim);
   const isBall = faceFlags(cornerCount / 3, eyeballs);
   const { faces, angles, start, around } = meshFrame(mesh);
@@ -65,8 +55,8 @@ export function bodyNormals(
       sx = 0;
       sy = 0;
       sz = 0;
-      // A cap and a rim face take the skin at the vertex with no crease angle.
-      const whole = isCap[own] === 1 || isRim[own] === 1;
+      // A rim face takes the skin at the vertex with no crease angle.
+      const whole = isRim[own] === 1;
       const v = corners[c] ?? 0;
       for (let i = start[v] ?? 0; i < (start[v + 1] ?? 0); i++) {
         const other = around[i] ?? 0;
@@ -74,7 +64,7 @@ export function bodyNormals(
         const fx = faces[face * 3] ?? 0;
         const fy = faces[face * 3 + 1] ?? 0;
         const fz = faces[face * 3 + 2] ?? 0;
-        const skin = finishes[face] === MATTE && isCap[face] !== 1;
+        const skin = finishes[face] === MATTE;
         let counts = whole ? skin : other === c || (skin && ox * fx + oy * fy + oz * fz >= limit);
         // An eyeball face takes the other faces of its ball at the vertex, with no crease angle.
         if (ball) {
@@ -119,7 +109,6 @@ const COLOR_CORNERS_PER_STEP = 4000;
  * @param crease The crease angle in degrees.
  * @param blend The largest difference of two face colors that blend, in each sRGB channel from
  *   0 to 1. With 0, each corner keeps the color of its face.
- * @param caps The `matte` triangles of the caps of the arms (`Body.caps`).
  * @returns The steps, which return linear r, g, b of each corner, in the order of
  *   `mesh.corners`.
  */
@@ -128,7 +117,6 @@ export function* bodyCornerColorsSteps(
   colors: ArrayLike<number>,
   crease: number,
   blend: number,
-  caps: readonly number[] = [],
 ): Steps<Float32Array> {
   const { corners, finishes } = mesh;
   const cornerCount = corners.length;
@@ -142,7 +130,6 @@ export function* bodyCornerColorsSteps(
   if (blend <= 0) {
     return out;
   }
-  const isCap = faceFlags(cornerCount / 3, caps);
   const { faces, angles, start, around } = meshFrame(mesh);
   yield;
   const srgb = Float32Array.from({ length: colors.length }, (_, i) => toSrgb(colors[i] ?? 0));
@@ -152,7 +139,7 @@ export function* bodyCornerColorsSteps(
       yield;
     }
     const own = Math.floor(c / 3);
-    if (finishes[own] !== MATTE || isCap[own] === 1) {
+    if (finishes[own] !== MATTE) {
       continue;
     }
     const ox = faces[own * 3] ?? 0;
@@ -166,7 +153,7 @@ export function* bodyCornerColorsSteps(
     for (let i = start[v] ?? 0; i < (start[v + 1] ?? 0); i++) {
       const other = around[i] ?? 0;
       const face = Math.floor(other / 3);
-      if (finishes[face] !== MATTE || isCap[face] === 1) {
+      if (finishes[face] !== MATTE) {
         continue;
       }
       const turn =

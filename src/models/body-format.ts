@@ -79,21 +79,11 @@ export const DIGIT_BONES = [
 export const DIGITS = 5;
 
 /**
- * The thumb bones of a rig whose paw is one fist with a free thumb (design 4.4), the left side
- * first. Each thumb is a child of the paw (`hand`), with its head at the root of the thumb and its
- * tail at the thumb tip, because the thumb of a real hand starts at the wrist. The pose code turns
- * each thumb about its close axis ({@link Body.thumbAxes}) by the bend of digit 1 of its paw
- * (`poseArm()` of `models/body-rig.ts`). With no bend, the thumb keeps the turn of the paw.
- */
-const THUMB_BONES = ['thumb_L', 'thumb_R'] as const;
-
-/**
  * The bones of a body (design 4.4, 4.7): the 30 body bones of a rig file, in
  * parent order, the two eye bones that `pnpm body-module` adds, so that the eyes blink (design
  * 5.1), and the optional bones ({@link OPTIONAL_BODY_BONES}): the tip of a tail of two bones,
- * the jaw of a beak, the arm segments and helpers ({@link ARM_SEGMENT_BONES}), the digit bones
- * of a hand rig ({@link DIGIT_BONES}), and the thumb bones of a fist ({@link THUMB_BONES}). The
- * optional bones come last, so that the index of each other bone stays. The names keep the
+ * the jaw of a beak, the arm segments and helpers ({@link ARM_SEGMENT_BONES}), and the digit
+ * bones of a hand rig ({@link DIGIT_BONES}). The optional bones come last, so that the index of each other bone stays. The names keep the
  * spelling of the rig. The packed skin names each bone by its index in this list.
  */
 export const BODY_BONES = [
@@ -133,7 +123,6 @@ export const BODY_BONES = [
   'jaw',
   ...ARM_SEGMENT_BONES,
   ...DIGIT_BONES,
-  ...THUMB_BONES,
 ] as const;
 
 /** A bone of a body. */
@@ -143,9 +132,9 @@ export type BodyBone = (typeof BODY_BONES)[number];
  * The bones that a body can lack: the tip of a tail of two bones, as the rig of the fox
  * mesh has, the jaw of a beak that opens, as the rig of the penguin mesh has, and the arm segments
  * and helpers, as the rig of the polar bear mesh has (design 4.4, 4.7), the digits of a hand
- * rig, as the polar bear has, and the thumbs of a fist, as the deer has. The `tail` bone then
+ * rig, as the polar bear has. The `tail` bone then
  * holds the root of the tail, and the `jaw` bone the lower part of the beak, at the hinge of the
- * beak. A body with no tip, no jaw, no arm segments, no digits, or no thumbs, such as the bear or
+ * beak. A body with no tip, no jaw, no arm segments, or no digits, such as the bear or
  * the rabbit, has no vertex on them.
  */
 export const OPTIONAL_BODY_BONES = [
@@ -153,7 +142,6 @@ export const OPTIONAL_BODY_BONES = [
   'jaw',
   ...ARM_SEGMENT_BONES,
   ...DIGIT_BONES,
-  ...THUMB_BONES,
 ] as const;
 
 /** A bone that a body can lack. */
@@ -232,8 +220,6 @@ export const BODY_PARENTS = {
   digit3_R: 'fingers_R',
   digit4_R: 'fingers_R',
   digit5_R: 'fingers_R',
-  thumb_L: 'hand_L',
-  thumb_R: 'hand_R',
 } as const satisfies Readonly<Record<BodyBone, BodyBone | null>>;
 
 /** A side of the body: the left side of the animal is at -x (design 4.4). */
@@ -583,17 +569,9 @@ export interface Body {
    */
   readonly cueLift?: number;
   /**
-   * The caps of the arms that the cut of a rig makes (design 4.4), as indices of the
-   * triangles of the packed mesh. With `cut.bodyNormals` of the config of the rig, they also hold
-   * the caps of the body and the two faces at the top of each cut. Each corner of a cap takes the
-   * normal of the skin at its vertex (`bodyNormals()`). A body with no such rule has none.
-   */
-  readonly caps?: readonly number[];
-  /**
-   * The skin faces around the caps of the body of the cut of a rig (`cut.bodyNormals` of the
-   * config of the rig, design 4.4), as indices of the triangles of the packed mesh. Each corner
-   * of a rim face takes the normal of the skin at its vertex with no crease angle
-   * (`bodyNormals()`). A body with no such rule has none.
+   * The faces of a fold of the bind that a hand rig marks, such as a seated crotch (design 4.4),
+   * as indices of the triangles of the packed mesh. Each corner of a rim face takes the normal of
+   * the skin at its vertex with no crease angle (`bodyNormals()`). A body with no fold has none.
    */
   readonly rim?: readonly number[];
   /**
@@ -616,25 +594,12 @@ export interface Body {
    */
   readonly palettes?: Readonly<Partial<Record<BodyPalette, string>>>;
   /**
-   * The share of the roll of each upper arm that the skin at the shoulder takes (design 4.4): a
-   * twist bone of the upper arm takes this share of the roll from the chest, and the weight of
-   * the upper arm moves to the twist bone near the shoulder. Thus the roll spreads along the upper
-   * arm, and the skin does not twist at the shoulder. A body with no share has no twist bone.
-   */
-  readonly upperTwist?: number;
-  /**
    * The unit elbow axis of each arm in the bind pose of a body with straight bind arms (design
    * 4.4): the axis about which the app bends the elbow (`poseArm()` of `models/body-rig.ts`). A
    * straight arm has no plane of its own. A body with no axes takes the axis of its bent bind arm:
    * the upper arm × the forearm.
    */
   readonly hinges?: Readonly<Record<Side, Vec3>>;
-  /**
-   * The unit close axis of each thumb in the bind pose of a body with thumb bones (design 4.4,
-   * {@link THUMB_BONES}): a turn about it by a positive angle moves the thumb tip across the palm
-   * (`thumbs` of the rig config). A body with no thumbs has none.
-   */
-  readonly thumbAxes?: Readonly<Record<Side, Vec3>>;
 }
 
 /** The largest number of bones of a vertex of a body. */

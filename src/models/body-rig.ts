@@ -105,8 +105,6 @@ export const BODY_FOLLOWS = {
   digit3_R: 'fingersR',
   digit4_R: 'fingersR',
   digit5_R: 'fingersR',
-  thumb_L: 'handL',
-  thumb_R: 'handR',
 } as const satisfies Readonly<Record<BodyBone, BodyBoneName>>;
 
 /**
@@ -189,12 +187,6 @@ interface BodyArm {
    * `models/body-format.ts`).
    */
   readonly digits: readonly { readonly index: number; readonly head: Vec3 }[] | null;
-  /**
-   * The thumb bone of a fist: the index in `BODY_BONES`, the head in the bind pose, and the
-   * close axis ({@link Body.thumbAxes}), or `null` for a body with no thumb
-   * (`THUMB_BONES` of `models/body-format.ts`).
-   */
-  readonly thumb: { readonly index: number; readonly head: Vec3; readonly axis: Vec3 } | null;
 }
 
 /**
@@ -226,9 +218,8 @@ export interface BodyRig {
    */
   readonly positions: Readonly<Record<BodyBoneName, Vec3>>;
   /**
-   * The bone of the player that each skin joint follows, as indices in `BONE_NAMES`: each body
-   * bone, and the twist bone of each upper arm at its index of {@link UPPER_TWIST_BONES}, which
-   * follows the upper arm. The readers of the bind mesh read the skin by this map.
+   * The bone of the player that each skin joint follows, as indices in `BONE_NAMES`: one for each
+   * body bone. The readers of the bind mesh read the skin by this map.
    */
   readonly follows: Uint8Array;
   readonly arms: Readonly<Record<Side, BodyArm>>;
@@ -343,24 +334,8 @@ const INSTRUMENT = boneIndex('instrument');
 /** The index of the `slide` bone of the player. */
 const SLIDE = boneIndex('slide');
 
-/**
- * The index of the matrix of the twist bone of each upper arm in a {@link BodyPose}, after the
- * bones of the player (`Body.upperTwist`).
- */
-export const UPPER_TWIST_BONES = {
-  L: BODY_BONES.length + BONE_NAMES.length,
-  R: BODY_BONES.length + BONE_NAMES.length + 1,
-} as const satisfies Readonly<Record<Side, number>>;
-
-/** The number of matrices of a {@link BodyPose}: with the twist bones of the upper arms. */
-export const BODY_POSE_BONES = BODY_BONES.length + BONE_NAMES.length + 2;
-
-/**
- * The places along the upper arm, from 0 at the shoulder joint to 1 at the elbow, between which
- * the weight of the upper arm moves from the twist bone to the upper arm bone
- * (`Body.upperTwist`).
- */
-const UPPER_TWIST_SPAN = [0.1, 0.9] as const;
+/** The number of matrices of a {@link BodyPose}: the bones of the body, then of the player. */
+export const BODY_POSE_BONES = BODY_BONES.length + BONE_NAMES.length;
 
 /**
  * The index of the weight of the first shape of a raised arm or of a bent wrist in
@@ -884,7 +859,6 @@ export function bodyRig(bound: Body, stands = false): BodyRig {
             correctives: unpacked.correctives.slice(0, armCorrectives(bound)),
           },
         };
-  const twisted = body.upperTwist === undefined ? mesh : withUpperTwist(body, mesh);
   const h = body.heads;
   const unit = (from: Vec3, to: Vec3): Vector3 =>
     new Vector3(...to).sub(new Vector3(...from)).normalize();
@@ -945,38 +919,15 @@ export function bodyRig(bound: Body, stands = false): BodyRig {
             head: h[bone] ?? h[`fingers_${side}`],
           }))
         : null,
-      thumb: thumbOf(body, side),
     };
   };
   return {
     body,
-    mesh: twisted,
+    mesh,
     positions: playerPositions(body),
     follows: skinFollows(),
     arms: { L: arm('L'), R: arm('R') },
   };
-}
-
-/**
- * Gives the thumb bone of one paw of a body with thumb bones (`THUMB_BONES` of
- * `models/body-format.ts`).
- *
- * @param body The body.
- * @param side The side of the paw.
- * @returns The index, the bind head, and the close axis of the thumb, or `null` for a body with no
- *   thumb.
- * @throws Error if the body has a thumb bone and no close axis for it.
- */
-function thumbOf(body: Body, side: Side): BodyArm['thumb'] {
-  const head = body.heads[`thumb_${side}`];
-  if (!head) {
-    return null;
-  }
-  const axis = body.thumbAxes?.[side];
-  if (!axis) {
-    throw new Error(`The body has the bone thumb_${side} and no close axis for it.`);
-  }
-  return { index: BODY_BONES.indexOf(`thumb_${side}`), head, axis };
 }
 
 /**
@@ -1008,9 +959,8 @@ function segmentShare(k: number): number {
 
 /**
  * Gives the bone of the player that each skin joint of a body follows
- * ({@link BodyRig.follows}): the bone of {@link BODY_FOLLOWS} for each body bone, and the
- * upper arm for the twist bone of each upper arm. Thus a vertex of the upper arm stays on the upper
- * arm for the readers of the bind mesh, such as the parts of the clearance sweep.
+ * ({@link BodyRig.follows}): the bone of {@link BODY_FOLLOWS} for each body bone. Thus a vertex
+ * of the upper arm stays on the upper arm for the readers of the bind mesh, such as the parts of the clearance sweep.
  *
  * @returns The bone of the player for each index of a skin joint, up to {@link BODY_POSE_BONES}.
  */
@@ -1019,62 +969,7 @@ function skinFollows(): Uint8Array {
   for (const [k, bone] of BODY_BONES.entries()) {
     follows[k] = boneIndex(BODY_FOLLOWS[bone]);
   }
-  follows[UPPER_TWIST_BONES.L] = boneIndex('upperArmL');
-  follows[UPPER_TWIST_BONES.R] = boneIndex('upperArmR');
   return follows;
-}
-
-/**
- * Moves the weight of each upper arm near the shoulder to the twist bone of the upper arm
- * (`Body.upperTwist`): the share of the twist bone falls from 1 to 0 over
- * {@link UPPER_TWIST_SPAN}. A vertex with four bones keeps its four largest weights.
- *
- * @param body The body.
- * @param mesh The unpacked mesh.
- * @returns The mesh with the new joints and weights.
- */
-function withUpperTwist(body: Body, mesh: BodyMesh): BodyMesh {
-  const joints = mesh.joints.slice();
-  const weights = mesh.weights.slice();
-  const [from, to] = UPPER_TWIST_SPAN;
-  const p = new Vector3();
-  for (const side of ['L', 'R'] as const) {
-    const upperBone = BODY_BONES.indexOf(`upper_arm_${side}`);
-    const shoulderAt = new Vector3(...body.heads[`upper_arm_${side}`]);
-    const axis = new Vector3(...body.heads[`forearm_${side}`]).sub(shoulderAt);
-    const length = axis.length();
-    axis.normalize();
-    for (let v = 0; v < joints.length / 4; v++) {
-      const k = [0, 1, 2, 3].find(
-        (i) => joints[v * 4 + i] === upperBone && (weights[v * 4 + i] ?? 0) > 0,
-      );
-      if (k === undefined) {
-        continue;
-      }
-      const along =
-        p
-          .fromArray(mesh.positions, v * 3)
-          .sub(shoulderAt)
-          .dot(axis) / length;
-      const share = clamp01((to - along) / (to - from));
-      const w = weights[v * 4 + k] ?? 0;
-      const skin: [number, number][] = [0, 1, 2, 3]
-        .filter((i) => i !== k && (weights[v * 4 + i] ?? 0) > 0)
-        .map((i) => [joints[v * 4 + i] ?? 0, weights[v * 4 + i] ?? 0]);
-      skin.push([upperBone, w * (1 - share)], [UPPER_TWIST_BONES[side], w * share]);
-      const kept = skin
-        .filter(([, weight]) => weight > 0)
-        .toSorted((a, b) => b[1] - a[1])
-        .slice(0, 4);
-      const total = kept.reduce((sum, [, weight]) => sum + weight, 0);
-      for (let i = 0; i < 4; i++) {
-        const [bone = 0, weight = 0] = kept[i] ?? [];
-        joints[v * 4 + i] = bone;
-        weights[v * 4 + i] = weight / total;
-      }
-    }
-  }
-  return { ...mesh, joints, weights };
 }
 
 /** The world rotation of each bone of the player. Each call writes them before it reads them. */
@@ -1107,7 +1002,6 @@ const X_AXIS = new Vector3(1, 0, 0);
 const twistTurn = new Quaternion();
 const segmentTurn = new Quaternion();
 const rollFrame = new Quaternion();
-const rollTurn = new Quaternion();
 const rollAxis = new Vector3();
 const rollEnd = new Vector3();
 const relative = new Quaternion();
@@ -1174,29 +1068,6 @@ function writeMatrix(
   offset.copy(from).applyQuaternion(turn);
   matrix.setPosition(to.x - offset.x, to.y - offset.y, to.z - offset.z);
   matrix.toArray(out, index * 16);
-}
-
-/**
- * Gives the turn of the twist bone of an upper arm (`Body.upperTwist`): the turn of the upper
- * arm, less the rest of its roll from the chest. The frame with no roll is the chest swung onto the
- * upper arm.
- *
- * @param armTurn The world turn of the upper arm from the bind pose.
- * @param chestTurn The world turn of the chest from the bind pose.
- * @param armBind The unit direction of the upper arm in the bind pose.
- * @param share The share of the roll that the twist bone takes, from 0 to 1.
- * @param out The quaternion to write.
- * @returns `out`.
- */
-export function upperTwistTurn(
-  armTurn: Quaternion,
-  chestTurn: Quaternion,
-  armBind: Vector3,
-  share: number,
-  out: Quaternion,
-): Quaternion {
-  const roll = upperRoll(armTurn, chestTurn, armBind);
-  return out.setFromAxisAngle(armBind, (share - 1) * roll).premultiply(armTurn);
 }
 
 /**
@@ -1538,24 +1409,10 @@ function poseArm(
   const side = arm.side;
   const keys = ARM_HEADS[side];
   writeMatrix(out.matrices, arm.bones.upper, upperTurn, bind.fromArray(h[keys.upper]), shoulder);
-  const share = rig.body.upperTwist;
-  if (share !== undefined) {
-    upperTwistTurn(upperTurn, rotations[CHEST] ?? local, upperBind, share, rollTurn);
-    writeMatrix(
-      out.matrices,
-      UPPER_TWIST_BONES[side],
-      rollTurn,
-      bind.fromArray(h[keys.upper]),
-      shoulder,
-    );
-  }
   writeMatrix(out.matrices, arm.bones.fore, foreTurn, bind.fromArray(h[keys.fore]), elbow);
   head.copy(elbow).lerp(wrist, arm.twistAt);
   writeMatrix(out.matrices, arm.bones.twist, twistTurn, bind.fromArray(h[keys.twist]), head);
   writeMatrix(out.matrices, arm.bones.hand, handTurn, bind.fromArray(h[keys.hand]), wrist);
-  if (arm.thumb) {
-    poseThumb(rig, arm, arm.thumb, offsets.digits, out);
-  }
   // The fingers start at the knuckle of the turned paw.
   head
     .fromArray(h[keys.fingers])
@@ -1569,36 +1426,6 @@ function poseArm(
   if (arm.segments) {
     poseSegments(rig, arm.segments, side, twist, out);
   }
-}
-
-/**
- * Writes the thumb bone of one paw of a fist (design 4.4, 5.3) from the turn of the paw that
- * {@link poseArm} leaves in the module values. The thumb takes the turn of the paw, then its own
- * bend about its close axis, and it turns around its head on the posed paw. The bend is the bend
- * of digit 1 of the paw (`digits` of `AnimalPose`): a positive bend moves the thumb tip across the
- * palm. With no bend, the thumb moves as the paw.
- *
- * @param rig The body rig.
- * @param arm The arm.
- * @param thumb The thumb of the arm.
- * @param bends The bend of each digit, the left paw first, or `null` for no bend.
- * @param out The pose to write.
- */
-function poseThumb(
-  rig: BodyRig,
-  arm: BodyArm,
-  thumb: NonNullable<BodyArm['thumb']>,
-  bends: Float32Array | null,
-  out: BodyPose,
-): void {
-  const handBind = rig.body.heads[ARM_HEADS[arm.side].hand];
-  curlTurn.setFromAxisAngle(
-    curlAxis.fromArray(thumb.axis),
-    bends?.[arm.side === 'L' ? 0 : DIGITS] ?? 0,
-  );
-  segmentTurn.copy(handTurn).multiply(curlTurn);
-  digitAt.fromArray(thumb.head).sub(bind.fromArray(handBind)).applyQuaternion(handTurn).add(wrist);
-  writeMatrix(out.matrices, thumb.index, segmentTurn, bind.fromArray(thumb.head), digitAt);
 }
 
 /**

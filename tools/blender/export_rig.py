@@ -145,7 +145,6 @@ def check_rig(rig, body, rm, bones, order):
     kinds = {
         'color': 'FLOAT_COLOR',
         'color_base': 'FLOAT_COLOR',
-        'cap': 'BOOLEAN',
         'rim': 'BOOLEAN',
         'plain': 'BOOLEAN',
         'eye': 'BOOLEAN',
@@ -411,8 +410,8 @@ def body_of(rig):
 
 
 def extras_of(rig, me, rm, bones, points, w, turns, raises):
-    """Gives the extras of the asset: the seat, the corrective shapes, the elbow axes, the caps,
-    the rim, and the recline."""
+    """Gives the extras of the asset: the seat, the corrective shapes, the elbow axes, the rim, and
+    the recline."""
     seat = sa.rig_property(rig, 'seat') or {}
     need(
         seat.get('prop') in ('chair', 'bench')
@@ -476,16 +475,15 @@ def extras_of(rig, me, rm, bones, points, w, turns, raises):
 
 
 def triangles(me):
-    """Gives the corners, the material, the color, the base color, the cap flag, the rim flag,
-    the lid flag, and the eye flag of each triangle, as Blender divides the faces, in the order of
-    the faces."""
+    """Gives the corners, the material, the color, the base color, the rim flag, the lid flag, and
+    the eye flag of each triangle, as Blender divides the faces, in the order of the faces."""
     me.calc_loop_triangles()
     owner = np.array([t.polygon_index for t in me.loop_triangles])
     slots = [m.name for m in me.materials]
     kinds = np.array([slots[p.material_index] for p in me.polygons])[owner]
     color = face_values(me, 'color', 4)[:, :3]
     base = face_values(me, 'color_base', 4, face_values(me, 'color', 4))[:, :3]
-    names = ('cap', 'rim', 'lid', 'eye')
+    names = ('rim', 'lid', 'eye')
     flags = [face_values(me, n, 1, np.zeros(len(me.polygons), bool))[owner] for n in names]
     need(not (np.any(flags, axis=0) & (kinds != 'fur')).any(), 'A flag face is not fur.')
     corners = np.array([t.vertices[:] for t in me.loop_triangles])
@@ -649,13 +647,11 @@ def main():
         if lids:
             extras['lids'] = lids
     extras['body'] = body_of(rig)
-    corners, kinds, colors, bases, caps, rim, lid, eye = triangles(body.data)
+    corners, kinds, colors, bases, rim, lid, eye = triangles(body.data)
     texture, uvs = texture_of(body, body.data, kinds)
     if texture:
         extras['texture'] = texture
     fur = np.cumsum(kinds == 'fur') - 1
-    if caps.any():
-        extras['caps'] = sorted(int(fur[t]) for t in np.nonzero(caps)[0])
     if rim.any():
         extras['rim'] = sorted(int(fur[t]) for t in np.nonzero(rim)[0])
     left = points[corners].mean(axis=1)[:, 0] > 0

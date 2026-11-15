@@ -832,11 +832,6 @@ async function preview(options: Options): Promise<PosePreview> {
   const glb = readGlb(bytes);
   const frame = blendFrame(bound, glb);
   const raises = raisesOf(glb).map((raise) => raise.target);
-  if (bound.upperTwist !== undefined) {
-    console.warn(
-      'The body has an upper arm twist bone (upperTwist), which the GLB file does not hold: the preview shows the upper arms with the weights of the file.',
-    );
-  }
 
   if (options.holds !== null) {
     console.log(`Hold changes: ${setHolds(options.holds).text}.`);

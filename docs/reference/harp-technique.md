@@ -393,8 +393,8 @@ The app does not follow these facts:
 
 - **The damp (7.6).** The flat palm does not press on the strings. The treble strings of the
   near harp lie near the chest of the deer, and a press put the right paw into the chest.
-- **The fingers (7.1).** The deer has a thumb bone and one bone for fingers 2 to 4, so fingers 2
-  to 4 close together. A digit pose for a paw with a bone for each finger reads the finger, the
+- **The fingers (7.1).** The paw of the deer has one `fingers` bone, so all fingers close
+  together. A digit pose for a paw with a bone for each finger reads the finger, the
   pluck time, and the close time of each note (`HarpFingering`) and closes each finger from its
   pluck to its close time.
 - **Thirds of fingers, glissandos, and repeated notes (7.5).** The app plays a glissando as single
