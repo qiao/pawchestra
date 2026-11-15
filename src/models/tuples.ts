@@ -13,6 +13,9 @@ export type Quat = Readonly<QuaternionTuple>;
 /** The rotation that changes nothing. */
 export const IDENTITY: Quat = [0, 0, 0, 1];
 
+/** The point (0, 0, 0). */
+export const ORIGIN: Vec3 = [0, 0, 0];
+
 /**
  * Copies a vector into its plain form. `new Vector3(...p)` makes the opposite conversion.
  *

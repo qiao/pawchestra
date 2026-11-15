@@ -14,6 +14,7 @@ import type { ArmRig } from './ik.ts';
 import { keepMoveBend, liftShoulder } from './round-arms.ts';
 import { smoothstep } from '../math.ts';
 import type { BowState } from './strokes.ts';
+import { ORIGIN } from '../models/tuples.ts';
 
 /** The sizes of the hand motion of the bowed strings, in meters and radians (design 5.3). */
 export const BOWED_HANDS = {
@@ -106,7 +107,6 @@ interface BowHand {
 const rest = new Quaternion();
 const playTurn = new Quaternion();
 const playShift = new Vector3();
-const ORIGIN = [0, 0, 0] as const;
 const restPivot = new Vector3();
 const parentInverse = new Quaternion();
 const pivotFromParent = new Vector3();

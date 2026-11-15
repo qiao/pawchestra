@@ -6,7 +6,7 @@ import { harpStringPosition } from '../models/instruments/harp.ts';
 import { placePoint } from '../models/instruments/hold.ts';
 import type { PlacedPiece } from '../models/instruments/hold.ts';
 import { pianoKeyFront } from '../models/instruments/piano.ts';
-import { IDENTITY, toVec3 } from '../models/tuples.ts';
+import { IDENTITY, ORIGIN, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
 import type { Steps } from '../score/steps.ts';
 import type { PlayerNote } from '../score/types.ts';
@@ -887,7 +887,6 @@ const wrist = new Vector3();
 const restWrist = new Vector3();
 const restHand = new Quaternion();
 const arcMove = new Vector3();
-const ORIGIN = [0, 0, 0] as const;
 
 /**
  * Turns a piano paw by the roll and the yaw of its hand state, around the claw of the note

@@ -5,7 +5,7 @@ import { boneIndex } from '../models/rig.ts';
 import type { SpeciesId } from '../models/species.ts';
 import { placePoint } from '../models/instruments/hold.ts';
 import type { PiecePoint } from '../models/instruments/types.ts';
-import { IDENTITY, toQuat, toVec3 } from '../models/tuples.ts';
+import { IDENTITY, ORIGIN, toQuat, toVec3 } from '../models/tuples.ts';
 import type { Quat, Vec3 } from '../models/tuples.ts';
 import { NO_TURN, X_AXIS, Y_AXIS, Z_AXIS } from './axes.ts';
 import { mixPole, mixRotation } from './blend.ts';
@@ -2053,7 +2053,6 @@ const restWrist = new Vector3();
 const restHand = new Quaternion();
 const rollTurn = new Quaternion();
 const arcMove = new Vector3();
-const ORIGIN = [0, 0, 0] as const;
 
 const tubeSide = new Vector3();
 const tubeAxis = new Vector3();
