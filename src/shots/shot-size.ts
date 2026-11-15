@@ -63,7 +63,7 @@ export const FRAME_MARGINS = {
   side: 0.1,
   /**
    * The top of each head stays this far below the top edge, so the head is not cut. Long ears can
-   * leave the frame ({@link HEAD_BONES} of `subjects.ts`).
+   * leave the frame (`HEAD_BONES` of `subjects.ts`).
    * The fit reads the head of the bind pose, and a playing pose can lift the head above it.
    */
   top: 0.1,

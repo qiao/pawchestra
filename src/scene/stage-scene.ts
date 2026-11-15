@@ -415,12 +415,6 @@ export function lightEffects(scene: Object3D): Object3D[] {
 }
 
 /**
- * The 3D scene of the page: the renderer, and the stage, the lights, the camera, the props, and the
- * players of one layout. The page keeps one renderer, so that a new layout does not compile the
- * shader programs again. The players show the bind pose until {@link StageScene.pose} gives them
- * the poses of a frame.
- */
-/**
  * Renders the scene pass of a frame (design 4.5). The depth pass of the beam renders the shadow
  * map of the frame (`BeamDepth.render`), so the scene pass after it does not render the map again.
  * With no depth pass, the scene pass renders the map. The setting of the shadow map comes back
@@ -463,6 +457,12 @@ interface ModeMove {
   weight: number;
 }
 
+/**
+ * The 3D scene of the page: the renderer, and the stage, the lights, the camera, the props, and the
+ * players of one layout. The page keeps one renderer, so that a new layout does not compile the
+ * shader programs again. The players show the bind pose until {@link StageScene.render} gives them
+ * the poses of a frame.
+ */
 export class StageScene {
   readonly #canvas: HTMLCanvasElement;
   readonly #renderer: WebGLRenderer;
