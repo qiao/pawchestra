@@ -39,7 +39,7 @@ of the old pig above do not change.
 | `tripo-hand/pig.blend` | Made from `tripo-p2/pig.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain pig` |
 | `tripo-hand/pig.rig.glb` | Export of `tripo-hand/pig.blend`. License as the FBX file | `pnpm rig-export pig --blend assets/models/pig/tripo-hand/pig.blend --out assets/models/pig/tripo-hand/pig.rig.glb` |
 | `tripo-hand/pig.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/pig-color.webp`, `tripo-hand/pig-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/pig-maps.py` |
+| `tripo-hand/pig-color.webp`, `tripo-hand/pig-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/tripo-maps.py pig` |
 
 ### tripo-p2/pig.fbx
 
@@ -264,10 +264,10 @@ The arm gate (`pnpm arm-check hornist --base 34d140d5c`) passes: folds p95 6 on 
 the right (8 and 23 before the new hold), skin twist p95 16 on each upper arm, and 17 and 14 on the
 forearms. The grip of the right arm takes the new median (`ACCEPTED_GRIPS`).
 
-**Color map** (`tools/pig-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and writes
-WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. The eyes keep the iris place
-of the source: in the play view, the 3/4 views, and the far hall view from the default camera, the
-gaze reads as a look ahead, and the face reads happy, so no iris moves.
+**Color map** (`tools/tripo-maps.py pig`). The tool scales the source to 2048 pixels (Lanczos) and
+writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. The eyes keep the iris
+place of the source: in the play view, the 3/4 views, and the far hall view from the default camera,
+the gaze reads as a look ahead, and the face reads happy, so no iris moves.
 
 **Normal map.** The same run writes `pig-normal.webp` from the normal map of the FBX, as for the
 wolf: each x, y tilt limited to 0.2 (0.57 % of the texels), a box scale to 1024 pixels, the tilts

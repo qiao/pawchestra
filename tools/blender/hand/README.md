@@ -35,7 +35,7 @@ Blender comes from the variable `BLENDER`, or from the path.
 | `redits.py` | The point edits that `make_config.py` and `build.py` share |
 | `rings.py`, `rimport.py`, `tail.py` | The ring splits, the import of the source, and the tail rows |
 | `eye-centers.json` | The eye faces of the source, for a body whose params name it in `eyeFaces` |
-| `assets/models/<species>/tripo-hand/<species>-bands.json` | Output: the band faces of the paw turns, for a body whose params name it in `bandFade`. The maps tool `tools/<species>-maps.py` reads it, so run that tool after the chain |
+| `assets/models/<species>/tripo-hand/<species>-bands.json` | Output: the band faces of the paw turns, for a body whose params name it in `bandFade`. The maps tool of the species (`tools/tripo-maps.py <species>` or `tools/<species>-maps.py`) reads it, so run that tool after the chain |
 
 The scripts also import `studio_armature.py`, `studio_eyes.py`, `bind_edit.py`, and
 `band_faces.py` of `tools/blender/`.

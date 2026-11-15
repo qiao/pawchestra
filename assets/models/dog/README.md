@@ -39,7 +39,7 @@ The arms keep the length of the source: no cut, no split from the trunk, and no 
 | `tripo-hand/dog.blend` | Made from `tripo-p2/dog.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain dog` |
 | `tripo-hand/dog.rig.glb` | Export of `tripo-hand/dog.blend`. License as the FBX file | `pnpm rig-export dog --blend assets/models/dog/tripo-hand/dog.blend --out assets/models/dog/tripo-hand/dog.rig.glb` |
 | `tripo-hand/dog.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/dog-color.webp`, `tripo-hand/dog-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/dog-maps.py` |
+| `tripo-hand/dog-color.webp`, `tripo-hand/dog-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/tripo-maps.py dog` |
 
 ### tripo-p2/dog.fbx
 
@@ -357,12 +357,12 @@ twist p95 stays 37° on the left and goes from 32° to 29° on the right (`pnpm 
 A larger tilt makes the left forearm of the table smaller (-41.5° to -43.6° in the play at 60°), but
 the paw then bends sideways on the wrist past the limit of the gate (107° p95 at 65°).
 
-**Maps** (`tools/dog-maps.py`). The tool scales the color map to 2048 pixels (Lanczos) and writes
-WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color: the fur, the ears, and the
-eye paint stay. In the play view and in the high hall view of the app, the gaze reads as a look at
-the viewer, so no iris moves. The same run writes `dog-normal.webp` from the normal map of the FBX:
-each x, y tilt limited to 0.2 (1.21 % of the texels), a box scale to 1024 pixels, the tilts times 4
-in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
+**Maps** (`tools/tripo-maps.py dog`). The tool scales the color map to 2048 pixels (Lanczos) and
+writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color: the fur, the ears, and
+the eye paint stay. In the play view and in the high hall view of the app, the gaze reads as a look
+at the viewer, so no iris moves. The same run writes `dog-normal.webp` from the normal map of the
+FBX: each x, y tilt limited to 0.2 (1.21 % of the texels), a box scale to 1024 pixels, the tilts
+times 4 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
 
 **Differences from the source.** The app light is warm and comes from above, so the orange fur reads
 more saturated and the cream reads warmer than in the even gray light of an FBX viewer. The front of

@@ -39,7 +39,7 @@ the seat, the viola, the eyes, a slight smile, and smaller front paws need.
 | `tripo-hand/cat.blend` | Made from `tripo-p2/cat.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain cat` |
 | `tripo-hand/cat.rig.glb` | Export of `tripo-hand/cat.blend`. License as the FBX file | `pnpm rig-export cat --blend assets/models/cat/tripo-hand/cat.blend --out assets/models/cat/tripo-hand/cat.rig.glb` |
 | `tripo-hand/cat.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/cat-color.webp`, `tripo-hand/cat-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/cat-maps.py` |
+| `tripo-hand/cat-color.webp`, `tripo-hand/cat-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/tripo-maps.py cat` |
 
 ### tripo-p2/cat.fbx
 
@@ -290,9 +290,9 @@ With no paw turn, no hinge turn, and the bind upper arm of the third cat, the ri
 68 to 118 degrees, and the left upper arm rolled from -38 degrees at rest to 57 degrees in the
 stroke. A bind upper arm that points more down and forward cut that range from 95 to 84 degrees.
 
-**Color map** (`tools/cat-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and writes
-WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color: the tabby fur, the brows,
-and the eye paint stay.
+**Color map** (`tools/tripo-maps.py cat`). The tool scales the source to 2048 pixels (Lanczos) and
+writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color: the tabby fur, the
+brows, and the eye paint stay.
 
 **Normal map.** The same run writes `cat-normal.webp` from the normal map of the FBX: each x, y
 tilt limited to 0.2 (2.84 % of the texels), a box scale to 1024 pixels, the tilts times 4 in red
@@ -303,7 +303,7 @@ source, that line falls from the middle of the W to its lowest point at |x| 0.03
 the corners, so the mouth read flat to sad from the front and the 3/4 view. The edit `smile` moves
 the lowest point of each side in toward the middle and lifts the corners, so the line bends up at
 its ends: a soft, slight smile. The color map paints only a thin, level line, so the edit is in
-the geometry only, and `tools/cat-maps.py` does not change. The weights, the joints, the seat,
+the geometry only, and `tools/tripo-maps.py cat` does not change. The weights, the joints, the seat,
 and the viola place do not change, so the rows of the viola, the bow, and the paws in the viola of
 `pnpm pose-depth violist` stay. In the lift and the lower of `beethoven-6-1`, a point of the right
 forearm lies in the body under the jaw, and its nearest skin is the lifted mouth corner: its depth

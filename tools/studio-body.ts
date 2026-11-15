@@ -298,9 +298,9 @@ export const ANIMALS: ReadonlyMap<string, AnimalEntry> = new Map<string, AnimalE
   // The viola cat (design 4.4): the candidate hand rig of the fourth Tripo P2 mesh
   // (`assets/models/cat/tripo-hand/cat.blend`), with no arm cut and no arm stretch, and the legs
   // of the source, so its chair is lower. Its `.blend` holds the facts of the body: the scale that
-  // keeps H of the cat of main, and the crease angle 180°. The color map of `tools/cat-maps.py`
-  // keeps the colors of the source, and it paints a light on each eye, so the eyes take the finish
-  // `varnish` and no eye light.
+  // keeps H of the cat of main, and the crease angle 180°. The color map of
+  // `tools/tripo-maps.py cat` keeps the colors of the source, and it paints a light on each eye, so
+  // the eyes take the finish `varnish` and no eye light.
   [
     'cat',
     {

@@ -40,7 +40,7 @@ deer above do not change.
 | `tripo-hand/deer.blend` | Made from `tripo-p2/deer.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain deer` |
 | `tripo-hand/deer.rig.glb` | Export of `tripo-hand/deer.blend`. License as the FBX file | `pnpm rig-export deer --blend assets/models/deer/tripo-hand/deer.blend --out assets/models/deer/tripo-hand/deer.rig.glb` |
 | `tripo-hand/deer.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/deer-color.webp`, `tripo-hand/deer-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/deer-maps.py` |
+| `tripo-hand/deer-color.webp`, `tripo-hand/deer-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/tripo-maps.py deer` |
 
 ### tripo-p2/deer.fbx
 
@@ -345,8 +345,8 @@ strings, inside their frame, in 90 % of the samples.
 | Right paw twist p95 at rest (limit 170) | 26 | 82 |
 | Right grip turn p50 (limit 45) | 40 | 20 |
 
-**Color map** (`tools/deer-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and writes
-WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color.
+**Color map** (`tools/tripo-maps.py deer`). The tool scales the source to 2048 pixels (Lanczos) and
+writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color.
 
 **Normal map.** The same run writes `deer-normal.webp` from the normal map of the FBX, as for the
 wolf: each x, y tilt limited to 0.2 (3.59 % of the texels), a box scale to 1024 pixels, the tilts

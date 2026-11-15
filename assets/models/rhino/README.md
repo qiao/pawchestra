@@ -40,7 +40,7 @@ entry of the rhino points to `tripo-hand/rhino.rig.glb`.
 | `tripo-hand/rhino.blend` | Made from `tripo-p2/rhino.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain rhino` |
 | `tripo-hand/rhino.rig.glb` | Export of `tripo-hand/rhino.blend`. License as the FBX file | `pnpm rig-export rhino --blend assets/models/rhino/tripo-hand/rhino.blend --out assets/models/rhino/tripo-hand/rhino.rig.glb` |
 | `tripo-hand/rhino.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/rhino-color.webp`, `tripo-hand/rhino-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/rhino-maps.py` |
+| `tripo-hand/rhino-color.webp`, `tripo-hand/rhino-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/tripo-maps.py rhino` |
 
 ### tripo-p2/rhino.fbx
 
@@ -237,7 +237,7 @@ middle of the soles (33.1 cm long) in each moment (`pnpm pose-preview tubist --s
 holds about 0.33 m³, so a tuba of about 10 kg about 40 cm in front of the middle moves the center
 about 1.2 cm more to the front. It stays over the soles.
 
-**Maps** (`tools/rhino-maps.py`). The tool scales the color map to 2048 pixels (Lanczos) and
+**Maps** (`tools/tripo-maps.py rhino`). The tool scales the color map to 2048 pixels (Lanczos) and
 writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. The same run writes
 `rhino-normal.webp` from the normal map of the FBX: each x, y tilt limited to 0.2 (2.86 % of the
 texels), a box scale to 1024 pixels, the tilts times 4 in red and green, 255 in blue, and `cwebp -q

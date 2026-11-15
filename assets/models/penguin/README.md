@@ -40,7 +40,7 @@ above do not change.
 | `tripo-hand/penguin.blend` | Made from `tripo-p2/penguin.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain penguin` |
 | `tripo-hand/penguin.rig.glb` | Export of `tripo-hand/penguin.blend`. License as the FBX file | `pnpm rig-export penguin --blend assets/models/penguin/tripo-hand/penguin.blend --out assets/models/penguin/tripo-hand/penguin.rig.glb` |
 | `tripo-hand/penguin.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/penguin-color.webp`, `tripo-hand/penguin-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/penguin-maps.py` |
+| `tripo-hand/penguin-color.webp`, `tripo-hand/penguin-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/tripo-maps.py penguin` |
 
 ### tripo-p2/penguin.fbx
 
@@ -209,10 +209,10 @@ toward the palm at the wrist (`CHOIR_HOLD.flex`) and the fingers curl 15 degrees
 as a hand holds a book. The tips stay out of the folder (0.0 cm), and the paws go 0.2 cm into it. The roots of the upper flippers
 go 2.0 cm into the sides in each pose (1.3 cm on the earlier penguin, limit 1.5 cm).
 
-**Color map** (`tools/penguin-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and
-writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. The eye of the map
-looks forward and a little out, as the eyes of a penguin on the sides of its head, so no iris
-moves. The iris is 0.15 of the head width, near the limit of 0.14, so the eyes keep their size.
+**Color map** (`tools/tripo-maps.py penguin`). The tool scales the source to 2048 pixels (Lanczos)
+and writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. The eye of the map
+looks forward and a little out, as the eyes of a penguin on the sides of its head, so no iris moves.
+The iris is 0.15 of the head width, near the limit of 0.14, so the eyes keep their size.
 
 **Normal map.** The same run writes `penguin-normal.webp` from the normal map of the FBX, as for the
 wolf: each x, y tilt limited to 0.2 (0.63 % of the texels), a box scale to 1024 pixels, the tilts

@@ -38,7 +38,7 @@ trunk, and no stretch. The `ANIMALS` entry of the monkey points to `tripo-hand/m
 | `tripo-hand/monkey.blend` | Made from `tripo-p2/monkey.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain monkey` |
 | `tripo-hand/monkey.rig.glb` | Export of `tripo-hand/monkey.blend`. License as the FBX file | `pnpm rig-export monkey --blend assets/models/monkey/tripo-hand/monkey.blend --out assets/models/monkey/tripo-hand/monkey.rig.glb` |
 | `tripo-hand/monkey.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/monkey-color.webp`, `tripo-hand/monkey-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/monkey-maps.py` |
+| `tripo-hand/monkey-color.webp`, `tripo-hand/monkey-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/tripo-maps.py monkey` |
 
 ### tripo-p2/monkey.fbx
 
@@ -224,8 +224,8 @@ With the hands of the source, the forearms twisted -130 and 112 degrees at rest.
 constants of the trumpet hold of the monkey of main. The right hand closes under the valves, the
 left hand on the lead pipe, and the mouthpiece meets the lips under the nose.
 
-**Color map** (`tools/monkey-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and
-writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. The eyes keep the
+**Color map** (`tools/tripo-maps.py monkey`). The tool scales the source to 2048 pixels (Lanczos)
+and writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. The eyes keep the
 iris place of the source. In the play view and the far hall view the gaze reads as a look ahead, so
 no iris moves.
 

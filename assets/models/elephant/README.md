@@ -40,7 +40,7 @@ no split from the trunk, and no stretch. The `ANIMALS` entry of the elephant poi
 | `tripo-hand/elephant.rig.glb` | Export of `tripo-hand/elephant.blend`. License as the FBX file | `pnpm rig-export elephant --blend assets/models/elephant/tripo-hand/elephant.blend --out assets/models/elephant/tripo-hand/elephant.rig.glb` |
 | `tripo-hand/elephant.rig.json` | Text summary of the export, for diffs | The same run |
 | `tripo-hand/elephant-bands.json` | The band faces of the stump turns, for the band fade of the maps (`tools/blender/band_faces.py`) | `pnpm hand-chain elephant` |
-| `tripo-hand/elephant-color.webp`, `tripo-hand/elephant-normal.webp` | Web copies of the color map and the normal map of the FBX, with the band fade ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/elephant-maps.py`, after the chain (the tool reads the band faces) |
+| `tripo-hand/elephant-color.webp`, `tripo-hand/elephant-normal.webp` | Web copies of the color map and the normal map of the FBX, with the band fade ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/tripo-maps.py elephant`, after the chain (the tool reads the band faces) |
 
 ### tripo-p2/elephant.fbx
 
@@ -259,8 +259,8 @@ The other pairs of the sweep, the note targets, the head height, and the seat he
 change. A clavicle share of 0.7 at x 0.13 and 0.5 at x 0.15 left 1.5 cm in the play, and 0.75 and
 0.55 split the body surface of the sweep into 5 open loops.
 
-**Color map** (`tools/elephant-maps.py`). The tool scales the source to 2048 pixels (Lanczos) and
-writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. The eyes keep the
+**Color map** (`tools/tripo-maps.py elephant`). The tool scales the source to 2048 pixels (Lanczos)
+and writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. The eyes keep the
 iris place of the source: in the face views, the play view, and the far hall view from the default
 camera, the gaze reads as a look ahead, and no iris is too large (0.09 of the head width), so no
 iris moves.

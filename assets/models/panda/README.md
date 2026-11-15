@@ -39,7 +39,7 @@ old panda above do not change.
 | `tripo-hand/panda.blend` | Made from `tripo-p2/panda.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain panda` |
 | `tripo-hand/panda.rig.glb` | Export of `tripo-hand/panda.blend`. License as the FBX file | `pnpm rig-export panda --blend assets/models/panda/tripo-hand/panda.blend --out assets/models/panda/tripo-hand/panda.rig.glb` |
 | `tripo-hand/panda.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/panda-color.webp`, `tripo-hand/panda-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/panda-maps.py` |
+| `tripo-hand/panda-color.webp`, `tripo-hand/panda-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/tripo-maps.py panda` |
 
 ### tripo-p2/panda.fbx
 
@@ -254,11 +254,10 @@ hold `PANDA_TROMBONE` of `src/pose/winds.ts`:
 
 With no paw turn, the forearms twisted -127 degrees on the left and 96 to 149 degrees on the right.
 
-**Maps** (`tools/panda-maps.py`, a copy of `tools/wolf-maps.py`). The color map is the source at
-2048 pixels (Lanczos), WebP quality 60, method 6: no texel changes its color. The normal map takes
-the red, green, and blue of the PNG: each x, y tilt limited to 0.2 (1.15 % of the texels), a box
-scale to 1024 pixels, the tilts times 4 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv
--m 6` (libwebp 1.5.0).
+**Maps** (`tools/tripo-maps.py panda`). The color map is the source at 2048 pixels (Lanczos), WebP
+quality 60, method 6: no texel changes its color. The normal map takes the red, green, and blue of
+the PNG: each x, y tilt limited to 0.2 (1.15 % of the texels), a box scale to 1024 pixels, the tilts
+times 4 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
 
 **Differences from the source.** The app light is warm and comes from above, so the cream fur reads
 lighter and the dark parts read browner than in the even gray light of an FBX viewer. The upper

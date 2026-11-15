@@ -38,7 +38,7 @@ wolf points to `tripo-hand/wolf.rig.glb`.
 | `tripo-hand/wolf.blend` | Made from `tripo-p2/wolf.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain wolf` |
 | `tripo-hand/wolf.rig.glb` | Export of `tripo-hand/wolf.blend`. License as the FBX file | `pnpm rig-export wolf --blend assets/models/wolf/tripo-hand/wolf.blend --out assets/models/wolf/tripo-hand/wolf.rig.glb` |
 | `tripo-hand/wolf.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/wolf-color.webp`, `tripo-hand/wolf-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/wolf-maps.py` |
+| `tripo-hand/wolf-color.webp`, `tripo-hand/wolf-normal.webp` | Web copies of the color map and the normal map of the FBX ("Color map" and "Normal map" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/tripo-maps.py wolf` |
 
 ### tripo-p2/wolf.fbx
 
@@ -237,15 +237,16 @@ does not reach between the knees: the clarinet is shorter than the line from the
 The folds of the arms (`pnpm arm-check`, folds p95) go from 53 to 66 (left) and from 48 to 55
 (right), over the limit of 8 before and after.
 
-**Color map** (`tools/wolf-maps.py`). The tool scales the source to 2048 pixels (Lanczos), keeps
-0.7 of its detail finer than a blur of 2 texels (`DETAIL_SHARE`), and writes WebP quality 60,
-method 6 (Pillow 13.0.0). Reason: the full detail read as carved grooves in the hall light. The
-colors of the fur, the brows, and the eye paint stay. The eyes keep the iris place of the source. In the play view of the app the gaze
-reads as a look at the viewer, so no iris moves.
+**Color map** (`tools/tripo-maps.py wolf`). The tool scales the source to 2048 pixels (Lanczos),
+keeps 0.7 of its detail finer than a blur of 2 texels (`detail` of `SPECIES`), and writes WebP
+quality 60, method 6 (Pillow 13.0.0). Reason: the full detail read as carved grooves in the hall
+light. The colors of the fur, the brows, and the eye paint stay. The eyes keep the iris place of the
+source. In the play view of the app the gaze reads as a look at the viewer, so no iris moves.
 
 **Normal map.** The same run writes `wolf-normal.webp` from the normal map of the FBX: each x, y
-tilt limited to 0.2 (5.15 % of the texels), a box scale to 1024 pixels, the tilts times 0.5
-(`TILT_SHARE`) and 4 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
+tilt limited to 0.2 (5.15 % of the texels), a box scale to 1024 pixels, the tilts times 0.5 (`tilt`
+of `SPECIES`) and 4 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6` (libwebp
+1.5.0).
 
 **Differences from the source.** The app light is warm and comes from above, so the gray fur reads
 lighter and warmer than in the even gray light of an FBX viewer, and the chin shades darker. The

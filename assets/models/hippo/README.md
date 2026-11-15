@@ -39,7 +39,7 @@ below), and the paws keep their size. The `ANIMALS` entry of the hippo points to
 | `tripo-hand/hippo.blend` | Made from `tripo-p2/hippo.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain hippo` |
 | `tripo-hand/hippo.rig.glb` | Export of `tripo-hand/hippo.blend`. License as the FBX file | `pnpm rig-export hippo --blend assets/models/hippo/tripo-hand/hippo.blend --out assets/models/hippo/tripo-hand/hippo.rig.glb` |
 | `tripo-hand/hippo.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/hippo-color.webp`, `tripo-hand/hippo-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/hippo-maps.py` |
+| `tripo-hand/hippo-color.webp`, `tripo-hand/hippo-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/tripo-maps.py hippo` |
 
 ### tripo-p2/hippo.fbx
 
@@ -202,7 +202,7 @@ Over the bowing of five demos (`--times` every 5 s), each part takes at most 40 
 pizzicato of `brahms-2`, the right upper arm and the right forearm each take about 62 degrees. The
 old hold twisted them about 100 degrees there.
 
-**Maps** (`tools/hippo-maps.py`). The tool scales the color map to 2048 pixels (Lanczos) and
+**Maps** (`tools/tripo-maps.py hippo`). The tool scales the color map to 2048 pixels (Lanczos) and
 writes WebP quality 60, method 6 (Pillow 13.0.0). No texel changes its color. The same run writes
 `hippo-normal.webp` from the normal map of the FBX: each x, y tilt limited to 0.2 (0.60 % of the
 texels), a box scale to 1024 pixels, the tilts times 4 in red and green, 255 in blue, and `cwebp -q

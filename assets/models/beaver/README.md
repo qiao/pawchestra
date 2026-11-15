@@ -39,7 +39,7 @@ files of the old beaver above do not change.
 | `tripo-hand/beaver.blend` | Made from `tripo-p2/beaver.fbx` by the scripted edits below. License as the FBX file | `pnpm hand-chain beaver` |
 | `tripo-hand/beaver.rig.glb` | Export of `tripo-hand/beaver.blend`. License as the FBX file | `pnpm rig-export beaver --blend assets/models/beaver/tripo-hand/beaver.blend --out assets/models/beaver/tripo-hand/beaver.rig.glb` |
 | `tripo-hand/beaver.rig.json` | Text summary of the export, for diffs | The same run |
-| `tripo-hand/beaver-color.webp`, `tripo-hand/beaver-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/beaver-maps.py` |
+| `tripo-hand/beaver-color.webp`, `tripo-hand/beaver-normal.webp` | Web copies of the color map and the normal map of the FBX ("Maps" below). License as the FBX file | `uv run --no-project --with numpy==2.5.4 --with pillow==13.0.0 python -I tools/tripo-maps.py beaver` |
 
 ### tripo-p2/beaver.fbx
 
@@ -243,13 +243,13 @@ in the body at 0.31 of its length, in each sample: that is its root in the round
 no cut, and no view shows it. The long joint passes beside the head, clear of the eye, and the
 boot stays below and behind the music desk.
 
-**Maps** (`tools/beaver-maps.py`). The tool scales the color map of the source to 2048 pixels
-(Lanczos), keeps 0.7 of its detail finer than a blur of 2 texels (`DETAIL_SHARE`), and writes
+**Maps** (`tools/tripo-maps.py beaver`). The tool scales the color map of the source to 2048 pixels
+(Lanczos), keeps 0.7 of its detail finer than a blur of 2 texels (`detail` of `SPECIES`), and writes
 WebP quality 60, method 6 (Pillow 13.0.0). Reason: the full detail read as carved grooves in the
-hall light. The colors stay. It writes `beaver-normal.webp` from the normal map of the FBX: each
-x, y tilt limited to 0.2 (5.85 % of the texels), a box scale to 1024 pixels, the tilts times 0.5
-(`TILT_SHARE`) and 4 in red and green, 255 in blue, and
-`cwebp -q 60 -sharp_yuv -m 6` (libwebp 1.5.0).
+hall light. The colors stay. It writes `beaver-normal.webp` from the normal map of the FBX: each x,
+y tilt limited to 0.2 (5.85 % of the texels), a box scale to 1024 pixels, the tilts times 0.5
+(`tilt` of `SPECIES`) and 4 in red and green, 255 in blue, and `cwebp -q 60 -sharp_yuv -m 6`
+(libwebp 1.5.0).
 
 **Differences from the source.** The app light is warm and comes from above, so the fur reads
 lighter and more orange than in the even gray light of an FBX viewer, and the neck under the head

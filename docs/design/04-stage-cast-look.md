@@ -783,8 +783,8 @@ light of the hall made the fur of the source colors lighter than the source. A
 hand rig of the fourth Tripo P2 cat (`assets/models/cat/tripo-hand/`) is the body of the cat
 violist, by the route of the Tripo wolf. The source FBX is the target of its look: no point edit
 changes its trunk, limbs, legs, or tail, its map keeps the colors of the source
-(`tools/cat-maps.py`), its crease angle is 180°, and it scales only to H of the cat of main. Its
-chair fits its legs: the shins of its bind stand nearly vertical and the heels are a little up,
+(`tools/tripo-maps.py cat`), its crease angle is 180°, and it scales only to H of the cat of main.
+Its chair fits its legs: the shins of its bind stand nearly vertical and the heels are a little up,
 with the toes on the floor. Reason: with flat feet, the chair read too low. The higher eyes
 change the sight pass of the layout (4.5) in five demos. The only form edits are those of the eyes, of the mouth corners, and of the
 front paws. The point edit `paw` makes each front paw shorter and narrower past the wrist joint,
@@ -1350,16 +1350,16 @@ The Tripo polar bear (`assets/models/polar-bear/tripo-hand/`) shows a map that
 of the main polar bear in the hall light (`FUR`), and the claws go dark (`CLAW`). Reason: the
 Tripo map paints a tan bear with brown claws, and the hall view sets the target, as for the fox.
 The painted brows keep half of their contrast to the fur (`soften_brows()`).
-The Tripo wolf (`assets/models/wolf/tripo-hand/`) shows the map of its Tripo FBX at 2048 pixels
-with no change of a color (`tools/wolf-maps.py`). Reason: the look target of this body is its
+The Tripo wolf (`assets/models/wolf/tripo-hand/`) shows the map of its Tripo FBX at 2048 pixels with
+no change of a color (`tools/tripo-maps.py wolf`). Reason: the look target of this body is its
 source FBX. The Tripo beagle of the dog (`assets/models/dog/tripo-hand/`) does the same with
-`tools/dog-maps.py`, and the Tripo monkey (`assets/models/monkey/tripo-hand/`) with
-`tools/monkey-maps.py`, for the same reason. The Tripo hippo (`assets/models/hippo/tripo-hand/`)
-does the same with `tools/hippo-maps.py`, the Tripo pig (`assets/models/pig/tripo-hand/`) with
-`tools/pig-maps.py`, the Tripo penguin (`assets/models/penguin/tripo-hand/`) with
-`tools/penguin-maps.py`, the Tripo elephant (`assets/models/elephant/tripo-hand/`) with
-`tools/elephant-maps.py`, and the Tripo fawn (`assets/models/deer/tripo-hand/`) with
-`tools/deer-maps.py`.
+`tools/tripo-maps.py dog`, and the Tripo monkey (`assets/models/monkey/tripo-hand/`) with
+`tools/tripo-maps.py monkey`, for the same reason. The Tripo hippo
+(`assets/models/hippo/tripo-hand/`) does the same with `tools/tripo-maps.py hippo`, the Tripo pig
+(`assets/models/pig/tripo-hand/`) with `tools/tripo-maps.py pig`, the Tripo penguin
+(`assets/models/penguin/tripo-hand/`) with `tools/tripo-maps.py penguin`, the Tripo elephant
+(`assets/models/elephant/tripo-hand/`) with `tools/tripo-maps.py elephant`, and the Tripo fawn
+(`assets/models/deer/tripo-hand/`) with `tools/tripo-maps.py deer`.
 
 A palette of the faces can have its own color map (`StudioTexture.palettes`), such as the map of
 the tan fox. `tools/fox-maps.py` makes both maps of the fox from the source image. A species shows
