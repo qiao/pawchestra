@@ -1274,14 +1274,14 @@ export const BOWED_HOLDS = {
  * forward (`reach`, 30° in the viola hold), so that the nearly straight bow arm passes in front of
  * the even oval belly: with 30°, the right upper arm goes 2.9 cm into the belly in the play, and
  * with 40°, new faces at the back of the right shoulder fold in each play sample. The front of the
- * upper belly is a little flatter, most at the middle line, where the upper arm lies (`flat` of
- * `tools/blender/cat_arms.py`). In pizzicato, the right elbow points out, a little down, and
- * forward, (1.2, -0.5, -1), a little further out than the chin hold, and the right palm plucks
- * 0.1 m from the strings toward the frog side (`pluckSide`), as the hand of a real player comes up
- * from the side: with the palm over the strings, the middle of the upper arm goes 2.1 cm into the
- * top of the chest under the chin in a pizzicato and in the lowering after it (1.3 cm in the
- * lowering with this side). With 0.05 m, it goes 1.9 cm in, and with the elbow (1.3, -0.35, -1)
- * or (1.5, -0.5, -1), the move twist of the arm gate passes its margin.
+ * upper belly is a little flatter, most at the middle line, where the upper arm lies. In
+ * pizzicato, the right elbow points out, a little down, and forward, (1.2, -0.5, -1), a little
+ * further out than the chin hold, and the right palm plucks 0.1 m from the strings toward the frog
+ * side (`pluckSide`), as the hand of a real player comes up from the side: with the palm over the
+ * strings, the middle of the upper arm goes 2.1 cm into the top of the chest under the chin in a
+ * pizzicato and in the lowering after it (1.3 cm in the lowering with this side). With 0.05 m, it
+ * goes 1.9 cm in, and with the elbow (1.3, -0.35, -1) or (1.5, -0.5, -1), the move twist of the arm
+ * gate passes its margin.
  *
  * The rest pose is the upright rest of the red fox, as a seated violinist rests
  * (`docs/reference/string-technique.md`, section 2.9): the viola stands on the top of the left

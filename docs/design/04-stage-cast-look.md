@@ -209,9 +209,8 @@ color edge of the old arm gives a saw-tooth edge. The rebuild thus puts a ring a
 across the arm. A species script `tools/blender/<a>_arms.py` replaces it only for a fault that it
 does not fix.
 
-An arm that the mesh joins to the trunk needs a free section. A species script frees it with a
-side wall on the trunk (`cat_arms.py`), or splits it from the trunk along its crease in a
-copy. An arm that joins the trunk only near the
+An arm that the mesh joins to the trunk needs a free section. A species script frees it: it splits
+the arm from the trunk along its crease in a copy. An arm that joins the trunk only near the
 shoulder also takes the split, because the long thin faces above a low shoulder line fold when the
 arm lifts. A flat flipper has rays of different lengths with no trunk in the section, so the free
 test takes a larger ratio for it (`--spec` key `free`).

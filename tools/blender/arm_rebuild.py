@@ -41,7 +41,7 @@ longer arms, as in the species scripts. `--spec` replaces settings of `step_meas
 keys of a species script, such as `{"cut": {"shoulder": 0.3, "tilt": 20, "wrist": 0.1}}`. Its key
 `free` replaces `FREE_RATIO` of the free test (`measure_joints()`), and its key `spread` turns on
 the UV fix of `step_spread()`. `--out` is the folder of the output files, the folder of `output`
-of the config by default. `--views` writes the check images of `cat_arms.look()`.
+of the config by default. `--views` writes the check images of `look()`.
 
 `--keep-faces` keeps the faces of a clean quad mesh that passes `pnpm mesh-intake` (design 4.4,
 "Source meshes"). It does steps 1, 6, 7, and 8, and of step 2 only the shoulder line, the zone,
@@ -71,12 +71,8 @@ import wind_arms as wa  # noqa: E402
 
 va = wa.va
 
-# `cat_arms.py` replaces `arm_faces()` and `arm_verts()` of `violin_arms.py` with the versions of
-# the side wall when it loads. This script has no side wall, so it puts the plain versions back.
-PLAIN = (va.arm_faces, va.arm_verts)
-import cat_arms as ca  # noqa: E402
-
-va.arm_faces, va.arm_verts = PLAIN
+#: The folder of the check images of `look()`, from `--views`. None writes no images.
+VIEWS = None
 
 #: The distance of two rings of a tube, as a share of the local radius of the arm. The rings of
 #: the rabbit and of the wolf stand 0.44 to 0.47 radii apart.
@@ -986,15 +982,79 @@ def step_spread(s):
     return len(wide)
 
 
+def look(s, name, objects=None, center=(0.15, 0.53, 0.05), scale=0.3,
+         views=(('front', 0, 0), ('side', 90, 0), ('back', 180, 0), ('under', 60, -45),
+                ('f35', 35, 10), ('b35', 145, 10))):
+    """Renders check views of the left arm with the edges, when `--views` names a folder."""
+    if VIEWS is None:
+        return
+    scene = bpy.context.scene
+    engine = scene.render.engine
+    scene.render.engine = 'BLENDER_WORKBENCH'
+    scene.display.shading.light = 'STUDIO'
+    scene.display.shading.color_type = 'TEXTURE'
+    scene.display.shading.show_backface_culling = False
+    scene.render.resolution_x = scene.render.resolution_y = 700
+    objects = objects or [s.mesh]
+    hidden = [o for o in scene.objects if o.type == 'MESH' and o not in objects
+              and not o.hide_render]
+    for o in hidden:
+        o.hide_render = True
+    mat = bpy.data.materials.get('look-wire')
+    if mat is None:
+        black = bpy.data.images.new('look-black', 4, 4)
+        black.pixels = [0.04, 0.04, 0.04, 1.0] * 16
+        mat = bpy.data.materials.new('look-wire')
+        mat.use_nodes = True
+        tex = mat.node_tree.nodes.new('ShaderNodeTexImage')
+        tex.image = black
+        mat.node_tree.nodes.active = tex
+    wires = []
+    for o in objects:
+        w = o.copy()
+        w.data = o.data.copy()
+        w.data.materials.clear()
+        w.data.materials.append(mat)
+        for m in list(w.modifiers):
+            w.modifiers.remove(m)
+        mod = w.modifiers.new('wire', 'WIREFRAME')
+        mod.thickness = s.units(0.0006)
+        mod.use_replace = True
+        scene.collection.objects.link(w)
+        w.hide_render = False
+        wires.append(w)
+    cam = bpy.data.objects.get('look-cam') or bpy.data.objects.new(
+        'look-cam', bpy.data.cameras.new('look-cam'))
+    if cam.name not in scene.collection.objects:
+        scene.collection.objects.link(cam)
+    scene.camera = cam
+    cam.data.type = 'ORTHO'
+    cam.data.ortho_scale = s.units(scale)
+    cam.data.clip_end = 100
+    target = s.fr.point(center)
+    for view, az, el in views:
+        a, e = math.radians(az), math.radians(el)
+        d = Vector((math.sin(a) * math.cos(e), -math.cos(a) * math.cos(e), math.sin(e)))
+        cam.location = target + d * 5
+        cam.rotation_euler = (-d).to_track_quat('-Z', 'Y').to_euler()
+        scene.render.filepath = os.path.join(VIEWS, f'{name}-{view}.png')
+        bpy.ops.render.render(write_still=True)
+    for w in wires:
+        bpy.data.objects.remove(w, do_unlink=True)
+    for o in hidden:
+        o.hide_render = False
+    scene.render.engine = engine
+
+
 def step_look(s):
-    """Renders the check images of the left arm (`cat_arms.look()`) when `--views` names a
-    folder, with the elbow in the middle of each image."""
-    if ca.VIEWS is None:
+    """Renders the check images of the left arm (`look()`) when `--views` names a folder, with
+    the elbow in the middle of each image."""
+    if VIEWS is None:
         return None
     _, e, _, _ = va.arm_line(s, 1)
     center = ((e.x) / s.fr.height, (e.z - s.fr.floor) / s.fr.height, -e.y / s.fr.height)
-    ca.look(s, 'arms', center=center, scale=0.4)
-    return ca.VIEWS
+    look(s, 'arms', center=center, scale=0.4)
+    return VIEWS
 
 
 #: The steps of the rebuild, in order.
@@ -1087,6 +1147,7 @@ def parse(argv):
 def main():
     """Runs the steps, and writes `<animal>-arms.glb` and `<animal>-weights.json` into the out
     dir."""
+    global VIEWS
     argv = sys.argv[sys.argv.index('--') + 1 :] if '--' in sys.argv else []
     if sys.flags.hash_randomization:
         # A fixed string hash gives the same order of each set and dict on each run.
@@ -1107,8 +1168,8 @@ def main():
         raise SystemExit(code)
     args = parse(argv)
     if args['views']:
-        ca.VIEWS = args['views']
-        os.makedirs(ca.VIEWS, exist_ok=True)
+        VIEWS = args['views']
+        os.makedirs(VIEWS, exist_ok=True)
     va.clear_scene()
     s = Session(args['animal'], args['source'], args['factor'], args['out'], args['spec'],
                 args['keep'])
