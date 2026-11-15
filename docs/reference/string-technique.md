@@ -478,9 +478,8 @@ The app follows these facts:
 The app does not follow these facts:
 
 - **The size for the arm (1.10).** The chart of [81] pairs a 10 inch viola with an arm of 36 cm,
-  the arm of the cat. The cat plays a larger viola, and the rabbit a violin larger than its arm
-  fits, so that the instrument reads at its size beside the body. Thus the left paw does not reach
-  the nut: it stops the strings only on the part of the fingerboard that it reaches
+  the arm of the cat. The cat plays a larger viola than its arm fits, so that the instrument reads
+  at its size beside the body. Thus the left paw does not reach the nut: it stops the strings only on the part of the fingerboard that it reaches
   (`BowedRig.stopRange`), as a player in a high position, and the bow plays a shorter part of the
   hair (`BowedRig.bowRange`).
 - **The guide finger (1.5).** No finger slides on the string, because the four fingers are one
@@ -501,7 +500,9 @@ The app does not follow these facts:
   body of the instrument, and the back of the hand is in a straight line with the elbow in the
   low positions [68]. The short arm of the cat reached the fingerboard only near the upper bout,
   so the cat plays the largest viola with which its forearm keeps out of the upper bout. The
-  forearm of the rabbit still touches the back of the violin.
+  rabbit has longer arms (`armStretch`) and a violin a little larger than the rule of a violin
+  shop, so its left paw stops the strings from the nut, and its forearm rises under the neck, free
+  of the upper bout.
 - **The left upper arm (1.10).** The left upper arm turns further out to the side than the arm of
   a violin student (`BowedHold.poleL`). With the elbow further in, the left paw twists too far on
   its forearm.

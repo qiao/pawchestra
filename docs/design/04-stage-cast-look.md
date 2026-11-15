@@ -715,7 +715,7 @@ of the third rabbit (`metersPerUnit` of its chain, 4.2). Its upper arms and fore
 longer than in the source (the point edit `armStretch`, as on the red fox). Reason: the source arm
 reached 0.299 m from the shoulder joint to the palm (0.98 H), and the left paw stopped the strings
 only at the body end of the fingerboard. It now reaches 0.367 m (1.20 H). The edit comes after
-`armGirth`, because the table of `armGirth` holds the x of the source. Its violin is 0.9 of the
+`armGirth`, because the table of `armGirth` holds the x of the source. Its violin is 0.75 of the
 violin of the app (4.6, `violinScale`). The Tripo bear
 (`assets/models/bear/tripo-hand/`) is the body of the conductor, by the rules of the badger. The
 source FBX is the target of its look: it keeps the eyeballs and the eye paint of the source with
@@ -1815,19 +1815,21 @@ length, and a species with short arms plays a smaller instrument (`SCALED_INSTRU
 fields of `SpeciesParams`), as a child plays a fractional violin or a small lever harp. A smaller
 instrument shrinks toward the mouth or the base, so the mouth keeps its place. A violin shop
 sizes a violin so that, with the left arm extended, the scroll lies in the middle of the palm
-(`pnpm hold-reach`). The rabbit violin and the cat viola are larger than this rule gives, near the
-smallest real sizes, and the arms keep their length. The left paw then stops the strings only on
+(`pnpm hold-reach`). The cat viola is larger than this rule gives, near the smallest real sizes,
+and the arms keep their length. The left paw then stops the strings only on
 the part of the fingerboard that it reaches (`BowedRig.stopRange`), as a player in a high
 position, the scroll stands out past the paw, and the bow plays only the part of the hair that
 the right arm reaches (`BowedRig.bowRange`). Reason: at the size of the rule, the instrument read
-as a toy under the paws in the hall view. The cello rule (`celloRule()` of `tools/cello-size.ts`) sizes a cello as a
-cellist does: the largest cello at which the left paw reaches the first position with the elbow
-bent to at most `CELLO_ELBOW`, the end pin fits the chest, and the lower bout is not below the
-knees, clamped to the real sizes (`REAL_CELLOS`, from a 1/10 to a 4/4). The cast matrix gives
-this size to a recast cellist, and a new cellist species takes it as its `celloScale`. The reach
-limit of the Tripo beagle fails at each size, so the rule gives it the clamp. Its cello keeps the
-share of the body that the clamp has at the H of the dog of main, because the body scales to a
-larger H (4.4), and the scroll must stay beside the left ear (`celloScale` of the dog). Each cello
+as a toy under the paws in the hall view. The rabbit has longer arms (`armStretch`, 4.4) and a
+violin a little larger than the rule gives, so its left paw stops the strings from the nut.
+Reason: in the first position, the left hand of a violinist is near the scroll. The cello rule
+(`celloRule()` of `tools/cello-size.ts`) sizes a cello as a cellist does: the largest cello at
+which the left paw reaches the first position with the elbow bent to at most `CELLO_ELBOW`, the
+end pin fits the chest, and the lower bout is not below the knees, clamped to the real sizes
+(`REAL_CELLOS`, from a 1/10 to a 4/4). The cast matrix gives this size to a recast cellist, and a
+new cellist species takes it as its `celloScale`. The reach limit of the Tripo beagle fails at
+each size, so the rule gives it the clamp. Its cello keeps the share of the body that the clamp
+has at the H of the dog of main, because the body scales to a larger H (4.4), and the scroll must stay beside the left ear (`celloScale` of the dog). Each cello
 gets the end pin of its body (`celloPinOf()`), so that the top of its back rests on the chest at
 the lean of `CELLO_PLACE`, as a cellist sets the end pin.
 
