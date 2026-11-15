@@ -13,6 +13,7 @@ import { REST_TIMES, liftScale } from '../pose/rest.ts';
 import type { RestMotion } from '../pose/rest.ts';
 import type { Transport } from '../pose/types.ts';
 import { clamp01 } from '../math.ts';
+import { PLAYING } from './view-poses.ts';
 
 /** One model of the gallery: a species with an instrument, or an instrument alone. */
 export interface GalleryItem {
@@ -273,18 +274,6 @@ export function aroundBody(view: CloseView, box: Bounds, facing: number): CloseV
     azimuth: azimuth - 360 * Math.round(azimuth / 360) + 0,
   };
 }
-
-/** A transport that plays since long before the first frame, so the instruments stay up. */
-const PLAYING: Transport = {
-  playing: true,
-  changedAtWall: -100,
-  before: null,
-  startSec: 0,
-  seekStart: false,
-  endedAtSong: false,
-  holdSec: 3,
-  leadSec: Number.POSITIVE_INFINITY,
-};
 
 /** The transport before the first play: the players keep the rest pose (design 5.2). */
 const REST: Transport = {
