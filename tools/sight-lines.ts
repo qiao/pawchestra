@@ -491,7 +491,7 @@ export async function main(): Promise<void> {
   const showAll = args.includes('--all');
   const results: DemoSight[] = [];
   for (const file of await patchedDemos()) {
-    const id = file.file.replace(/\.mid$/, '');
+    const id = file.id;
     if (demos.length > 0 && !demos.includes(id)) {
       continue;
     }

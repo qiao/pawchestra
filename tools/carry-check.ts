@@ -472,17 +472,14 @@ function carryLines(tree: readonly RoleCarry[], base: readonly RoleCarry[] | nul
  */
 async function measureRoles(args: CarryArgs): Promise<RoleCarry[]> {
   const all = await probeDemos();
-  const names = all.map((demo) => demo.file.replace(/\.mid$/, ''));
+  const names = all.map((demo) => demo.id);
   const unknown = args.demos.filter((demo) => !names.includes(demo));
   if (unknown.length > 0) {
     throw new Error(
       `The demos ${unknown.join(', ')} are not known. The demos are: ${names.join(', ')}.`,
     );
   }
-  const demos =
-    args.demos.length === 0
-      ? all
-      : all.filter((demo) => args.demos.includes(demo.file.replace(/\.mid$/, '')));
+  const demos = args.demos.length === 0 ? all : all.filter((demo) => args.demos.includes(demo.id));
   const changes = args.holds === null ? null : setHolds(args.holds);
   try {
     return args.roles.map((role) => ({ role, moves: measureCarry(role, demos) }));

@@ -648,7 +648,7 @@ export function probeLaps(
     const audible = allAudible(scene.score);
     const buffer = createScenePose(scene.plan);
     const start = -countInAt(scene.plan.beats, 0).lengthSec;
-    const id = demo.file.replace(/\.mid$/, '');
+    const id = demo.id;
     for (const { index, model } of roleBodies(role, scene)) {
       const cast = index === null ? null : scene.layout.players[index]?.cast;
       if (index === null || !cast || cast.support === 'stand') {
@@ -727,7 +727,7 @@ export function scanSamples(
     if (!cast) {
       continue;
     }
-    const id = demo.file.replace(/\.mid$/, '');
+    const id = demo.id;
     const audible = allAudible(scene.score);
     const buffer = createScenePose(scene.plan);
     for (const wall of walls) {

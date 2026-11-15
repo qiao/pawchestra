@@ -1907,9 +1907,8 @@ async function fitDemos(
   options: FitOptions,
 ): Promise<{ readonly demos: DemoFile[]; readonly first: TestScene }> {
   const all = await probeDemos(options.midi);
-  const id = (demo: DemoFile): string => demo.file.replace(/\.mid$/, '');
   const unknown = options.demos.filter(
-    (name) => name !== 'all' && !all.some((demo) => id(demo) === name),
+    (name) => name !== 'all' && !all.some((demo) => demo.id === name),
   );
   if (unknown.length > 0) {
     throw new Error(`No demo has the name ${unknown.join(', ')}.`);
@@ -1919,8 +1918,8 @@ async function fitDemos(
   for (const demo of all) {
     const scene = roleScene(options.role, demo.bytes);
     if (roleBodies(options.role, scene).length > 0) {
-      scenes.set(id(demo), scene);
-      notes.set(id(demo), roleNotes(options.role, scene));
+      scenes.set(demo.id, scene);
+      notes.set(demo.id, roleNotes(options.role, scene));
     }
   }
   const missing = options.demos.filter((name) => name !== 'all' && !scenes.has(name));
@@ -1932,7 +1931,7 @@ async function fitDemos(
   if (!first) {
     throw new Error(`No demo has the role ${options.name}.`);
   }
-  return { demos: all.filter((demo) => ids.includes(id(demo))), first };
+  return { demos: all.filter((demo) => ids.includes(demo.id)), first };
 }
 
 /**
@@ -2005,7 +2004,7 @@ async function compareFit(options: FitOptions, ref: string): Promise<void> {
   if (options.demos.length === 0) {
     // The one demo with the most notes goes to both children by name, because the hold-fit of an
     // older commit takes all demos of a role that no demo of FIT_DEMOS has.
-    const ids = (await fitDemos(options)).demos.map((demo) => demo.file.replace(/\.mid$/, ''));
+    const ids = (await fitDemos(options)).demos.map((demo) => demo.id);
     if (!ids.some((id) => FIT_DEMOS.includes(id))) {
       args.push(...ids.flatMap((id) => ['--demo', id]));
     }
@@ -2184,7 +2183,7 @@ async function main(): Promise<void> {
   const sweep = fitSweep(options.role, first, options.sets);
   const chin = chinOf(options.role);
   const laps = hasLapRest(options.role) && options.sets.includes('rest');
-  const ids = demos.map((demo) => demo.file.replace(/\.mid$/, ''));
+  const ids = demos.map((demo) => demo.id);
   console.log(
     `Hold fit of the ${options.name}: play folds at a step of ${options.step} s, ${sweep ? `the sweep of the ${sweep.role} with the bodies of the role` : 'no sweep (folds only)'}${chin ? `, and the reach of ${chin.species} with the ${chin.instrument}` : ''}.`,
   );

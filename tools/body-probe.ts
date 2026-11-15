@@ -516,7 +516,7 @@ export function probeScenePoses(scene: TestScene): DemoPoses {
 async function probePoses(): Promise<Record<string, DemoPoses>> {
   const poses: Record<string, DemoPoses> = {};
   for (const demo of await patchedDemos()) {
-    poses[demo.file.replace(/\.mid$/, '')] = probeScenePoses(sceneOf(demo.bytes));
+    poses[demo.id] = probeScenePoses(sceneOf(demo.bytes));
   }
   return poses;
 }

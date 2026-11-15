@@ -86,7 +86,7 @@ export function strikeReach(
       if (plan?.note.family !== 'percussion') {
         continue;
       }
-      found.push(demo.file.replace(/\.mid$/, ''));
+      found.push(demo.id);
       const model = scene.models.get(cast.species, cast.instrument, cast.kettles, cast.support);
       const buffer = createScenePose(scene.plan);
       const audible = allAudible(scene.score);

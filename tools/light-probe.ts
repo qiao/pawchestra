@@ -530,8 +530,9 @@ async function main(): Promise<void> {
 
   const demos = await Promise.all(
     args.demos.map(async (file) => {
-      const layout = layoutScene(scoreOf((await patchedDemo(file)).bytes), new ModelCache());
-      return { file, name: file.replace(/\.mid$/, ''), layout };
+      const demo = await patchedDemo(file);
+      const layout = layoutScene(scoreOf(demo.bytes), new ModelCache());
+      return { file, name: demo.id, layout };
     }),
   );
   const measure = () => {

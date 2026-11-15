@@ -429,7 +429,7 @@ async function firstDemo(role: string): Promise<string> {
   const { roleDemos } = await import('./pose-depth.ts');
   const sweep = findSweep(role);
   const [demo] = sweep ? await roleDemos([], [], sweep) : [];
-  return demo ? demo.file.replace(/\.mid$/, '') : stop(`The role ${role} has no sweep or no demo.`);
+  return demo ? demo.id : stop(`The role ${role} has no sweep or no demo.`);
 }
 
 /**

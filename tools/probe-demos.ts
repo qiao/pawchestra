@@ -174,7 +174,7 @@ function userDemos(paths: readonly string[], known: readonly string[] = []): Dem
     }
     names.push(file);
     const bytes = new Uint8Array(readFileSync(path));
-    return { file, bytes, source: bytes };
+    return { file, id: file.replace(/\.mid$/, ''), bytes, source: bytes };
   });
 }
 
@@ -192,7 +192,7 @@ function userDemos(paths: readonly string[], known: readonly string[] = []): Dem
 export async function probeDemos(midi: readonly string[] = []): Promise<DemoFile[]> {
   const tools = [...TOOL_SCORES].map(([file, build]): DemoFile => {
     const bytes = writeSmf(build());
-    return { file, bytes, source: bytes };
+    return { file, id: file.replace(/\.mid$/, ''), bytes, source: bytes };
   });
   const listed = [...(await patchedDemos()), ...tools];
   return [

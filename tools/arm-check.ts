@@ -2696,7 +2696,8 @@ const TRACE_LINES = 5000;
 function userFiles(paths: readonly string[]): DemoFile[] {
   return paths.map((path) => {
     const bytes = new Uint8Array(readFileSync(path));
-    return { file: `${basename(path).replace(/(\.midi?)+$/i, '')}.mid`, bytes, source: bytes };
+    const id = basename(path).replace(/(\.midi?)+$/i, '');
+    return { file: `${id}.mid`, id, bytes, source: bytes };
   });
 }
 

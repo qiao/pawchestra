@@ -821,14 +821,13 @@ function resultLines(result: PlayerResult, step: number): string[] {
  */
 async function runProbe(options: ClipOptions): Promise<PlayerResult[]> {
   const all = await probeDemos();
-  const idOf = (demo: DemoFile): string => demo.file.replace(/\.mid$/, '');
   for (const id of options.demos) {
-    if (!all.some((demo) => idOf(demo) === id)) {
+    if (!all.some((demo) => demo.id === id)) {
       throw new Error(`No demo has the id ${id}.`);
     }
   }
   const demos =
-    options.demos.length > 0 ? all.filter((demo) => options.demos.includes(idOf(demo))) : all;
+    options.demos.length > 0 ? all.filter((demo) => options.demos.includes(demo.id)) : all;
 
   const results: PlayerResult[] = [];
   for (const demo of demos) {
@@ -837,7 +836,7 @@ async function runProbe(options: ClipOptions): Promise<PlayerResult[]> {
       continue;
     }
     for (const player of found.players) {
-      const result = measurePlayer(idOf(demo), found.scene, player, options);
+      const result = measurePlayer(demo.id, found.scene, player, options);
       console.log(resultLines(result, options.step).join('\n'));
       results.push(result);
     }

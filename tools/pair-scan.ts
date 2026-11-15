@@ -253,9 +253,7 @@ async function main(): Promise<void> {
   for (const [name, changes] of options.variants) {
     const applied = setHolds(changes);
     try {
-      const scenes = demos.map(
-        (demo) => [demo.file.replace(/\.mid$/, ''), sceneOf(demo.bytes)] as const,
-      );
+      const scenes = demos.map((demo) => [demo.id, sceneOf(demo.bytes)] as const);
       const { results, reach } = scanVariant(options, scenes);
       const cells = options.pairs.map((p) => {
         const r = results.get(`${p.set}:${p.part}:${p.into}`);

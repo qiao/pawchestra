@@ -808,19 +808,9 @@ export async function sweepDemos(options: SweepOptions, role: RoleSweep): Promis
         console.warn(line);
       }
     }
-    results.push(...sweepScene(demoId(demo), scene, options, role, false));
+    results.push(...sweepScene(demo.id, scene, options, role, false));
   }
   return results;
-}
-
-/**
- * Gives the id of a demo: the name of its file with no `.mid`.
- *
- * @param demo The demo.
- * @returns The id, such as `beethoven-8`.
- */
-function demoId(demo: DemoFile): string {
-  return demo.file.replace(/\.mid$/, '');
 }
 
 /**
@@ -838,8 +828,7 @@ export async function roleDemos(
   role: RoleSweep,
 ): Promise<DemoFile[]> {
   return (await probeDemos(midi)).filter(
-    (demo) =>
-      (asked.length === 0 || asked.includes(demoId(demo))) && role.hasRole(scoreOf(demo.bytes)),
+    (demo) => (asked.length === 0 || asked.includes(demo.id)) && role.hasRole(scoreOf(demo.bytes)),
   );
 }
 
@@ -1621,7 +1610,7 @@ async function sweepRows(options: Options, role: RoleSweep): Promise<SweepRow[]>
   const cached = cache && existsSync(cache) ? readRows(readFileSync(cache, 'utf8'))[0] : undefined;
   const ids = options.soloist
     ? []
-    : (await roleDemos(options.demos, options.midi, role)).map(demoId);
+    : (await roleDemos(options.demos, options.midi, role)).map((demo) => demo.id);
   for (const variant of options.variants) {
     if (variant === '' && cached) {
       rows.push(cached);
@@ -1717,7 +1706,7 @@ async function compareRef(
 async function printPlan(options: Options, role: RoleSweep): Promise<void> {
   const ids = options.soloist
     ? []
-    : (await roleDemos(options.demos, options.midi, role)).map(demoId);
+    : (await roleDemos(options.demos, options.midi, role)).map((demo) => demo.id);
   const cache = options.base === null ? treeRowCache(options) : null;
   const cached = cache && existsSync(cache) ? readRows(readFileSync(cache, 'utf8'))[0] : undefined;
   const known = readTimes()[timeKey(options)] ?? {};

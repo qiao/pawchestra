@@ -476,7 +476,7 @@ async function roleSeat(name: string, demo: string | null): Promise<RoleSeat> {
     throw new Error(`${name} is no role. ${USAGE}`);
   }
   for (const file of await probeDemos()) {
-    const id = file.file.replace(/\.mid$/, '');
+    const id = file.id;
     if (demo !== null && id !== demo) {
       continue;
     }

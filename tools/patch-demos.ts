@@ -16,6 +16,8 @@ interface DemoPatch {
 export interface DemoFile {
   /** File name in demos/src/, such as `beethoven-9.mid`. */
   readonly file: string;
+  /** The id of the demo: the file name with no `.mid`, such as `beethoven-9`. */
+  readonly id: string;
   /** The bytes after the changes. */
   readonly bytes: Uint8Array<ArrayBuffer>;
   /** The bytes of the file in demos/src/, before the changes. */
@@ -190,7 +192,12 @@ export async function patchedDemos(dir = DEMOS_DIR): Promise<DemoFile[]> {
     const bytes = new Uint8Array(await readFile(join(dir, 'src', file)));
     checkDemo(file, bytes, checksums);
     const patch = patches.find((item) => item.file === file);
-    demos.push({ file, bytes: patch ? applyPatch(bytes, patch) : bytes, source: bytes });
+    demos.push({
+      file,
+      id: file.replace(/\.mid$/, ''),
+      bytes: patch ? applyPatch(bytes, patch) : bytes,
+      source: bytes,
+    });
   }
   return demos;
 }
