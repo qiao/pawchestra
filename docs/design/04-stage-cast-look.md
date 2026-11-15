@@ -27,7 +27,7 @@ These product choices apply to each area:
   says which image wins where two images differ. A newer product choice wins over an image, and
   its section names it.
 - **Happy faces.** Each animal has a happy face. A face rule of the rig removes a sad look, such
-  as raised inner brows or a crease that goes down over the eyes (4.4, mesh rig). The faces have
+  as raised inner brows or a crease that goes down over the eyes (4.4). The faces have
   no blush.
 - **Natural balance.** A body that stands, or that plays with no chair, keeps its center of mass
   over the middle of its soles, where a real stance is most stable (4.4, seat).
@@ -191,37 +191,21 @@ has a studio body: a source mesh, rigged into the studio format. The app reads o
 of `src/models/studio/`, and the tools make them from the meshes:
 
 ```text
-user mesh (GLB)  ->  pnpm mesh-intake (keep faces | needs rebuild)
-  ->  tools/blender/arm_rebuild.py [--keep-faces]  ->  <a>-arms.glb + <a>-weights.json
-  ->  pnpm rig-mesh <a> (tools/mesh-rigs/<a>.json, Blender)  ->  <a>.rig.glb
+source FBX + chain (tools/blender/hand/<a>/)  ->  build.py (headless Blender)  ->  <a>.blend
+  ->  pnpm rig-export <a> (headless Blender)  ->  <a>.rig.glb
   ->  pnpm studio-body <a> (no Blender)  ->  src/models/studio/<a>.ts (the app reads only this)
 ```
 
-A body with a hand rig makes `<a>.rig.glb` with `pnpm rig-export` in place of the two middle steps
-("Hand rig"). A body of the simple route makes the `.blend` of such a rig with a script ("Simple
-route").
+The simple route makes the `.blend` of a new body with one script ("Simple route"), and a person
+can also make it by hand ("Hand rig"). The test mannequin keeps a fixed rig file.
 
-The rebuild applies only to a body whose arms or legs get new quad faces. A clean quad mesh
-(`keep faces`, "Source meshes") keeps its faces, and the step adds only the arm segments and the
-weights. The rebuild takes its settings from the joints of the config and from the mesh, so that
-a new mesh gets clean arms with no work by hand. Each face takes one color, so a face across a
-color edge of the old arm gives a saw-tooth edge. The rebuild thus puts a ring at each color edge
-across the arm. A species script `tools/blender/<a>_arms.py` replaces it only for a fault that it
-does not fix.
-
-An arm that the mesh joins to the trunk needs a free section. A species script frees it: it splits
-the arm from the trunk along its crease in a copy. An arm that joins the trunk only near the
-shoulder also takes the split, because the long thin faces above a low shoulder line fold when the
-arm lifts. A flat flipper has rays of different lengths with no trunk in the section, so the free
-test takes a larger ratio for it (`--spec` key `free`).
-
-Point edits of a copy then clean the seams, and the rig reads each moved vertex with its weight row
-(`weightMoves`). They merge fins, slivers, spikes, and near twin vertices into a neighbor, and
-they merge a flat ledge or a strip under a freed root into a crease. Reason: a short clip of the
-root into the trunk looks better than a gap, a notch, a flap, or a ledge under it. The old faces
-keep their colors. The `README.md` of `assets/models/<a>/` gives the source, the steps, and the
-reason of each file. [`docs/agents/rigging.md`](../agents/rigging.md) gives the details and the
-traps of the rig.
+Each source mesh has its arms apart from the trunk, so no rig cuts an arm free. A chain changes
+the form of its source only with point edits: pure maps of points in `redits.py`, with their
+values in `edits` of `params.json`. `build.py` moves the mesh with the maps, and `make_config.py`
+moves the joints with the same maps, so that the bones fit the edited mesh. Reason: a map moves
+each vertex and each joint by one rule, and a run gives the same bytes again. The `README.md` of
+`assets/models/<a>/` gives the source, the steps, and the reason of each file.
+[`docs/agents/rigging.md`](../agents/rigging.md) gives the details and the traps of the rig.
 
 ### Source meshes
 
@@ -235,21 +219,12 @@ traps of the rig.
   the chair, the seat height, and the leg length. The source mesh sets the head, the face, the
   girths of the arms and the legs, the paws, and the tail. Reason: rules that copied the old body (a
   smaller head, thinner arms) made the cat differ from its own mesh, and its paws then looked too
-  large. The leg factors stretch the legs to the old seat, so the stretched legs take a girth
-  across their axes (`legGirth`) that keeps more of the stocky look of the legs of the mesh: of the
-  girth variants, the one whose mid thigh and mid shin widths, as a share of the head height and of
-  the hip width, are nearest to the mesh. The leg turns of the seat (`studio.legTurns`) keep the
-  knees of the old body. The trunk length and the trunk shape stay a
-  product choice of the form keys of "Mesh rig" (`trunkFactor`, `girthProfile`). `pnpm body-shape` measures the seated bind: the width and the
-  depth of the trunk at 10 heights from the seat to the neck joint, the girths of the limbs at their
-  middles, the knee and the ankle gaps from the front, the distance of the shoulder joints, and the
-  bulge of the back line behind the line from the waist to the neck. A width row of `girthProfile`
-  at the shoulder joints moves the joints and the arm roots in together, so the arm root keeps its
-  form. The arms then hang nearer to the trunk, and the hold turns the elbows out where they go into
-  the body (5.3). On a T-pose body, the cut near the armpits goes through the level arm roots, and
-  the trunk share of the painted weights (`weights.paintedBelow`) counts them as trunk. So that
-  width row measures the arm roots, and a width row of `girthProfile` does not change it: the images
-  of the app view judge that height.
+  large. A point edit can stretch the legs to the old seat (the edit `legs` of a chain), and the
+  leg turns of the seat (`studio.legTurns`) keep the knees of the old body. The trunk length and
+  the trunk shape stay a product choice of the point edits. `pnpm body-shape` measures the seated
+  bind: the width and the depth of the trunk at 10 heights from the seat to the neck joint, the
+  girths of the limbs at their middles, the knee and the ankle gaps from the front, the distance of
+  the shoulder joints, and the bulge of the back line behind the line from the waist to the neck.
 - **Colors.** The texture shows as one color for each face. A color rule of the rig can move the
   fur toward the color of the species in the reference images. The faces near a color edge of the
   texture take gray, tan, or pale yellow mixes, and the color blend of the render (`colorBlend`)
@@ -259,7 +234,7 @@ traps of the rig.
 - **Color edges.** A large face across a sharp color edge gives a saw-tooth edge, or an angular
   eye patch. A script cuts such faces along the edge in a copy, and each new vertex lies on an old
   face. The rig takes the weights of the mesh
-  before the cut (`weightSource`). Where the weights change fast, such as at the clavicles, the
+  before the cut. Where the weights change fast, such as at the clavicles, the
   skin moves a new vertex off the line of its old edge, and a small new face turns over in the
   play. There the cut adds few and large faces: it splits no face at the middles of its edges, and
   a change near a corner goes through that corner. The texture has a soft gray step at each edge,
@@ -268,11 +243,9 @@ traps of the rig.
   So the penguin copy cuts along the zero line of a smoothed side field over the surface in place
   of the texture change, and a face of the other texture side takes the UVs of a near face of its
   side (`assets/models/penguin/README.md`).
-- **Intake spec.** A new mesh comes with clean quad faces, so that its arms keep their faces: the
-  rig adds only the arm segments and the weights (`arm_rebuild.py --keep-faces`). `pnpm
-  mesh-intake` checks each point of the intake table below with the limits of
-  `tools/blender/mesh_intake.py`, and gives the verdict `keep faces` or `needs rebuild`. The rig
-  fixes the meshes that exist.
+- **Intake spec.** A new mesh comes with its arms apart from the trunk and with clean quad rings,
+  as the table below gives, so that the rig keeps its faces and adds only the arm segments and the
+  weights.
 - **Triangle budget.** The budget of a studio body allows round forms, such as a round tube for
   each arm (`STUDIO_TRIANGLE_BUDGET`, `STUDIO_MESH_GZIP_BUDGET` of `tools/studio-budgets.ts`).
   The first download of 1 MB and the frame time of 9.7 stay the limits. The whole scene has no
@@ -285,23 +258,23 @@ traps of the rig.
   proportions of an adult of 1.8 m, and the preset `animal` the mean proportions of the wolf and
   the rabbit. A band and a front stripe on each limb show a twist. The palm and the back of the
   hand have two colors, and the two sides have two tints. Each joint has quad rings of 16
-  vertices. The species `mannequin` has the animal preset with its own faces as its body
-  (`arm_rebuild.py --keep-faces`), and no section casts it.
+  vertices. The species `mannequin` has the animal preset as its body, from a fixed rig file, and
+  no section casts it.
   The role tools test it with a recast role, such as `violinist@mannequin`. No piece casts it,
   so the app does not load it (7.2).
 
 | Intake point | Target | Reason |
 | --- | --- | --- |
-| Pose | An A-pose: each upper arm 30° to 45° below the horizontal (`POSE`). | A hanging arm and a raised arm then bend the shoulder about the same angle from the bind. |
-| Arm gap | A gap between each arm and the trunk: the arm is free of the trunk from a shoulder line before `FREE_ARM` of the upper arm, and the free arm stays `GAP` arm radii from the trunk and the legs. | An arm that touches the trunk needs a cut with a flat cap, and bone heat then spreads the arm weights into the trunk. Both give flaps at the armpit. |
-| Limb rings | Each arm and leg is a quad tube. Its rings have 16 vertices (at least `RING_VERTS`), stand at a right angle to the bone (`TILT`), and lie about 0.45 to 0.5 radii apart (at most `SPACING`). | Short arm segments keep each turn step small, and close rings keep the faces between them from a spiral fold. A ring of fewer vertices shows a flat side when the arm twists. |
-| Joint rings | At least 3 rings within one radius of each elbow and knee, and 2 of each wrist (`JOINT_RINGS`). | The helper bone of a joint spans these rings, so that the bend spreads over several faces. |
-| Color edges | Each color edge of the texture lies on a ring or another edge, and no arm face crosses one (`COLOR_FACES`). | Each face takes one color, so a face across a color edge gives a saw-tooth edge. |
-| Faces | At least `QUAD_SHARE` of the triangles in quads, and at most `STUDIO_TRIANGLE_BUDGET` triangles. | A triangle stops an edge ring. The budget keeps the download and the frame time. |
+| Pose | An A-pose: each upper arm 30° to 45° below the horizontal. | A hanging arm and a raised arm then bend the shoulder about the same angle from the bind. |
+| Arm gap | A gap between each arm and the trunk: the arm is free of the trunk from a shoulder line near the top of the upper arm, and the free arm stays clear of the trunk and the legs. | An arm that touches the trunk needs a cut with a flat cap, and bone heat then spreads the arm weights into the trunk. Both give flaps at the armpit. |
+| Limb rings | Each arm and leg is a quad tube. Its rings have 16 vertices, stand at a right angle to the bone, and lie about 0.45 to 0.5 radii apart. | Short arm segments keep each turn step small, and close rings keep the faces between them from a spiral fold. A ring of fewer vertices shows a flat side when the arm twists. |
+| Joint rings | At least 3 rings within one radius of each elbow and knee, and 2 of each wrist. | The helper bone of a joint spans these rings, so that the bend spreads over several faces. |
+| Color edges | Each color edge of the texture lies on a ring or another edge, and no arm face crosses one. | Each face takes one color, so a face across a color edge gives a saw-tooth edge. |
+| Faces | Most of the triangles in quads, and at most `STUDIO_TRIANGLE_BUDGET` triangles. | A triangle stops an edge ring. The budget keeps the download and the frame time. |
 
-The check reads the rings along each arm, and the rings across each knee. A GLB file holds only
-triangles. The glTF exporter writes the two triangles of a quad one after the other, so the check
-joins each such pair into a quad again.
+A GLB file holds only triangles. The glTF exporter writes the two triangles of a quad one after
+the other, so the simple route joins each such pair into a quad again (`join_quads()` of
+`simple_rig.py`).
 
 ### Rules of each body
 
@@ -320,8 +293,7 @@ the facts of its body in its `.blend` ("Hand rig").
 - It turns the animal to face -z and scales it. It drops the props and the clips of the GLB file,
   because the app keeps its own, and it joins the digits of a paw into one `fingers` bone.
 - It drops the eyes of the mesh, and puts the bead eyes of the app on eye bones of their own, so
-  that they blink. A body of `pnpm rig-mesh` puts each bead eye on the head surface under the
-  middle of its old eye. A hand rig gives its eyes with objects of its `.blend` ("Hand rig"). A
+  that they blink. A hand rig gives its eyes with objects of its `.blend` ("Hand rig"). A
   hand rig with no eye objects keeps the eyes of its mesh (`eyes` is `null`): each eye bone lies at
   the middle of the sphere that fits the eye faces of its side (`ownEyesOf()`), and the app adds no
   bead eyes. Such eyes follow the head bone. A lid on each eye blinks over them
@@ -354,46 +326,31 @@ the facts of its body in its `.blend` ("Hand rig").
   each other body. A longer leg raises the landmark, so the trunk, the head, and the arms keep
   their size in meters.
 
-### Mesh rig
+### Rig file
 
-`pnpm rig-mesh <animal>` rigs a source mesh with Blender: one mesh of faces with one color each,
-the skeleton of a studio body (`STUDIO_BONES`), a skin of up to four bones for each vertex,
-and up to `RAISE_LIMIT` corrective shapes. The config `tools/mesh-rigs/<animal>.json` gives the
-joints and the rules, each with a note. The rig file holds only the animal, so that other tools
-can read it, and a role-neutral body holds no prop of a role. The seat of the config goes into the
-extras of the asset as numbers ("Seat"), and only the preview images show a chair.
+The rig file `<s>.rig.glb` (`pnpm rig-export <s>`) holds one mesh of faces with one color each,
+the skeleton of a studio body (`STUDIO_BONES`), a skin of up to four bones for each vertex, and up
+to `RAISE_LIMIT` corrective shapes. The rig config of a chain
+(`tools/mesh-rigs/simple/<s>-tripo.json`) gives the joints and the rules, each with a note. The
+rig file holds only the animal, so that other tools can read it, and a role-neutral body holds no
+prop of a role. The seat of the config goes into the extras of the asset as numbers ("Seat"), and
+only the preview images show a chair.
 
 | Group | Config keys | Purpose |
 | --- | --- | --- |
-| Form | `armFactor`, `legFactor`, `shinFactor`, `headFactor`, `neckFactor`, `trunkFactor`, `trunkTop`, `girthFactor`, `girthProfile`, `armGirth`, `legGirth`, `proportions` | Change a part to a product choice or to the sheet. The head can keep its form. A long thigh can keep its width. A trunk can shorten only below the chest joint (`trunkTop`), so that the arm roots keep their form: the shoulders fold when the chest under them shortens. The trunk can change its width, its front, and its back by bands along its axis (`girthProfile`), so that the back on the chair keeps its place. The arms can become thinner across their axes (`armGirth`). The legs and the tail keep their places. |
-| Seat | `studio.legTurns`, `sit`, `studio.trunk`, `chair.front`, `crease` | Bind a seated role in its pose of 5.2, with the haunch on the seat. |
-| Weights | `weights.*`, `refine.rings`, `refine.pointFlip`, `heatSource`, `weightSource` | Bone heat, with rules and rings that keep the faces at the joints from a fold. A planar split of the faces takes the weights of the mesh before it. The trunk under a T-pose arm root keeps a trunk share of the painted weights (`weights.paintedBelow`), so that a raised arm does not pull the side out. That share also holds the front of the root with the chest, so a hanging arm leaves a dark notch there. A shape of the rest takes the front of the root along with the arm (`raise` with `follow`), and the play keeps the share. |
-| Shapes | `raise` | Give the source back in the standing pose, and relax the faces of a bent arm. |
-| Arms | `upperTwist`, `armSegments`, `studio.bindSupination`, `studio.bindArms`, `studio.straightArms`, `armSmooth` | Spread the roll of an arm along the arm, so the skin does not twist. |
-| Thumbs | `thumbs` | Give the free thumb of a fist its own bone. |
-| Splits | `weights.armSplit`, `weights.armFree`, `weights.armCrease`, `cut` | Free an arm that the mesh joins to the trunk, so a raised arm pulls no flap out. Free it only as far as a raised arm needs: a small clip is better than an over-cut. |
-| Normals | `cut.skinNormals`, `cut.bodyNormals`, `rootNormals` | Shade a bent arm root, elbow, wrist, or knee soft, with no dark slot. |
-| Colors | `colors.tone`, `colors.shift`, `colors.dark`, `colors.border`, `colors.split`, `colors.flank`, `colors.twoTone` | Move the face colors toward the reference, and keep the black borders clean. |
-| Face | `colors.patch`, `colors.smile`, `soften`, `eyeShell` | Give a happy face: round eye patches, a thin smile line, and no brow crease. |
-| Tail, ears, jaw | `studio.tailCurl`, `studio.tailBind`, `tailBall`, `sit.carryTail`, `sit.tailSpread`, `earFlap`, `noseFront`, `weights.jaw` | Lay a tail on the seat or the floor, move a tail ball down with the haunch, let a trunk or a hanging ear follow the head, and open a beak. |
+| Seat | `studio.legTurns`, `sit`, `studio.trunk`, `chair.front` | Bind a seated role in its pose of 5.2, with the haunch on the seat. |
+| Arms | `armSegments`, `studio.bindSupination`, `studio.bindArms`, `studio.straightArms` | Spread the roll of an arm along the arm, so the skin does not twist. |
+| Colors | `colors.tone`, `colors.dark` | Move the face colors toward the reference, and keep the black borders clean. |
+| Face | `eyeShell` | Give the bead eyes their shells. |
+| Tail | `studio.tailBind` | Lay a tail on the seat or the floor. |
 
 **Arms.** A hold with the elbow out and level rolls the upper arm far, and the linear blend at
-the shoulder then twists the skin and squeezes the arm flat. So a body takes a twist bone of each
-upper arm (`upperTwist`), or arm segments with a helper bone at the elbow and at the wrist
-(`armSegments`). The arms of a body with segments are quad tubes that a script of
-`tools/blender/` builds on the arms of the mesh. The bind paw sets the zero of the paw twist, so
+the shoulder then twists the skin and squeezes the arm flat. So a body takes arm segments with a
+helper bone at the elbow and at the wrist (`armSegments`). The bind paw sets the zero of the paw twist, so
 the rig turns it toward supination where a hold supinates far (`studio.bindSupination`).
 
-**Thumb of a fist.** A paw of a mesh can be one fist with a free thumb stub, as each deer paw
-is. Point edits that split the fist into digits would change the form, so such a paw keeps the one
-`fingers` bone, and only the thumb takes a bone of its own (`thumbs`, `THUMB_BONES`). The thumb
-is a child of the paw, because the thumb of a real hand starts at the wrist. The config
-lists the vertices of the free stub, chosen by hand. Each gives only its share of the paw to the
-thumb, and keeps its shares of the fingers and the wrist helper. Thus a pose with no thumb bend
-skins each vertex as before. The vertices around the root of the stub keep their rows, because
-each already has four bones. The pose bends the thumb by the bend of digit 1 of its paw
-(`AnimalPose.digits`) about its close axis (`StudioBody.thumbAxes`), which moves the tip across
-the palm, so the pose data has one format for claws and thumbs.
+**Thumb bones.** The format has a thumb bone for each paw (`THUMB_BONES`), with a close axis
+(`StudioBody.thumbAxes`). No body of the app uses them now.
 
 **Straight bind.** A bind that bends a thick elbow or paw (`studio.bindArms`) makes the rest shape
 a linear blend of that bend, with the skin on the inner side already pressed. Each pose then blends
@@ -409,8 +366,7 @@ whole bend then falls on the rings at the joint, and the inner skin folds. A fol
 elbow needs a turn ramp about as long as the elbow radius times the bend angle. The relax of a
 shape moves only the faces that turn over in the pose of its rule, so the fold can move to the
 next faces of the elbow ring. Thus a rule of a bent elbow can turn further than the mean turn of
-its folded samples (`--further` of `pnpm raise-fit`), so that its pose also turns over the next
-faces.
+its folded samples, so that its pose also turns over the next faces.
 
 **Role-neutral bind.** The target of each body is a bind that fits no single role: straight bind
 arms, and one bind supination of each paw for all roles. A bind bent for one hold gives a rest
@@ -432,14 +388,6 @@ first value: the body rigs it, and a probe of the new rig gives the change that 
 value of a side makes a clearance of the own role of the body grow in the concert, or dents its
 skin in the 2x crops, the own role wins, and the value of that side stays smaller: the concert
 plays the own role, and a recast role is only a test.
-
-The forearm segments share the bind supination, so the rest shape holds a twisted forearm. On a
-thick forearm, the edges of its thin faces then turn more than the crease angle, and a hold near
-the twist of the source shows a dark saw-tooth line under the wrist. So the forearm faces of such
-a body take the skin normals with no crease angle (`rootNormals.wrist`, from the elbow side of
-the forearm to the paw). A normal rule cannot change the form: on a thick forearm, the
-supination can dent the side of the forearm near the wrist, or push the forearm near the elbow
-deeper into an instrument.
 
 **Arm gate.** A fold count does not see a twisted or a flat arm. So `pnpm arm-check` reads all
 arm measures of each arm against one table of limits (`ARM_LIMITS`). A change of a pose, a hold,
@@ -508,17 +456,17 @@ body has few shapes (`RAISE_LIMIT`), so a shape goes to the recast holds with th
 
 A body can also come from a rig that a person or an agent makes by hand in Blender, saved as
 `assets/models/<s>/tripo-hand/<s>.blend`. `pnpm rig-export <s>` (`tools/blender/export_rig.py`,
-headless Blender) reads it and writes `<s>.rig.glb` in the format of "Mesh rig". Thus `pnpm studio-body`,
+headless Blender) reads it and writes `<s>.rig.glb` in the format of "Rig file". Thus `pnpm studio-body`,
 the app, and the gates (`arm-check`, `cast-matrix`, `pose-depth`, `close-views`) do not change.
-Reason: `pnpm rig-mesh` calculates each rig again from the source on each run, so a rule for one
-fault also moves vertices that the rule was not written for. A fix by hand is local, and it shows
-in Blender before the export. A pose in Blender skins from the T-pose and the app from the bind, so
+Reason: a rig that a program calculates again from the source on each run moves vertices that a
+rule was not written for. A fix by hand or by a point edit is local, and it shows in Blender
+before the export. A pose in Blender skins from the T-pose and the app from the bind, so
 `pnpm pose-preview` and `tools/blender/studio_preview.py` show the app pose of each moment on an
 export of the open `.blend`, with the bind as its rest.
 
 Eighteen species have the hand rig of a Tripo P2 mesh (`assets/models/<s>/tripo-hand/<s>.blend`).
-A chain of `tools/blender/hand/<s>/` makes each one (`pnpm hand-chain <s>`). Only the mannequin
-comes from `rig-mesh`. A long muzzle that lies as far from the head bone as from the ear bones
+A chain of `tools/blender/hand/<s>/` makes each one (`pnpm hand-chain <s>`). The mannequin keeps
+a fixed rig file. A long muzzle that lies as far from the head bone as from the ear bones
 takes face rows after the ear rows (`faceRows` of the params of the rhino): each other share of the
 muzzle goes to the head. Reason: bone heat gave the muzzle of the rhino shares of the ears, so the
 muzzle moved with the ears, and the export found no tip of the nose. In the arm rows of
@@ -550,7 +498,7 @@ In a rig made by hand, the mesh of the `.blend` is the source of truth, and no t
 again from the source file.
 `add_surface()` runs one time on that mesh: each face takes the color of the base color texture
 of the source (the GLB file, or the image file of an FBX source) through the UVs of the mesh, by
-the color rules of "Mesh rig" (`face_colors()`, `palette()`). The faces of the old eyes take the
+the color rules of "Rig file" (`face_colors()`, `palette()`). The faces of the old eyes take the
 fur color, and with `eye_fans=False` the mesh gets no gloss fan on them, because the eye objects
 or the eye faces give the eyes. Then a person edits the colors in Blender, and the export reads
 them only from the face attribute `color`. A hand rig can also show the color map of its source
@@ -572,8 +520,7 @@ and the width of the chair, are custom properties of the armature, so that each 
 place beside the rig that it fits. `ANIMALS` keeps only the settings of the app: the role, the
 constant, and the GLB file. A tool reads each value from the export
 (`<s>.rig.glb` or its summary `<s>.rig.json`), never from the rig config
-`tools/mesh-rigs/<s>.json`, which keeps the values of the old chain. `pnpm rig-mesh <s>` stops
-for a body with a `.blend` beside its GLB file (`handRigOf()` of `tools/glb-swap.ts`).
+of its chain.
 
 Each Tripo body of `tripo-hand/` comes from a script chain in
 `tools/blender/hand/<s>/`: `params.json` and `base-config.json` hold its values, `make_config.py`
@@ -669,7 +616,7 @@ The layout of the `.blend`:
   toward the ball, so the moving edge shows no gap.
 - **Shape keys.** `Basis` is the T-pose source. A key `bind*`, such as `bind_sit`, is a fix of the
   bind at the weight 1, such as the haunch on the seat or a crease. A key `arm_raise_<side>`, then
-  `arm_raise_<side>2`, is a corrective shape of "Mesh rig", at most `STUDIO_RAISES`, in the order
+  `arm_raise_<side>2`, is a corrective shape of "Rig file", at most `STUDIO_RAISES`, in the order
   of the keys. A rig that comes from a GLB file can also hold the pose of the sheet as the Action
   `reference`, and the four shapes of the source as drawn keys.
 
@@ -994,9 +941,8 @@ vertex that the edges join to the far ring of the turned band, and no vertex of 
 Reason: a cut by the place along the forearm also turned vertices of the slanted near ring, and
 they made fins and slits at the wrist. Past the far ring, the turned part changes from the form of
 the ring before the turn to its own turned form over `turnFit`. Reason: over a shorter fade, the
-turn of the right paw left a step on the edge of the forearm. An arm that the mesh
-joins to the trunk needs a cut,
-so such a mesh takes the mesh rig ("Mesh rig").
+turn of the right paw left a step on the edge of the forearm. The simple route takes no mesh whose arms join
+the trunk (the intake table of "Source meshes").
 
 ```text
 source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface())
@@ -1011,7 +957,7 @@ source (FBX with quads, or GLB) + base color  ->  weld, face colors (add_surface
   of the old body (`limbs`). Each factor is a plain stretch along the bone or the height.
 - **Rings.** A new ring halfway between two arm rings splits each edge of the quad edge ring
   between them at its middle (`rings.subdivide`), so that each roll segment has about two rings and
-  each elbow the rings of `JOINT_RINGS`. Reason: a plane cut goes through the faces at any angle
+  each elbow the joint rings of the intake table. Reason: a plane cut goes through the faces at any angle
   and leaves slivers, and a new ring on the quads follows them. An edge ring that holds a triangle
   or a pole takes no split.
 - **Roll split.** Each vertex keeps its weight on the roll segments of its arm part, and the
@@ -1263,11 +1209,6 @@ interface PlayerClip {
   (`PAWCHESTRA_CLIPS`, `scratch/clips/` by default), so `dist/` gets no Mixamo file (8.1).
   `pnpm clip-views` shows a clip from the four sides, and measures the floor depth and the depth
   of each arm part in the body.
-- **Models.** `pnpm mixamo-model` reads a Mixamo-rigged mesh, and writes the inputs of
-  `pnpm rig-mesh`: the mesh alone as the source, the joints and the palm of the config, and a
-  `paintedWeights` file from the skin. Mixamo has no twist bone, so the forearm weight moves to
-  the twist bone along the forearm (`TWIST_RAMP`). Mixamo has no ears and no tail, so the rigger
-  adds their joints. The rig then adds the eyes, the palms, and the seat.
 
 ## 4.5 Visual values
 
@@ -2251,7 +2192,7 @@ type BoneName =
   | 'slide';
 ```
 
-- **Studio bones.** A studio body has a skeleton of its own: the body bones of the mesh rig, two
+- **Studio bones.** A studio body has a skeleton of its own: the 30 body bones, two
   eye bones for the bead eyes (for the lids of a body with the eyes of its mesh), and the
   optional bones (`OPTIONAL_STUDIO_BONES`): a tail tip (`tail_tip`), the jaw of a beak (`jaw`),
   the arm segments and helpers (`ARM_SEGMENT_BONES`), the digits of a hand rig (`DIGIT_BONES`),

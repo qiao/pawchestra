@@ -201,13 +201,8 @@ Design 4.4 gives the rule and the reason of each config key.
 
 ### Weights, folds, and shapes
 
-- Bone heat gives the trunk side a part of a hanging arm. Keep the arm weights on the free arm
-  (`armSplit`, `armBelow`, `armCrease`).
 - A thin face with corners of different weights turns over at a bent joint, so `weights.rigid`
-  gives it the mean. The `sliver` rule can move a weight 4 cm: compare the weights with `main`.
-- A hanging T-pose arm folds the faces under its root. Make them and the first tube ring rigid
-  (`rigidPainted`), and join two rigid groups that touch. A rigid group at the front of a root or
-  across the chest, or a Smooth of the root weights, moves the fold to its edge as a dark notch.
+  gives it the mean.
 - Start `rows.control` near the bone heat clavicle share of the armpit (0.55 to 0.7), else the
   front folds in a reach. Give the arm shares of the back wall to the clavicle (`back_rows()`,
   badger), else a backward elbow folds it into a slit.
@@ -224,8 +219,7 @@ Design 4.4 gives the rule and the reason of each config key.
   on each side: a rise of 0.018 units sharpened the fox elbow.
 - Uneven shares around one forearm ring dent a bent elbow and shear the twisted faces into dark
   spikes. Measure them with `sa.ring_spread()`.
-- Blender weights on the trunk, the head, or the neck fold faces. Keep the rule weights there
-  (`paintedLower`).
+- Blender weights on the trunk, the head, or the neck fold faces. Keep the rule weights there.
 - A thigh share in the crotch lifts the lower belly band of a seated bind into a shelf. Move the
   band onto the thigh tops with a key `bind*`, and keep each crease vertex off the line of its
   neighbors. A lower thigh share only moves the shelf down, because the belly then hangs over the
@@ -253,17 +247,10 @@ Design 4.4 gives the merges of each copy.
 
 - Remove a closed tetrahedron or a vertex of two surfaces in a crease before the split. A
   collapse at a cut loop can give a face of a stray color (`spread`).
-- Free an arm (`cut`) only as far as a raised arm of the played roles needs it, and stop where the
-  root meets the trunk. End a cut above the shoulder joint, else a black triangle shows on the
-  back. Give the caps the skin normals, and check the flat rig view (front, below, back).
 - A flap, a shard, or a dent at a seam is often a source form that the hanging arm hid. Look at the
   sheets of `pnpm close-views audit`.
-- A free arm corner that turns away from a trunk hole leaves a notch beside the cap. Move it toward
-  the trunk with `weightMoves`, beyond the plane of `armSplit`.
-- After a cut, the inner root of a bow arm swings into the chest. Give the rule weights a chest
-  share (`weights.armRoot`), or turn the elbow out (design 5.3).
 - Split normals can make a dark slot at an arm root, an elbow, or a wrist. Render
-  `--probe colors,normals`, and try `rootNormals` before a rebuild.
+  `--probe colors,normals`.
 
 ### Legs, seat, and tail
 
@@ -271,7 +258,7 @@ Design 4.4 gives the merges of each copy.
   ("scales or shears"). Slope the thigh about 15° back (the rhino).
 - Put the hip joints of short thick legs in the haunch. Keep the shin to thigh ratio of the mesh,
   and fit the bench to the legs. A long thigh puts the feet forward: lengthen the shin
-  (`shinFactor`), and move `headFloor` and each lap share (`lap.along`) with the legs.
+  with a point edit, and move `headFloor` and each lap share (`lap.along`) with the legs.
 - The linear blend flattens a bent knee. Give the knees `bind.knee`.
 - A tail on the floor stays flat with rigid bone turns (`studio.tailBind`). A large tail needs two
   bones. A tip bone far off the curl of the mesh pinches the bend (`weights.tail.bend`). A tail
@@ -287,7 +274,7 @@ Design 4.4 gives the merges of each copy.
 - A closed beak cannot open by weights. Split a copy of the source.
 - A face takes black from a third of dark samples. Make the border faces light (`colors.border`).
 - An old eye that is a ball in a groove shows a light rim or a dark almond around the bead eye.
-  Fill it (`eyeFill`), or move the dome and groove vertices along the eye axis onto the face
+  Move the dome and groove vertices along the eye axis onto the face
   surface, and put the eye object on that surface. A ball with a painted eye
   stays (step 3 of "Steps of a hand rig").
 - The eye box and the nose box of `add_surface()` are in the units of the source. Run it before
