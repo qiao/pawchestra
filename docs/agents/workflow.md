@@ -202,10 +202,9 @@ These traps make a task of the main thread long:
 Write the images of a report into `reports/<date>-<topic>/` of your checkout. Git ignores this
 folder, and the manager reads the images there before the merge. `tools/merge-worktree.sh` copies
 the folder and `scratch/` into the main checkout before it removes the worktree. Commit no report
-image. The hook
-`tools/git-hooks/pre-commit` stops a commit that adds an image or a video outside the folders of
-the product images, such as `src/`, `public/`, and `docs/reference/`, because report images made
-most of the size of the git history.
+image. The hook `tools/git-hooks/pre-commit` stops a commit that adds an image or a video outside
+the folders of the product images, such as `src/`, `public/`, and `docs/reference/`, because
+report images made most of the size of the git history.
 
 ## Images of a mesh
 

@@ -13,23 +13,23 @@ model folder gives the files of each step.
 
 | Species | Body | Role |
 | --- | --- | --- |
-| bear | Hand rig at the eye height of the older bear, smaller paws, paws turned by whole ring steps. Stands on the podium. | `conductor` |
+| bear | Hand rig, smaller paws, paws turned by whole ring steps. Stands on the podium. | `conductor` |
 | polar-bear | Hand rig, a digit bone for each claw. Sits on a bench that fits the legs, with the thighs sloped down (`benchFitOf()`). | `pianist` |
-| rabbit | Hand rig of the fourth Tripo rabbit at the seated eye height of the third rabbit, arms of the girth of the third rabbit (`armGirth`), a smaller violin. | `violinist` |
-| fox-red | Hand rig at the eye height of the older fox, arms 1.25 times longer, a smaller fore paw, own joints for the legs and the right ear of a source that is no mirror. | `fox-violinist` |
+| rabbit | Hand rig of the fourth Tripo rabbit, thicker arms (`armGirth`), a smaller violin. | `violinist` |
+| fox-red | Hand rig, arms 1.25 times longer, a smaller fore paw, own joints for the legs and the right ear of a source that is no mirror. | `fox-violinist` |
 | fox-tan | The red fox rig with a tan palette (`palettes`). | `flutist` |
 | cat | Hand rig, a tail curled on the seat, a viola of `violaScale`. | `violist` |
 | dog | Hand rig of the beagle. | `cellist` |
 | panda | Hand rig, arms 1.2 times longer. Stands as a soloist. | `trombonist` |
 | hippo | Hand rig, arms 1.2 times longer. Stands at the contrabass. | `bassist` |
-| mouse | Hand rig at the eye height of the older mouse, a long tail on the floor, a smaller oboe. No chair: it stands on the legs of its source. | `oboist` |
+| mouse | Hand rig, a long tail on the floor, a smaller oboe. No chair: it stands on the legs of its source. | `oboist` |
 | elephant | Hand rig. Stands at the timpani. | `timpanist` |
 | beaver | Hand rig. No chair: it stands on its short legs. | `bassoonist` |
 | pig | Hand rig. Stands as a soloist. | `hornist` |
 | wolf | Hand rig. | `clarinetist`, `violinist@wolf` (recast) |
-| badger | Hand rig at the crown of the older badger, arms 1.2 times longer, a left eyeball fused to its socket (`fused_ball()`), a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
-| monkey | Hand rig at 1.2 times H of the older monkey, no chair, a smaller trumpet (`trumpetScale`). | `trumpeter` |
-| rhino | Hand rig at the standing eye height of the older rhino, arms 1.2 times longer, the left paw turned by 5 ring steps, face rows on the long muzzle (`faceRows`). Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
+| badger | Hand rig, arms 1.2 times longer, a left eyeball fused to its socket (`fused_ball()`), a suspended cymbal (`cymbalForm`). Stands at each percussion instrument. | `bass-drummer`, `snare-drummer`, `cymbalist`, `percussionist`, `xylophonist` |
+| monkey | Hand rig, no chair, a smaller trumpet (`trumpetScale`). | `trumpeter` |
+| rhino | Hand rig, arms 1.2 times longer, the left paw turned by 5 ring steps, face rows on the long muzzle (`faceRows`). Stands at a tuba with a longer lead pipe (`tubaPipe`). | `tubist` |
 | deer | Hand rig of the fawn, arms 1.5 times longer. Sits on the harp stool, with the harp of 0.975 (`harpScale`) in front of the chest. | `harpist` |
 | penguin | Hand rig. Stands on its riser. | `singer` |
 | mannequin | The test body: the animal preset of `mannequin.py`, its own faces (`arm_rebuild.py --keep-faces`). | `violinist@mannequin`, `clarinetist@mannequin` (recast) |
@@ -316,8 +316,7 @@ Design 4.4 gives the merges of each copy.
   root can set the seat top: fix it with `sit.top` and `sit.root`.
 - A girth move that ends at a joint leaves a ledge in the seated bind. Relax the posed bind there
   in a few plain Laplacian rounds, into the sit key by the inverse skin. Taubin keeps the ledge.
-  A standing body gets the source back from `legs_straight`: use `smooth` boxes (the old rhino
-  of `8e42c4eaa`).
+  A standing body gets the source back from `legs_straight`: use `smooth` boxes.
 
 ### Head and colors
 
